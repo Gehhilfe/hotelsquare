@@ -1,8 +1,3 @@
-'use strict';
-
-/**
- * Created by gehhi on 29.04.2017.
- */
 
 require('../models/User');
 
