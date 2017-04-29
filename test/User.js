@@ -11,6 +11,8 @@ describe('user', function() {
     var validUser;
 
     beforeEach(function(done) {
+        mongoose.Promise = global.Promise;
+        
         validUser = new User({
             name: 'Test',
             email: 'test@test.de',
@@ -18,7 +20,6 @@ describe('user', function() {
         });
 
         if (mongoose.connection.db) return done();
-        mongoose.promise = global.promise;
         mongoose.connect('mongodb://' + config.get('db.host') + '/' + config.get('db.name')).then(() => User.remove({}, done));
     });
 
