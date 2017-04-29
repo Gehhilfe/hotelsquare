@@ -1,6 +1,6 @@
 {
   "db": {
-    "host": "mongodb",
+    "host": "mongo",
     "name": "test"
   }
 }
