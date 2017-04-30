@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/models/User.js" line="7" />
+    <bookmark url="file://$PROJECT_DIR$/models/User.js" line="9" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="93b36571-be53-4b2b-9d8e-769f44323dec" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/Util.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/development.json" afterPath="$PROJECT_DIR$/config/development.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/User.js" afterPath="$PROJECT_DIR$/models/User.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/User.js" afterPath="$PROJECT_DIR$/test/User.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -27,10 +27,11 @@
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="306">
-              <caret line="18" column="19" lean-forward="false" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
+              <caret line="19" column="19" lean-forward="false" selection-start-line="19" selection-start-column="19" selection-end-line="19" selection-end-column="19" />
               <folding>
-                <marker date="1493530465500" expanded="true" signature="79:104" ph="{&quot;test&quot;: &quot;mocha test&quot;...}" />
-                <marker date="1493530465500" expanded="true" signature="380:458" ph="{&quot;chai&quot;: &quot;^3.5.0&quot;...}" />
+                <marker date="1493573169419" expanded="true" signature="79:104" ph="{&quot;test&quot;: &quot;mocha test&quot;...}" />
+                <marker date="1493573169419" expanded="true" signature="173:326" ph="{&quot;config&quot;: &quot;^1.25.1&quot;...}" />
+                <marker date="1493573169419" expanded="true" signature="404:482" ph="{&quot;chai&quot;: &quot;^3.5.0&quot;...}" />
               </folding>
             </state>
           </provider>
@@ -59,8 +60,8 @@
       <file leaf-file-name="User.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models/User.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="15" column="101" lean-forward="false" selection-start-line="15" selection-start-column="101" selection-end-line="15" selection-end-column="101" />
+            <state relative-caret-position="442">
+              <caret line="26" column="22" lean-forward="true" selection-start-line="26" selection-start-column="22" selection-end-line="26" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -69,8 +70,30 @@
       <file leaf-file-name="User.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/User.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="506">
-              <caret line="41" column="43" lean-forward="true" selection-start-line="41" selection-start-column="43" selection-end-line="41" selection-end-column="43" />
+            <state relative-caret-position="625">
+              <caret line="86" column="17" lean-forward="false" selection-start-line="86" selection-start-column="17" selection-end-line="86" selection-end-column="17" />
+              <folding>
+                <element signature="e#734#1668#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="model.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node_modules/mongoose/lib/model.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="425">
+              <caret line="3730" column="14" lean-forward="false" selection-start-line="3730" selection-start-column="14" selection-end-line="3730" selection-end-column="14" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="applyHooks.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node_modules/mongoose/lib/services/model/applyHooks.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="248">
+              <caret line="145" column="18" lean-forward="false" selection-start-line="145" selection-start-column="18" selection-end-line="145" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -80,7 +103,7 @@
         <entry file="file://$PROJECT_DIR$/lib/Util.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="68">
-              <caret line="4" column="2" lean-forward="true" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="2" />
+              <caret line="4" column="2" lean-forward="false" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="2" />
               <folding />
             </state>
           </provider>
@@ -131,8 +154,8 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/config/development.json" />
         <option value="$PROJECT_DIR$/lib/Util.js" />
-        <option value="$PROJECT_DIR$/models/User.js" />
         <option value="$PROJECT_DIR$/test/User.js" />
+        <option value="$PROJECT_DIR$/models/User.js" />
       </list>
     </option>
   </component>
@@ -174,8 +197,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -246,6 +267,8 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -257,123 +280,6 @@
     <property name="nodejs.mocha.mocha_node_package_dir" value="C:\Users\gehhi\WebstormProjects\ip-backend\node_modules\mocha" />
     <property name="settings.editor.selected.configurable" value="watcher.settings" />
     <property name="javascript.nodejs.core.library.configured.version" value="6.10.2" />
-  </component>
-  <component name="RestoreUpdateTree" date="Moments ago" ActionInfo="_Update">
-    <UpdatedFiles>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Updated from server" />
-        <option name="myStatusName" value="Changed on server" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="CHANGED_ON_SERVER" />
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Updated" />
-          <option name="myStatusName" value="Changed" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="UPDATED" />
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/.gitlab-ci.yml</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/config/development.json</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/models/User.js</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/package.json</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/test/User.js</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/test/string.js</PATH>
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Created" />
-          <option name="myStatusName" value="Created" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="CREATED" />
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/.eslintrc.yml</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/config/test.json</PATH>
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Deleted" />
-          <option name="myStatusName" value="Deleted" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="true" />
-          <option name="myId" value="REMOVED_FROM_REPOSITORY" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Restored" />
-          <option name="myStatusName" value="Will be restored" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="RESTORED" />
-        </FILE-GROUP>
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Modified" />
-        <option name="myStatusName" value="Modified" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MODIFIED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Skipped" />
-        <option name="myStatusName" value="Skipped" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="SKIPPED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged with conflicts" />
-        <option name="myStatusName" value="Will be merged with conflicts" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED_WITH_CONFLICTS" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged with tree conflicts" />
-        <option name="myStatusName" value="Merged with tree conflicts" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged with property conflicts" />
-        <option name="myStatusName" value="Will be merged with property conflicts" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged" />
-        <option name="myStatusName" value="Will be merged" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Not in repository" />
-        <option name="myStatusName" value="Not in repository" />
-        <option name="mySupportsDeletion" value="true" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="UNKNOWN" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Locally added" />
-        <option name="myStatusName" value="Locally added" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="LOCALLY_ADDED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Locally removed" />
-        <option name="myStatusName" value="Locally removed" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="LOCALLY_REMOVED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Switched" />
-        <option name="myStatusName" value="Switched" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="SWITCHED" />
-      </FILE-GROUP>
-    </UpdatedFiles>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -387,57 +293,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Mocha.user.can be saved">
-    <configuration default="false" name="user.name.cant be empty" type="mocha-javascript-test-runner" factoryName="Mocha" temporary="true" nameIsGenerated="true">
-      <node-interpreter>project</node-interpreter>
-      <node-options />
-      <working-directory>$PROJECT_DIR$</working-directory>
-      <pass-parent-env>true</pass-parent-env>
-      <envs />
-      <ui>bdd</ui>
-      <extra-mocha-options />
-      <test-kind>TEST</test-kind>
-      <test-file>$PROJECT_DIR$/test/User.js</test-file>
-      <test-names>
-        <name value="user" />
-        <name value="name" />
-        <name value="cant be empty" />
-      </test-names>
-      <method />
-    </configuration>
-    <configuration default="false" name="user.name" type="mocha-javascript-test-runner" factoryName="Mocha" temporary="true" nameIsGenerated="true">
-      <node-interpreter>project</node-interpreter>
-      <node-options />
-      <working-directory>$PROJECT_DIR$</working-directory>
-      <pass-parent-env>true</pass-parent-env>
-      <envs />
-      <ui>bdd</ui>
-      <extra-mocha-options />
-      <test-kind>SUITE</test-kind>
-      <test-file>$PROJECT_DIR$/test/User.js</test-file>
-      <test-names>
-        <name value="user" />
-        <name value="name" />
-      </test-names>
-      <method />
-    </configuration>
-    <configuration default="false" name="user.email.cant be empty" type="mocha-javascript-test-runner" factoryName="Mocha" temporary="true" nameIsGenerated="true">
-      <node-interpreter>project</node-interpreter>
-      <node-options />
-      <working-directory>$PROJECT_DIR$</working-directory>
-      <pass-parent-env>true</pass-parent-env>
-      <envs />
-      <ui>bdd</ui>
-      <extra-mocha-options />
-      <test-kind>TEST</test-kind>
-      <test-file>$PROJECT_DIR$/test/User.js</test-file>
-      <test-names>
-        <name value="user" />
-        <name value="email" />
-        <name value="cant be empty" />
-      </test-names>
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Mocha.user">
     <configuration default="false" name="user.can be saved" type="mocha-javascript-test-runner" factoryName="Mocha" temporary="true" nameIsGenerated="true">
       <node-interpreter>project</node-interpreter>
       <node-options />
@@ -466,6 +322,56 @@
       <test-file>$PROJECT_DIR$/test/User.js</test-file>
       <test-names>
         <name value="user" />
+      </test-names>
+      <method />
+    </configuration>
+    <configuration default="false" name="user.password" type="mocha-javascript-test-runner" factoryName="Mocha" temporary="true" nameIsGenerated="true">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <working-directory>$PROJECT_DIR$</working-directory>
+      <pass-parent-env>true</pass-parent-env>
+      <envs />
+      <ui>bdd</ui>
+      <extra-mocha-options />
+      <test-kind>SUITE</test-kind>
+      <test-file>$PROJECT_DIR$/test/User.js</test-file>
+      <test-names>
+        <name value="user" />
+        <name value="password" />
+      </test-names>
+      <method />
+    </configuration>
+    <configuration default="false" name="user.password.should be hashed when saved" type="mocha-javascript-test-runner" factoryName="Mocha" temporary="true" nameIsGenerated="true">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <working-directory>$PROJECT_DIR$</working-directory>
+      <pass-parent-env>true</pass-parent-env>
+      <envs />
+      <ui>bdd</ui>
+      <extra-mocha-options />
+      <test-kind>TEST</test-kind>
+      <test-file>$PROJECT_DIR$/test/User.js</test-file>
+      <test-names>
+        <name value="user" />
+        <name value="password" />
+        <name value="should be hashed when saved" />
+      </test-names>
+      <method />
+    </configuration>
+    <configuration default="false" name="user.email.must be a valid email" type="mocha-javascript-test-runner" factoryName="Mocha" temporary="true" nameIsGenerated="true">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <working-directory>$PROJECT_DIR$</working-directory>
+      <pass-parent-env>true</pass-parent-env>
+      <envs />
+      <ui>bdd</ui>
+      <extra-mocha-options />
+      <test-kind>TEST</test-kind>
+      <test-file>$PROJECT_DIR$/test/User.js</test-file>
+      <test-names>
+        <name value="user" />
+        <name value="email" />
+        <name value="must be a valid email" />
       </test-names>
       <method />
     </configuration>
@@ -570,19 +476,19 @@
     </configuration>
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="npm.Test" />
-      <item index="1" class="java.lang.String" itemvalue="Mocha.user.name.cant be empty" />
-      <item index="2" class="java.lang.String" itemvalue="Mocha.user.name" />
-      <item index="3" class="java.lang.String" itemvalue="Mocha.user.email.cant be empty" />
-      <item index="4" class="java.lang.String" itemvalue="Mocha.user.can be saved" />
-      <item index="5" class="java.lang.String" itemvalue="Mocha.user" />
+      <item index="1" class="java.lang.String" itemvalue="Mocha.user.can be saved" />
+      <item index="2" class="java.lang.String" itemvalue="Mocha.user" />
+      <item index="3" class="java.lang.String" itemvalue="Mocha.user.password" />
+      <item index="4" class="java.lang.String" itemvalue="Mocha.user.password.should be hashed when saved" />
+      <item index="5" class="java.lang.String" itemvalue="Mocha.user.email.must be a valid email" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Mocha.user.can be saved" />
-        <item index="1" class="java.lang.String" itemvalue="Mocha.user" />
-        <item index="2" class="java.lang.String" itemvalue="Mocha.user.email.cant be empty" />
-        <item index="3" class="java.lang.String" itemvalue="Mocha.user.name" />
-        <item index="4" class="java.lang.String" itemvalue="Mocha.user.name.cant be empty" />
+        <item index="0" class="java.lang.String" itemvalue="Mocha.user" />
+        <item index="1" class="java.lang.String" itemvalue="Mocha.user.password.should be hashed when saved" />
+        <item index="2" class="java.lang.String" itemvalue="Mocha.user.password" />
+        <item index="3" class="java.lang.String" itemvalue="Mocha.user.email.must be a valid email" />
+        <item index="4" class="java.lang.String" itemvalue="Mocha.user.can be saved" />
       </list>
     </recent_temporary>
   </component>
@@ -598,7 +504,8 @@
       <updated>1493470117179</updated>
       <workItem from="1493470118889" duration="357000" />
       <workItem from="1493471820969" duration="3635000" />
-      <workItem from="1493530442282" duration="3460000" />
+      <workItem from="1493530442282" duration="3835000" />
+      <workItem from="1493572765289" duration="1469000" />
     </task>
     <task id="LOCAL-00001" summary="Add User model and test in javascript">
       <created>1493474990224</created>
@@ -611,39 +518,39 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="user - 2017.04.30 at 09h 05m 11s.xml">
+    <history-entry file="user - 2017.04.30 at 19h 30m 33s.xml">
       <configuration name="user" configurationId="mocha-javascript-test-runner" />
     </history-entry>
-    <history-entry file="user - 2017.04.30 at 09h 06m 18s.xml">
+    <history-entry file="user - 2017.04.30 at 19h 33m 21s.xml">
       <configuration name="user" configurationId="mocha-javascript-test-runner" />
     </history-entry>
-    <history-entry file="user - 2017.04.30 at 09h 06m 29s.xml">
-      <configuration name="user" configurationId="mocha-javascript-test-runner" />
+    <history-entry file="user_email_must_be_a_valid_email - 2017.04.30 at 19h 30m 29s.xml">
+      <configuration name="user.email.must be a valid email" configurationId="mocha-javascript-test-runner" />
     </history-entry>
-    <history-entry file="user - 2017.04.30 at 09h 07m 31s.xml">
-      <configuration name="user" configurationId="mocha-javascript-test-runner" />
+    <history-entry file="user_password - 2017.04.30 at 19h 30m 16s.xml">
+      <configuration name="user.password" configurationId="mocha-javascript-test-runner" />
     </history-entry>
-    <history-entry file="user - 2017.04.30 at 09h 08m 04s.xml">
-      <configuration name="user" configurationId="mocha-javascript-test-runner" />
+    <history-entry file="user_password - 2017.04.30 at 19h 32m 01s.xml">
+      <configuration name="user.password" configurationId="mocha-javascript-test-runner" />
     </history-entry>
-    <history-entry file="user_can_be_saved - 2017.04.30 at 09h 05m 09s.xml">
-      <configuration name="user.can be saved" configurationId="mocha-javascript-test-runner" />
+    <history-entry file="user_password_should_be_hashed_when_saved - 2017.04.30 at 19h 28m 56s.xml">
+      <configuration name="user.password.should be hashed when saved" configurationId="mocha-javascript-test-runner" />
     </history-entry>
-    <history-entry file="user_can_be_saved - 2017.04.30 at 09h 08m 53s.xml">
-      <configuration name="user.can be saved" configurationId="mocha-javascript-test-runner" />
+    <history-entry file="user_password_should_be_hashed_when_saved - 2017.04.30 at 19h 29m 38s.xml">
+      <configuration name="user.password.should be hashed when saved" configurationId="mocha-javascript-test-runner" />
     </history-entry>
-    <history-entry file="user_email_cant_be_empty - 2017.04.30 at 09h 03m 46s.xml">
-      <configuration name="user.email.cant be empty" configurationId="mocha-javascript-test-runner" />
+    <history-entry file="user_password_should_be_hashed_when_saved - 2017.04.30 at 19h 30m 13s.xml">
+      <configuration name="user.password.should be hashed when saved" configurationId="mocha-javascript-test-runner" />
     </history-entry>
-    <history-entry file="user_name - 2017.04.30 at 08h 54m 21s.xml">
-      <configuration name="user.name" configurationId="mocha-javascript-test-runner" />
+    <history-entry file="user_password_should_be_hashed_when_saved - 2017.04.30 at 19h 33m 05s.xml">
+      <configuration name="user.password.should be hashed when saved" configurationId="mocha-javascript-test-runner" />
     </history-entry>
-    <history-entry file="user_name_cant_be_empty - 2017.04.30 at 08h 54m 19s.xml">
-      <configuration name="user.name.cant be empty" configurationId="mocha-javascript-test-runner" />
+    <history-entry file="user_password_should_be_hashed_when_saved - 2017.04.30 at 19h 33m 13s.xml">
+      <configuration name="user.password.should be hashed when saved" configurationId="mocha-javascript-test-runner" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7452000" />
+    <option name="totallyTimeSpent" value="9296000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -656,18 +563,17 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13632782" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969603" sideWeight="0.49842396" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3998441" sideWeight="0.51891255" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969603" sideWeight="0.4968479" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32969603" sideWeight="0.5110323" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969603" sideWeight="0.49527186" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22837101" sideWeight="0.47951144" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22837101" sideWeight="0.47320724" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24980299" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969603" sideWeight="0.49054372" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32969603" sideWeight="0.4889677" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3998441" sideWeight="0.48108748" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3998441" sideWeight="0.47635934" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32969603" sideWeight="0.49842396" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -690,15 +596,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/test/User.js</url>
-          <line>32</line>
-          <properties />
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="18" />
+      <option name="time" value="23" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -708,8 +606,79 @@
         <state relative-caret-position="306">
           <caret line="18" column="19" lean-forward="false" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
           <folding>
-            <marker date="1493530465500" expanded="true" signature="79:104" ph="{&quot;test&quot;: &quot;mocha test&quot;...}" />
-            <marker date="1493530465500" expanded="true" signature="380:458" ph="{&quot;chai&quot;: &quot;^3.5.0&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="79:104" ph="{&quot;test&quot;: &quot;mocha test&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="173:326" ph="{&quot;config&quot;: &quot;^1.25.1&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="404:482" ph="{&quot;chai&quot;: &quot;^3.5.0&quot;...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/development.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="22" lean-forward="false" selection-start-line="2" selection-start-column="22" selection-end-line="2" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/string.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="3" lean-forward="false" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/User.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="15" column="101" lean-forward="false" selection-start-line="15" selection-start-column="101" selection-end-line="15" selection-end-column="101" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/Util.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="2" lean-forward="false" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/test.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="18" lean-forward="false" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitlab-ci.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="28" column="41" lean-forward="false" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/User.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="18" lean-forward="true" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
+          <folding>
+            <element signature="e#734#1668#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="18" column="19" lean-forward="false" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
+          <folding>
+            <marker date="1493573169419" expanded="true" signature="79:104" ph="{&quot;test&quot;: &quot;mocha test&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="173:326" ph="{&quot;config&quot;: &quot;^1.25.1&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="404:482" ph="{&quot;chai&quot;: &quot;^3.5.0&quot;...}" />
           </folding>
         </state>
       </provider>
@@ -750,7 +719,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
           <caret line="21" column="3" lean-forward="true" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
-          <folding />
+          <folding>
+            <element signature="e#734#1668#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -759,8 +730,9 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1493530465500" expanded="true" signature="79:104" ph="{&quot;test&quot;: &quot;mocha test&quot;...}" />
-            <marker date="1493530465500" expanded="true" signature="380:458" ph="{&quot;chai&quot;: &quot;^3.5.0&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="79:104" ph="{&quot;test&quot;: &quot;mocha test&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="173:326" ph="{&quot;config&quot;: &quot;^1.25.1&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="404:482" ph="{&quot;chai&quot;: &quot;^3.5.0&quot;...}" />
           </folding>
         </state>
       </provider>
@@ -815,10 +787,11 @@
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
-          <caret line="18" column="19" lean-forward="false" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
+          <caret line="19" column="19" lean-forward="false" selection-start-line="19" selection-start-column="19" selection-end-line="19" selection-end-column="19" />
           <folding>
-            <marker date="1493530465500" expanded="true" signature="79:104" ph="{&quot;test&quot;: &quot;mocha test&quot;...}" />
-            <marker date="1493530465500" expanded="true" signature="380:458" ph="{&quot;chai&quot;: &quot;^3.5.0&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="79:104" ph="{&quot;test&quot;: &quot;mocha test&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="173:326" ph="{&quot;config&quot;: &quot;^1.25.1&quot;...}" />
+            <marker date="1493573169419" expanded="true" signature="404:482" ph="{&quot;chai&quot;: &quot;^3.5.0&quot;...}" />
           </folding>
         </state>
       </provider>
@@ -834,7 +807,7 @@
     <entry file="file://$PROJECT_DIR$/lib/Util.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
-          <caret line="4" column="2" lean-forward="true" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="2" />
+          <caret line="4" column="2" lean-forward="false" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="2" />
           <folding />
         </state>
       </provider>
@@ -855,19 +828,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/mongoose/lib/model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="3730" column="14" lean-forward="false" selection-start-line="3730" selection-start-column="14" selection-end-line="3730" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/mongoose/lib/services/model/applyHooks.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="248">
+          <caret line="145" column="18" lean-forward="false" selection-start-line="145" selection-start-column="18" selection-end-line="145" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/models/User.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="101" lean-forward="false" selection-start-line="15" selection-start-column="101" selection-end-line="15" selection-end-column="101" />
+        <state relative-caret-position="442">
+          <caret line="26" column="22" lean-forward="true" selection-start-line="26" selection-start-column="22" selection-end-line="26" selection-end-column="22" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/User.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="41" column="43" lean-forward="true" selection-start-line="41" selection-start-column="43" selection-end-line="41" selection-end-column="43" />
-          <folding />
+        <state relative-caret-position="625">
+          <caret line="86" column="17" lean-forward="false" selection-start-line="86" selection-start-column="17" selection-end-line="86" selection-end-column="17" />
+          <folding>
+            <element signature="e#734#1668#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>

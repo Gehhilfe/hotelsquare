@@ -2,7 +2,6 @@ require('../models/User');
 
 const mongoose = require('mongoose');
 const expect = require('chai').expect;
-const config = require('config');
 const Util = require('../lib/Util');
 const User = mongoose.model('User');
 
@@ -25,11 +24,7 @@ describe('user', function() {
     });
 
     it('can be saved', function(done) {
-        var u = new User({
-            name: 'Test',
-            email: 'test@test.de',
-            password: 'password'
-        });
+        var u = new User(validUser);
         u.save(done);
     });
 
@@ -88,8 +83,18 @@ describe('user', function() {
                 var u = new User(validUser);
                 u.validate(function(err) {
                     expect(err).to.be.null;
-                    done();
+                    return done();
                 });
+            });
+        });
+    });
+
+    describe('password', function () {
+        it('should be hashed when saved', function(done) {
+            var u = new User(validUser);
+            u.save(function() {
+                expect(u.password).to.be.not.equal(validUser.password);
+                return done();
             });
         });
     });

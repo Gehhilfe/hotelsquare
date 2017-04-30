@@ -9,6 +9,7 @@
     "node": ">= 5.12.0"
   },
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "config": "^1.25.1",
     "mongodb": "~2.2.26",
     "mongoose": "~4.9.6",
