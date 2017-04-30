@@ -7,9 +7,14 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        minlength: 4
     },
-    email: String,
+    email: {
+        type: String,
+        required: true,
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+    },
     hashed_password: String
 });
 
