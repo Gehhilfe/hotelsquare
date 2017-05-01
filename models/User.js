@@ -26,7 +26,7 @@ const UserSchema = new Schema({
         validate: {
             validator: function (v) {
                 var user = this;
-                if(!user.isModified('password'))
+                if (!user.isModified('password'))
                     return true;
                 return v.length >= 6;
             }
@@ -56,17 +56,17 @@ UserSchema.pre('save', function (next) {
 UserSchema.statics.login = function (name, password) {
     var User = this;
     return new Promise(function (resolve, reject) {
-        User.findOne({name: name}).then(function (res){
-             var foundUser = res;
-             if(res === null)
-                 return reject();
-             return foundUser.comparePassword(password).then(function(res) {
-                 if(res)
-                     return resolve(foundUser);
-                 else
-                     return reject();
-             }, reject);
-         }, reject);
+        User.findOne({name: name}).then(function (res) {
+            var foundUser = res;
+            if (res === null)
+                return reject();
+            return foundUser.comparePassword(password).then(function (res) {
+                if (res)
+                    return resolve(foundUser);
+                else
+                    return reject();
+            }, reject);
+        }, reject);
     });
 };
 
