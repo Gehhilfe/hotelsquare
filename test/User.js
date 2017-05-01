@@ -24,7 +24,7 @@ describe('user', function () {
         });
 
         if (mongoose.connection.db) return done();
-        mongoose.connect(Util.databaseURI()).then(function () {
+        Util.connectDatabase(mongoose).then(function () {
             User.remove({}, done);
         });
     });
