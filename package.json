@@ -15,7 +15,8 @@
     "mongodb": "~2.2.26",
     "mongoose": "~4.9.6",
     "redis": "~2.7.1",
-    "restify": "~4.3.0"
+    "restify": "~4.3.0",
+    "uuid": "^3.0.1"
   },
   "author": "",
   "license": "MIT",
