@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "lint": "eslint ./**/*.js",
-    "test": "mocha test"
+    "test": "mocha test",
+    "coverage": " ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
   },
   "engines": {
     "node": ">= 5.12.0"
@@ -21,9 +22,10 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
     "eslint": "^3.19.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
-    "sinon": "^2.1.0",
-    "chai-as-promised": "^6.0.0"
+    "sinon": "^2.1.0"
   }
 }
