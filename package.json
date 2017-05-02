@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "lint": "eslint ./**/*.js",
-    "test": "mocha test",
+    "test": "mocha test test test/api",
     "coverage": " ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
   },
   "engines": {
@@ -13,6 +13,7 @@
   "dependencies": {
     "bcrypt": "^1.0.2",
     "config": "^1.25.1",
+    "jsonwebtoken": "^7.4.0",
     "mongodb": "~2.2.26",
     "mongoose": "~4.9.6",
     "redis": "~2.7.1",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
+    "chai-http": "^3.0.0",
     "eslint": "^3.19.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
