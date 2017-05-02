@@ -22,6 +22,9 @@ test:
    - export NODE_ENV=test
    - npm install
    - npm run coverage
+  artifacts:
+    paths:
+     - coverage
    
 lint:
   script:

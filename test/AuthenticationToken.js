@@ -1,5 +1,5 @@
-require('../models/User');
-require('../models/AuthenticationToken');
+require('../app/models/user');
+require('../app/models/AuthenticationToken');
 
 const mongoose = require('mongoose');
 const chai = require('chai');
@@ -7,7 +7,7 @@ const expect = chai.expect;
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
-const Util = require('../lib/Util');
+const Util = require('../lib/util');
 const User = mongoose.model('User');
 const AuthToken = mongoose.model('AuthenticationToken');
 

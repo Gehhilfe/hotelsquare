@@ -1,4 +1,4 @@
-require('../models/User');
+require('../app/models/user');
 
 const mongoose = require('mongoose');
 const chai = require('chai');
@@ -6,7 +6,7 @@ const expect = chai.expect;
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
-const Util = require('../lib/Util');
+const Util = require('../lib/util');
 const User = mongoose.model('User');
 
 describe('user', function () {
@@ -138,6 +138,11 @@ describe('user', function () {
                     return done();
                 });
             });
+        });
+
+        it('should not be converted into json', function () {
+            var u = new User(validUser);
+            expect(u.toJSON().password).to.be.undefined;
         });
     });
 

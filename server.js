@@ -1,13 +1,21 @@
-var restify = require('restify');
+'use strict';
 
-function respond(req, res, next) {
-  res.send('hello ' + req.params.name);
-}
+const restify = require('restify');
+const session = require('./app/routes/session');
+const util = require('./lib/util');
+const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 
 var server = restify.createServer();
-server.get('/hello/:name', respond);
-server.head('/hello/:name', respond);
+
+util.connectDatabase(mongoose);
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+server.use(restify.bodyParser({ mapParams: true }));
+server.post('/session', session.postSession);
 
 server.listen(8080, function() {
   console.log('%s listening at %s', server.name, server.url);
 });
+
+module.exports = server;
