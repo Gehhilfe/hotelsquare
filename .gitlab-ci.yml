@@ -23,7 +23,9 @@ test:
    - npm install
    - npm run coverage
   artifacts:
-   - coverage
+    untracked: true
+    paths:
+     - coverage
    
 lint:
   script:
