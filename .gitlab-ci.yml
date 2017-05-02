@@ -23,7 +23,6 @@ test:
    - npm install
    - npm run coverage
   artifacts:
-    untracked: true
     paths:
      - coverage
    
