@@ -17,7 +17,7 @@ const User = mongoose.model('User');
  */
 function postSession(req, res, next) {
     User.login(req.body).then((u) => {
-        var token = jwt.sign(u.toJSON(), config.jwt.secret);
+        var token = jwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
         res.json({token: token});
         return next();
     }, () => {

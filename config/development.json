@@ -4,6 +4,9 @@
     "name": "dev"
   },
   "jwt": {
-    "secret": "secret"
+    "secret": "secret",
+    "options": {
+      "algorithm": "HS256"
+    }
   }
 }

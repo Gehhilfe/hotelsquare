@@ -45,7 +45,7 @@ describe('Session', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
-                    jwt.verify(res.body.token, config.jwt.secret, (err, decoded) => {
+                    jwt.verify(res.body.token, config.jwt.secret, config.jwt.options, (err, decoded) => {
                         expect(decoded.name).to.be.equal(loginDetails.name);
                     });
                     return done();
