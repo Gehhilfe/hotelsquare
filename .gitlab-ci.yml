@@ -30,4 +30,4 @@ lint:
   script:
    - export NODE_ENV=test
    - npm install
-   - ./node_modules/.bin/eslint ./**/*.js
+   - npm run lint
