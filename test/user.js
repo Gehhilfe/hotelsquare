@@ -1,12 +1,12 @@
 const mock = require('mock-require');
 const bcrypt = require('bcrypt');
 
-var failBcrypt = false;
+let failBcrypt = false;
 
 mock('bcrypt', {
     hash: function(password, salt_work) {
         if(failBcrypt)
-            return Promise.reject("Cant hash password!");
+            return Promise.reject('Cant hash password!');
         else
             return bcrypt.hash(password, salt_work);
     },
@@ -29,7 +29,7 @@ const User = mongoose.model('User');
 describe('user', function () {
 
 
-    var validUser;
+    let validUser;
 
     beforeEach(function (done) {
         failBcrypt = false;
@@ -48,14 +48,14 @@ describe('user', function () {
     });
 
     it('can be saved', function (done) {
-        var u = new User(validUser);
+        const u = new User(validUser);
         u.save(done);
     });
 
     describe('#name', function () {
         it('cant be empty', function (done) {
             validUser.name = '';
-            var u = new User(validUser);
+            const u = new User(validUser);
 
             u.validate(function (err) {
                 expect(err).to.not.be.null;
@@ -66,7 +66,7 @@ describe('user', function () {
 
         it('with 3 characters is invalid', function (done) {
             validUser.name = 'a'.repeat(3);
-            var u = new User(validUser);
+            const u = new User(validUser);
 
             u.validate(function (err) {
                 expect(err).to.not.be.null;
@@ -77,7 +77,7 @@ describe('user', function () {
 
         it('with 4 characters is valid', function (done) {
             validUser.name = 'a'.repeat(4);
-            var u = new User(validUser);
+            const u = new User(validUser);
 
             u.validate(function (err) {
                 expect(err).to.be.null;
@@ -89,7 +89,7 @@ describe('user', function () {
     describe('#email', function () {
         it('cant be empty', function (done) {
             validUser.email = '';
-            var u = new User(validUser);
+            const u = new User(validUser);
             u.validate(function (err) {
                 expect(err).to.not.be.null;
                 expect(err.errors.email).to.exist;
@@ -99,12 +99,12 @@ describe('user', function () {
 
         it('must be a valid email', function (done) {
             validUser.email = 'test.test.de';
-            var u = new User(validUser);
+            const u = new User(validUser);
             u.validate(function (err) {
                 expect(err).to.not.be.null;
                 expect(err.errors.email).to.exist;
                 validUser.email = 'test@test.de';
-                var u = new User(validUser);
+                const u = new User(validUser);
                 u.validate(function (err) {
                     expect(err).to.be.null;
                     return done();
@@ -116,7 +116,7 @@ describe('user', function () {
     describe('#password', function () {
 
         it('should have a minimum length of 6 characters', function (done) {
-            var u = new User(validUser);
+            const u = new User(validUser);
             u.password = '12345';
 
             u.validate(function (err) {
@@ -131,7 +131,7 @@ describe('user', function () {
         });
 
         it('should stay valid when not changed', function (done) {
-            var u = new User(validUser);
+            const u = new User(validUser);
             u.save().then((res) => {
                 res.name = 'Blub';
                 res.validate().then(done);
@@ -139,7 +139,7 @@ describe('user', function () {
         });
 
         it('should be hashed when saved', function (done) {
-            var u = new User(validUser);
+            const u = new User(validUser);
             u.save(function () {
                 expect(u.password).to.be.not.equal(validUser.password);
                 return done();
@@ -147,9 +147,9 @@ describe('user', function () {
         });
 
         it('should not change when already hashed and saved again', (done) => {
-            var u = new User(validUser);
+            const u = new User(validUser);
             u.save().then((res) => {
-                var hashed_password = res.password;
+                const hashed_password = res.password;
                 res.save().then((res) => {
                     expect(hashed_password).to.be.equal(res.password);
                     return done();
@@ -158,20 +158,20 @@ describe('user', function () {
         });
 
         it('should not be converted into json', function () {
-            var u = new User(validUser);
+            const u = new User(validUser);
             expect(u.toJSON().password).to.be.undefined;
         });
 
         it('should not save object if password cant be hashed', () => {
             failBcrypt = true;
-            var u = new User(validUser);
+            const u = new User(validUser);
             return expect(u.save()).to.eventually.rejected;
         });
     });
 
     describe('comparePassword', () => {
         it('compare should yield a true result with correct plain text password', function (done) {
-            var u = new User(validUser);
+            const u = new User(validUser);
             u.save().then(function () {
                 u.comparePassword(validUser.password).then(function (res) {
                     expect(res).to.be.true;
@@ -181,7 +181,7 @@ describe('user', function () {
         });
 
         it('compare should yield a false result with wrong plain text password', function (done) {
-            var u = new User(validUser);
+            const u = new User(validUser);
             u.save().then(function () {
                 u.comparePassword('haxor').then(function (res) {
                     expect(res).to.be.false;

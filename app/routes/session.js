@@ -11,18 +11,24 @@ const mongoose = require('mongoose');
 require('../models/user');
 const User = mongoose.model('User');
 
-/*
- * POST /session
- * Creates a new session with given login details
+
+/**
+ * Creates a new session with the given login credentials.
+ *
+ * @function postSession
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
  */
-function postSession(req, res, next) {
-    User.login(req.body).then((u) => {
+function postSession(request, response, next) {
+    User.login(request.params).then((u) => {
         var token = jwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
-        res.json({token: token});
+        response.json({token: token});
         return next();
     }, () => {
-        res.status(401);
-        res.json({error: 'Login credentials wrong!'});
+        response.status(401);
+        response.json({error: 'Login credentials wrong!'});
         return next();
     });
 }

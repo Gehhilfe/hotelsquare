@@ -18,5 +18,10 @@ rules:
   semi:
     - error
     - always
+  valid-jsdoc:
+    - error
+  require-jsdoc: 1
+  prefer-const:
+    - error
   no-console: 0
 
