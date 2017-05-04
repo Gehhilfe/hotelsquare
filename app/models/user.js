@@ -19,20 +19,16 @@ const UserSchema = new Schema({
     email: {
         type: String,
         required: true,
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
     },
     password: {
         type: String,
-        validate: {
-            validator: function (v) {
-                return v.length >= 6;
-            }
-        }
+        minlength: 6
     }
 });
 
 UserSchema.pre('save', function (next) {
-    var user = this;
+    const user = this;
 
     if (!user.isModified('password'))
         return next();
@@ -51,14 +47,14 @@ UserSchema.pre('save', function (next) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 UserSchema.statics.login = function (name, password) {
-    var User = this;
+    const User = this;
     if(password === undefined) {
         password = name.password;
         name = name.name;
     }
     return new Promise(function (resolve, reject) {
         User.findOne({name: name}).then(function (res) {
-            var foundUser = res;
+            const foundUser = res;
             if (res === null)
                 return reject();
             return foundUser.comparePassword(password).then(function (res) {
@@ -76,12 +72,12 @@ UserSchema.statics.login = function (name, password) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 UserSchema.methods.comparePassword = function (candidatePassword) {
-    var user = this;
+    const user = this;
     return bcrypt.compare(candidatePassword, user.password, null);
 };
 
 UserSchema.methods.toJSON = function () {
-    var obj = this.toObject();
+    const obj = this.toObject();
     delete obj.password;
     return obj;
 };

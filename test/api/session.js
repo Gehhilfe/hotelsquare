@@ -9,7 +9,7 @@ const chaiHttp = require('chai-http');
 const server = require('../../server');
 const util = require('../../lib/util');
 chai.should();
-const expect = chai.expect();
+const expect = chai.expect;
 chai.use(chaiHttp);
 
 const jwt = require('jsonwebtoken');

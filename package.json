@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "lint": "eslint ./app/**/*.js *.js test/**/*.js",
+    "lint": "eslint *.js ./app/**/*.js *.js ./test/*.js ./test/**/*.js",
     "test": "mocha test test test/api",
     "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
   },

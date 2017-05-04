@@ -1,6 +1,6 @@
 // test/string.js
 
-var expect = require('chai').expect;
+const expect = require('chai').expect;
 
 describe('Math', function() {
     describe('#max', function() {
