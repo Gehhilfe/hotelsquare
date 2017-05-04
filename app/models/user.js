@@ -25,9 +25,6 @@ const UserSchema = new Schema({
         type: String,
         validate: {
             validator: function (v) {
-                var user = this;
-                if (!user.isModified('password'))
-                    return true;
                 return v.length >= 6;
             }
         }
@@ -45,7 +42,7 @@ UserSchema.pre('save', function (next) {
         user.password = hash;
         return next();
     }, function (err) {
-        return next(err);
+        return next(new Error(err));
     });
 });
 

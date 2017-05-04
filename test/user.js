@@ -1,3 +1,19 @@
+const mock = require('mock-require');
+const bcrypt = require('bcrypt');
+
+var failBcrypt = false;
+
+mock('bcrypt', {
+    hash: function(password, salt_work) {
+        if(failBcrypt)
+            return Promise.reject("Cant hash password!");
+        else
+            return bcrypt.hash(password, salt_work);
+    },
+    compare: bcrypt.compare
+});
+
+
 require('../app/models/user');
 
 const mongoose = require('mongoose');
@@ -7,6 +23,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const Util = require('../lib/util');
+
 const User = mongoose.model('User');
 
 describe('user', function () {
@@ -15,6 +32,7 @@ describe('user', function () {
     var validUser;
 
     beforeEach(function (done) {
+        failBcrypt = false;
         mongoose.Promise = global.Promise;
 
         validUser = new User({
@@ -112,6 +130,14 @@ describe('user', function () {
             });
         });
 
+        it('should stay valid when not changed', function (done) {
+            var u = new User(validUser);
+            u.save().then((res) => {
+                res.name = 'Blub';
+                res.validate().then(done);
+            });
+        });
+
         it('should be hashed when saved', function (done) {
             var u = new User(validUser);
             u.save(function () {
@@ -120,6 +146,30 @@ describe('user', function () {
             });
         });
 
+        it('should not change when already hashed and saved again', (done) => {
+            var u = new User(validUser);
+            u.save().then((res) => {
+                var hashed_password = res.password;
+                res.save().then((res) => {
+                    expect(hashed_password).to.be.equal(res.password);
+                    return done();
+                });
+            });
+        });
+
+        it('should not be converted into json', function () {
+            var u = new User(validUser);
+            expect(u.toJSON().password).to.be.undefined;
+        });
+
+        it('should not save object if password cant be hashed', () => {
+            failBcrypt = true;
+            var u = new User(validUser);
+            return expect(u.save()).to.eventually.rejected;
+        });
+    });
+
+    describe('comparePassword', () => {
         it('compare should yield a true result with correct plain text password', function (done) {
             var u = new User(validUser);
             u.save().then(function () {
@@ -138,11 +188,6 @@ describe('user', function () {
                     return done();
                 });
             });
-        });
-
-        it('should not be converted into json', function () {
-            var u = new User(validUser);
-            expect(u.toJSON().password).to.be.undefined;
         });
     });
 
@@ -171,6 +216,10 @@ describe('user', function () {
 
         it('should reject with invalid name', function () {
             return expect(User.login('test', 'password')).to.eventually.rejected;
+        });
+
+        it('should work with a json object as first parameter', () => {
+            return expect(User.login({name: 'test', password: 'password'})).to.eventually.resolved;
         });
     });
 });

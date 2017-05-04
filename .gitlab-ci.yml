@@ -17,7 +17,7 @@ cache:
   - node_modules/
 
 test:
-  coverage: '/^Statements[\s]*:[\s]*\d+\.\d+%/'
+  coverage: '/^Statements[\s]*:[\s]*(\d+\.*\d*%)/'
   script:
    - export NODE_ENV=test
    - npm install
