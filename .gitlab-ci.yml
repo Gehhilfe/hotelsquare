@@ -14,11 +14,16 @@ services:
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
   paths:
-  - node_modules/
+  - backend/node_modules/
 
-test:
+stages:
+  - backend
+
+backend-test:
+  stage: backend
   coverage: '/^Statements[\s]*:[\s]*(\d+\.*\d*%)/'
   script:
+   - cd backend
    - export NODE_ENV=test
    - npm install
    - npm run coverage
@@ -26,8 +31,9 @@ test:
     paths:
      - coverage
    
-lint:
+backend-lint:
   script:
+   - cd backend
    - export NODE_ENV=test
    - npm install
    - npm run lint
