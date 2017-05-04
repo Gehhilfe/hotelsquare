@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "lint": "eslint ./**/*.js",
+    "lint": "eslint ./app/**/*.js *.js test/**/*.js",
     "test": "mocha test test test/api",
-    "coverage": " ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
+    "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
   },
   "engines": {
     "node": ">= 5.12.0"

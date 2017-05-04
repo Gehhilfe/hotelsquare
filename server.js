@@ -15,7 +15,7 @@ server.use(restify.bodyParser({ mapParams: true }));
 server.post('/session', session.postSession);
 
 server.listen(8080, function() {
-  console.log('%s listening at %s', server.name, server.url);
+    console.log('%s listening at %s', server.name, server.url);
 });
 
 module.exports = server;

@@ -7,8 +7,9 @@ const mongoose = require('mongoose');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../server');
-const should = chai.should();
 const util = require('../../lib/util');
+chai.should();
+const expect = chai.expect();
 chai.use(chaiHttp);
 
 const jwt = require('jsonwebtoken');
@@ -27,17 +28,17 @@ describe('Session', () => {
         beforeEach((done) => {
             User.remove({}).then(() => {
                 User.create({
-                    name: "test",
-                    password: "secret",
-                    email: "test@test.de"
+                    name: 'test',
+                    password: 'secret',
+                    email: 'test@test.de'
                 }).then(() => {return done();});
             });
         });
 
         it('should return a new jwt with correct login details', (done) => {
             const loginDetails = {
-                name: "test",
-                password: "secret"
+                name: 'test',
+                password: 'secret'
             };
             chai.request(server)
                 .post('/session')
@@ -54,8 +55,8 @@ describe('Session', () => {
 
         it('should return a 401 unauthorized with wrong login details', (done) => {
             const loginDetails = {
-                name: "test",
-                password: "wrong"
+                name: 'test',
+                password: 'wrong'
             };
             chai.request(server)
                 .post('/session')
