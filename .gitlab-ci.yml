@@ -32,6 +32,7 @@ backend-test:
      - coverage
    
 backend-lint:
+  stage: backend
   script:
    - cd backend
    - export NODE_ENV=test
