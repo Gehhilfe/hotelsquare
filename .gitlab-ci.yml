@@ -18,6 +18,7 @@ cache:
 
 stages:
   - backend
+  - backend-build
 
 backend-test:
   stage: backend
@@ -38,3 +39,17 @@ backend-lint:
    - export NODE_ENV=test
    - npm install
    - npm run lint
+
+build-backend-container:
+  image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay
+  services:
+    - docker:dind
+  stage: backend-build
+  script:
+   - cd backend
+   - export IMAGE_TAG=$(echo -en $CI_COMMIT_REF_NAME | tr -c '[:alnum:]_.-' '-')
+   - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+   - docker build --pull -t "$CI_REGISTRY_IMAGE:$IMAGE_TAG" .
+   - docker push "$CI_REGISTRY_IMAGE:$IMAGE_TAG"

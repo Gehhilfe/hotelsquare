@@ -1,0 +1,12 @@
+{
+  "db": {
+    "host": "mongo",
+    "name": "dev"
+  },
+  "jwt": {
+    "secret": "secret",
+    "options": {
+      "algorithm": "HS256"
+    }
+  }
+}
