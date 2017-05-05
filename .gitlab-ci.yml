@@ -42,6 +42,8 @@ backend-lint:
    - npm run lint
 
 build-backend-container:
+  only: 
+   - master
   image: docker:latest
   variables:
     DOCKER_DRIVER: overlay
@@ -56,6 +58,11 @@ build-backend-container:
    - docker push "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
    
 backend-deploy-container:
+  only: 
+   - master
+  environment:
+    name: staging
+    url: https://staging.ip.stimi.ovh
   stage: backend-deploy
   image: cdrx/rancher-gitlab-deploy
   script:
