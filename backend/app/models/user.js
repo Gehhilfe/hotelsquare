@@ -81,4 +81,5 @@ UserSchema.methods.toJSON = function () {
     delete obj.password;
     return obj;
 };
-mongoose.model('User', UserSchema);
+
+module.exports = mongoose.model('User', UserSchema);
