@@ -8,5 +8,10 @@
     "options": {
       "algorithm": "HS256"
     }
+  },
+  "bootstrap": {
+    "User": [
+      {"name": "admin", "email": "admin@test.de", "password": "123456"}
+    ]
   }
 }
