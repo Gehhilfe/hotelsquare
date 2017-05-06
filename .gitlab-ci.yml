@@ -44,6 +44,7 @@ backend-lint:
 build-backend-container:
   only: 
    - master
+   - dev
   image: docker:latest
   variables:
     DOCKER_DRIVER: overlay
@@ -60,10 +61,11 @@ build-backend-container:
 backend-deploy-container:
   only: 
    - master
+   - dev
   environment:
     name: staging
     url: https://staging.ip.stimi.ovh
   stage: backend-deploy
   image: cdrx/rancher-gitlab-deploy
   script:
-   - upgrade --stack ip-staging --service node-app
+   - upgrade --stack "ip-$IMAGE_TAG" --service node-app
