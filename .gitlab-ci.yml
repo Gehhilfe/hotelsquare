@@ -57,15 +57,25 @@ build-backend-container:
    - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
    - docker build --pull -t "$CI_REGISTRY_IMAGE:$IMAGE_TAG" .
    - docker push "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
-   
-backend-deploy-container:
+
+backend-deploy-container-master:
   only: 
    - master
-   - dev
   environment:
     name: staging
     url: https://staging.ip.stimi.ovh
   stage: backend-deploy
   image: cdrx/rancher-gitlab-deploy
   script:
-   - upgrade --stack "ip-$IMAGE_TAG" --service node-app
+   - upgrade --stack ip-master --service node-app
+   
+backend-deploy-container-dev:
+  only: 
+   - dev
+  environment:
+    name: dev
+    url: https://dev.ip.stimi.ovh
+  stage: backend-deploy
+  image: cdrx/rancher-gitlab-deploy
+  script:
+   - upgrade --stack ip-dev --service node-app
