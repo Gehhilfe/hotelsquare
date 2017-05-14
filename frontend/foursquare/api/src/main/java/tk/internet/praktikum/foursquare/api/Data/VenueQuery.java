@@ -7,4 +7,5 @@ package tk.internet.praktikum.foursquare.api.Data;
 public class VenueQuery
 {
 
+
 }
