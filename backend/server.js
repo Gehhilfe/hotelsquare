@@ -25,6 +25,12 @@ util.connectDatabase(mongoose).then(() => {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 server.use(restify.bodyParser({ mapParams: true }));
+
+server.pre(function (request, response, next) {
+    console.log(request.rawHeaders);
+    next();
+});
+
 server.post('/session', session.postSession);
 
 server.listen(8081, function() {
