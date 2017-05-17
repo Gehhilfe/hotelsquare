@@ -3,6 +3,7 @@
 const config = require('config');
 const restify = require('restify');
 const session = require('./app/routes/session');
+const user = require('./app/routes/user');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
@@ -32,6 +33,8 @@ server.pre(function (request, response, next) {
 });
 
 server.post('/session', session.postSession);
+
+server.post('/user', user.postUser);
 
 server.listen(8081, function() {
     console.log('%s listening at %s', server.name, server.url);
