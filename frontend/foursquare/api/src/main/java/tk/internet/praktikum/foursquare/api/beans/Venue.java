@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare.api.Data;
+package tk.internet.praktikum.foursquare.api.beans;
 
 /**
  * Created by robert on 14.05.2017.

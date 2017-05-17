@@ -1,4 +1,4 @@
-package tk.internet.praktikum.utils;
+package tk.internet.praktikum.foursquare.api.utils;
 
 /**
  * Created by truongtud on 16.05.2017.
