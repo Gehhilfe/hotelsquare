@@ -6,6 +6,8 @@ const session = require('./app/routes/session');
 const user = require('./app/routes/user');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
+const chalk = require('chalk');
+
 mongoose.Promise = global.Promise;
 
 const server = restify.createServer();
@@ -28,8 +30,8 @@ db.on('error', console.error.bind(console, 'connection error:'));
 server.use(restify.bodyParser({ mapParams: true }));
 
 server.pre(function (request, response, next) {
-    console.log(request.rawHeaders);
-    next();
+    console.log(chalk.green(request.method) + " - " + request.url + " - " + request.headers['host']);
+    return next();
 });
 
 server.post('/session', session.postSession);
