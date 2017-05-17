@@ -32,6 +32,27 @@ server.pre(function (request, response, next) {
     next();
 });
 
+server.pre(function (req, res, next) {
+   console.log('filtering server request');
+
+   const filters = [{route : /^\/user.*$/g, method: 'DELETE'}];
+   let filters_passed = true;
+   filters.forEach((e)=>
+    {
+       if(req.url.match(e.route) !== null && req.method === e.method)
+       {
+           if(req.headers["x-auth"] === undefined)
+           {
+               res.status(403);
+               res.json({error: 'authentication failed'});
+               filters_passed = false;
+           }
+
+    }});
+    if(filters_passed)
+        return next();
+});
+
 server.post('/session', session.postSession);
 
 server.post('/user', user.postUser);

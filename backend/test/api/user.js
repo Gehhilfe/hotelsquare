@@ -11,6 +11,7 @@ const util = require('../../lib/util');
 chai.should();
 chai.use(chaiHttp);
 
+
 describe('User', () => {
     beforeEach((done) => {
         util.connectDatabase(mongoose);
@@ -76,6 +77,30 @@ describe('User', () => {
                 });
         });
 
+
+    });
+
+    describe('/DELETE user', () => {
+
+        it('should delete user if authenticated', (done) => {
+            chai.request(server)
+                .delete('/user')
+                .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ')
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    return done();
+                });
+        });
+
+        it('should fail authentical because Token was changed', (done) => {
+            chai.request(server)
+                .delete('/user')
+                .set('x-auth', 'eyJhbGciOI1NiIsInRcCI6IkpXVCJ9.eyQzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ')
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    return done();
+                });
+        });
 
     });
 });
