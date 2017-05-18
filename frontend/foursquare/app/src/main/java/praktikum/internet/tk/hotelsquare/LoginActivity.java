@@ -6,11 +6,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.pojo.LoginCredentials;
+import tk.internet.praktikum.foursquare.api.pojo.TokenInformation;
+import tk.internet.praktikum.foursquare.api.services.SessionService;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -63,14 +74,35 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
 
-        // TODO - Login by using the Backend api.
-        new android.os.Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                successfulLogin();
-                progressDialog.dismiss();
-            }
-        }, 3000);
+        // Get the SessionService from the backend api
+        // Url should be stored somewhere as an constant
+        SessionService service = ServiceFactory.createRetrofitService(SessionService.class, "https://dev.ip.stimi.ovh/");
+
+        /**
+         * Use RxJava to handle a long runing backend api call without blocking the application
+         * Would be more clean if we used java 1.8 target with Jack
+         */
+        service.postSession(new LoginCredentials(email, password))
+                .subscribeOn(Schedulers.newThread())                // call is executed i a new thread
+                .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
+                .subscribe(
+                        new Consumer<TokenInformation>() {          // called when no error happened
+                            @Override
+                            public void accept(@NonNull TokenInformation tokenInformation) throws Exception {
+                                successfulLogin();
+                                progressDialog.dismiss();
+                                Toast toast = Toast.makeText(getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG);
+                                toast.show();
+                            }
+                        },
+                        new Consumer<Throwable>() {                 // called when an error is thrown
+                            @Override
+                            public void accept(@NonNull Throwable throwable) throws Exception {
+                                failedLogin();
+                                progressDialog.dismiss();
+                            }
+                        }
+                );
     }
 
     /**
@@ -82,18 +114,6 @@ public class LoginActivity extends AppCompatActivity {
 
         String email = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
-
-        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailInput.setError("Please enter a valid email address.");
-            valid = false;
-        } else
-            emailInput.setError(null);
-
-        if (password.isEmpty() || password.length() < 8 || password.length() > 12) {
-            passwordInput.setError("Please enter a valid password (8 - 12 characters).");
-            valid = false;
-        } else
-            passwordInput.setError(null);
 
         return valid;
     }
