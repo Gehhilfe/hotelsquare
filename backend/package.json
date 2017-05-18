@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "lint": "eslint *.js ./app/**/*.js *.js ./test/*.js ./test/**/*.js ./lib/*.js ./lib/**/*.js",
-    "test": "mocha test test test/api",
-    "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
+    "test": "mocha test test test/api --timeout 10000",
+    "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha  test test test/api --timeout 10000"
   },
   "engines": {
     "node": ">= 5.12.0"
