@@ -31,7 +31,7 @@ backend-test:
    - npm run coverage
   artifacts:
     paths:
-     - coverage
+     - backend/coverage
    
 backend-lint:
   stage: backend
