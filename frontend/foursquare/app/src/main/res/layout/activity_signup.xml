@@ -21,6 +21,20 @@
             android:layout_marginBottom="24dp"
             android:layout_gravity="center_horizontal" />
 
+        <!-- Username field -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+            <EditText
+                android:id="@+id/register_name_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"
+                android:hint="@string/name" />
+        </android.support.design.widget.TextInputLayout>
+
         <!-- Email field -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -49,39 +63,27 @@
                 android:hint="@string/login_password" />
         </android.support.design.widget.TextInputLayout>
 
-        <!-- Login Button -->
+        <!-- Register button -->
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/login_btn"
+            android:id="@+id/create_acc_btn"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
             android:padding="12dp"
-            android:text="@string/login"
+            android:text="@string/register"
             />
 
-        <!-- Register link -->
+        <!-- Back to login link -->
         <TextView
             android:id="@+id/login_link"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:text="@string/register_here"
+            android:text="@string/existing_account"
             android:gravity="center"
             android:textSize="16sp"
             />
 
-        <!-- TODO Forgotten password -->
-
-        <!-- Facebook login placeholder -->
-        <TextView
-            android:id="@+id/fb_login"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:text="@string/fb_login"
-            android:gravity="center"
-            android:textSize="16sp"
-            />
     </LinearLayout>
 </ScrollView>
