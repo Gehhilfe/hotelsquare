@@ -29,8 +29,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Response;
+import tk.internet.praktikum.foursquare.api.beans.LoginCredentials;
+import tk.internet.praktikum.foursquare.api.beans.TokenInformation;
+import tk.internet.praktikum.foursquare.api.services.SessionServices;
+import tk.internet.praktikum.services.RemoteServices;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -44,13 +52,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -185,18 +186,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            LoginCredentials loginCredentials=new LoginCredentials(email,password);
+            mAuthTask = new UserLoginTask(loginCredentials);
             mAuthTask.execute((Void) null);
         }
     }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
+        // add regular expression then validate email
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
+        // add regular expression then validate password
         return password.length() > 4;
     }
 
@@ -296,12 +300,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
+        private LoginCredentials mLoginCredentials;
+        private TokenInformation token;
+        UserLoginTask(LoginCredentials loginCredentials) {
+           mLoginCredentials=loginCredentials;
         }
 
         @Override
@@ -315,16 +317,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+            try {
+                Response<TokenInformation> response=RemoteServices.createRemoteService(SessionServices.class,"/session").postSession(mLoginCredentials).execute();
+                if(response.isSuccessful()){
+                    token=response.body();
+                    return true;
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
-            // TODO: register the new account here.
-            return true;
+           return false;
         }
 
         @Override

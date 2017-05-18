@@ -2,8 +2,8 @@ package tk.internet.praktikum.foursquare.api;
 
 import org.junit.Test;
 
-import tk.internet.praktikum.foursquare.api.Data.LoginCredentials;
-import tk.internet.praktikum.foursquare.api.Data.TokenInformation;
+import tk.internet.praktikum.foursquare.api.beans.LoginCredentials;
+import tk.internet.praktikum.foursquare.api.beans.TokenInformation;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
