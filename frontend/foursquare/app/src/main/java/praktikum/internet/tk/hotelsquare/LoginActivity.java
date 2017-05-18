@@ -86,21 +86,15 @@ public class LoginActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.newThread())                // call is executed i a new thread
                 .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
                 .subscribe(
-                        new Consumer<TokenInformation>() {          // called when no error happened
-                            @Override
-                            public void accept(@NonNull TokenInformation tokenInformation) throws Exception {
-                                successfulLogin();
-                                progressDialog.dismiss();
-                                Toast toast = Toast.makeText(getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG);
-                                toast.show();
-                            }
+                        tokenInformation -> {
+                            successfulLogin();
+                            progressDialog.dismiss();
+                            Toast toast = Toast.makeText(getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG);
+                            toast.show();
                         },
-                        new Consumer<Throwable>() {                 // called when an error is thrown
-                            @Override
-                            public void accept(@NonNull Throwable throwable) throws Exception {
-                                failedLogin();
-                                progressDialog.dismiss();
-                            }
+                        throwable -> {
+                            failedLogin();
+                            progressDialog.dismiss();
                         }
                 );
     }
