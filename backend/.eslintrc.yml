@@ -5,6 +5,8 @@ env:
 extends: 'eslint:recommended'
 parserOptions:
   sourceType: module
+plugins:
+  - security
 rules:
   indent:
     - error
