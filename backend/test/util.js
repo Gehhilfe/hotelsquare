@@ -1,3 +1,5 @@
+'use strict';
+
 const Util = require('../lib/util');
 const mongoose = require('mongoose');
 const chai = require('chai');
