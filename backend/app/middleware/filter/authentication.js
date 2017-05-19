@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 
 /**
- * Filters all requests for authentication information.
- * If a requests matches a route and no valid auth information is provided a 403 is returned.
+ * Checks if a request is authenticated and drops non authenticated connections with status 403.
+ *
  * @param {Object} request http request
  * @param {Object} response http response
  * @param {Function} next next handler
