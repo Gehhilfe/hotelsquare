@@ -6,7 +6,7 @@ const session = require('./app/routes/session');
 const user = require('./app/routes/user');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
-
+const auth = require('./app/middleware/filter/authentication');
 
 mongoose.Promise = global.Promise;
 
@@ -31,6 +31,7 @@ server.use(restify.bodyParser({mapParams: true}));
 
 server.pre(require('./app/middleware/log'));
 
+/*
 server.pre(function (req, res, next) {
     console.log('filtering server request');
 
@@ -48,11 +49,12 @@ server.pre(function (req, res, next) {
     });
     if (filters_passed)
         return next();
-});
+});*/
 
 server.post('/session', session.postSession);
 
 server.post('/user', user.postUser);
+server.del('/user', auth, user.deleteUser);
 
 server.listen(8081, function () {
     console.log('%s listening at %s', server.name, server.url);

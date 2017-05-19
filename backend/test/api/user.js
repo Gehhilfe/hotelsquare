@@ -84,15 +84,24 @@ describe('User', () => {
                 .delete('/user')
                 .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ')
                 .end((err, res) => {
+                    res.should.have.status(200);
+                    return done();
+                });
+        });
+
+        it('should fail when token is not signed correct', (done) => {
+            chai.request(server)
+                .delete('/user')
+                .set('x-auth', 'eyJhbGciOI1NiIsInRcCI6IkpXVCJ9.eyQzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ')
+                .end((err, res) => {
                     res.should.have.status(403);
                     return done();
                 });
         });
 
-        it('should fail authentical because Token was changed', (done) => {
+        it('should fail when header is missing', (done) => {
             chai.request(server)
                 .delete('/user')
-                .set('x-auth', 'eyJhbGciOI1NiIsInRcCI6IkpXVCJ9.eyQzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ')
                 .end((err, res) => {
                     res.should.have.status(403);
                     return done();

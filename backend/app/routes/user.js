@@ -26,5 +26,18 @@ function postUser(req, res, next) {
     });
 }
 
+/**
+ * Deletes the current authenticated user
+ *
+ * @param {Object} request
+ * @param {Object}response
+ * @param {Function} next
+ * @returns {undefined}
+ */
+function deleteUser(request, response, next) {
+    response.json();
+    return next();
+}
 
-module.exports = {postUser};
+
+module.exports = {postUser, deleteUser};
