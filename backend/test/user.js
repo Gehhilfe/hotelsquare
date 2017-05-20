@@ -86,17 +86,17 @@ describe('user', function () {
         });
         
         const format_tests = [
-            {name: "test", result: true},
-            {name: "test123", result: true},
-            {name: "test-123", result: true},
-            {name: "test#", result: false},
-            {name: "1test", result: false},
-            {name: "a", result: false}
-            ];
+            {name: 'test', result: true},
+            {name: 'test123', result: true},
+            {name: 'test-123', result: true},
+            {name: 'test#', result: false},
+            {name: '1test', result: false},
+            {name: 'a', result: false}
+        ];
         
         it('should match the examples format results', (done) => {
             for(let i=0;i<format_tests.length;i++) {
-                let example = format_tests[i];
+                const example = format_tests[i];
                 validUser.name = example.name;
                 const u = new User(validUser);
                 u.validate(function (err) {
@@ -110,7 +110,7 @@ describe('user', function () {
                         return done();
                 });
             }
-        })
+        });
     });
 
     describe('#email', function () {
