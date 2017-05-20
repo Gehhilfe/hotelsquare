@@ -37,6 +37,7 @@ server.post('session', session.postSession);
 // user
 server.post('user', user.postUser);
 server.del('user', auth, user.deleteUser);
+server.post('user/avatar', auth, user.uploadAvatar);
 
 server.listen(8081, function () {
     console.log('%s listening at %s', server.name, server.url);

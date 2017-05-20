@@ -39,5 +39,18 @@ function deleteUser(request, response, next) {
     return next();
 }
 
+/**
+ * Uploads a avatar image for the current authenticated user and stores into
+ * minio cloud storage.
+ *
+ * @param {IncommingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function uploadAvatar(request, response, next) {
+    response.json();
+    return next();
+}
 
-module.exports = {postUser, deleteUser};
+module.exports = {postUser, deleteUser, uploadAvatar};
