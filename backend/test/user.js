@@ -1,6 +1,8 @@
-const mock = require('mock-require');
-const bcrypt = require('bcrypt');
+'use strict';
 
+const mock = require('mock-require');
+
+const bcrypt = require('bcrypt');
 let failBcrypt = false;
 
 mock('bcrypt', {
@@ -13,18 +15,19 @@ mock('bcrypt', {
     compare: bcrypt.compare
 });
 
-
-require('../app/models/user');
-
+// Need to reload User model with mocked bcrypt
 const mongoose = require('mongoose');
+mongoose.models = {};
+mongoose.modelSchemas = {};
+const User = mock.reRequire('../app/models/user');
+
+
 const chai = require('chai');
 const expect = chai.expect;
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const Util = require('../lib/util');
-
-const User = mongoose.model('User');
 
 describe('user', function () {
 

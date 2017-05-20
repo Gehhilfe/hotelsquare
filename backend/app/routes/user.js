@@ -6,25 +6,38 @@ const User = mongoose.model('User');
  * registers a new user with the given profile information.
  *
  * @function postUser
- * @param {Object} req request
- * @param {Object} res response
+ * @param {Object} request request
+ * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function postUser(req, res, next) {
+function postUser(request, response, next) {
 
-    const user = User(req.params);
+    const user = User(request.params);
     user.validate().then(() => {
         user.save();
-        res.status(200);
-        res.json(user);
+        response.status(200);
+        response.json(user);
         return next();
     }, () => {
-        res.status(400);
-        res.json({error: 'new user could not be created'});
+        response.status(400);
+        response.json({error: 'new user could not be created'});
         return next();
     });
 }
 
+/**
+ * Deletes the current authenticated user
+ *
+ * @param {IncommingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function deleteUser(request, response, next) {
+    response.json();
+    return next();
+}
 
-module.exports = {postUser};
+
+module.exports = {postUser, deleteUser};
