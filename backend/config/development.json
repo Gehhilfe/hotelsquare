@@ -1,6 +1,6 @@
 {
   "db": {
-    "host": "localhost",
+    "host": "mongo",
     "name": "dev"
   },
   "jwt": {
@@ -13,5 +13,10 @@
     "User": [
       {"name": "admin", "email": "admin@test.de", "password": "123456"}
     ]
+  },
+  "minio": {
+    "key": "stimi-storage",
+    "secret": "6!u40ws?}QwjhpFw"
+    "bucket": "test"
   }
 }
