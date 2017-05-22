@@ -1,6 +1,19 @@
-const mongoose = require('mongoose');
-require('../models/user');
-const User = mongoose.model('User');
+
+const User = require('../models/user');
+/*
+TODO Store upload into minio
+const minio = require('minio');
+const config = require('config');
+
+
+const minioClient = new minio.Client({
+    endPoint: 'stimi.ovh',
+    port: 9000,
+    secure: true,
+    accessKey: config.minio.key,
+    secretKey: config.minio.secret
+});
+*/
 
 /**
  * registers a new user with the given profile information.
@@ -49,8 +62,23 @@ function deleteUser(request, response, next) {
  * @returns {undefined}
  */
 function uploadAvatar(request, response, next) {
-    response.json();
+    //console.log(request.files);
+    response.json({});
     return next();
 }
 
-module.exports = {postUser, deleteUser, uploadAvatar};
+/**
+ * Retrieves a stored avater image for the authenticated user.
+ *
+ * @param {IncommingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function getAvatar(request, response, next) {
+    response.setHeader('Content-Type', 'image/jpeg');
+    response.send();
+    return next();
+}
+
+module.exports = {postUser, deleteUser, uploadAvatar, getAvatar};

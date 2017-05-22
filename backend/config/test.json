@@ -11,7 +11,7 @@
   },
   "minio": {
     "key": "stimi-storage",
-    "secret": "6!u40ws?}QwjhpFw"
+    "secret": "6!u40ws?}QwjhpFw",
     "bucket": "test"
   }
 }

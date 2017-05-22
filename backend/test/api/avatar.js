@@ -8,6 +8,14 @@ const util = require('../../lib/util');
 chai.should();
 chai.use(chaiHttp);
 
+const expect = chai.expect;
+
+const request = require('supertest');
+const imageGenerator = require('js-image-generator');
+const tempWrite = require('temp-write');
+const fs = require('fs');
+const path = require('path');
+
 const testHelpers = require('../../lib/test_helpers');
 
 describe('User Avatar', () => {
@@ -23,25 +31,56 @@ describe('User Avatar', () => {
         return done();
     });
     
-    describe('POST /user/avater', () => {
-        it('should require an authentication', (done) => {
-            chai.request(server)
+    describe('/user/avatar', () => {
+        describe('image', () => {
+            
+            let image;
+            let imagePath;
+            
+            before((done) => {
+                imageGenerator.generateImage(600,600, 80, (err, i) => {
+                    expect(err).to.be.null;
+                    image = i;
+                    imagePath = tempWrite.sync(image.data, 'avatar.jpeg');
+                    console.log('Image Path: '+imagePath);
+                    return done();
+                });
+            });
+            
+            after((done) => {
+                fs.unlink(imagePath, () => {
+                    fs.rmdir(path.dirname(imagePath), () => {
+                        return done();  
+                    });
+                });
+            });
+            
+            it('should handle a uploaded image', (done) => {
+                request(server)
                 .post('/user/avatar')
                 .set('x-auth', token)
+                .attach('avatar', imagePath)
                 .end((err, res) => {
+                    expect(err).to.be.null;
                     res.should.have.status(200);
                     return done();
                 });
-        });
-        
-        it('should return 403 without authentication', (done) => {
-            chai.request(server)
-                .post('/user/avatar')
-                .end((err, res) => {
-                    res.should.have.status(403);
+            });
+            
+            it('should retrieve stored image', (done) => {
+                request(server)
+                .get('/user/avatar')
+                .set('x-auth', token)
+                .end((err,res) => {
+                    expect(err).to.be.null;
+                    res.should.have.status(200);
+                    res.should.have.header('content-type', /jpeg/);
                     return done();
                 });
+            });
         });
+        
+       
         
     });
 });
