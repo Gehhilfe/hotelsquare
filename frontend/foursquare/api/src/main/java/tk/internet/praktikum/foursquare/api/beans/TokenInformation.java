@@ -7,7 +7,7 @@ package tk.internet.praktikum.foursquare.api.beans;
 public class TokenInformation {
 
     public String token;
-    public long expiresDate;
+    public long expired_date;
 
 
 }

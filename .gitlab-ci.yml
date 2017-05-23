@@ -27,18 +27,18 @@ backend-test:
   script:
    - cd backend
    - export NODE_ENV=test
-   - npm install
+   - npm install --silent
    - npm run coverage
   artifacts:
     paths:
-     - coverage
+     - backend/coverage
    
 backend-lint:
   stage: backend
   script:
    - cd backend
    - export NODE_ENV=test
-   - npm install
+   - npm install --silent
    - npm run lint
 
 build-backend-container:

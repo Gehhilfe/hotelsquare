@@ -1,9 +1,8 @@
-package tk.internet.praktikum.foursquare.api;
+package praktikum.internet.tk.hotelsquare;
 
 import org.junit.Test;
 
-import tk.internet.praktikum.foursquare.api.beans.LoginCredentials;
-import tk.internet.praktikum.foursquare.api.beans.TokenInformation;
+import static org.junit.Assert.*;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -12,8 +11,7 @@ import tk.internet.praktikum.foursquare.api.beans.TokenInformation;
  */
 public class ExampleUnitTest {
     @Test
-    public void login_working() throws Exception {
-
-
+    public void addition_isCorrect() throws Exception {
+        assertEquals(4, 2 + 2);
     }
 }

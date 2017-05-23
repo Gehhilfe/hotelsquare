@@ -1,353 +1,151 @@
-package tk.internet.praktikum.foursquare;
+package praktikum.internet.tk.hotelsquare;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.TextUtils;
-import android.view.KeyEvent;
+import android.support.v7.widget.AppCompatButton;
+import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
-import retrofit2.Call;
-import retrofit2.Response;
-import tk.internet.praktikum.foursquare.api.beans.LoginCredentials;
-import tk.internet.praktikum.foursquare.api.beans.TokenInformation;
-import tk.internet.praktikum.foursquare.api.services.SessionServices;
-import tk.internet.praktikum.services.RemoteServices;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.pojo.LoginCredentials;
+import tk.internet.praktikum.foursquare.api.pojo.TokenInformation;
+import tk.internet.praktikum.foursquare.api.services.SessionService;
 
-import static android.Manifest.permission.READ_CONTACTS;
+public class LoginActivity extends AppCompatActivity {
 
-/**
- * A login screen that offers login via email/password.
- */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
-
-    // UI references.
-    private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
+    private EditText emailInput, passwordInput;
+    private AppCompatButton loginBtn;
+    private TextView registerLbl;
+    private static int REGISTER_REQUEST = 0;    // Register Request Tag für switching Between the Register and Login Activity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        emailInput = (EditText) findViewById(R.id.register_mail_input);
+        passwordInput = (EditText) findViewById(R.id.register_password_input);
+        loginBtn = (AppCompatButton) findViewById(R.id.login_btn);
+        registerLbl = (TextView) findViewById(R.id.login_link);
+
+        loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
+            public void onClick(View v) {
+                login();
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        registerLbl.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                attemptLogin();
+            public void onClick(View v) {
+                register();
             }
         });
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
     }
 
-    private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
+    /**
+     * Starts the login sequence. For now it only validates the input and displays the Progress dialog for 3 seconds.
+     */
+    private void login() {
+        if (!validate()) {
+            failedLogin();
             return;
         }
 
-        getLoaderManager().initLoader(0, null, this);
-    }
+        loginBtn.setEnabled(false);
 
-    private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this, 0);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Waiting for login...");
+        progressDialog.show();
+
+        String email = emailInput.getText().toString();
+        String password = passwordInput.getText().toString();
+
+        // Get the SessionService from the backend api
+        // Url should be stored somewhere as an constant
+        SessionService service = ServiceFactory.createRetrofitService(SessionService.class, "https://dev.ip.stimi.ovh/");
+
+        /**
+         * Use RxJava to handle a long runing backend api call without blocking the application
+         * Would be more clean if we used java 1.8 target with Jack
+         */
+        service.postSession(new LoginCredentials(email, password))
+                .subscribeOn(Schedulers.newThread())                // call is executed i a new thread
+                .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
+                .subscribe(
+                        tokenInformation -> {
+                            successfulLogin();
+                            progressDialog.dismiss();
+                            Toast toast = Toast.makeText(getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG);
+                            toast.show();
+                        },
+                        throwable -> {
+                            failedLogin();
+                            progressDialog.dismiss();
                         }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-        }
-        return false;
+                );
     }
 
     /**
-     * Callback received when a permissions request has been completed.
+     * Validates the entered input. Might be unnecessary if we only validate on the backend.
+     * @return True or false depending on if the input is valid.
      */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
-            }
-        }
-    }
+    private boolean validate() {
+        boolean valid = true;
 
+        String email = emailInput.getText().toString();
+        String password = passwordInput.getText().toString();
 
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
-    private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
-        // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
-
-        // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
-
-        boolean cancel = false;
-        View focusView = null;
-
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
-
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true);
-            LoginCredentials loginCredentials=new LoginCredentials(email,password);
-            mAuthTask = new UserLoginTask(loginCredentials);
-            mAuthTask.execute((Void) null);
-        }
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        // add regular expression then validate email
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        // add regular expression then validate password
-        return password.length() > 4;
+        return valid;
     }
 
     /**
-     * Shows the progress UI and hides the login form.
+     * Start up the next Activity or Fragment after a successful login. At the moment it just logs
+     * the login and finishes the Activity.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
-    }
-
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
+    private void successfulLogin() {
+        Log.d("LOGIN_ACTIVITY", "Successful login.");
+        loginBtn.setEnabled(true);
+        finish();
     }
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
+     * Routine to execute on Failed login. Logs the login attempt and displays a Toast for the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    private void failedLogin() {
+        Log.d("LOGIN_ACTIVITY", "Failed login.");
+        loginBtn.setEnabled(true);
+        Toast.makeText(getBaseContext(), "Failed to login.", Toast.LENGTH_LONG).show();
+    }
 
-        private LoginCredentials mLoginCredentials;
-        private TokenInformation token;
-        UserLoginTask(LoginCredentials loginCredentials) {
-           mLoginCredentials=loginCredentials;
-        }
+    /**
+     * Starts the Register Activity.
+     */
+    private void register() {
+        Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+        startActivityForResult(intent, REGISTER_REQUEST);
+    }
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            try {
-                Response<TokenInformation> response=RemoteServices.createRemoteService(SessionServices.class,"/session").postSession(mLoginCredentials).execute();
-                if(response.isSuccessful()){
-                    token=response.body();
-                    return true;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-           return false;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REGISTER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                // TODO - Start the new Activity after a successful registration. Probably going on the the User Setting view
                 finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
         }
     }
 }
-

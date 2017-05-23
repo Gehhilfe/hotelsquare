@@ -3,8 +3,11 @@
 const config = require('config');
 const restify = require('restify');
 const session = require('./app/routes/session');
+const user = require('./app/routes/user');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
+
+
 mongoose.Promise = global.Promise;
 
 const server = restify.createServer();
@@ -25,7 +28,12 @@ util.connectDatabase(mongoose).then(() => {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 server.use(restify.bodyParser({ mapParams: true }));
+
+server.pre(require('./app/middleware/log'));
+
 server.post('/session', session.postSession);
+
+server.post('/user', user.postUser);
 
 server.listen(8081, function() {
     console.log('%s listening at %s', server.name, server.url);
