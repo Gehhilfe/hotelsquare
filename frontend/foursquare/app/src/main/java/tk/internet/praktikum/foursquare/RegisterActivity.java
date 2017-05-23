@@ -1,4 +1,4 @@
-package praktikum.internet.tk.hotelsquare;
+package tk.internet.praktikum.foursquare;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;

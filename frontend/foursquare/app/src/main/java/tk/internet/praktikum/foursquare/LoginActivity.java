@@ -1,9 +1,9 @@
-package praktikum.internet.tk.hotelsquare;
+package tk.internet.praktikum.foursquare;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.View;
@@ -11,16 +11,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.foursquare.RegisterActivity;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.pojo.LoginCredentials;
-import tk.internet.praktikum.foursquare.api.pojo.TokenInformation;
 import tk.internet.praktikum.foursquare.api.services.SessionService;
 
 public class LoginActivity extends AppCompatActivity {

@@ -2,10 +2,13 @@
     <string name="app_name">Hotelsquare</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
+    <string name="user_name">Username</string>
     <string name="login">Login</string>
     <string name="register_here">New? Register here.</string>
     <string name="fb_login">Login with Facebook.</string>
     <string name="existing_account">Got an account already? Login!</string>
     <string name="register">Register</string>
     <string name="name">Name</string>
+    <string name="user_preferences">User_preferences</string>
+    <string name="title_activity_foursquare">Foursquare</string>
 </resources>
