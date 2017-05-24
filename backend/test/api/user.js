@@ -109,24 +109,5 @@ describe('User', () => {
                 });
         });
 
-        it('should fail when token is not signed correct', (done) => {
-            chai.request(server)
-                .delete('/user')
-                .set('x-auth', 'eyJhbGciOI1NiIsInRcCI6IkpXVCJ9.eyQzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ')
-                .end((err, res) => {
-                    res.should.have.status(403);
-                    return done();
-                });
-        });
-
-        it('should fail when header is missing', (done) => {
-            chai.request(server)
-                .delete('/user')
-                .end((err, res) => {
-                    res.should.have.status(403);
-                    return done();
-                });
-        });
-
     });
 });

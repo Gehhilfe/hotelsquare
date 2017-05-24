@@ -7,6 +7,7 @@ const user = require('./app/routes/user');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
+const  restifyBunyanLogger = require('restify-bunyan-logger');
 
 mongoose.Promise = global.Promise;
 
@@ -29,7 +30,9 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 server.use(restify.bodyParser({mapParams: true}));
 
-server.pre(require('./app/middleware/log'));
+
+server.on('after', restifyBunyanLogger());
+//server.pre(require('./app/middleware/log'));
 
 // session
 server.post('session', session.postSession);
