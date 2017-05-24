@@ -97,14 +97,15 @@ describe('User', () => {
             return done();
         });
 
-        it('should delete user if authenticated', () => {
+        it('should delete user if authenticated', (done) => {
             chai.request(server)
                 .delete('/user')
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
                     User.findById(u._doc._id, (error, user) => {
-                        return expect(user).to.be.null;
+                        expect(user).to.be.null;
+                        return done();
                     });
                 });
         });
