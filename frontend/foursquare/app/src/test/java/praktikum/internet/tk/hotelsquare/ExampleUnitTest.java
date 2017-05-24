@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare;
+package praktikum.internet.tk.hotelsquare;
 
 import org.junit.Test;
 
