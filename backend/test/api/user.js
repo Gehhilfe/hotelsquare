@@ -1,18 +1,30 @@
 'use strict';
-
+const config = require('config');
 const mongoose = require('mongoose');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../server');
 const util = require('../../lib/util');
+const User = require('../../app/models/user');
+const jsonwt = require('jsonwebtoken');
+const expect = chai.expect;
 chai.should();
 chai.use(chaiHttp);
 
 
 describe('User', () => {
-    beforeEach((done) => {
+
+    let u;
+
+    before((done) => {
         util.connectDatabase(mongoose);
-        return done();
+        User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99'}).then((param) => {
+            u = param;
+            return done();
+        }).catch((error ) => {
+            console.log(error);
+            return done();
+        });
     });
 
     describe('/POST user', () => {
@@ -79,13 +91,19 @@ describe('User', () => {
 
     describe('/DELETE user', () => {
 
-        it('should delete user if authenticated', (done) => {
+        let token;
+        before((done) => {
+            token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
+            return done();
+        });
+
+        it('should delete user if authenticated', () => {
             chai.request(server)
                 .delete('/user')
-                .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ')
+                .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    return done();
+                    return expect(User.count({id: u._doc._id})).should.eventually.equal(0);
                 });
         });
 
