@@ -83,6 +83,10 @@ backend-deploy-container-dev:
    
 frontend-build:
   stage: frontend
+  only:
+   - /frontend/
+   - dev
+   - master
   image: jangrewe/gitlab-ci-android
   script:
    - cd frontend/foursquare
