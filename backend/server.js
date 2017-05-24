@@ -7,6 +7,7 @@ const user = require('./app/routes/user');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
+const fs = require('fs');
 
 
 mongoose.Promise = global.Promise;
@@ -31,14 +32,9 @@ db.on('error', console.error.bind(console, 'connection error:'));
 server.use(restify.bodyParser({
     maxBodySize: 1024*1024,
     mapParams: true,
-    mapFiles: false,
+    mapFiles: true,
     overrideParams: false,
-    keepExtensions: false,
-    multipartFileHandler: (part, request) => {
-        //Todo upload handling
-        console.log(request);
-        console.log(part);
-    },
+    keepExtensions: true,
     uploadDir: '/tmp',
     multiples: true,
     hash: 'sha1'
@@ -46,7 +42,7 @@ server.use(restify.bodyParser({
 
 console.log('Upload directory: '+os.tmpdir());
 
-// server.pre(require('./app/middleware/log'));
+server.pre(require('./app/middleware/log'));
 
 // session
 server.post('session', session.postSession);
@@ -56,6 +52,16 @@ server.post('user', user.postUser);
 server.del('user', auth, user.deleteUser);
 server.post('user/avatar', auth, user.uploadAvatar);
 server.get('user/avatar', auth, user.getAvatar);
+
+// delete downloads
+server.on('after', (request) => {
+    if(request.files) {
+        const key = Object.keys(request.files);
+        key.forEach((k) => {
+            fs.unlink(request.files[k].path, () => {});
+        });
+    }
+});
 
 server.listen(8081, function () {
     console.log('%s listening at %s', server.name, server.url);

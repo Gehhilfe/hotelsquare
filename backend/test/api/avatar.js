@@ -38,7 +38,7 @@ describe('User Avatar', () => {
             let imagePath;
             
             before((done) => {
-                imageGenerator.generateImage(600,600, 80, (err, i) => {
+                imageGenerator.generateImage(300,600, 80, (err, i) => {
                     expect(err).to.be.null;
                     image = i;
                     imagePath = tempWrite.sync(image.data, 'avatar.jpeg');

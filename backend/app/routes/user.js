@@ -1,19 +1,17 @@
 
 const User = require('../models/user');
-/*
-TODO Store upload into minio
 const minio = require('minio');
 const config = require('config');
-
+const sharp = require('sharp');
 
 const minioClient = new minio.Client({
     endPoint: 'stimi.ovh',
     port: 9000,
-    secure: true,
+    secure: false,
     accessKey: config.minio.key,
     secretKey: config.minio.secret
 });
-*/
+
 
 /**
  * registers a new user with the given profile information.
@@ -25,7 +23,6 @@ const minioClient = new minio.Client({
  * @returns {undefined}
  */
 function postUser(request, response, next) {
-
     const user = User(request.params);
     user.validate().then(() => {
         user.save();
@@ -62,9 +59,28 @@ function deleteUser(request, response, next) {
  * @returns {undefined}
  */
 function uploadAvatar(request, response, next) {
-    //console.log(request.files);
-    response.json({});
-    return next();
+    //Convert to jpeg
+    sharp(request.files.avatar.path)
+        .resize(200,200)
+        .toFormat('jpeg')
+        .toBuffer()
+        .then((buffer) => {
+            minioClient.putObject(config.minio.bucket, 'avatar_'+request.authentication._id+'.jpeg', buffer, 'image/jpeg', (err, etag) => {
+                if(err) {
+                    response.status(500);
+                    response.json(err);
+                    return next();
+                } else {
+                    response.json(etag);
+                    return next();
+                }
+            });
+        })
+        .catch((err) => {
+            response.status(500);
+            response.json(err);
+            return next();
+        });
 }
 
 /**
