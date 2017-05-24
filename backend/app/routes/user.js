@@ -35,8 +35,16 @@ function postUser(request, response, next) {
  * @returns {undefined}
  */
 function deleteUser(request, response, next) {
-    response.json();
-    return next();
+    User.find({id:request.authentication._id}).remove((error, res) => {
+        if(error){
+            response.status(500);
+            response.json(error);
+            return next();
+        } else {
+            response.json(res);
+            return next();
+        }
+    });
 }
 
 
