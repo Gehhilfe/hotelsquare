@@ -6,7 +6,7 @@ const session = require('./app/routes/session');
 const user = require('./app/routes/user');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
-
+const auth = require('./app/middleware/filter/authentication');
 
 mongoose.Promise = global.Promise;
 
@@ -14,11 +14,11 @@ const server = restify.createServer();
 
 util.connectDatabase(mongoose).then(() => {
     //Bootstrap database
-    if(process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production') {
         const User = require('./app/models/user');
 
-        if(config.bootstrap) {
-            if(config.bootstrap.User)
+        if (config.bootstrap) {
+            if (config.bootstrap.User)
                 util.bootstrap(User, config.bootstrap.User);
         }
     }
@@ -27,15 +27,18 @@ util.connectDatabase(mongoose).then(() => {
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-server.use(restify.bodyParser({ mapParams: true }));
+server.use(restify.bodyParser({mapParams: true}));
 
 server.pre(require('./app/middleware/log'));
 
-server.post('/session', session.postSession);
+// session
+server.post('session', session.postSession);
 
-server.post('/user', user.postUser);
+// user
+server.post('user', user.postUser);
+server.del('user', auth, user.deleteUser);
 
-server.listen(8081, function() {
+server.listen(8081, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
 
