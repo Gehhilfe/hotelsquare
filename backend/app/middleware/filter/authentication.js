@@ -21,7 +21,7 @@ module.exports = function (request, response, next) {
                 response.json({});
                 return next(new Error(err));
             } else {
-                reqeust.authentication = decoded;
+                request.authentication = decoded;
                 return next();
             }
         });
