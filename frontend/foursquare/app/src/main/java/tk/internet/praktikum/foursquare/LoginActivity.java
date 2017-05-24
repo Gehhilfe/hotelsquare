@@ -15,8 +15,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.RegisterActivity;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
-import tk.internet.praktikum.foursquare.api.pojo.LoginCredentials;
-import tk.internet.praktikum.foursquare.api.services.SessionService;
+import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
+import tk.internet.praktikum.foursquare.api.service.SessionService;
+import tk.internet.praktikum.foursquare.api.service.UserService;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -84,8 +85,15 @@ public class LoginActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
                 .subscribe(
                         tokenInformation -> {
-                            successfulLogin();
-                            progressDialog.dismiss();
+                            UserService uservice = ServiceFactory.createRetrofitService(UserService.class, "https://dev.ip.stimi.ovh/", tokenInformation.getToken());
+                            uservice.deleteUser()
+                                    .subscribeOn(Schedulers.newThread())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(user -> {
+                                    Toast.makeText(getBaseContext(), "jelöscht", Toast.LENGTH_SHORT).show();
+                                    successfulLogin();
+                                    progressDialog.dismiss();
+                        });
                             Toast.makeText(getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG).show();
                         },
                         throwable -> {
