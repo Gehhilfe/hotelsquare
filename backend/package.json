@@ -19,6 +19,7 @@
     "mongoose": "~4.9.6",
     "redis": "~2.7.1",
     "restify": "~4.3.0",
+    "restify-bunyan-logger": "^2.0.7",
     "uuid": "^3.0.1"
   },
   "author": "",

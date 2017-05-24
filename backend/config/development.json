@@ -1,6 +1,6 @@
 {
   "db": {
-    "host": "localhost",
+    "host": "mongo",
     "name": "dev"
   },
   "jwt": {
