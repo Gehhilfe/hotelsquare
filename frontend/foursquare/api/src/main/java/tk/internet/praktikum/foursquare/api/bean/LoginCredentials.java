@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare.api.pojo;
+package tk.internet.praktikum.foursquare.api.bean;
 
 public class LoginCredentials {
 

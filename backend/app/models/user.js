@@ -14,7 +14,8 @@ const UserSchema = new Schema({
     name: {
         type: String,
         required: true,
-        minlength: 4
+        minlength: 4,
+        match: [/^[a-zA-Z][a-zA-Z0-9-_]*$/, 'Only a-z,A-Z,0-9,-,_ characters are allowed as name']
     },
     email: {
         type: String,
@@ -35,10 +36,10 @@ UserSchema.pre('save', function (next) {
         return next();
 
 
-    bcrypt.hash(user.password, SALT_WORK_FACTOR).then(function (hash) {
+    bcrypt.hash(user.password, SALT_WORK_FACTOR).then((hash) => {
         user.password = hash;
         return next();
-    }, function (err) {
+    }, (err) => {
         return next(new Error(err));
     });
 });

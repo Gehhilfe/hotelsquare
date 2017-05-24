@@ -1,6 +1,8 @@
-const mock = require('mock-require');
-const bcrypt = require('bcrypt');
+'use strict';
 
+const mock = require('mock-require');
+
+const bcrypt = require('bcrypt');
 let failBcrypt = false;
 
 mock('bcrypt', {
@@ -13,18 +15,19 @@ mock('bcrypt', {
     compare: bcrypt.compare
 });
 
-
-require('../app/models/user');
-
+// Need to reload User model with mocked bcrypt
 const mongoose = require('mongoose');
+mongoose.models = {};
+mongoose.modelSchemas = {};
+const User = mock.reRequire('../app/models/user');
+
+
 const chai = require('chai');
 const expect = chai.expect;
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const Util = require('../lib/util');
-
-const User = mongoose.model('User');
 
 describe('user', function () {
 
@@ -83,6 +86,33 @@ describe('user', function () {
                 expect(err).to.be.null;
                 return done();
             });
+        });
+        
+        const format_tests = [
+            {name: 'test', result: true},
+            {name: 'test123', result: true},
+            {name: 'test-123', result: true},
+            {name: 'test#', result: false},
+            {name: '1test', result: false},
+            {name: 'a', result: false}
+        ];
+        
+        it('should match the examples format results', (done) => {
+            for(let i=0;i<format_tests.length;i++) {
+                const example = format_tests[i];
+                validUser.name = example.name;
+                const u = new User(validUser);
+                u.validate(function (err) {
+                    if(example.result) {
+                        expect(err).to.be.null;
+                    } else {
+                        expect(err).to.not.be.null;
+                        expect(err.errors.name).to.exist;
+                    }
+                    if(i === format_tests.length-1)
+                        return done();
+                });
+            }
         });
     });
 

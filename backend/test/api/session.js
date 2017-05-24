@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Created by gehhi on 02.05.2017.
- */
 
 const mongoose = require('mongoose');
 const chai = require('chai');
