@@ -103,7 +103,9 @@ describe('User', () => {
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    return expect(User.count({id: u._doc._id})).should.eventually.equal(0);
+                    User.findById(u._doc._id, (error, user) => {
+                        return expect(user).to.be.null;
+                    });
                 });
         });
 
