@@ -6,14 +6,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.Patterns;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.pojo.LoginCredentials;
+import tk.internet.praktikum.foursquare.api.services.UserService;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = RegisterActivity.class.getSimpleName();
+    private final String URL = "https://dev.ip.stimi.ovh/";
 
     private EditText nameInput, emailInput, passwordInput;
     private AppCompatButton registerBtn;
@@ -25,24 +31,14 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
 
         nameInput = (EditText) findViewById(R.id.register_name_input);
-        emailInput = (EditText) findViewById(R.id.register_mail_input);
+        emailInput = (EditText) findViewById(R.id.user_input);
         passwordInput = (EditText) findViewById(R.id.register_password_input);
         registerBtn = (AppCompatButton) findViewById(R.id.create_acc_btn);
         loginLbl = (TextView) findViewById(R.id.login_link);
 
-        registerBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                register();
-            }
-        });
+        registerBtn.setOnClickListener(v -> register());
 
-        loginLbl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        loginLbl.setOnClickListener(v -> finish());
     }
 
     /**
@@ -65,15 +61,22 @@ public class RegisterActivity extends AppCompatActivity {
         String email = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
 
-        // TODO - Registration process with the backend api.
+        UserService service = ServiceFactory.createRetrofitService(UserService.class, URL);
 
-        new android.os.Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                successfulRegister();
-                progressDialog.dismiss();
-            }
-        }, 3000);
+        service.postRegistration(new LoginCredentials(name, email, password))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        loginCredentials -> {
+                            successfulRegister();
+                            progressDialog.dismiss();
+                            Toast.makeText(getApplicationContext(), "Registration complete.", Toast.LENGTH_LONG).show();
+                        },
+                        throwable -> {
+                            failedRegister();
+                            progressDialog.dismiss();
+                        }
+                );
     }
 
     /**
@@ -87,20 +90,20 @@ public class RegisterActivity extends AppCompatActivity {
         String eMail = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
 
-        if (name.isEmpty() || name.length() < 2) {
-            nameInput.setError("Please enter a valid name.");
-            valid = false;
-        } else
-            nameInput.setError(null);
-
         if (eMail.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(eMail).matches()) {
             emailInput.setError("Please enter a valid email address.");
             valid = false;
         } else
             emailInput.setError(null);
 
-        if (password.isEmpty() || password.length() < 8 || password.length() > 12) {
-            passwordInput.setError("Please enter a valid password (8 - 12 characters).");
+        if (name.isEmpty() || name.length() < 3) {
+            nameInput.setError("Please enter a valid name.");
+            valid = false;
+        } else
+            nameInput.setError(null);
+
+        if (password.isEmpty() || password.length() < 6) {
+            passwordInput.setError("Please enter a valid password (> 6 characters).");
             valid = false;
         } else
             passwordInput.setError(null);
@@ -113,7 +116,7 @@ public class RegisterActivity extends AppCompatActivity {
      * the login and finishes the Activity.
      */
     private void successfulRegister() {
-        Log.d("LOGIN_ACTIVITY", "Successful login.");
+        Log.d(LOG_TAG, "Successful login.");
         registerBtn.setEnabled(true);
         setResult(RESULT_OK, null);
         finish();
@@ -123,7 +126,7 @@ public class RegisterActivity extends AppCompatActivity {
      * Routine to execute on Failed registration. Logs the login attempt and displays a Toast for the user.
      */
     private void failedRegister() {
-        Log.d("LOGIN_ACTIVITY", "Failed login.");
+        Log.d(LOG_TAG, "Failed login.");
         registerBtn.setEnabled(true);
         Toast.makeText(getBaseContext(), "Failed to register.", Toast.LENGTH_LONG).show();
     }
