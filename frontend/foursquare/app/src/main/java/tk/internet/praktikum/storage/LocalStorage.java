@@ -11,6 +11,8 @@ import tk.internet.praktikum.foursquare.R;
 
 public class LocalStorage {
 
+    private static final String LOG_TAG = LocalStorage.class.getSimpleName();
+
 
     private static LocalStorage localStorage;
 

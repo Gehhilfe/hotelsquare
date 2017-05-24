@@ -5,4 +5,6 @@ package tk.internet.praktikum.storage;
  */
 
 public class HistoryActivity {
+
+    private static final String LOG_TAG = HistoryActivity.class.getSimpleName();
 }

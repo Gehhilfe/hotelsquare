@@ -20,6 +20,8 @@ import tk.internet.praktikum.foursquare.api.services.SessionService;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
+
     private EditText emailInput, passwordInput;
     private AppCompatButton loginBtn;
     private TextView registerLbl;
@@ -84,8 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                         tokenInformation -> {
                             successfulLogin();
                             progressDialog.dismiss();
-                            Toast toast = Toast.makeText(getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG);
-                            toast.show();
+                            Toast.makeText(getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG).show();
                         },
                         throwable -> {
                             failedLogin();
@@ -112,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
      * the login and finishes the Activity.
      */
     private void successfulLogin() {
-        Log.d("LOGIN_ACTIVITY", "Successful login.");
+        Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
         finish();
     }
@@ -121,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
      * Routine to execute on Failed login. Logs the login attempt and displays a Toast for the user.
      */
     private void failedLogin() {
-        Log.d("LOGIN_ACTIVITY", "Failed login.");
+        Log.d(LOG_TAG, "Failed login.");
         loginBtn.setEnabled(true);
         Toast.makeText(getBaseContext(), "Failed to login.", Toast.LENGTH_LONG).show();
     }

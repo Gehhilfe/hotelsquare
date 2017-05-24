@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = RegisterActivity.class.getSimpleName();
+
     private EditText nameInput, emailInput, passwordInput;
     private AppCompatButton registerBtn;
     private TextView loginLbl;
