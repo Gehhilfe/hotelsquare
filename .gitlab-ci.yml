@@ -18,6 +18,7 @@ stages:
   - backend
   - backend-build
   - backend-deploy
+  - frontend
 
 backend-test:
   services:
@@ -79,3 +80,13 @@ backend-deploy-container-dev:
   image: cdrx/rancher-gitlab-deploy
   script:
    - upgrade --stack ip-dev --service node-app
+   
+frontend-build:
+  stage: frontend
+  image: jangrewe/gitlab-ci-android
+  script:
+   - cd frontend/foursquare
+   - ./gradlew assembleDebug
+  artifacts:
+    paths:
+     - frontend/foursquare/app/build/outputs/apk/apk-debug.apk
