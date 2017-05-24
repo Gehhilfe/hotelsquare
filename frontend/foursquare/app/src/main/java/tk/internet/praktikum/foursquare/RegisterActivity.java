@@ -13,8 +13,8 @@ import android.widget.Toast;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
-import tk.internet.praktikum.foursquare.api.pojo.LoginCredentials;
-import tk.internet.praktikum.foursquare.api.services.UserService;
+import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.service.UserService;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -63,11 +63,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         UserService service = ServiceFactory.createRetrofitService(UserService.class, URL);
 
-        service.postRegistration(new LoginCredentials(name, email, password))
+        service.register(new User(name, email, password))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        loginCredentials -> {
+                        user -> {
                             successfulRegister();
                             progressDialog.dismiss();
                             Toast.makeText(getApplicationContext(), "Registration complete.", Toast.LENGTH_LONG).show();
