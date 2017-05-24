@@ -86,7 +86,6 @@ frontend-build:
   image: jangrewe/gitlab-ci-android
   script:
    - cd frontend/foursquare
+   - export GRADLE_USER_HOME=$(pwd)/.gradle
+   - chmod +x ./gradlew
    - ./gradlew assembleDebug
-  artifacts:
-    paths:
-     - frontend/foursquare/app/build/outputs/apk/apk-debug.apk
