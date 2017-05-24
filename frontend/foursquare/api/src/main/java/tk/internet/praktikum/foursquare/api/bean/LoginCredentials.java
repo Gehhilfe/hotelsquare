@@ -1,8 +1,4 @@
-package tk.internet.praktikum.foursquare.api.beans;
-
-/**
- * Created by robert on 14.05.2017.
- */
+package tk.internet.praktikum.foursquare.api.bean;
 
 public class LoginCredentials {
 

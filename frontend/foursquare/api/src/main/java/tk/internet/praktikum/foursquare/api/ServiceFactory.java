@@ -9,6 +9,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceFactory {
 
+    /**
+     * service factory for creating retrofit services for all server apis
+     *
+     * @param clazz class of created service
+     * @param endpoint web url of server
+     * @param <T> class of returned service
+     * @return service
+     */
     public static <T> T createRetrofitService(final Class<T> clazz, final String endpoint)
     {
         final Retrofit retrofit = new Retrofit.Builder().baseUrl(endpoint)

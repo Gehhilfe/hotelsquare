@@ -1,20 +1,13 @@
-package tk.internet.praktikum.foursquare.api.beans;
+package tk.internet.praktikum.foursquare.api.bean;
 
 import java.util.List;
 import java.io.Serializable;
-/**
- * Created by robert on 14.05.2017.
- */
 
 public class User implements Serializable
 {
     private String name;
     private String email;
     private String password;
-    private String address;
-
-
-    List<UserDTO> friends;
 
     public String getEmail() {
         return email;
@@ -32,15 +25,6 @@ public class User implements Serializable
         this.password = password;
     }
 
-    public List<UserDTO> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(List<UserDTO> friends) {
-        this.friends = friends;
-    }
-
-
     public String getName() {
         return name;
     }
@@ -49,14 +33,4 @@ public class User implements Serializable
         this.name = name;
     }
 
-    public String getAddress() {
-        return address;
-    }
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public void addFriend(UserDTO friend){
-         friends.add(friend);
-    }
 }
