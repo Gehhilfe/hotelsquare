@@ -1,9 +1,9 @@
 package tk.internet.praktikum.foursquare.api.service;
 
+import io.reactivex.Observable;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.POST;
-import rx.Observable;
 import tk.internet.praktikum.foursquare.api.bean.User;
 
 public interface UserService {
