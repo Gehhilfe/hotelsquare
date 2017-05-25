@@ -46,13 +46,10 @@ describe('user', function () {
 
         if (mongoose.connection.db) return done();
         Util.connectDatabase(mongoose).then(function () {
-            User.remove({}, done);
+            User.remove({}).then(() => {
+                validUser.save(done);
+            });
         });
-    });
-
-    it('can be saved', function (done) {
-        const u = new User(validUser);
-        u.save(done);
     });
 
     describe('#name', function () {
@@ -86,6 +83,10 @@ describe('user', function () {
                 expect(err).to.be.null;
                 return done();
             });
+        });
+
+        it('should be unqiue', function () {
+            return expect(User.create(validUser)).to.be.eventually.rejected;
         });
         
         const format_tests = [
