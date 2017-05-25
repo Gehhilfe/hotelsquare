@@ -18,7 +18,7 @@ function ValidationError(errors) {
         message: message,
         constructorOpt: ValidationError
     });
-    this.name = 'MyError';
+    this.name = 'ValidationError';
     this.body.errors = message;
 };
 util.inherits(ValidationError, restify.RestError);
