@@ -20,7 +20,8 @@ import tk.internet.praktikum.foursquare.api.service.UserService;
 public class LoginActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = LoginActivity.class.getSimpleName();
-    private static int REGISTER_REQUEST = 0;    // Register Request Tag für switching Between the Register and Login Activity
+    private static final int REGISTER_REQUEST = 0;    // Register Request Tag für switching Between the Register and Login Activity
+    private static final int RESTORE_PW_REQUEST = 1;
     private final String URL = "https://dev.ip.stimi.ovh/";
 
     private EditText userInput, passwordInput;
@@ -88,10 +89,6 @@ public class LoginActivity extends AppCompatActivity {
                 );
     }
 
-    // TODO - Restore Password
-    private void restorePassword() {
-    }
-
     /**
      * Start up the next Activity or Fragment after a successful login. At the moment it just logs
      * the login and finishes the Activity.
@@ -120,14 +117,29 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(intent, REGISTER_REQUEST);
     }
 
+    // TODO - Restore Password
+    private void restorePassword() {
+        Intent intent = new Intent(getApplicationContext(), RestorePasswordActivity.class);
+        startActivityForResult(intent, RESTORE_PW_REQUEST);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REGISTER_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                // TODO - Start the new Activity after a successful registration. Probably going on the the User Setting view.
-                // TODO - Or wait at the login activity for an email confirmation and then login.
-                //finish();
-            }
+        switch (requestCode) {
+            case REGISTER_REQUEST :
+                if (resultCode == RESULT_OK) {
+                    // TODO - Start the new Activity after a successful registration. Probably going on the the User Setting view.
+                    // TODO - Or wait at the login activity for an email confirmation and then login.
+                    break;
+                } else
+                    break;
+
+            case RESTORE_PW_REQUEST :
+                if (resultCode == RESULT_OK) {
+                    // TODO - Wait at the login activity for the user to restore his password and login.
+                    break;
+                } else
+                    break;
         }
     }
 }
