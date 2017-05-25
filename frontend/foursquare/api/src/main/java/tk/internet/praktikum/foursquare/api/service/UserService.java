@@ -1,15 +1,28 @@
 package tk.internet.praktikum.foursquare.api.service;
 
 import io.reactivex.Observable;
-import retrofit2.http.Body;
-import retrofit2.http.DELETE;
-import retrofit2.http.POST;
+import retrofit2.http.*;
 import tk.internet.praktikum.foursquare.api.bean.User;
 
 public interface UserService {
+    /**
+     * Retrieves profile of current authenticated user
+     *
+     * @return profile of authenticated user
+     */
+    @GET("profile")
+    Observable<User> proile();
 
     /**
-     * deletes currently authenticated user
+     * Retrives profile of user with name
+     * @param name user name
+     * @return profile of user
+     */
+    @GET("user/{name}")
+    Observable<User> profile(@Path("name") String name);
+
+    /**
+     * Deletes currently authenticated user
      *
      * @return deleted user
      */
@@ -17,11 +30,10 @@ public interface UserService {
     Observable<User> deleteUser();
 
     /**
-     * registers new user
+     * Registers a new user
      * @param user user which will be registered
      * @return registered user
      */
     @POST("user")
     Observable<User> register(@Body User user);
-
 }
