@@ -62,7 +62,20 @@ function register(request, response, next) {
         response.json(user);
         return next();
     }).catch((error) => {
-        return next(new ValidationError(error.errors));
+        switch(error.name) {
+        case 'MongoError':
+            return next(new ValidationError({
+                name: {
+                    message: 'Name is already taken'
+                }
+            }));
+
+        case 'ValidationError':
+            return next(new ValidationError(error.errors));
+
+        default:
+            return next(new Error());
+        }
     });
 }
 

@@ -13,8 +13,8 @@ const SALT_WORK_FACTOR = 10;
 const UserSchema = new Schema({
     name: {
         type: String,
-        required: true,
-        minlength: 4,
+        required: [true, 'Please fill a name'],
+        minlength: [4, 'Name needs to have at least 5 characters'],
         unique: true,
         match: [/^[a-zA-Z][a-zA-Z0-9-_]*$/, 'Only a-z,A-Z,0-9,-,_ characters are allowed as name']
     },

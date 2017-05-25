@@ -93,6 +93,7 @@ describe('User', () => {
                 .post('/user')
                 .send(registrationData)
                 .end((err, res) => {
+                    console.log(res.body);
                     res.should.have.status(400);
                     return done();
                 });
