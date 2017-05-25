@@ -36,4 +36,12 @@ public interface UserService {
      */
     @POST("user")
     Observable<User> register(@Body User user);
+
+    /**
+     * Retrives profile of user with name
+     * @param name user name
+     * @return profile of user
+     */
+    @POST("user/{name}/friend")
+    Observable<Object> sendFriendRequest(@Path("name") String name);
 }
