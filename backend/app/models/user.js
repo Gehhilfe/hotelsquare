@@ -40,14 +40,14 @@ const UserSchema = new Schema({
 });
 
 UserSchema.pre('save', function (next) {
-    const user = this;
+    const self = this;
 
-    if (!user.isModified('password'))
+    if (!self.isModified('password'))
         return next();
 
 
-    bcrypt.hash(user.password, SALT_WORK_FACTOR).then((hash) => {
-        user.password = hash;
+    bcrypt.hash(self.password, SALT_WORK_FACTOR).then((hash) => {
+        self.password = hash;
         return next();
     }, (err) => {
         return next(new Error(err));
@@ -59,13 +59,13 @@ UserSchema.pre('save', function (next) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 UserSchema.statics.login = function (name, password) {
-    const User = this;
+    const self = this;
     if(password === undefined) {
         password = name.password;
         name = name.name;
     }
     return new Promise(function (resolve, reject) {
-        User.findOne({$or: [{name: name}, {email: name}]}).then(function (res) {
+        self.findOne({$or: [{name: name}, {email: name}]}).then(function (res) {
             const foundUser = res;
             if (res === null)
                 return reject();
@@ -84,8 +84,8 @@ UserSchema.statics.login = function (name, password) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 UserSchema.methods.comparePassword = function (candidatePassword) {
-    const user = this;
-    return bcrypt.compare(candidatePassword, user.password, null);
+    const self = this;
+    return bcrypt.compare(candidatePassword, self.password, null);
 };
 
 UserSchema.methods.toJSON = function () {

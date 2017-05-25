@@ -28,9 +28,6 @@ util.connectDatabase(mongoose).then(() => {
     }
 });
 
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
 server.use(restify.bodyParser({
     maxBodySize: 1024*1024,
     mapParams: true,
@@ -63,10 +60,10 @@ server.on('after', restifyBunyanLogger({
     logger: bunyanLogger
 }));
 
-// session
+// Session
 server.post('session', session.postSession);
 
-// user
+// User
 server.get('user', auth, user.profile);
 server.get('user/:name', user.profile);
 server.get('profile/avatar', auth, user.getAvatar);
@@ -81,7 +78,7 @@ server.del('profile/avatar', auth, user.deleteAvatar);
 server.post('user/:name/friend', auth, user.sendFriendRequest);
 
 
-// delete downloads
+// Delete downloads
 server.on('after', (request) => {
     if(request.files) {
         const key = Object.keys(request.files);

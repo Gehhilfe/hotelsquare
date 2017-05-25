@@ -57,7 +57,6 @@ function profile(request, response, next) {
  * @returns {undefined}
  */
 function register(request, response, next) {
-    console.log(request.params);
     User.create(request.params).then((user) => {
         response.json(user);
         return next();
@@ -192,7 +191,6 @@ function sendFriendRequest(request, response, next) {
                 return response.send(400, {error: 'Friend request already existing'});
             }
         }).catch((err) => {
-            console.log(err);
             return next(err);
         });
 }
