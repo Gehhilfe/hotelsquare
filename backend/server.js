@@ -42,8 +42,11 @@ server.use(restify.bodyParser({
     hash: 'sha1'
 }));
 
+const bunyanLogger = bunyan.createLogger({
+    name: 'hotel-square',
+    level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO)
+});
 
-const bunyanLogger = bunyan.createLogger({name: 'hotel-square'});
 server.on('after', restifyBunyanLogger({
     skip: function(req) {
         return req.method === 'OPTIONS';
@@ -64,7 +67,7 @@ server.on('after', restifyBunyanLogger({
 server.post('session', session.postSession);
 
 // user
-server.post('user', user.postUser);
+server.post('user', user.register);
 server.del('user', auth, user.deleteUser);
 
 server.post('user/avatar', auth, user.uploadAvatar);

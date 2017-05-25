@@ -3,6 +3,7 @@ const User = require('../models/user');
 const minio = require('minio');
 const config = require('config');
 const sharp = require('sharp');
+const ValidationError = require('../ValidationError');
 
 const minioClient = new minio.Client({
     endPoint: 'stimi.ovh',
@@ -12,27 +13,24 @@ const minioClient = new minio.Client({
     secretKey: config.minio.secret
 });
 
-
 /**
- * registers a new user with the given profile information.
+ * Registers a new user with the given profile information.
  *
- * @function postUser
+ * @function register
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function postUser(request, response, next) {
+function register(request, response, next) {
     const user = User(request.params);
     user.validate().then(() => {
         user.save();
         response.status(200);
         response.json(user);
         return next();
-    }, () => {
-        response.status(400);
-        response.json({error: 'new user could not be created'});
-        return next();
+    }, (error) => {
+        return next(new ValidationError(error.errors));
     });
 }
 
@@ -47,10 +45,7 @@ function postUser(request, response, next) {
 function deleteUser(request, response, next) {
     User.findByIdAndRemove(request.authentication._id, (error, res) => {
         if(error){
-            console.log(error);
-            response.status(500);
-            response.json(error);
-            return next();
+            return next(error);
         } else {
             response.json(res);
             return next();
@@ -134,4 +129,4 @@ function getAvatar(request, response, next) {
     });
 }
 
-module.exports = {postUser, deleteUser, uploadAvatar, getAvatar, deleteAvatar};
+module.exports = {register, deleteUser, uploadAvatar, getAvatar, deleteAvatar};
