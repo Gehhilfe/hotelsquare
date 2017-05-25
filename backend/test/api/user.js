@@ -54,6 +54,7 @@ describe('User', () => {
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
+                    console.log(res.body);
                     return done();
                 });
         });
