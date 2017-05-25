@@ -1,4 +1,6 @@
+'use strict';
 
+const restify = require('restify');
 const User = require('../models/user');
 const minio = require('minio');
 const config = require('config');
@@ -12,6 +14,38 @@ const minioClient = new minio.Client({
     accessKey: config.minio.key,
     secretKey: config.minio.secret
 });
+
+/**
+ * Retrieves user profile
+ *
+ * @function register
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function profile(request, response, next) {
+    let selfRequest = false;
+
+    // When no name provided use authenticated user
+    if(request.params.name === undefined) {
+        request.params.name = request.authentication.name;
+        selfRequest = true;
+    }
+
+    User.findOne({name: request.params.name}).exec().then((user) => {
+        if(user === null)
+            return next(new restify.errors.NotFoundError());
+        if(!selfRequest) {
+            // Remove sensitive information
+            user = user.toJSONPublic();
+        }
+        response.send(user);
+        return next();
+    }).catch((err) => {
+        return next(err);
+    });
+}
 
 /**
  * Registers a new user with the given profile information.
@@ -129,4 +163,4 @@ function getAvatar(request, response, next) {
     });
 }
 
-module.exports = {register, deleteUser, uploadAvatar, getAvatar, deleteAvatar};
+module.exports = {register, deleteUser, uploadAvatar, getAvatar, deleteAvatar, profile};

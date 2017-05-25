@@ -84,4 +84,11 @@ UserSchema.methods.toJSON = function () {
     return obj;
 };
 
+UserSchema.methods.toJSONPublic = function () {
+    const obj = this.toObject();
+    delete obj.password;
+    delete obj.email;
+    return obj;
+};
+
 module.exports = mongoose.model('User', UserSchema);

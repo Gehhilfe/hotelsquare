@@ -31,7 +31,7 @@ describe('User Avatar', () => {
         return done();
     });
 
-    describe('/user/avatar', () => {
+    describe('/profile/avatar', () => {
 
         let image;
         let imagePath;
@@ -56,7 +56,7 @@ describe('User Avatar', () => {
 
         it('should handle a uploaded image', (done) => {
             request(server)
-                .post('/user/avatar')
+                .post('/profile/avatar')
                 .set('x-auth', token)
                 .attach('avatar', imagePath)
                 .end((err, res) => {
@@ -68,7 +68,7 @@ describe('User Avatar', () => {
 
         it('should retrieve stored image', (done) => {
             request(server)
-                .get('/user/avatar')
+                .get('/profile/avatar')
                 .set('x-auth', token)
                 .end((err, res) => {
                     expect(err).to.be.null;
@@ -91,7 +91,7 @@ describe('User Avatar', () => {
 
         it('should delete the stored image', (done) => {
             request(server)
-                .post('/user/avatar')
+                .post('/profile/avatar')
                 .set('x-auth', token)
                 .attach('avatar', imagePath)
                 .end((err) => {
