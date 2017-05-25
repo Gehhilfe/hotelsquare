@@ -45,8 +45,8 @@ server.use(restify.bodyParser({
 
 const bunyanLogger = bunyan.createLogger({name: 'hotel-square'});
 server.on('after', restifyBunyanLogger({
-    skip: function(req, res) {
-        return req.method === "OPTIONS";
+    skip: function(req) {
+        return req.method === 'OPTIONS';
     },
     custom: function(req, res, route, err, log) {
         // This will not work when using gzip.
