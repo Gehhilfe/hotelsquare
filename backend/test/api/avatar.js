@@ -97,12 +97,12 @@ describe('User Avatar', () => {
                 .end((err) => {
                     expect(err).to.be.null;
                     request(server)
-                        .del('/user/avatar')
+                        .del('/profile/avatar')
                         .set('x-auth', token)
                         .end((err) => {
                             expect(err).to.be.null;
                             request(server)
-                                .get('/user/avatar')
+                                .get('/profile/avatar')
                                 .set('x-auth', token)
                                 .end((err, res) => {
                                     expect(err).to.be.null;

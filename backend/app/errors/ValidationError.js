@@ -3,6 +3,11 @@
 const restify = require('restify');
 const util = require('util');
 
+/**
+ * Maps a mongoose validation error to a restify error
+ * @param {Array} errors Error descriptions
+ * @constructor
+ */
 function ValidationError(errors) {
     const message = [];
     for (const key in errors) {
@@ -20,7 +25,8 @@ function ValidationError(errors) {
     });
     this.name = 'ValidationError';
     this.body.errors = message;
-};
+}
+
 util.inherits(ValidationError, restify.RestError);
 
 module.exports = ValidationError;

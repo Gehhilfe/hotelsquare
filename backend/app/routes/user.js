@@ -5,7 +5,7 @@ const User = require('../models/user');
 const minio = require('minio');
 const config = require('config');
 const sharp = require('sharp');
-const ValidationError = require('../ValidationError');
+const ValidationError = require('../errors/ValidationError');
 
 const minioClient = new minio.Client({
     endPoint: 'stimi.ovh',
@@ -28,15 +28,15 @@ function profile(request, response, next) {
     let selfRequest = false;
 
     // When no name provided use authenticated user
-    if(request.params.name === undefined) {
+    if (request.params.name === undefined) {
         request.params.name = request.authentication.name;
         selfRequest = true;
     }
 
     User.findOne({name: request.params.name}).exec().then((user) => {
-        if(user === null)
+        if (user === null)
             return next(new restify.errors.NotFoundError());
-        if(!selfRequest) {
+        if (!selfRequest) {
             // Remove sensitive information
             user = user.toJSONPublic();
         }
@@ -62,7 +62,7 @@ function register(request, response, next) {
         response.json(user);
         return next();
     }).catch((error) => {
-        switch(error.name) {
+        switch (error.name) {
         case 'MongoError':
             return next(new ValidationError({
                 name: {
@@ -72,9 +72,6 @@ function register(request, response, next) {
 
         case 'ValidationError':
             return next(new ValidationError(error.errors));
-
-        default:
-            return next(new Error());
         }
     });
 }
@@ -89,7 +86,7 @@ function register(request, response, next) {
  */
 function deleteUser(request, response, next) {
     User.findByIdAndRemove(request.authentication._id, (error, res) => {
-        if(error){
+        if (error) {
             return next(error);
         } else {
             response.json(res);
@@ -110,12 +107,12 @@ function deleteUser(request, response, next) {
 function uploadAvatar(request, response, next) {
     //Convert to jpeg
     sharp(request.files.avatar.path)
-        .resize(200,200)
+        .resize(200, 200)
         .toFormat('jpeg')
         .toBuffer()
         .then((buffer) => {
-            minioClient.putObject(config.minio.bucket, 'avatar_'+request.authentication.name+'.jpeg', buffer, 'image/jpeg', (err, etag) => {
-                if(err) {
+            minioClient.putObject(config.minio.bucket, 'avatar_' + request.authentication.name + '.jpeg', buffer, 'image/jpeg', (err, etag) => {
+                if (err) {
                     response.send(500, err);
                     return next();
                 } else {
@@ -140,9 +137,9 @@ function uploadAvatar(request, response, next) {
  * @returns {undefined}
  */
 function deleteAvatar(request, response, next) {
-    minioClient.removeObject(config.minio.bucket, 'avatar_'+request.authentication.name+'.jpeg', (err) => {
-        if(err) {
-            response.send('404', 'Avatar for '+request.authentication.name+' not found');
+    minioClient.removeObject(config.minio.bucket, 'avatar_' + request.authentication.name + '.jpeg', (err) => {
+        if (err) {
+            response.send('404', 'Avatar for ' + request.authentication.name + ' not found');
         } else {
             response.send();
         }
@@ -160,10 +157,10 @@ function deleteAvatar(request, response, next) {
  */
 function getAvatar(request, response, next) {
     // When no name provided use authenticated user
-    if(request.params.name === undefined)
+    if (request.params.name === undefined)
         request.params.name = request.authentication.name;
 
-    minioClient.getObject(config.minio.bucket, 'avatar_'+request.params.name+'.jpeg', (err, buffer) => {
+    minioClient.getObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', (err, buffer) => {
         if (err) {
             response.send(404, '');
         } else {
@@ -174,4 +171,30 @@ function getAvatar(request, response, next) {
     });
 }
 
-module.exports = {register, deleteUser, uploadAvatar, getAvatar, deleteAvatar, profile};
+/**
+ * Sends a friend request from the authenticated user to name
+ *
+ * @param {IncommingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function sendFriendRequest(request, response, next) {
+    User.findOne({'friendRequests.name': request.authentication.name}, {'friendRequests.$': 1})
+        .then((found) => {
+            if (found === null) {
+                return User.updateOne({name: request.params.name}, {$push: {'friendRequests': request.authentication}})
+                    .then((res) => {
+                        response.json(res);
+                        return next();
+                    });
+            } else {
+                return response.send(400, {error: 'Friend request already existing'});
+            }
+        }).catch((err) => {
+            console.log(err);
+            return next(err);
+        });
+}
+
+module.exports = {register, deleteUser, uploadAvatar, getAvatar, deleteAvatar, profile, sendFriendRequest};

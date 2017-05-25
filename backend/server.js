@@ -78,6 +78,8 @@ server.del('user', auth, user.deleteUser);
 server.post('profile/avatar', auth, user.uploadAvatar);
 server.del('profile/avatar', auth, user.deleteAvatar);
 
+server.post('user/:name/friend', auth, user.sendFriendRequest);
+
 
 // delete downloads
 server.on('after', (request) => {

@@ -10,11 +10,12 @@ const jsonwt = require('jsonwebtoken');
 const expect = chai.expect;
 chai.should();
 chai.use(chaiHttp);
-
+const request = require('supertest');
 
 describe('User', () => {
 
     let u;
+    let other;
     let token;
 
     before((done) => {
@@ -23,7 +24,10 @@ describe('User', () => {
                 User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99'}).then((user) => {
                     u = user;
                     token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
-                    return done();
+                    User.create({name: 'peter2', email: 'peter1223@cool.de', password: 'peter99'}).then((user) => {
+                        other = user;
+                        return done();
+                    });
                 });
             });
         });
@@ -31,7 +35,7 @@ describe('User', () => {
 
     describe('GET user', () => {
         it('should retrieve user information when name given', (done) => {
-            chai.request(server)
+            request(server)
                 .get('/user/'+u.name)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -43,7 +47,7 @@ describe('User', () => {
         });
 
         it('should respond with 404 if user is unkown', (done) => {
-            chai.request(server)
+            request(server)
                 .get('/user/unkown')
                 .end((err, res) => {
                     res.should.have.status(404);
@@ -52,7 +56,7 @@ describe('User', () => {
         });
 
         it('should retrieve own user information when authenticated and no name given', (done) => {
-            chai.request(server)
+            request(server)
                 .get('/user')
                 .set('x-auth', token)
                 .end((err, res) => {
@@ -74,7 +78,7 @@ describe('User', () => {
                 email: 'mail@online.de',
                 password: 'secret'
             };
-            chai.request(server)
+            request(server)
                 .post('/user')
                 .send(registrationData)
                 .end((err, res) => {
@@ -89,7 +93,7 @@ describe('User', () => {
                 email: 'mail@online.de',
                 password: 'secret'
             };
-            chai.request(server)
+            request(server)
                 .post('/user')
                 .send(registrationData)
                 .end((err, res) => {
@@ -104,7 +108,7 @@ describe('User', () => {
                 email: 'mail@online.de',
                 password: 'secret'
             };
-            chai.request(server)
+            request(server)
                 .post('/user')
                 .send(registrationData)
                 .end((err, res) => {
@@ -118,7 +122,7 @@ describe('User', () => {
                 name: 'test',
                 password: 'secret'
             };
-            chai.request(server)
+            request(server)
                 .post('/user')
                 .send(registrationData)
                 .end((err, res) => {
@@ -132,7 +136,7 @@ describe('User', () => {
                 email: 'mail@online.de',
                 name: 'test'
             };
-            chai.request(server)
+            request(server)
                 .post('/user')
                 .send(registrationData)
                 .end((err, res) => {
@@ -144,10 +148,10 @@ describe('User', () => {
 
     });
 
-    describe('/DELETE user', () => {
+    describe('DELETE user', () => {
 
         it('should delete user if authenticated', (done) => {
-            chai.request(server)
+            request(server)
                 .delete('/user')
                 .set('x-auth', token)
                 .end((err, res) => {
@@ -159,5 +163,43 @@ describe('User', () => {
                 });
         });
 
+    });
+
+    describe('friend requests', () => {
+        it('should be able to send a friend request', (done) => {
+            request(server)
+                .post('/user/'+other.name+'/friend')
+                .set('x-auth', token)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    User.findOne({name: other.name}).then((u) => {
+                        u.friendRequests.should.not.be.empty;
+                        return done();
+                    });
+                });
+        });
+
+        describe('when a request already exists', () => {
+
+            beforeEach((done) => {
+                other.friendRequests.push(u);
+                other.save().then(() => {
+                    return done();
+                });
+            });
+
+            it('should not add another request', (done) => {
+                request(server)
+                    .post('/user/'+other.name+'/friend')
+                    .set('x-auth', token)
+                    .end((err, res) => {
+                        res.should.have.status(400);
+                        User.findOne({name: other.name}).then((u) => {
+                            u.friendRequests.length.should.be.equal(1);
+                            return done();
+                        });
+                    });
+            });
+        });
     });
 });

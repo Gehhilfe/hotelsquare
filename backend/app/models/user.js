@@ -1,6 +1,5 @@
 'use strict';
 
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
@@ -27,7 +26,17 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         minlength: 6
-    }
+    },
+    friends: [{
+        name: String
+    }],
+    friendRequests: [{
+        name: String,
+        created_at: {
+            type: Date,
+            default: Date.now
+        }
+    }]
 });
 
 UserSchema.pre('save', function (next) {
@@ -56,7 +65,7 @@ UserSchema.statics.login = function (name, password) {
         name = name.name;
     }
     return new Promise(function (resolve, reject) {
-        User.findOne({name: name}).then(function (res) {
+        User.findOne({$or: [{name: name}, {email: name}]}).then(function (res) {
             const foundUser = res;
             if (res === null)
                 return reject();
@@ -89,6 +98,7 @@ UserSchema.methods.toJSONPublic = function () {
     const obj = this.toObject();
     delete obj.password;
     delete obj.email;
+    delete obj.friends;
     return obj;
 };
 

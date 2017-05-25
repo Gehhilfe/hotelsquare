@@ -1,13 +1,12 @@
 'use strict';
 
 const mock = require('mock-require');
-
 const bcrypt = require('bcrypt');
 let failBcrypt = false;
 
 mock('bcrypt', {
-    hash: function(password, salt_work) {
-        if(failBcrypt)
+    hash: function (password, salt_work) {
+        if (failBcrypt)
             return Promise.reject('Cant hash password!');
         else
             return bcrypt.hash(password, salt_work);
@@ -21,11 +20,14 @@ mongoose.models = {};
 mongoose.modelSchemas = {};
 const User = mock.reRequire('../app/models/user');
 
-
 const chai = require('chai');
+
 const expect = chai.expect;
+
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
+chai.use(require('chai-date'));
+chai.should();
 
 const Util = require('../lib/util');
 
@@ -33,7 +35,8 @@ describe('user', function () {
 
 
     let validUser;
-    let storedUser;
+    let aUser;
+    let bUser;
 
     beforeEach(function (done) {
         failBcrypt = false;
@@ -45,18 +48,26 @@ describe('user', function () {
             password: 'password'
         };
 
-        //if (mongoose.connection.db) return done();
-        Util.connectDatabase(mongoose).then(function () {
+        const otherUser = {
+            name: 'OtherTest',
+            email: 'test@test.de',
+            password: 'password'
+        };
+
+        Util.connectDatabase(mongoose).then(() => {
             User.remove({}).then(() => {
                 User.create(validUser).then((u) => {
-                    storedUser = u;
-                    return done();
+                    aUser = u;
+                    User.create(otherUser).then((u) => {
+                        bUser = u;
+                        return done();
+                    });
                 });
             });
         });
     });
 
-    describe('#name', function () {
+    describe('#name', () => {
         it('cant be empty', function (done) {
             validUser.name = '';
             const u = new User(validUser);
@@ -92,7 +103,7 @@ describe('user', function () {
         it('should be unqiue', function () {
             return expect(User.create(validUser)).to.be.eventually.rejected;
         });
-        
+
         const format_tests = [
             {name: 'test', result: true},
             {name: 'test123', result: true},
@@ -101,27 +112,27 @@ describe('user', function () {
             {name: '1test', result: false},
             {name: 'a', result: false}
         ];
-        
+
         it('should match the examples format results', (done) => {
-            for(let i=0;i<format_tests.length;i++) {
+            for (let i = 0; i < format_tests.length; i++) {
                 const example = format_tests[i];
                 validUser.name = example.name;
                 const u = new User(validUser);
                 u.validate(function (err) {
-                    if(example.result) {
+                    if (example.result) {
                         expect(err).to.be.null;
                     } else {
                         expect(err).to.not.be.null;
                         expect(err.errors.name).to.exist;
                     }
-                    if(i === format_tests.length-1)
+                    if (i === format_tests.length - 1)
                         return done();
                 });
             }
         });
     });
 
-    describe('#email', function () {
+    describe('#email', () => {
         it('cant be empty', function (done) {
             validUser.email = '';
             const u = new User(validUser);
@@ -148,7 +159,7 @@ describe('user', function () {
         });
     });
 
-    describe('#password', function () {
+    describe('#password', () => {
 
         it('should have a minimum length of 6 characters', function (done) {
             const u = new User(validUser);
@@ -166,16 +177,16 @@ describe('user', function () {
         });
 
         it('should stay valid when not changed', function (done) {
-            storedUser.name = 'Blubbbb';
-            storedUser.validate().then(done);
+            aUser.name = 'Blubbbb';
+            aUser.validate().then(done);
         });
 
         it('should be hashed when saved', function () {
-            expect(storedUser.password).to.be.not.equal(validUser.password);
+            expect(aUser.password).to.be.not.equal(validUser.password);
         });
 
         it('should not change when already hashed and saved again', (done) => {
-            storedUser.save().then((res) => {
+            aUser.save().then((res) => {
                 const hashed_password = res.password;
                 res.save().then((res) => {
                     expect(hashed_password).to.be.equal(res.password);
@@ -196,16 +207,26 @@ describe('user', function () {
         });
     });
 
+    describe('#friendRequests', () => {
+        it('should store name of sender', (done) => {
+            aUser.friendRequests.push(bUser);
+            expect(aUser.friendRequests[0].name).to.be.equal(bUser.name);
+            console.log(aUser.friendRequests[0]);
+            aUser.friendRequests[0].created_at.should.be.today;
+            return done();
+        });
+    });
+
     describe('comparePassword', () => {
         it('compare should yield a true result with correct plain text password', function (done) {
-            storedUser.comparePassword(validUser.password).then(function (res) {
+            aUser.comparePassword(validUser.password).then(function (res) {
                 expect(res).to.be.true;
                 return done();
             });
         });
 
         it('compare should yield a false result with wrong plain text password', function (done) {
-            storedUser.comparePassword('haxor').then(function (res) {
+            aUser.comparePassword('haxor').then(function (res) {
                 expect(res).to.be.false;
                 return done();
             });
@@ -227,6 +248,12 @@ describe('user', function () {
 
         it('should return the user with valid name and password', function () {
             return expect(User.login(validUser.name, 'password').then(function (u) {
+                return Promise.resolve(u.equals(validUser));
+            })).to.eventually.equal(true);
+        });
+
+        it('should return the user with valid emai and password', function () {
+            return expect(User.login(validUser.email, 'password').then(function (u) {
                 return Promise.resolve(u.equals(validUser));
             })).to.eventually.equal(true);
         });
