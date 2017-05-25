@@ -18,6 +18,7 @@ stages:
   - backend
   - backend-build
   - backend-deploy
+  - frontend
 
 backend-test:
   services:
@@ -79,3 +80,16 @@ backend-deploy-container-dev:
   image: cdrx/rancher-gitlab-deploy
   script:
    - upgrade --stack ip-dev --service node-app
+   
+frontend-build:
+  stage: frontend
+  only:
+   - /frontend/
+   - dev
+   - master
+  image: jangrewe/gitlab-ci-android
+  script:
+   - cd frontend/foursquare
+   - export GRADLE_USER_HOME=$(pwd)/.gradle
+   - chmod +x ./gradlew
+   - ./gradlew assembleDebug

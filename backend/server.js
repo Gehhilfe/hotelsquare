@@ -7,6 +7,7 @@ const user = require('./app/routes/user');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
+const  restifyBunyanLogger = require('restify-bunyan-logger');
 const fs = require('fs');
 
 
@@ -35,14 +36,12 @@ server.use(restify.bodyParser({
     mapFiles: true,
     overrideParams: false,
     keepExtensions: true,
-    uploadDir: '/tmp',
+    uploadDir: os.tmpdir(),
     multiples: true,
     hash: 'sha1'
 }));
 
-console.log('Upload directory: '+os.tmpdir());
-
-server.pre(require('./app/middleware/log'));
+server.on('after', restifyBunyanLogger());
 
 // session
 server.post('session', session.postSession);
