@@ -71,15 +71,9 @@ public class LoginActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
                 .subscribe(
                         tokenInformation -> {
-                            UserService uservice = ServiceFactory.createRetrofitService(UserService.class, "https://dev.ip.stimi.ovh/", tokenInformation.getToken());
-                            uservice.deleteUser()
-                                    .subscribeOn(Schedulers.newThread())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(user -> {
-                                    Toast.makeText(getBaseContext(), "jelöscht", Toast.LENGTH_SHORT).show();
-                                    successfulLogin();
-                                    progressDialog.dismiss();
-                        });
+                            UserService uservice = ServiceFactory.createRetrofitService(UserService.class, URL, tokenInformation.getToken());
+                            successfulLogin();
+                            progressDialog.dismiss();
                             Toast.makeText(getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG).show();
                         },
                         throwable -> {
