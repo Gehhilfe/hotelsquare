@@ -74,10 +74,9 @@ function uploadAvatar(request, response, next) {
         .toFormat('jpeg')
         .toBuffer()
         .then((buffer) => {
-            minioClient.putObject(config.minio.bucket, 'avatar_'+request.authentication._id+'.jpeg', buffer, 'image/jpeg', (err, etag) => {
+            minioClient.putObject(config.minio.bucket, 'avatar_'+request.authentication.name+'.jpeg', buffer, 'image/jpeg', (err, etag) => {
                 if(err) {
-                    response.status(500);
-                    response.json(err);
+                    response.send(500, err);
                     return next();
                 } else {
                     response.json(etag);
@@ -93,7 +92,26 @@ function uploadAvatar(request, response, next) {
 }
 
 /**
- * Retrieves a stored avater image for the authenticated user.
+ * Deletes a stored avater image for the authenticated user.
+ *
+ * @param {IncommingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function deleteAvatar(request, response, next) {
+    minioClient.removeObject(config.minio.bucket, 'avatar_'+request.authentication.name+'.jpeg', (err) => {
+        if(err) {
+            response.send('404', 'Avatar for '+request.authentication.name+' not found');
+        } else {
+            response.send();
+        }
+        return next();
+    });
+}
+
+/**
+ * Retrieves a stored avater image for a user.
  *
  * @param {IncommingMessage} request request
  * @param {Object} response response
@@ -101,9 +119,19 @@ function uploadAvatar(request, response, next) {
  * @returns {undefined}
  */
 function getAvatar(request, response, next) {
-    response.setHeader('Content-Type', 'image/jpeg');
-    response.send();
-    return next();
+    // When no name provided use authenticated user
+    if(request.params.name === undefined)
+        request.params.name = request.authentication.name;
+
+    minioClient.getObject(config.minio.bucket, 'avatar_'+request.params.name+'.jpeg', (err, buffer) => {
+        if (err) {
+            response.send(404, '');
+        } else {
+            response.setHeader('Content-Type', 'image/jpeg');
+            buffer.pipe(response);
+        }
+        return next();
+    });
 }
 
-module.exports = {postUser, deleteUser, uploadAvatar, getAvatar};
+module.exports = {postUser, deleteUser, uploadAvatar, getAvatar, deleteAvatar};

@@ -7,7 +7,8 @@ const user = require('./app/routes/user');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
-const  restifyBunyanLogger = require('restify-bunyan-logger');
+const bunyan = require('bunyan');
+const restifyBunyanLogger = require('restify-bunyan-logger');
 const fs = require('fs');
 
 
@@ -41,7 +42,23 @@ server.use(restify.bodyParser({
     hash: 'sha1'
 }));
 
-server.on('after', restifyBunyanLogger());
+
+const bunyanLogger = bunyan.createLogger({name: 'hotel-square'});
+server.on('after', restifyBunyanLogger({
+    skip: function(req, res) {
+        return req.method === "OPTIONS";
+    },
+    custom: function(req, res, route, err, log) {
+        // This will not work when using gzip.
+        log.res.length = res.get('Content-Length');
+
+        log.err = err;
+
+        // Don't forget to return!
+        return log;
+    },
+    logger: bunyanLogger
+}));
 
 // session
 server.post('session', session.postSession);
@@ -49,8 +66,12 @@ server.post('session', session.postSession);
 // user
 server.post('user', user.postUser);
 server.del('user', auth, user.deleteUser);
+
 server.post('user/avatar', auth, user.uploadAvatar);
 server.get('user/avatar', auth, user.getAvatar);
+server.get('user/:name/avatar', auth, user.getAvatar);
+server.del('user/avatar', auth, user.deleteAvatar);
+
 
 // delete downloads
 server.on('after', (request) => {
