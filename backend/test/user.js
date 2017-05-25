@@ -33,21 +33,25 @@ describe('user', function () {
 
 
     let validUser;
+    let storedUser;
 
     beforeEach(function (done) {
         failBcrypt = false;
         mongoose.Promise = global.Promise;
 
-        validUser = new User({
+        validUser = {
             name: 'Test',
             email: 'test@test.de',
             password: 'password'
-        });
+        };
 
-        if (mongoose.connection.db) return done();
+        //if (mongoose.connection.db) return done();
         Util.connectDatabase(mongoose).then(function () {
             User.remove({}).then(() => {
-                validUser.save(done);
+                User.create(validUser).then((u) => {
+                    storedUser = u;
+                    return done();
+                });
             });
         });
     });
@@ -162,24 +166,16 @@ describe('user', function () {
         });
 
         it('should stay valid when not changed', function (done) {
-            const u = new User(validUser);
-            u.save().then((res) => {
-                res.name = 'Blub';
-                res.validate().then(done);
-            });
+            storedUser.name = 'Blubbbb';
+            storedUser.validate().then(done);
         });
 
-        it('should be hashed when saved', function (done) {
-            const u = new User(validUser);
-            u.save(function () {
-                expect(u.password).to.be.not.equal(validUser.password);
-                return done();
-            });
+        it('should be hashed when saved', function () {
+            expect(storedUser.password).to.be.not.equal(validUser.password);
         });
 
         it('should not change when already hashed and saved again', (done) => {
-            const u = new User(validUser);
-            u.save().then((res) => {
+            storedUser.save().then((res) => {
                 const hashed_password = res.password;
                 res.save().then((res) => {
                     expect(hashed_password).to.be.equal(res.password);
@@ -202,22 +198,16 @@ describe('user', function () {
 
     describe('comparePassword', () => {
         it('compare should yield a true result with correct plain text password', function (done) {
-            const u = new User(validUser);
-            u.save().then(function () {
-                u.comparePassword(validUser.password).then(function (res) {
-                    expect(res).to.be.true;
-                    return done();
-                });
+            storedUser.comparePassword(validUser.password).then(function (res) {
+                expect(res).to.be.true;
+                return done();
             });
         });
 
         it('compare should yield a false result with wrong plain text password', function (done) {
-            const u = new User(validUser);
-            u.save().then(function () {
-                u.comparePassword('haxor').then(function (res) {
-                    expect(res).to.be.false;
-                    return done();
-                });
+            storedUser.comparePassword('haxor').then(function (res) {
+                expect(res).to.be.false;
+                return done();
             });
         });
     });
