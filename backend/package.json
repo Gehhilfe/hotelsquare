@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "lint": "eslint *.js ./app/**/*.js *.js ./test/*.js ./test/**/*.js ./lib/*.js ./lib/**/*.js",
-    "test": "mocha test test test/api --timeout 10000",
-    "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- test test test/api --timeout 10000"
+    "test": "mocha test test/api test/middleware/filter --timeout 10000",
+    "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- test test/api test/middleware/filter --timeout 10000"
   },
   "engines": {
     "node": ">= 5.12.0"
@@ -15,11 +15,15 @@
     "chalk": "^1.1.3",
     "config": "^1.25.1",
     "jsonwebtoken": "^7.4.0",
+    "minio": "^3.1.3",
     "mongodb": "~2.2.26",
     "mongoose": "~4.9.6",
+    "promisify-node": "^0.4.0",
     "redis": "~2.7.1",
     "restify": "~4.3.0",
     "restify-bunyan-logger": "^2.0.7",
+    "sharp": "^0.17.3",
+    "temp-write": "^3.3.0",
     "uuid": "^3.0.1"
   },
   "author": "",
@@ -30,8 +34,10 @@
     "chai-http": "^3.0.0",
     "eslint": "^3.19.0",
     "istanbul": "^0.4.5",
+    "js-image-generator": "^1.0.2",
     "mocha": "^3.3.0",
     "mock-require": "^2.0.2",
-    "sinon": "^2.1.0"
+    "sinon": "^2.1.0",
+    "supertest": "^3.0.0"
   }
 }

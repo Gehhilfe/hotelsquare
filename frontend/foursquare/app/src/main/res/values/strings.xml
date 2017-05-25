@@ -11,4 +11,7 @@
     <string name="name">Name</string>
     <string name="user_preferences">User_preferences</string>
     <string name="title_activity_foursquare">Foursquare</string>
+    <string name="password_forgotten">Password forgotten?</string>
+    <string name="reset_password_lbl">Enter your Email address to reset your password.</string>
+    <string name="reset_password">Reset Password</string>
 </resources>
