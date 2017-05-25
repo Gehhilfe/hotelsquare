@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../server');
-const util = require('../../lib/util');
+const Util = require('../../lib/util');
 const User = require('../../app/models/user');
 const jsonwt = require('jsonwebtoken');
 const expect = chai.expect;
@@ -18,14 +18,14 @@ describe('User', () => {
     let token;
 
     before((done) => {
-        util.connectDatabase(mongoose);
-        User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99'}).then((param) => {
-            u = param;
-            token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
-            return done();
-        }).catch((error ) => {
-            console.log(error);
-            return done();
+        Util.connectDatabase(mongoose).then(function () {
+            User.remove({}).then(() => {
+                User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99'}).then((user) => {
+                    u = user;
+                    token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
+                    return done();
+                });
+            });
         });
     });
 
@@ -70,7 +70,7 @@ describe('User', () => {
 
         it('should register a new user with valid data', (done) => {
             const registrationData = {
-                name: 'test',
+                name: 'testTest',
                 email: 'mail@online.de',
                 password: 'secret'
             };
@@ -79,6 +79,21 @@ describe('User', () => {
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(200);
+                    return done();
+                });
+        });
+
+        it('should not register user with same name', (done) => {
+            const registrationData = {
+                name: 'peter',
+                email: 'mail@online.de',
+                password: 'secret'
+            };
+            chai.request(server)
+                .post('/user')
+                .send(registrationData)
+                .end((err, res) => {
+                    res.should.have.status(400);
                     return done();
                 });
         });
@@ -93,7 +108,6 @@ describe('User', () => {
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
-                    console.log(res.body);
                     return done();
                 });
         });

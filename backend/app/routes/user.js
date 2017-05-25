@@ -57,13 +57,11 @@ function profile(request, response, next) {
  * @returns {undefined}
  */
 function register(request, response, next) {
-    const user = User(request.params);
-    user.validate().then(() => {
-        user.save();
-        response.status(200);
+    console.log(request.params);
+    User.create(request.params).then((user) => {
         response.json(user);
         return next();
-    }, (error) => {
+    }).catch((error) => {
         return next(new ValidationError(error.errors));
     });
 }
