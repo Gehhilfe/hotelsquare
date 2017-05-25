@@ -15,7 +15,6 @@ const imageGenerator = require('js-image-generator');
 const tempWrite = require('temp-write');
 const fs = require('fs');
 const path = require('path');
-const sharp = require('sharp');
 
 const testHelpers = require('../../lib/test_helpers');
 
