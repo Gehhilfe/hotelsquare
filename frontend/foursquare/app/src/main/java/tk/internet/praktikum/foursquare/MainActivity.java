@@ -81,10 +81,15 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_search) {
-            // Handle the camera action
+           // call Search activity
         } else if (id == R.id.nav_history) {
+            // call history activity
 
-        } else if (id == R.id.nav_manage) {
+        }
+        else if(id==R.id.nav_me){
+            // call login activity if didn't login util now
+        }
+        else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
 
