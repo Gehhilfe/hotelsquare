@@ -233,6 +233,33 @@ describe('user', function () {
         });
     });
 
+    describe('public json', () => {
+        it('should not contain password', () => {
+            const json = aUser.toJSONPublic();
+            json.should.not.have.property('password');
+        });
+
+        it('should not contain email', () => {
+            const json = aUser.toJSONPublic();
+            json.should.not.have.property('email');
+        });
+
+        it('should not contain friends', () => {
+            const json = aUser.toJSONPublic();
+            json.should.not.have.property('friends');
+        });
+
+        it('should not contain friendRequests', () => {
+            const json = aUser.toJSONPublic();
+            json.should.not.have.property('friendRequests');
+        });
+
+        it('should contain name', () => {
+            const json = aUser.toJSONPublic();
+            json.should.have.property('name');
+        });
+    });
+
     describe('login', function () {
         beforeEach(function (done) {
 

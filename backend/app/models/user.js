@@ -99,6 +99,7 @@ UserSchema.methods.toJSONPublic = function () {
     delete obj.password;
     delete obj.email;
     delete obj.friends;
+    delete obj.friendRequests;
     return obj;
 };
 
