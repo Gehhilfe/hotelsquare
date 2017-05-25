@@ -23,5 +23,21 @@ rules:
   require-jsdoc: 1
   prefer-const:
     - error
-  no-console: 0
-
+  no-console: warn
+  no-redeclare: error
+  no-self-assign: error
+  no-useless-return: error
+  no-unused-vars: error
+  callback-return: error
+  brace-style:
+   - error
+   - 1tbs
+  capitalized-comments: error
+  comma-dangle: error
+  comma-spacing: error
+  comma-style:
+   - error
+   - last
+  consistent-this:
+   - error
+   - self

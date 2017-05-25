@@ -17,7 +17,7 @@ function bootstrap(model, data) {
     data.forEach((e) => {
         promises.push(model.create(e));
     });
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         Promise.all(promises).then(resolve).catch(reject);
     });
 }
