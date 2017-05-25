@@ -15,11 +15,13 @@ chai.use(chaiHttp);
 describe('User', () => {
 
     let u;
+    let token;
 
     before((done) => {
         util.connectDatabase(mongoose);
         User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99'}).then((param) => {
             u = param;
+            token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
             return done();
         }).catch((error ) => {
             console.log(error);
@@ -27,7 +29,44 @@ describe('User', () => {
         });
     });
 
-    describe('/POST user', () => {
+    describe('GET user', () => {
+        it('should retrieve user information when name given', (done) => {
+            chai.request(server)
+                .get('/user/'+u.name)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(u.name);
+                    expect(res.body.email).to.be.undefined;
+                    return done();
+                });
+        });
+
+        it('should respond with 404 if user is unkown', (done) => {
+            chai.request(server)
+                .get('/user/unkown')
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    return done();
+                });
+        });
+
+        it('should retrieve own user information when authenticated and no name given', (done) => {
+            chai.request(server)
+                .get('/user')
+                .set('x-auth', token)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(u.name);
+                    return done();
+                });
+        });
+
+
+    });
+
+    describe('POST user', () => {
 
         it('should register a new user with valid data', (done) => {
             const registrationData = {
@@ -91,12 +130,6 @@ describe('User', () => {
     });
 
     describe('/DELETE user', () => {
-
-        let token;
-        before((done) => {
-            token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
-            return done();
-        });
 
         it('should delete user if authenticated', (done) => {
             chai.request(server)
