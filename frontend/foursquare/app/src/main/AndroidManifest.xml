@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".RegisterActivity" android:theme="@style/AppTheme.Dark"/>
+        <activity android:name=".RestorePasswordActivity" android:theme="@style/AppTheme.Dark"/>
         <activity android:name=".FoursquareActivity" android:theme="@style/AppTheme.Dark"></activity>
     </application>
 
