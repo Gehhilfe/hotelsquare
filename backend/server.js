@@ -42,8 +42,11 @@ server.use(restify.bodyParser({
     hash: 'sha1'
 }));
 
+const bunyanLogger = bunyan.createLogger({
+    name: 'hotel-square',
+    level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO)
+});
 
-const bunyanLogger = bunyan.createLogger({name: 'hotel-square'});
 server.on('after', restifyBunyanLogger({
     skip: function(req) {
         return req.method === 'OPTIONS';
@@ -64,13 +67,16 @@ server.on('after', restifyBunyanLogger({
 server.post('session', session.postSession);
 
 // user
-server.post('user', user.postUser);
+server.get('user', auth, user.profile);
+server.get('user/:name', user.profile);
+server.get('profile/avatar', auth, user.getAvatar);
+server.get('user/:name/avatar', auth, user.getAvatar);
+
+server.post('user', user.register);
 server.del('user', auth, user.deleteUser);
 
-server.post('user/avatar', auth, user.uploadAvatar);
-server.get('user/avatar', auth, user.getAvatar);
-server.get('user/:name/avatar', auth, user.getAvatar);
-server.del('user/avatar', auth, user.deleteAvatar);
+server.post('profile/avatar', auth, user.uploadAvatar);
+server.del('profile/avatar', auth, user.deleteAvatar);
 
 
 // delete downloads

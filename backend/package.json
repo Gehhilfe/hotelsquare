@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "lint": "eslint *.js ./app/**/*.js *.js ./test/*.js ./test/**/*.js ./lib/*.js ./lib/**/*.js",
-    "test": "mocha test test/api test/middleware/filter --timeout 10000",
+    "test": "HOTEL_QUIET=1 mocha test test/api test/middleware/filter --timeout 10000",
     "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- test test/api test/middleware/filter --timeout 10000"
   },
   "engines": {
