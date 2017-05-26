@@ -11,7 +11,6 @@ const expect = chai.expect;
 chai.should();
 chai.use(chaiHttp);
 const request = require('supertest');
-const when = require('when');
 
 describe('User', () => {
 
@@ -210,7 +209,7 @@ describe('User', () => {
                     .send({accept: true})
                     .end((err, res) => {
                         res.should.have.status(200);
-                        when.all([
+                        Promise.all([
                             User.findById(u._id),
                             User.findById(other._id)
                         ]).then((results) => {
@@ -230,7 +229,7 @@ describe('User', () => {
                     .send({accept: false})
                     .end((err, res) => {
                         res.should.have.status(200);
-                        when.all([
+                        Promise.all([
                             User.findById(u._id),
                             User.findById(other._id)
                         ]).then((results) => {

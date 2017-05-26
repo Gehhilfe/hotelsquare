@@ -5,7 +5,6 @@ const User = require('../models/user');
 const minio = require('minio');
 const config = require('config');
 const sharp = require('sharp');
-const when = require('when');
 
 const ValidationError = require('../errors/ValidationError');
 
@@ -26,7 +25,7 @@ const minioClient = new minio.Client({
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function profile(request, response, next) {
+async function profile(request, response, next) {
     let selfRequest = false;
 
     // When no name provided use authenticated user
@@ -35,18 +34,15 @@ function profile(request, response, next) {
         selfRequest = true;
     }
 
-    User.findOne({name: request.params.name}).exec().then((user) => {
-        if (user === null)
-            return next(new restify.errors.NotFoundError());
-        if (!selfRequest) {
-            // Remove sensitive information
-            user = user.toJSONPublic();
-        }
-        response.send(user);
-        return next();
-    }).catch((err) => {
-        return next(err);
-    });
+    let user = await User.findOne({name: request.params.name});
+    if (user === null)
+        return next(new restify.errors.NotFoundError());
+    if (!selfRequest) {
+        // Remove sensitive information
+        user = user.toJSONPublic();
+    }
+    response.send(user);
+    return next();
 }
 
 /**
@@ -58,11 +54,12 @@ function profile(request, response, next) {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function register(request, response, next) {
-    User.create(request.params).then((user) => {
+async function register(request, response, next) {
+    try {
+        const user = await User.create(request.params);
         response.json(user);
         return next();
-    }).catch((error) => {
+    } catch (error) {
         switch (error.name) {
         case 'MongoError':
             return next(new ValidationError({
@@ -74,7 +71,7 @@ function register(request, response, next) {
         case 'ValidationError':
             return next(new ValidationError(error.errors));
         }
-    });
+    }
 }
 
 /**
@@ -85,15 +82,10 @@ function register(request, response, next) {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function deleteUser(request, response, next) {
-    User.findByIdAndRemove(request.authentication._id, (error, res) => {
-        if (error) {
-            return next(error);
-        } else {
-            response.json(res);
-            return next();
-        }
-    });
+async function deleteUser(request, response, next) {
+    const res = await User.findByIdAndRemove(request.authentication._id);
+    response.json(res);
+    return next();
 }
 
 /**
@@ -105,28 +97,22 @@ function deleteUser(request, response, next) {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function uploadAvatar(request, response, next) {
+async function uploadAvatar(request, response, next) {
     //Convert to jpeg
-    sharp(request.files.avatar.path)
+    const buffer = await sharp(request.files.avatar.path)
         .resize(200, 200)
         .toFormat('jpeg')
-        .toBuffer()
-        .then((buffer) => {
-            minioClient.putObject(config.minio.bucket, 'avatar_' + request.authentication.name + '.jpeg', buffer, 'image/jpeg', (err, etag) => {
-                if (err) {
-                    response.send(500, err);
-                    return next();
-                } else {
-                    response.json(etag);
-                    return next();
-                }
-            });
-        })
-        .catch((err) => {
-            response.status(500);
-            response.json(err);
+        .toBuffer();
+
+    minioClient.putObject(config.minio.bucket, 'avatar_' + request.authentication.name + '.jpeg', buffer, 'image/jpeg', (err, etag) => {
+        if (err) {
+            response.send(500, err);
             return next();
-        });
+        } else {
+            response.json(etag);
+            return next();
+        }
+    });
 }
 
 /**
@@ -180,21 +166,17 @@ function getAvatar(request, response, next) {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function sendFriendRequest(request, response, next) {
-    User.findOne({'friendRequests.name': request.authentication.name, name: request.params.name}, {'friendRequests.$': 1})
-        .then((found) => {
-            if (found === null) {
-                return User.updateOne({name: request.params.name}, {$push: {'friendRequests': request.authentication}})
-                    .then((res) => {
-                        response.json(res);
-                        return next();
-                    });
-            } else {
-                return response.send(400, {error: 'Friend request already existing'});
-            }
-        }).catch((err) => {
-            return next(err);
-        });
+async function sendFriendRequest(request, response, next) {
+    const result = await User.findOne({
+        'friendRequests.name': request.authentication.name,
+        name: request.params.name
+    }, {'friendRequests.$': 1});
+    if (result === null) {
+        const res = await User.updateOne({name: request.params.name}, {$push: {'friendRequests': request.authentication}});
+        response.json(res);
+        return next();
+    }
+    return response.send(400, {error: 'Friend request already existing'});
 }
 
 /**
@@ -205,42 +187,47 @@ function sendFriendRequest(request, response, next) {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function confirmFriendRequest(request, response, next) {
+async function confirmFriendRequest(request, response, next) {
+
     // Find both users
-    when.all([
+    const results = await Promise.all([
         User.findOne({name: request.authentication.name}),
         User.findOne({name: request.params.name})
-    ]).then((results) => {
+    ]);
 
-        const receiver = results[0];
-        const sender = results[1];
+    const receiver = results[0];
+    const sender = results[1];
 
-        if (!receiver.friendRequests.some((e) => e.name === sender.name)) {
-            response.send(400, {error: 'No friend request existing'});
-            return next();
-        }
-
-        receiver.friendRequests.pull(sender);
-        if(!request.body.accept) {
-            return receiver.save().then(() => {
-                response.json({});
-                return next();
-            });
-        } else {
-            receiver.friends.push(sender);
-            sender.friends.push(receiver);
-            when.all([
-                sender.save(),
-                receiver.save()
-            ]).then(() => {
-                response.json({});
-                return next();
-            });
-        }
-    }).catch(() => {
-        response.send(500, {error: 'Could not handle friend request confirmation'});
+    if (!receiver.friendRequests.some((e) => e.name === sender.name)) {
+        response.send(400, {error: 'No friend request existing'});
         return next();
-    });
+    }
+
+    receiver.friendRequests.pull(sender);
+    if (!request.body.accept) {
+        await receiver.save();
+        response.json({});
+        return next();
+    }
+
+    receiver.friends.push(sender);
+    sender.friends.push(receiver);
+    await Promise.all([
+        sender.save(),
+        receiver.save()
+    ]);
+
+    response.json({});
+    return next();
 }
 
-module.exports = {register, deleteUser, uploadAvatar, getAvatar, deleteAvatar, profile, sendFriendRequest, confirmFriendRequest};
+module.exports = {
+    register,
+    deleteUser,
+    uploadAvatar,
+    getAvatar,
+    deleteAvatar,
+    profile,
+    sendFriendRequest,
+    confirmFriendRequest
+};
