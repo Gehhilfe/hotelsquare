@@ -17,8 +17,9 @@ describe('User', () => {
     let u;
     let other;
     let token;
+    let otherToken;
 
-    before((done) => {
+    beforeEach((done) => {
         Util.connectDatabase(mongoose).then(function () {
             User.remove({}).then(() => {
                 User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99'}).then((user) => {
@@ -26,6 +27,7 @@ describe('User', () => {
                     token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
                     User.create({name: 'peter2', email: 'peter1223@cool.de', password: 'peter99'}).then((user) => {
                         other = user;
+                        otherToken = jsonwt.sign(other.toJSON(), config.jwt.secret, config.jwt.options);
                         return done();
                     });
                 });
@@ -97,7 +99,6 @@ describe('User', () => {
                 .post('/user')
                 .send(registrationData)
                 .end((err, res) => {
-                    console.log(res.body);
                     res.should.have.status(400);
                     return done();
                 });
@@ -168,12 +169,12 @@ describe('User', () => {
     describe('friend requests', () => {
         it('should be able to send a friend request', (done) => {
             request(server)
-                .post('/user/'+other.name+'/friend')
+                .post('/user/'+other.name+'/friend_requests')
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    User.findOne({name: other.name}).then((u) => {
-                        u.friendRequests.should.not.be.empty;
+                    User.findOne({name: other.name}).then((other) => {
+                        other.friendRequests.should.not.be.empty;
                         return done();
                     });
                 });
@@ -190,12 +191,52 @@ describe('User', () => {
 
             it('should not add another request', (done) => {
                 request(server)
-                    .post('/user/'+other.name+'/friend')
+                    .post('/user/'+other.name+'/friend_requests')
                     .set('x-auth', token)
                     .end((err, res) => {
                         res.should.have.status(400);
                         User.findOne({name: other.name}).then((u) => {
                             u.friendRequests.length.should.be.equal(1);
+                            return done();
+                        });
+                    });
+            });
+
+            it('should be able to accept', (done) => {
+                request(server)
+                    .put('/profile/friend_requests/'+u.name)
+                    .set('x-auth', otherToken)
+                    .send({accept: true})
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        Promise.all([
+                            User.findById(u._id),
+                            User.findById(other._id)
+                        ]).then((results) => {
+                            results[0].friendRequests.length.should.be.equal(0);
+                            results[1].friendRequests.length.should.be.equal(0);
+                            results[0].friends.length.should.be.equal(1);
+                            results[1].friends.length.should.be.equal(1);
+                            return done();
+                        });
+                    });
+            });
+
+            it('should be able to decline', (done) => {
+                request(server)
+                    .put('/profile/friend_requests/'+u.name)
+                    .set('x-auth', otherToken)
+                    .send({accept: false})
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        Promise.all([
+                            User.findById(u._id),
+                            User.findById(other._id)
+                        ]).then((results) => {
+                            results[0].friendRequests.length.should.be.equal(0);
+                            results[1].friendRequests.length.should.be.equal(0);
+                            results[0].friends.length.should.be.equal(0);
+                            results[1].friends.length.should.be.equal(0);
                             return done();
                         });
                     });

@@ -41,7 +41,6 @@ describe('User Avatar', () => {
                 expect(err).to.be.null;
                 image = i;
                 imagePath = tempWrite.sync(image.data, 'avatar.jpeg');
-                console.log('Image Path: ' + imagePath);
                 return done();
             });
         });

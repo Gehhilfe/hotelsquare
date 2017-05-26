@@ -2,6 +2,7 @@ package tk.internet.praktikum.foursquare.api.service;
 
 import io.reactivex.Observable;
 import retrofit2.http.*;
+import tk.internet.praktikum.foursquare.api.bean.Answer;
 import tk.internet.praktikum.foursquare.api.bean.User;
 
 public interface UserService {
@@ -39,9 +40,17 @@ public interface UserService {
 
     /**
      * Retrives profile of user with name
-     * @param name user name
+     * @param name User name
      * @return profile of user
      */
-    @POST("user/{name}/friend")
+    @POST("user/{name}/friend_requests")
     Observable<Object> sendFriendRequest(@Path("name") String name);
+
+    /**
+     * Answers pending friend request
+     * @param name User name of request sender
+     * @param answer Accept or decline answer
+     */
+    @PUT("profile/friend_requests/{name}")
+    Observable<Object> answerFriendRequest(@Path("name") String name, @Body Answer answer);
 }

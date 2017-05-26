@@ -30,7 +30,9 @@ describe('Session', () => {
                     name: 'test',
                     password: 'secret',
                     email: 'test@test.de'
-                }).then(() => {return done();});
+                }).then(() => {
+                    return done();
+                });
             });
         });
 

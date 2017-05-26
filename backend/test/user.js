@@ -211,7 +211,6 @@ describe('user', function () {
         it('should store name of sender', (done) => {
             aUser.friendRequests.push(bUser);
             expect(aUser.friendRequests[0].name).to.be.equal(bUser.name);
-            console.log(aUser.friendRequests[0]);
             aUser.friendRequests[0].created_at.should.be.today;
             return done();
         });
