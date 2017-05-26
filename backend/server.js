@@ -66,16 +66,22 @@ server.post('session', session.postSession);
 // User
 server.get('user', auth, user.profile);
 server.get('user/:name', user.profile);
-server.get('profile/avatar', auth, user.getAvatar);
 server.get('user/:name/avatar', auth, user.getAvatar);
 
 server.post('user', user.register);
+server.post('user/:name/friend_requests', auth, user.sendFriendRequest);
+
 server.del('user', auth, user.deleteUser);
 
+server.get('profile/avatar', auth, user.getAvatar);
+
 server.post('profile/avatar', auth, user.uploadAvatar);
+
+server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
+
 server.del('profile/avatar', auth, user.deleteAvatar);
 
-server.post('user/:name/friend', auth, user.sendFriendRequest);
+
 
 
 // Delete downloads

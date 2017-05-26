@@ -5,6 +5,8 @@ const User = require('../models/user');
 const minio = require('minio');
 const config = require('config');
 const sharp = require('sharp');
+const when = require('when');
+
 const ValidationError = require('../errors/ValidationError');
 
 const minioClient = new minio.Client({
@@ -179,7 +181,7 @@ function getAvatar(request, response, next) {
  * @returns {undefined}
  */
 function sendFriendRequest(request, response, next) {
-    User.findOne({'friendRequests.name': request.authentication.name}, {'friendRequests.$': 1})
+    User.findOne({'friendRequests.name': request.authentication.name, name: request.params.name}, {'friendRequests.$': 1})
         .then((found) => {
             if (found === null) {
                 return User.updateOne({name: request.params.name}, {$push: {'friendRequests': request.authentication}})
@@ -195,4 +197,50 @@ function sendFriendRequest(request, response, next) {
         });
 }
 
-module.exports = {register, deleteUser, uploadAvatar, getAvatar, deleteAvatar, profile, sendFriendRequest};
+/**
+ * Confirms or declines a friend request
+ *
+ * @param {IncommingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function confirmFriendRequest(request, response, next) {
+    // Find both users
+    when.all([
+        User.findOne({name: request.authentication.name}),
+        User.findOne({name: request.params.name})
+    ]).then((results) => {
+
+        const receiver = results[0];
+        const sender = results[1];
+
+        if (!receiver.friendRequests.some((e) => e.name === sender.name)) {
+            response.send(400, {error: 'No friend request existing'});
+            return next();
+        }
+
+        receiver.friendRequests.pull(sender);
+        if(!request.body.accept) {
+            return receiver.save().then(() => {
+                response.json({});
+                return next();
+            });
+        } else {
+            receiver.friends.push(sender);
+            sender.friends.push(receiver);
+            when.all([
+                sender.save(),
+                receiver.save()
+            ]).then(() => {
+                response.json({});
+                return next();
+            });
+        }
+    }).catch(() => {
+        response.send(500, {error: 'Could not handle friend request confirmation'});
+        return next();
+    });
+}
+
+module.exports = {register, deleteUser, uploadAvatar, getAvatar, deleteAvatar, profile, sendFriendRequest, confirmFriendRequest};
