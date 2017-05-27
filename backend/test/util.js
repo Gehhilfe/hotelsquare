@@ -56,7 +56,7 @@ describe('util', function () {
 
         it('should connect to a database only once', (done) => {
             Util.connectDatabase(mongoose).then(() => {
-                var db = mongoose.connection.db;
+                const db = mongoose.connection.db;
                 Util.connectDatabase(mongoose).then(() => {
                     expect(mongoose.connection.db).to.be.equal(db);
                     return done();

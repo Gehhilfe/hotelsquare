@@ -2,11 +2,9 @@
 
 const mongoose = require('mongoose');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 const server = require('../../server');
 const util = require('../../lib/util');
 chai.should();
-chai.use(chaiHttp);
 
 const expect = chai.expect;
 
