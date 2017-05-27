@@ -57,7 +57,8 @@ const UserSchema = new Schema({
 UserSchema.pre('save', function (next) {
     const self = this;
 
-    self.updated_at = Date.now();
+    if(self.isModified())
+        self.updated_at = Date.now();
 
     if (self.isModified('name')) {
         self.displayName = self.name;
@@ -110,6 +111,16 @@ class UserClass {
         o1.addFriend(o2);
         o2.addFriend(o1);
         return [o1, o2];
+    }
+
+    update(data) {
+        const self = this;
+
+        if(data.gender)
+            self.gender = data.gender;
+
+        if(data.password)
+            self.password = data.password;
     }
 
     comparePassword(candidatePassword) {

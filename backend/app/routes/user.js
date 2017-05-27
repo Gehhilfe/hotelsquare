@@ -46,6 +46,24 @@ async function profile(request, response, next) {
 }
 
 /**
+ * Retrieves user profile information
+ *
+ * @function register
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function updateUser(request, response, next) {
+    const user = await User.findOne({_id: request.authentication._id});
+    user.update(request.body);
+    await user.save();
+
+    response.send(user);
+    return next();
+}
+
+/**
  * Registers a new user with the given profile information.
  *
  * @function register
@@ -237,5 +255,6 @@ module.exports = {
     deleteAvatar,
     profile,
     sendFriendRequest,
-    confirmFriendRequest
+    confirmFriendRequest,
+    updateUser
 };

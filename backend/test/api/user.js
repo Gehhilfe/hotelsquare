@@ -72,6 +72,57 @@ describe('User', () => {
 
     });
 
+    describe('PUT user', () => {
+        it('should change the gender', (done) => {
+            const before_updated_at = u.updated_at;
+
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({gender: 'm'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(u.name);
+                    res.body.gender.should.be.equal('m');
+                    res.body.updated_at.should.not.equal(before_updated_at);
+                    return done();
+                });
+        });
+
+        it('should change the password', (done) => {
+            const before_password = u.password;
+
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({password: 'leetpassword'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    return User.findById(u._id).then((found) => {
+                        found.password.should.not.equal(before_password);
+                        return done();
+                    });
+                });
+        });
+
+        it('should not change created_at when nothing changed', (done) => {
+            const before_updated_at = u.updated_at;
+
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(u.name);
+                    res.body.updated_at.should.equal(before_updated_at.toJSON());
+                    return done();
+                });
+        });
+    });
+
     describe('POST user', () => {
 
         it('should register a new user with valid data', (done) => {

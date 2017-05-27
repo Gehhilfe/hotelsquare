@@ -71,6 +71,8 @@ server.get('user/:name/avatar', auth, user.getAvatar);
 server.post('user', user.register);
 server.post('user/:name/friend_requests', auth, user.sendFriendRequest);
 
+server.put('user', auth, user.updateUser);
+
 server.del('user', auth, user.deleteUser);
 
 server.get('profile/avatar', auth, user.getAvatar);
