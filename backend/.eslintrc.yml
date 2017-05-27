@@ -33,7 +33,6 @@ rules:
   brace-style:
    - error
    - 1tbs
-  capitalized-comments: error
   comma-dangle: error
   comma-spacing: error
   comma-style:

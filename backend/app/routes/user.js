@@ -80,11 +80,11 @@ async function register(request, response, next) {
     } catch (error) {
         switch (error.name) {
         case 'MongoError':
-            return next(new ValidationError({
+            return next(new ValidationError([{
                 name: {
                     message: 'Name or email is already taken'
                 }
-            }));
+            }]));
 
         case 'ValidationError':
             return next(new ValidationError(error.errors));
@@ -95,7 +95,7 @@ async function register(request, response, next) {
 /**
  * Deletes the current authenticated user
  *
- * @param {IncommingMessage} request request
+ * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
@@ -110,7 +110,7 @@ async function deleteUser(request, response, next) {
  * Uploads a avatar image for the current authenticated user and stores into
  * minio cloud storage.
  *
- * @param {IncommingMessage} request request
+ * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
@@ -136,7 +136,7 @@ async function uploadAvatar(request, response, next) {
 /**
  * Deletes a stored avater image for the authenticated user.
  *
- * @param {IncommingMessage} request request
+ * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
@@ -155,7 +155,7 @@ function deleteAvatar(request, response, next) {
 /**
  * Retrieves a stored avater image for a user.
  *
- * @param {IncommingMessage} request request
+ * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
@@ -179,7 +179,7 @@ function getAvatar(request, response, next) {
 /**
  * Sends a friend request from the authenticated user to name
  *
- * @param {IncommingMessage} request request
+ * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
@@ -202,7 +202,7 @@ async function sendFriendRequest(request, response, next) {
 /**
  * Confirms or declines a friend request
  *
- * @param {IncommingMessage} request request
+ * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}

@@ -97,7 +97,7 @@ server.on('after', (request) => {
 });
 
 server.listen(8081, function () {
-    console.log('%s listening at %s', server.name, server.url);
+    server.log.info('%s listening at %s', server.name, server.url);
 });
 
 module.exports = server;
