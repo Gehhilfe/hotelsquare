@@ -174,16 +174,26 @@ describe('User', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     User.findOne({name: other.name}).then((other) => {
-                        other.friendRequests.should.not.be.empty;
+                        other.friend_requests.should.not.be.empty;
                         return done();
                     });
+                });
+        });
+
+        it('should result in error if a non existing friend request is tried to accept', (done) => {
+            request(server)
+                .put('/profile/friend_requests/'+u.name)
+                .set('x-auth', token)
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    return done();
                 });
         });
 
         describe('when a request already exists', () => {
 
             beforeEach((done) => {
-                other.friendRequests.push(u);
+                other.addFriendRequest(u);
                 other.save().then(() => {
                     return done();
                 });
@@ -196,7 +206,7 @@ describe('User', () => {
                     .end((err, res) => {
                         res.should.have.status(400);
                         User.findOne({name: other.name}).then((u) => {
-                            u.friendRequests.length.should.be.equal(1);
+                            u.friend_requests.length.should.be.equal(1);
                             return done();
                         });
                     });
@@ -213,8 +223,8 @@ describe('User', () => {
                             User.findById(u._id),
                             User.findById(other._id)
                         ]).then((results) => {
-                            results[0].friendRequests.length.should.be.equal(0);
-                            results[1].friendRequests.length.should.be.equal(0);
+                            results[0].friend_requests.length.should.be.equal(0);
+                            results[1].friend_requests.length.should.be.equal(0);
                             results[0].friends.length.should.be.equal(1);
                             results[1].friends.length.should.be.equal(1);
                             return done();
@@ -233,8 +243,8 @@ describe('User', () => {
                             User.findById(u._id),
                             User.findById(other._id)
                         ]).then((results) => {
-                            results[0].friendRequests.length.should.be.equal(0);
-                            results[1].friendRequests.length.should.be.equal(0);
+                            results[0].friend_requests.length.should.be.equal(0);
+                            results[1].friend_requests.length.should.be.equal(0);
                             results[0].friends.length.should.be.equal(0);
                             results[1].friends.length.should.be.equal(0);
                             return done();

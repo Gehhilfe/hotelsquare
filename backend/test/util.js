@@ -17,7 +17,9 @@ describe('util', function () {
 
             if (mongoose.connection.db) return done();
             Util.connectDatabase(mongoose).then(function () {
-                User.remove({}, done);
+                User.remove({}, () => {
+                    User.ensureIndexes(done);
+                });
             });
         });
 
@@ -36,8 +38,8 @@ describe('util', function () {
         it('should resolve', () => {
             return expect(Util.bootstrap(User, [
                 {
-                    name: 'test',
-                    email: 'test@test.de',
+                    name: 'testetstsetste',
+                    email: 'test@tttttt.de',
                     password: 'admin1'
                 }
             ])).eventually.fulfilled;
