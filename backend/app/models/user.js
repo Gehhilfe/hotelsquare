@@ -17,9 +17,11 @@ const UserSchema = new Schema({
         unique: true,
         match: [/^[a-zA-Z][a-zA-Z0-9-_]*$/, 'Only a-z,A-Z,0-9,-,_ characters are allowed as name']
     },
+    displayName: String,
     email: {
         type: String,
         required: true,
+        unique: true,
         match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
     },
     password: {
@@ -28,19 +30,40 @@ const UserSchema = new Schema({
         minlength: 6
     },
     friends: [{
-        name: String
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }],
-    friendRequests: [{
-        name: String,
+    friend_requests: [{
+        sender: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
         created_at: {
             type: Date,
             default: Date.now
         }
-    }]
+    }],
+    gender: {
+        type: String,
+        enum: ['m', 'f', 'unspecified'],
+        default: 'unspecified'
+    },
+    updated_at: {
+        type: Date,
+        default: Date.now()
+    }
 });
 
 UserSchema.pre('save', function (next) {
     const self = this;
+
+    if(self.isModified())
+        self.updated_at = Date.now();
+
+    if (self.isModified('name')) {
+        self.displayName = self.name;
+        self.name = self.name.toLowerCase();
+    }
 
     if (!self.isModified('password'))
         return next();
@@ -54,53 +77,92 @@ UserSchema.pre('save', function (next) {
     });
 });
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Statics
-// ---------------------------------------------------------------------------------------------------------------------
+class UserClass {
 
-UserSchema.statics.login = function (name, password) {
-    const self = this;
-    if(password === undefined) {
-        password = name.password;
-        name = name.name;
-    }
-    return new Promise(function (resolve, reject) {
-        self.findOne({$or: [{name: name}, {email: name}]}).then(function (res) {
-            const foundUser = res;
-            if (res === null)
-                return reject();
-            return foundUser.comparePassword(password).then(function (res) {
-                if (res)
-                    return resolve(foundUser);
-                else
+    static login(name, password) {
+        const self = this;
+        if (password === undefined) {
+            password = name.password;
+            name = name.name;
+        }
+        return new Promise(function (resolve, reject) {
+            self.findOne({$or: [{displayName: name}, {email: name}]}).then(function (res) {
+                const foundUser = res;
+                if (res === null)
                     return reject();
+                return foundUser.comparePassword(password).then(function (res) {
+                    if (res)
+                        return resolve(foundUser);
+                    else
+                        return reject();
+                }, reject);
             }, reject);
-        }, reject);
-    });
-};
+        });
+    }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Methods
-// ---------------------------------------------------------------------------------------------------------------------
+    /**
+     * Connects the friendship between two users
+     *
+     * @param {User} o1 One part of the friendship
+     * @param {User} o2 Other part of the friendship
+     * @returns {Array} Changed objects
+     */
+    static connectFriends(o1, o2) {
+        o1.addFriend(o2);
+        o2.addFriend(o1);
+        return [o1, o2];
+    }
 
-UserSchema.methods.comparePassword = function (candidatePassword) {
-    const self = this;
-    return bcrypt.compare(candidatePassword, self.password, null);
-};
+    update(data) {
+        const self = this;
 
-UserSchema.methods.toJSON = function () {
-    const obj = this.toObject();
-    delete obj.password;
-    return obj;
-};
+        if(data.gender)
+            self.gender = data.gender;
 
-UserSchema.methods.toJSONPublic = function () {
-    const obj = this.toObject();
-    delete obj.password;
-    delete obj.email;
-    delete obj.friends;
-    delete obj.friendRequests;
-    return obj;
-};
+        if(data.password)
+            self.password = data.password;
+    }
 
+    comparePassword(candidatePassword) {
+        const self = this;
+        return bcrypt.compare(candidatePassword, self.password, null);
+    }
+
+    addFriendRequest(sender) {
+        const self = this;
+        self.friend_requests.push({
+            sender: sender
+        });
+    }
+
+    addFriend(other) {
+        const self = this;
+        self.friends.push(other);
+    }
+
+    removeFriendRequest(friendRequest) {
+        const self = this;
+
+        self.friend_requests.pull(friendRequest);
+
+        return [self];
+    }
+
+    toJSON() {
+        const obj = this.toObject();
+        delete obj.password;
+        return obj;
+    }
+
+    toJSONPublic() {
+        const obj = this.toObject();
+        delete obj.password;
+        delete obj.email;
+        delete obj.friends;
+        delete obj.friend_requests;
+        return obj;
+    }
+}
+
+UserSchema.loadClass(UserClass);
 module.exports = mongoose.model('User', UserSchema);

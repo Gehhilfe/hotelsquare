@@ -50,7 +50,7 @@ describe('user', function () {
 
         const otherUser = {
             name: 'OtherTest',
-            email: 'test@test.de',
+            email: 'test@2test.de',
             password: 'password'
         };
 
@@ -102,6 +102,10 @@ describe('user', function () {
 
         it('should be unqiue', function () {
             return expect(User.create(validUser)).to.be.eventually.rejected;
+        });
+
+        it('should be saved all lowercase', () => {
+            expect(aUser.name === validUser.name.toLowerCase()).to.be.true;
         });
 
         const format_tests = [
@@ -157,6 +161,12 @@ describe('user', function () {
                 });
             });
         });
+
+        it('should be unqiue', function () {
+            const copy = validUser;
+            copy.name = 'StillSameEmail';
+            return expect(User.create(copy)).to.be.eventually.rejected;
+        });
     });
 
     describe('#password', () => {
@@ -207,12 +217,18 @@ describe('user', function () {
         });
     });
 
-    describe('#friendRequests', () => {
+    describe('#friend_requests', () => {
         it('should store name of sender', (done) => {
-            aUser.friendRequests.push(bUser);
-            expect(aUser.friendRequests[0].name).to.be.equal(bUser.name);
-            aUser.friendRequests[0].created_at.should.be.today;
+            aUser.friend_requests.push({sender: bUser});
+            expect(aUser.friend_requests[0].sender.name).to.be.equal(bUser.name);
+            aUser.friend_requests[0].created_at.should.be.today;
             return done();
+        });
+    });
+
+    describe('#gener', () => {
+        it('should default to unspecified', () => {
+            aUser.gender.should.be.equal('unspecified');
         });
     });
 
@@ -248,9 +264,9 @@ describe('user', function () {
             json.should.not.have.property('friends');
         });
 
-        it('should not contain friendRequests', () => {
+        it('should not contain friend_requests', () => {
             const json = aUser.toJSONPublic();
-            json.should.not.have.property('friendRequests');
+            json.should.not.have.property('friend_requests');
         });
 
         it('should contain name', () => {
@@ -273,7 +289,7 @@ describe('user', function () {
         });
 
         it('should return the user with valid name and password', function () {
-            return expect(User.login(validUser.name, 'password').then(function (u) {
+            return expect(User.login(validUser.displayName, 'password').then(function (u) {
                 return Promise.resolve(u.equals(validUser));
             })).to.eventually.equal(true);
         });
@@ -285,15 +301,15 @@ describe('user', function () {
         });
 
         it('should reject with invalid password', function () {
-            return expect(User.login(validUser.name, 'wrong')).to.eventually.rejected;
+            return expect(User.login(validUser.displayName, 'wrong')).to.eventually.rejected;
         });
 
         it('should reject with invalid name', function () {
-            return expect(User.login('test', 'password')).to.eventually.rejected;
+            return expect(User.login('wrong', 'password')).to.eventually.rejected;
         });
 
         it('should work with a json object as first parameter', () => {
-            return expect(User.login({name: 'test', password: 'password'})).to.eventually.resolved;
+            return expect(User.login({name: 'Test', password: 'password'})).to.eventually.resolved;
         });
     });
 });

@@ -46,6 +46,24 @@ async function profile(request, response, next) {
 }
 
 /**
+ * Retrieves user profile information
+ *
+ * @function register
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function updateUser(request, response, next) {
+    const user = await User.findOne({_id: request.authentication._id});
+    user.update(request.body);
+    await user.save();
+
+    response.send(user);
+    return next();
+}
+
+/**
  * Registers a new user with the given profile information.
  *
  * @function register
@@ -64,7 +82,7 @@ async function register(request, response, next) {
         case 'MongoError':
             return next(new ValidationError({
                 name: {
-                    message: 'Name is already taken'
+                    message: 'Name or email is already taken'
                 }
             }));
 
@@ -168,11 +186,13 @@ function getAvatar(request, response, next) {
  */
 async function sendFriendRequest(request, response, next) {
     const result = await User.findOne({
-        'friendRequests.name': request.authentication.name,
+        'friend_requests.sender': request.authentication._id,
         name: request.params.name
-    }, {'friendRequests.$': 1});
+    }, {'friend_requests.$': 1});
     if (result === null) {
-        const res = await User.updateOne({name: request.params.name}, {$push: {'friendRequests': request.authentication}});
+        const res = await User.findOne({name: request.params.name});
+        res.addFriendRequest(request.authentication);
+        await res.save();
         response.json(res);
         return next();
     }
@@ -188,7 +208,6 @@ async function sendFriendRequest(request, response, next) {
  * @returns {undefined}
  */
 async function confirmFriendRequest(request, response, next) {
-
     // Find both users
     const results = await Promise.all([
         User.findOne({name: request.authentication.name}),
@@ -198,27 +217,34 @@ async function confirmFriendRequest(request, response, next) {
     const receiver = results[0];
     const sender = results[1];
 
-    if (!receiver.friendRequests.some((e) => e.name === sender.name)) {
+    // Check if a friend requests exists
+    const friendRequest = receiver.friend_requests.find(((e) => {
+        return e.sender.equals(sender._id);
+    }));
+
+    if (friendRequest === undefined) {
         response.send(400, {error: 'No friend request existing'});
         return next();
     }
 
-    receiver.friendRequests.pull(sender);
-    if (!request.body.accept) {
+    // Remove friend request
+    receiver.removeFriendRequest(friendRequest);
+
+    if (request.body.accept) {
+        // Request accepted
+        User.connectFriends(sender, receiver);
+        await Promise.all([
+            sender.save(),
+            receiver.save()
+        ]);
+        response.json({message: 'Friend request accepted'});
+        return next();
+    } else {
+        // Request declined
         await receiver.save();
-        response.json({});
+        response.json({message: 'Friend request declined'});
         return next();
     }
-
-    receiver.friends.push(sender);
-    sender.friends.push(receiver);
-    await Promise.all([
-        sender.save(),
-        receiver.save()
-    ]);
-
-    response.json({});
-    return next();
 }
 
 module.exports = {
@@ -229,5 +255,6 @@ module.exports = {
     deleteAvatar,
     profile,
     sendFriendRequest,
-    confirmFriendRequest
+    confirmFriendRequest,
+    updateUser
 };

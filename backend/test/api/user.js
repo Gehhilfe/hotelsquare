@@ -72,6 +72,57 @@ describe('User', () => {
 
     });
 
+    describe('PUT user', () => {
+        it('should change the gender', (done) => {
+            const before_updated_at = u.updated_at;
+
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({gender: 'm'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(u.name);
+                    res.body.gender.should.be.equal('m');
+                    res.body.updated_at.should.not.equal(before_updated_at);
+                    return done();
+                });
+        });
+
+        it('should change the password', (done) => {
+            const before_password = u.password;
+
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({password: 'leetpassword'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    return User.findById(u._id).then((found) => {
+                        found.password.should.not.equal(before_password);
+                        return done();
+                    });
+                });
+        });
+
+        it('should not change created_at when nothing changed', (done) => {
+            const before_updated_at = u.updated_at;
+
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(u.name);
+                    res.body.updated_at.should.equal(before_updated_at.toJSON());
+                    return done();
+                });
+        });
+    });
+
     describe('POST user', () => {
 
         it('should register a new user with valid data', (done) => {
@@ -174,16 +225,26 @@ describe('User', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     User.findOne({name: other.name}).then((other) => {
-                        other.friendRequests.should.not.be.empty;
+                        other.friend_requests.should.not.be.empty;
                         return done();
                     });
+                });
+        });
+
+        it('should result in error if a non existing friend request is tried to accept', (done) => {
+            request(server)
+                .put('/profile/friend_requests/'+u.name)
+                .set('x-auth', token)
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    return done();
                 });
         });
 
         describe('when a request already exists', () => {
 
             beforeEach((done) => {
-                other.friendRequests.push(u);
+                other.addFriendRequest(u);
                 other.save().then(() => {
                     return done();
                 });
@@ -196,7 +257,7 @@ describe('User', () => {
                     .end((err, res) => {
                         res.should.have.status(400);
                         User.findOne({name: other.name}).then((u) => {
-                            u.friendRequests.length.should.be.equal(1);
+                            u.friend_requests.length.should.be.equal(1);
                             return done();
                         });
                     });
@@ -213,8 +274,8 @@ describe('User', () => {
                             User.findById(u._id),
                             User.findById(other._id)
                         ]).then((results) => {
-                            results[0].friendRequests.length.should.be.equal(0);
-                            results[1].friendRequests.length.should.be.equal(0);
+                            results[0].friend_requests.length.should.be.equal(0);
+                            results[1].friend_requests.length.should.be.equal(0);
                             results[0].friends.length.should.be.equal(1);
                             results[1].friends.length.should.be.equal(1);
                             return done();
@@ -233,8 +294,8 @@ describe('User', () => {
                             User.findById(u._id),
                             User.findById(other._id)
                         ]).then((results) => {
-                            results[0].friendRequests.length.should.be.equal(0);
-                            results[1].friendRequests.length.should.be.equal(0);
+                            results[0].friend_requests.length.should.be.equal(0);
+                            results[1].friend_requests.length.should.be.equal(0);
                             results[0].friends.length.should.be.equal(0);
                             results[1].friends.length.should.be.equal(0);
                             return done();
