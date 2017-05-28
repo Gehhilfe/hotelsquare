@@ -65,6 +65,8 @@ server.post('session', session.postSession);
 
 // User
 server.get('user', auth, user.profile);
+server.post('users', auth, user.search);
+
 server.get('user/:name', user.profile);
 server.get('user/:name/avatar', auth, user.getAvatar);
 
@@ -75,15 +77,16 @@ server.put('user', auth, user.updateUser);
 
 server.del('user', auth, user.deleteUser);
 
+server.get('profile', auth, user.profile);
 server.get('profile/avatar', auth, user.getAvatar);
+
+server.del('profile/friends/:name', auth, user.removeFriend);
 
 server.post('profile/avatar', auth, user.uploadAvatar);
 
 server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
 server.del('profile/avatar', auth, user.deleteAvatar);
-
-
 
 
 // Delete downloads

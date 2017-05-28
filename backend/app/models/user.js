@@ -27,7 +27,7 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: true,
-        minlength: 6
+        minlength: [6, 'Please fill a password with minimum length of 6 characters']
     },
     friends: [{
         type: Schema.Types.ObjectId,
@@ -138,6 +138,11 @@ class UserClass {
     addFriend(other) {
         const self = this;
         self.friends.push(other);
+    }
+
+    removeFriend(other) {
+        const self = this;
+        self.friends.pull(other);
     }
 
     removeFriendRequest(friendRequest) {

@@ -4,6 +4,9 @@ import io.reactivex.Observable;
 import retrofit2.http.*;
 import tk.internet.praktikum.foursquare.api.bean.Answer;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.bean.UserSearchQuery;
+
+import java.util.List;
 
 public interface UserService {
     /**
@@ -12,7 +15,7 @@ public interface UserService {
      * @return profile of authenticated user
      */
     @GET("profile")
-    Observable<User> proile();
+    Observable<User> profile();
 
     /**
      * Retrives profile of user with name
@@ -63,4 +66,11 @@ public interface UserService {
      */
     @PUT("profile/friend_requests/{name}")
     Observable<Object> answerFriendRequest(@Path("name") String name, @Body Answer answer);
+
+    /**
+     * Search for users with a given name and gender
+     * @param query Search query
+     */
+    @POST("users")
+    Observable<List<User>> search(@Body UserSearchQuery query);
 }

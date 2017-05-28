@@ -22,10 +22,10 @@ describe('User', () => {
     beforeEach((done) => {
         Util.connectDatabase(mongoose).then(function () {
             User.remove({}).then(() => {
-                User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99'}).then((user) => {
+                User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99', gender: 'm'}).then((user) => {
                     u = user;
                     token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
-                    User.create({name: 'peter2', email: 'peter1223@cool.de', password: 'peter99'}).then((user) => {
+                    User.create({name: 'peter2', email: 'peter1223@cool.de', password: 'peter99', gender: 'f'}).then((user) => {
                         other = user;
                         otherToken = jsonwt.sign(other.toJSON(), config.jwt.secret, config.jwt.options);
                         return done();
@@ -106,6 +106,40 @@ describe('User', () => {
                 });
         });
 
+        it('should set error when gender not valid', (done) => {
+            const before_password = u.password;
+
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({gender: 's'})
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.body.errors.some((e) => e.field === 'gender').should.be.true;
+                    return User.findById(u._id).then((found) => {
+                        found.password.should.equal(before_password);
+                        return done();
+                    });
+                });
+        });
+
+        it('should set error when password not valid', (done) => {
+            const before_password = u.password;
+
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({password: 'short'})
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.body.errors.some((e) => e.field === 'password').should.be.true;
+                    return User.findById(u._id).then((found) => {
+                        found.password.should.equal(before_password);
+                        return done();
+                    });
+                });
+        });
+
         it('should not change created_at when nothing changed', (done) => {
             const before_updated_at = u.updated_at;
 
@@ -124,7 +158,6 @@ describe('User', () => {
     });
 
     describe('POST user', () => {
-
         it('should register a new user with valid data', (done) => {
             const registrationData = {
                 name: 'testTest',
@@ -196,8 +229,6 @@ describe('User', () => {
                     return done();
                 });
         });
-
-
     });
 
     describe('DELETE user', () => {
@@ -215,6 +246,55 @@ describe('User', () => {
                 });
         });
 
+    });
+
+    describe('DELETE profile/friend/:name', () => {
+        describe('when a friend', () => {
+            beforeEach((done) => {
+                u.addFriend(other);
+                other.addFriend(u);
+                Promise.all([
+                    u.save(),
+                    other.save()
+                ]).then(() => done());
+            });
+
+            it('should be possible to remove a friend', (done) => {
+                request(server)
+                    .del('/profile/friends/'+other.name)
+                    .set('x-auth', token)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        Promise.all([
+                            User.findById(u._id),
+                            User.findById(other._id)
+                        ]).then((results) => {
+                            results[0].friends.length.should.be.equal(0);
+                            results[1].friends.length.should.be.equal(0);
+                            return done();
+                        });
+                    });
+            });
+        });
+
+        describe('when not a friend', () => {
+            it('should not be possible to remove a friend', (done) => {
+                request(server)
+                    .del('/profile/friends/'+other.name)
+                    .set('x-auth', token)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        Promise.all([
+                            User.findById(u._id),
+                            User.findById(other._id)
+                        ]).then((results) => {
+                            results[0].friends.length.should.be.equal(0);
+                            results[1].friends.length.should.be.equal(0);
+                            return done();
+                        });
+                    });
+            });
+        });
     });
 
     describe('friend requests', () => {
@@ -302,6 +382,56 @@ describe('User', () => {
                         });
                     });
             });
+        });
+
+        describe('when already friends', () => {
+            beforeEach((done) => {
+                u.addFriend(other);
+                other.addFriend(u);
+                Promise.all([
+                    u.save(),
+                    other.save()
+                ]).then(() => done());
+            });
+
+            it('should result in error', (done) => {
+                request(server)
+                    .post('/user/'+other.name+'/friend_requests')
+                    .set('x-auth', token)
+                    .end((err, res) => {
+                        res.should.have.status(400);
+                        User.findOne({name: other.name}).then((other) => {
+                            other.friend_requests.should.be.empty;
+                            return done();
+                        });
+                    });
+            });
+        });
+    });
+
+    describe('search', () => {
+        it('should find both users', (done) => {
+            request(server)
+                .post('/users')
+                .set('x-auth', token)
+                .send({ name: 'pet'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.length.should.equal(2);
+                    return done();
+                });
+        });
+
+        it('should find only peter2', (done) => {
+            request(server)
+                .post('/users')
+                .set('x-auth', token)
+                .send({ name: 'er2'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.length.should.equal(1);
+                    return done();
+                });
         });
     });
 });
