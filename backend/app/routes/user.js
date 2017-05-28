@@ -34,7 +34,10 @@ const handleValidation = (next, func) => {
 
 
 async function search(request, response, next) {
-    const result = await User.find({ name: new RegExp(request.body.name, 'i') });
+    let query = User.find({ name: new RegExp(request.body.name, 'i')  });
+    if(request.body.gender)
+        query = query.where('gender').equals(request.body.gender);
+    const result = await query;
     response.send(result);
     return next();
 }
