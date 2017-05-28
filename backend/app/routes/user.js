@@ -16,6 +16,29 @@ const minioClient = new minio.Client({
     secretKey: config.minio.secret
 });
 
+const handleValidation = (next, func) => {
+    func().catch((error) => {
+        switch (error.name) {
+        case 'MongoError':
+            return next(new ValidationError([{
+                name: {
+                    message: 'Name or email is already taken'
+                }
+            }]));
+
+        case 'ValidationError':
+            return next(new ValidationError(error.errors));
+        }
+    });
+};
+
+
+async function search(request, response, next) {
+    const result = await User.find({ name: new RegExp(request.body.name, 'i') });
+    response.send(result);
+    return next();
+}
+
 /**
  * Retrieves user profile
  *
@@ -55,12 +78,14 @@ async function profile(request, response, next) {
  * @returns {undefined}
  */
 async function updateUser(request, response, next) {
-    const user = await User.findOne({_id: request.authentication._id});
-    user.update(request.body);
-    await user.save();
+    handleValidation(next, async () => {
+        const user = await User.findOne({_id: request.authentication._id});
+        user.update(request.body);
+        await user.save();
 
-    response.send(user);
-    return next();
+        response.send(user);
+        return next();
+    });
 }
 
 /**
@@ -73,23 +98,11 @@ async function updateUser(request, response, next) {
  * @returns {undefined}
  */
 async function register(request, response, next) {
-    try {
+    handleValidation(next, async () => {
         const user = await User.create(request.params);
         response.json(user);
         return next();
-    } catch (error) {
-        switch (error.name) {
-        case 'MongoError':
-            return next(new ValidationError([{
-                name: {
-                    message: 'Name or email is already taken'
-                }
-            }]));
-
-        case 'ValidationError':
-            return next(new ValidationError(error.errors));
-        }
-    }
+    });
 }
 
 /**
@@ -185,18 +198,47 @@ function getAvatar(request, response, next) {
  * @returns {undefined}
  */
 async function sendFriendRequest(request, response, next) {
-    const result = await User.findOne({
-        'friend_requests.sender': request.authentication._id,
-        name: request.params.name
-    }, {'friend_requests.$': 1});
-    if (result === null) {
+    const results = await Promise.all([
+        User.findOne({name: request.params.name, 'friend_requests.sender': { $in: [request.authentication._id]}}),
+        User.findOne({name: request.params.name, friends: { $in: [request.authentication._id]}})
+    ]);
+    if (results[0] === null && results[1] == null) {
         const res = await User.findOne({name: request.params.name});
         res.addFriendRequest(request.authentication);
         await res.save();
         response.json(res);
         return next();
     }
-    return response.send(400, {error: 'Friend request already existing'});
+    return response.send(400, {error: 'Could not send friend request'});
+}
+
+/**
+ * Removes a friend from the authenticated user
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function removeFriend(request, response, next) {
+    // Find both users
+    const results = await Promise.all([
+        User.findOne({name: request.authentication.name}),
+        User.findOne({name: request.params.name})
+    ]);
+
+    const receiver = results[0];
+    const sender = results[1];
+
+    sender.removeFriend(receiver);
+    receiver.removeFriend(sender);
+
+    await Promise.all([
+        sender.save(),
+        receiver.save()
+    ]);
+    response.json({message: 'Friend removed'});
+    return next();
 }
 
 /**
@@ -256,5 +298,7 @@ module.exports = {
     profile,
     sendFriendRequest,
     confirmFriendRequest,
-    updateUser
+    updateUser,
+    removeFriend,
+    search
 };
