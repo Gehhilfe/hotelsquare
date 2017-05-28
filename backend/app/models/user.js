@@ -160,12 +160,10 @@ class UserClass {
     }
 
     toJSONPublic() {
-        const obj = this.toObject();
-        delete obj.password;
-        delete obj.email;
-        delete obj.friends;
-        delete obj.friend_requests;
-        return obj;
+        return {
+            _id: this._id,
+            name: this.name
+        };
     }
 }
 
