@@ -1,4 +1,4 @@
-FROM node:boron
+FROM node:latest
 ENV NODE_ENV staging
 
 # Create app directory

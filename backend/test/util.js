@@ -17,7 +17,9 @@ describe('util', function () {
 
             if (mongoose.connection.db) return done();
             Util.connectDatabase(mongoose).then(function () {
-                User.remove({}, done);
+                User.remove({}, () => {
+                    User.ensureIndexes(done);
+                });
             });
         });
 
@@ -36,8 +38,8 @@ describe('util', function () {
         it('should resolve', () => {
             return expect(Util.bootstrap(User, [
                 {
-                    name: 'test',
-                    email: 'test@test.de',
+                    name: 'testetstsetste',
+                    email: 'test@tttttt.de',
                     password: 'admin1'
                 }
             ])).eventually.fulfilled;
@@ -54,7 +56,7 @@ describe('util', function () {
 
         it('should connect to a database only once', (done) => {
             Util.connectDatabase(mongoose).then(() => {
-                var db = mongoose.connection.db;
+                const db = mongoose.connection.db;
                 Util.connectDatabase(mongoose).then(() => {
                     expect(mongoose.connection.db).to.be.equal(db);
                     return done();
