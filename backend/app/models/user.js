@@ -77,6 +77,11 @@ UserSchema.pre('save', function (next) {
     });
 });
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Class
+// ---------------------------------------------------------------------------------------------------------------------
+
+
 class UserClass {
 
     static login(name, password) {
@@ -160,12 +165,10 @@ class UserClass {
     }
 
     toJSONPublic() {
-        const obj = this.toObject();
-        delete obj.password;
-        delete obj.email;
-        delete obj.friends;
-        delete obj.friend_requests;
-        return obj;
+        return {
+            _id: this._id,
+            name: this.name
+        };
     }
 }
 

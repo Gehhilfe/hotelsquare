@@ -39,9 +39,19 @@ server.use(restify.bodyParser({
     hash: 'sha1'
 }));
 
+let streams = undefined;
+
+if(config.logstash) {
+    streams = [{
+        type: 'raw',
+        stream: require('bunyan-logstash').createStream(config.logstash)
+    }];
+}
+
 const bunyanLogger = bunyan.createLogger({
     name: 'hotel-square',
-    level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO)
+    level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO),
+    streams: streams
 });
 
 server.on('after', restifyBunyanLogger({

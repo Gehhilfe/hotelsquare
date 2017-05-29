@@ -433,5 +433,29 @@ describe('User', () => {
                     return done();
                 });
         });
+
+        it('should filter by gender male', (done) => {
+            request(server)
+                .post('/users')
+                .set('x-auth', token)
+                .send({ name: 'p', gender: 'f'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.length.should.equal(1);
+                    return done();
+                });
+        });
+
+        it('should filter by gender female', (done) => {
+            request(server)
+                .post('/users')
+                .set('x-auth', token)
+                .send({ name: '2', gender: 'm'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.length.should.equal(0);
+                    return done();
+                });
+        });
     });
 });
