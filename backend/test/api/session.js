@@ -8,6 +8,8 @@ const util = require('../../lib/util');
 chai.should();
 const expect = chai.expect;
 chai.use(chaiHttp);
+const request = require('supertest');
+
 
 const jwt = require('jsonwebtoken');
 const config = require('config');
@@ -28,7 +30,9 @@ describe('Session', () => {
                     name: 'test',
                     password: 'secret',
                     email: 'test@test.de'
-                }).then(() => {return done();});
+                }).then(() => {
+                    return done();
+                });
             });
         });
 
@@ -37,7 +41,7 @@ describe('Session', () => {
                 name: 'test',
                 password: 'secret'
             };
-            chai.request(server)
+            request(server)
                 .post('/session')
                 .send(loginDetails)
                 .end((err, res) => {
@@ -55,7 +59,7 @@ describe('Session', () => {
                 name: 'test',
                 password: 'wrong'
             };
-            chai.request(server)
+            request(server)
                 .post('/session')
                 .send(loginDetails)
                 .end((err, res) => {

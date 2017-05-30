@@ -5,9 +5,6 @@ const chai = require('chai');
 const expect = chai.expect;
 
 let failVerify = false;
-let decoded = {
-    test: 'a'
-};
 
 mock('jsonwebtoken', {
     verify: (token, secret, cb) => {
@@ -32,34 +29,34 @@ describe('authentication filter', () => {
         };
         
         response = {
-            status: (code) => {
+            status: () => {
                 
             },
-            json: (body) => {
+            json: () => {
                 
             }
-        }
+        };
         return done();
     });
     
     
-     it('should add decode to request.authentication with valid signature', (done) => {
+    it('should add decode to request.authentication with valid signature', (done) => {
         failVerify = false;
         auth(request, response, () => {
             expect(request.authentication).to.not.be.undefined;
             return done();
         });
-     });
+    });
      
-     it('should not add decode to request.authentication with invalid signature', (done) => {
+    it('should not add decode to request.authentication with invalid signature', (done) => {
         failVerify = true;
         auth(request, response, () => {
             expect(request.authentication).to.be.undefined;
             return done();
         });
-     });
+    });
      
-     it('should not add decode to request.authentication without header', (done) => {
+    it('should not add decode to request.authentication without header', (done) => {
         failVerify = false;
         request = {
             headers: {
@@ -71,5 +68,5 @@ describe('authentication filter', () => {
             expect(request.authentication).to.be.undefined;
             return done();
         });
-     });
+    });
 });

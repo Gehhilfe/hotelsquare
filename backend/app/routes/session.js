@@ -1,9 +1,5 @@
 'use strict';
 
-/**
- * Created by gehhi on 02.05.2017.
- */
-
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const mongoose = require('mongoose');
@@ -23,7 +19,7 @@ const User = mongoose.model('User');
  */
 function postSession(request, response, next) {
     User.login(request.params).then((u) => {
-        var token = jwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
+        const token = jwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
         response.json({token: token});
         return next();
     }, () => {

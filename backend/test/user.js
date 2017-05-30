@@ -1,13 +1,12 @@
 'use strict';
 
 const mock = require('mock-require');
-
 const bcrypt = require('bcrypt');
 let failBcrypt = false;
 
 mock('bcrypt', {
-    hash: function(password, salt_work) {
-        if(failBcrypt)
+    hash: function (password, salt_work) {
+        if (failBcrypt)
             return Promise.reject('Cant hash password!');
         else
             return bcrypt.hash(password, salt_work);
@@ -21,11 +20,14 @@ mongoose.models = {};
 mongoose.modelSchemas = {};
 const User = mock.reRequire('../app/models/user');
 
-
 const chai = require('chai');
+
 const expect = chai.expect;
+
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
+chai.use(require('chai-date'));
+chai.should();
 
 const Util = require('../lib/util');
 
@@ -33,29 +35,39 @@ describe('user', function () {
 
 
     let validUser;
+    let aUser;
+    let bUser;
 
     beforeEach(function (done) {
         failBcrypt = false;
         mongoose.Promise = global.Promise;
 
-        validUser = new User({
+        validUser = {
             name: 'Test',
             email: 'test@test.de',
             password: 'password'
-        });
+        };
 
-        if (mongoose.connection.db) return done();
-        Util.connectDatabase(mongoose).then(function () {
-            User.remove({}, done);
+        const otherUser = {
+            name: 'OtherTest',
+            email: 'test@2test.de',
+            password: 'password'
+        };
+
+        Util.connectDatabase(mongoose).then(() => {
+            User.remove({}).then(() => {
+                User.create(validUser).then((u) => {
+                    aUser = u;
+                    User.create(otherUser).then((u) => {
+                        bUser = u;
+                        return done();
+                    });
+                });
+            });
         });
     });
 
-    it('can be saved', function (done) {
-        const u = new User(validUser);
-        u.save(done);
-    });
-
-    describe('#name', function () {
+    describe('#name', () => {
         it('cant be empty', function (done) {
             validUser.name = '';
             const u = new User(validUser);
@@ -87,7 +99,15 @@ describe('user', function () {
                 return done();
             });
         });
-        
+
+        it('should be unqiue', function () {
+            return expect(User.create(validUser)).to.be.eventually.rejected;
+        });
+
+        it('should be saved all lowercase', () => {
+            expect(aUser.name === validUser.name.toLowerCase()).to.be.true;
+        });
+
         const format_tests = [
             {name: 'test', result: true},
             {name: 'test123', result: true},
@@ -96,27 +116,27 @@ describe('user', function () {
             {name: '1test', result: false},
             {name: 'a', result: false}
         ];
-        
+
         it('should match the examples format results', (done) => {
-            for(let i=0;i<format_tests.length;i++) {
+            for (let i = 0; i < format_tests.length; i++) {
                 const example = format_tests[i];
                 validUser.name = example.name;
                 const u = new User(validUser);
                 u.validate(function (err) {
-                    if(example.result) {
+                    if (example.result) {
                         expect(err).to.be.null;
                     } else {
                         expect(err).to.not.be.null;
                         expect(err.errors.name).to.exist;
                     }
-                    if(i === format_tests.length-1)
+                    if (i === format_tests.length - 1)
                         return done();
                 });
             }
         });
     });
 
-    describe('#email', function () {
+    describe('#email', () => {
         it('cant be empty', function (done) {
             validUser.email = '';
             const u = new User(validUser);
@@ -141,9 +161,15 @@ describe('user', function () {
                 });
             });
         });
+
+        it('should be unqiue', function () {
+            const copy = validUser;
+            copy.name = 'StillSameEmail';
+            return expect(User.create(copy)).to.be.eventually.rejected;
+        });
     });
 
-    describe('#password', function () {
+    describe('#password', () => {
 
         it('should have a minimum length of 6 characters', function (done) {
             const u = new User(validUser);
@@ -161,24 +187,16 @@ describe('user', function () {
         });
 
         it('should stay valid when not changed', function (done) {
-            const u = new User(validUser);
-            u.save().then((res) => {
-                res.name = 'Blub';
-                res.validate().then(done);
-            });
+            aUser.name = 'Blubbbb';
+            aUser.validate().then(done);
         });
 
-        it('should be hashed when saved', function (done) {
-            const u = new User(validUser);
-            u.save(function () {
-                expect(u.password).to.be.not.equal(validUser.password);
-                return done();
-            });
+        it('should be hashed when saved', function () {
+            expect(aUser.password).to.be.not.equal(validUser.password);
         });
 
         it('should not change when already hashed and saved again', (done) => {
-            const u = new User(validUser);
-            u.save().then((res) => {
+            aUser.save().then((res) => {
                 const hashed_password = res.password;
                 res.save().then((res) => {
                     expect(hashed_password).to.be.equal(res.password);
@@ -199,25 +217,61 @@ describe('user', function () {
         });
     });
 
+    describe('#friend_requests', () => {
+        it('should store name of sender', (done) => {
+            aUser.friend_requests.push({sender: bUser});
+            expect(aUser.friend_requests[0].sender.name).to.be.equal(bUser.name);
+            aUser.friend_requests[0].created_at.should.be.today;
+            return done();
+        });
+    });
+
+    describe('#gener', () => {
+        it('should default to unspecified', () => {
+            aUser.gender.should.be.equal('unspecified');
+        });
+    });
+
     describe('comparePassword', () => {
         it('compare should yield a true result with correct plain text password', function (done) {
-            const u = new User(validUser);
-            u.save().then(function () {
-                u.comparePassword(validUser.password).then(function (res) {
-                    expect(res).to.be.true;
-                    return done();
-                });
+            aUser.comparePassword(validUser.password).then(function (res) {
+                expect(res).to.be.true;
+                return done();
             });
         });
 
         it('compare should yield a false result with wrong plain text password', function (done) {
-            const u = new User(validUser);
-            u.save().then(function () {
-                u.comparePassword('haxor').then(function (res) {
-                    expect(res).to.be.false;
-                    return done();
-                });
+            aUser.comparePassword('haxor').then(function (res) {
+                expect(res).to.be.false;
+                return done();
             });
+        });
+    });
+
+    describe('public json', () => {
+        it('should not contain password', () => {
+            const json = aUser.toJSONPublic();
+            json.should.not.have.property('password');
+        });
+
+        it('should not contain email', () => {
+            const json = aUser.toJSONPublic();
+            json.should.not.have.property('email');
+        });
+
+        it('should not contain friends', () => {
+            const json = aUser.toJSONPublic();
+            json.should.not.have.property('friends');
+        });
+
+        it('should not contain friend_requests', () => {
+            const json = aUser.toJSONPublic();
+            json.should.not.have.property('friend_requests');
+        });
+
+        it('should contain name', () => {
+            const json = aUser.toJSONPublic();
+            json.should.have.property('name');
         });
     });
 
@@ -235,21 +289,27 @@ describe('user', function () {
         });
 
         it('should return the user with valid name and password', function () {
-            return expect(User.login(validUser.name, 'password').then(function (u) {
+            return expect(User.login(validUser.displayName, 'password').then(function (u) {
+                return Promise.resolve(u.equals(validUser));
+            })).to.eventually.equal(true);
+        });
+
+        it('should return the user with valid emai and password', function () {
+            return expect(User.login(validUser.email, 'password').then(function (u) {
                 return Promise.resolve(u.equals(validUser));
             })).to.eventually.equal(true);
         });
 
         it('should reject with invalid password', function () {
-            return expect(User.login(validUser.name, 'wrong')).to.eventually.rejected;
+            return expect(User.login(validUser.displayName, 'wrong')).to.eventually.rejected;
         });
 
         it('should reject with invalid name', function () {
-            return expect(User.login('test', 'password')).to.eventually.rejected;
+            return expect(User.login('wrong', 'password')).to.eventually.rejected;
         });
 
         it('should work with a json object as first parameter', () => {
-            return expect(User.login({name: 'test', password: 'password'})).to.eventually.resolved;
+            return expect(User.login({name: 'Test', password: 'password'})).to.eventually.resolved;
         });
     });
 });
