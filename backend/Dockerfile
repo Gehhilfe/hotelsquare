@@ -1,4 +1,4 @@
-FROM FROM node:7.10.0-alpine
+FROM node:7.10.0-alpine
 ENV NODE_ENV staging
 
 # Create app directory
