@@ -90,7 +90,8 @@ public class LoginActivity extends AppCompatActivity {
     private void successfulLogin() {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
-        //finish();
+
+        finish();
         // TODO - Return to the FourSquareActivity.
     }
 

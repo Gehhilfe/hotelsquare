@@ -1,8 +1,10 @@
 package tk.internet.praktikum.foursquare;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -88,6 +90,8 @@ public class MainActivity extends AppCompatActivity
         }
         else if(id==R.id.nav_me){
             // call login activity if didn't login util now
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivityForResult(intent, 0);
         }
         else if (id == R.id.nav_manage) {
 
