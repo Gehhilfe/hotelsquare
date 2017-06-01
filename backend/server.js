@@ -4,6 +4,7 @@ const config = require('config');
 const restify = require('restify');
 const session = require('./app/routes/session');
 const user = require('./app/routes/user');
+const venue = require('./app/routes/venue');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
@@ -98,6 +99,8 @@ server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
 server.del('profile/avatar', auth, user.deleteAvatar);
 
+//Venue
+server.post('venues/query', venue.queryVenue);
 
 // Delete downloads
 server.on('after', (request) => {
