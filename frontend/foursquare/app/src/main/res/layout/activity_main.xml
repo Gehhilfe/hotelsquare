@@ -9,6 +9,11 @@
     tools:openDrawer="start">
 
     <include
+        layout="@layout/activity_foursquare"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <include
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -21,9 +26,12 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
+
+    <!-- This Block wont work like this. It overwrites the layout from the first include
+    which also leads to a problem with the binding of the onSelectlistener
     <include
         layout="@layout/activity_foursquare"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
+    -->
 </android.support.v4.widget.DrawerLayout>
