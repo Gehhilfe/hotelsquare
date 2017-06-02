@@ -1,7 +1,7 @@
 'use strict';
 
-const restify = require('restify');
-const Venue = require('../models/venue');
+//const restify = require('restify');
+//const Venue = require('../models/venue');
 const googleapilib = require('googleplaces');
 const config = require('config');
 
@@ -15,26 +15,22 @@ const config = require('config');
  * @returns {undefined}
  */
 function queryVenue(request, response, next) {
-    let api = googleapilib(config.googleapi.GOOGLE_PLACES_API_KEY, config.googleapi.GOOGLE_PLACES_OUTPUT_FORMAT);
+    const api = googleapilib(config.googleapi.GOOGLE_PLACES_API_KEY, config.googleapi.GOOGLE_PLACES_OUTPUT_FORMAT);
 
-    let params = {
+    const params = {
         location: request.body.location,
         keyword: request.body.keyword
     };
 
-    try {
-        api.nearBySearch(params, function (error, res) {
-            if (error) {
-                response.send(500, err);
-                return next();
-            } else {
-                response.json(res);
-                return next();
-            }
-        });
-    } catch (err) {
-        console.log(err);
-    }
+    api.nearBySearch(params, function (error, res) {
+        if (error) {
+            response.send(500, error);
+            return next();
+        } else {
+            response.json(res);
+            return next();
+        }
+    });
 }
 
 module.exports = {
