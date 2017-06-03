@@ -20,11 +20,19 @@ const handleValidation = (next, func) => {
     func().catch((error) => {
         switch (error.name) {
         case 'MongoError':
-            return next(new ValidationError([{
-                name: {
-                    message: 'Name or email is already taken'
-                }
-            }]));
+            if(error.errmsg.includes('name')) {
+                return next(new ValidationError({
+                    name: {
+                        message: 'Name is already taken'
+                    }}));
+            }
+            if(error.errmsg.includes('email')) {
+                return next(new ValidationError({
+                    email: {
+                        message: 'Email is already used'
+                    }}));
+            }
+            break;
 
         case 'ValidationError':
             return next(new ValidationError(error.errors));

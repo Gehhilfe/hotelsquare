@@ -23,8 +23,11 @@ util.connectDatabase(mongoose).then(() => {
         const User = require('./app/models/user');
 
         if (config.bootstrap) {
-            if (config.bootstrap.User)
-                util.bootstrap(User, config.bootstrap.User);
+            if (config.bootstrap.User) {
+                User.remove({}).then(() => {
+                    util.bootstrap(User, config.bootstrap.User);
+                });
+            }
         }
     }
 });
@@ -41,19 +44,24 @@ server.use(restify.bodyParser({
 }));
 
 let streams = undefined;
-
+let bunyanLogger;
 if(config.logstash) {
     streams = [{
         type: 'raw',
         stream: require('bunyan-logstash').createStream(config.logstash)
     }];
+    bunyanLogger = bunyan.createLogger({
+        name: 'hotel-square',
+        level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO),
+        streams: streams
+    });
+} else {
+    bunyanLogger = bunyan.createLogger({
+        name: 'hotel-square',
+        level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO)
+    });
 }
 
-const bunyanLogger = bunyan.createLogger({
-    name: 'hotel-square',
-    level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO),
-    streams: streams
-});
 
 server.on('after', restifyBunyanLogger({
     skip: function(req) {
@@ -70,6 +78,25 @@ server.on('after', restifyBunyanLogger({
     },
     logger: bunyanLogger
 }));
+
+if(process.env.NODE_ENV !== 'production') {
+    server.use(restify.CORS({
+
+        // Defaults to ['*'].
+        origins: ['*']
+
+    }));
+
+    server.opts(/.*/, function (req, res, next) {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', req.header('Access-Control-Request-Method'));
+        res.header('Access-Control-Allow-Headers', req.header('Access-Control-Request-Headers'));
+        res.send(200);
+        return next();
+    });
+
+    bunyanLogger.info('Using CORS');
+}
 
 // Session
 server.post('session', session.postSession);
@@ -113,7 +140,7 @@ server.on('after', (request) => {
 });
 
 server.listen(8081, function () {
-    server.log.info('%s listening at %s', server.name, server.url);
+    bunyanLogger.info('%s listening at %s', server.name, server.url);
 });
 
 module.exports = server;

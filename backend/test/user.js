@@ -289,6 +289,12 @@ describe('user', function () {
         });
 
         it('should return the user with valid name and password', function () {
+            return expect(User.login(validUser.name, 'password').then(function (u) {
+                return Promise.resolve(u.equals(validUser));
+            })).to.eventually.equal(true);
+        });
+
+        it('should return the user with valid displayName and password', function () {
             return expect(User.login(validUser.displayName, 'password').then(function (u) {
                 return Promise.resolve(u.equals(validUser));
             })).to.eventually.equal(true);

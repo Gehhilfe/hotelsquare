@@ -10,6 +10,8 @@ const jsonwt = require('jsonwebtoken');
 const expect = chai.expect;
 chai.should();
 chai.use(chaiHttp);
+chai.use(require('chai-things'));
+
 const request = require('supertest');
 
 describe('User', () => {
@@ -184,6 +186,23 @@ describe('User', () => {
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
+                    res.body.errors.should.contain.an.item.with.property('field', 'name');
+                    return done();
+                });
+        });
+
+        it('should not register user with same email', (done) => {
+            const registrationData = {
+                name: 'peter2123123',
+                email: 'peter123@cool.de',
+                password: 'secret'
+            };
+            request(server)
+                .post('/user')
+                .send(registrationData)
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.body.errors.should.contain.an.item.with.property('field', 'email');
                     return done();
                 });
         });
