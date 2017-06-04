@@ -167,7 +167,9 @@ class UserClass {
     toJSONPublic() {
         return {
             _id: this._id,
-            name: this.name
+            name: this.name,
+            displayName: this.displayName,
+            friends: this.friends.length
         };
     }
 }

@@ -476,5 +476,49 @@ describe('User', () => {
                     return done();
                 });
         });
+
+        describe('results', () => {
+
+            let results;
+
+            beforeEach((done) => {
+                request(server)
+                    .post('/users')
+                    .set('x-auth', token)
+                    .send({ name: 'pet'})
+                    .end((err, res) => {
+                        results = res.body;
+                        return done();
+                    });
+            });
+
+            it('should contain name', () => {
+                results.should.all.contain.item.with.property('name');
+            });
+
+            it('should contain displayName', () => {
+                results.should.all.contain.item.with.property('displayName');
+            });
+
+            it('should contain type', () => {
+                results.should.all.contain.item.with.property('type', 'user');
+            });
+
+            it('should not contain email', () => {
+                results.should.not.contain.an.item.with.property('email');
+            });
+
+            it('should not contain password', () => {
+                results.should.not.contain.an.item.with.property('password');
+            });
+
+            it('should contain friends as number', () => {
+                results[0].friends.should.be.a('number');
+            });
+
+            it('should not contain friend_requests', () => {
+                results.should.not.contain.an.item.with.property('friend_requests');
+            });
+        });
     });
 });
