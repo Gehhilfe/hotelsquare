@@ -259,9 +259,9 @@ describe('user', function () {
             json.should.not.have.property('email');
         });
 
-        it('should not contain friends', () => {
+        it('should contain friends as a number', () => {
             const json = aUser.toJSONPublic();
-            json.should.not.have.property('friends');
+            json.friends.should.be.a('number');
         });
 
         it('should not contain friend_requests', () => {
