@@ -91,7 +91,9 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
         //finish();
-        // TODO - Return to the FourSquareActivity.
+        // TODO - Return to the UserActivity.
+        Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+        startActivityForResult(intent, 3);
     }
 
     /**

@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     tools:context="tk.internet.praktikum.foursquare.MainActivity">
 
-    <include layout="@layout/content_main" />
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -29,5 +27,7 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_main" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -10,6 +10,6 @@ public class FoursquareActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_foursquare);
+        setContentView(R.layout.activity_foursquare_search);
     }
 }

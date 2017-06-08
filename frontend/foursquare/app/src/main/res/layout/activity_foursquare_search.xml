@@ -12,18 +12,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingTop="35dp">
-        <!-- android:paddingLeft="24dp"
-        android:paddingRight="24dp"-->
-
-
-      <!--  <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="72dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="30dp"
-            android:orientation="vertical"
-            android:src="@mipmap/foursquare_logo_2" />-->
 
         <!-- Logo -->
         <SearchView
