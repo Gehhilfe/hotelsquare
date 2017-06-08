@@ -94,6 +94,9 @@ public class LoginActivity extends AppCompatActivity {
         // TODO - Return to the UserActivity.
         Intent intent = new Intent(getApplicationContext(), UserActivity.class);
         startActivityForResult(intent, 3);
+
+        finish();
+        // TODO - Return to the FourSquareActivity.
     }
 
     /**
