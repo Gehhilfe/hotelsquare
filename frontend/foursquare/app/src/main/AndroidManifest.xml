@@ -14,9 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity" android:theme="@style/AppTheme.Dark"/>
-        <activity android:name=".RegisterActivity" android:theme="@style/AppTheme.Dark"/>
-        <activity android:name=".RestorePasswordActivity" android:theme="@style/AppTheme.Dark"/>
+        <activity android:name=".login.LoginActivity" android:theme="@style/AppTheme.Dark"/>
         <activity android:name=".FoursquareActivity" android:theme="@style/AppTheme.Dark"/>
         <activity android:name=".ProfileActivity"  android:label="@string/title_activity_profile" android:theme="@style/AppTheme.NoActionBar"/>
         <activity
