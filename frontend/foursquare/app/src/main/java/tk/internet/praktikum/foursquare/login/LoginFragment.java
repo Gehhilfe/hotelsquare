@@ -21,13 +21,14 @@ import tk.internet.praktikum.foursquare.api.service.SessionService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 
 public class LoginFragment extends Fragment {
-
     private static final String LOG_TAG = LoginFragment.class.getSimpleName();
     private final String URL = "https://dev.ip.stimi.ovh/";
 
     private EditText userInput, passwordInput;
     private AppCompatButton loginBtn;
     private TextView registerLbl, passwordForgottenLbl;
+    private  LoginGeneralFragment loginGeneralFragment;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -92,7 +93,6 @@ public class LoginFragment extends Fragment {
     private void successfulLogin() {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
-
         getActivity().finish();
     }
 
@@ -106,14 +106,24 @@ public class LoginFragment extends Fragment {
     }
 
     /**
-     * Starts the Register Activity.
+     * Starts the Register Fragment
      */
     private void register() {
         ((LoginActivity) getActivity()).changeFragment(1);
+        //loginGeneralFragment.changeFragment(1);
     }
 
     // TODO - Restore Password
     private void restorePassword() {
         ((LoginActivity) getActivity()).changeFragment(2);
+        //loginGeneralFragment.changeFragment(2);
+    }
+
+    public LoginGeneralFragment getLoginGeneralFragment() {
+        return loginGeneralFragment;
+    }
+
+    public void setLoginGeneralFragment(LoginGeneralFragment loginGeneralFragment) {
+        this.loginGeneralFragment = loginGeneralFragment;
     }
 }
