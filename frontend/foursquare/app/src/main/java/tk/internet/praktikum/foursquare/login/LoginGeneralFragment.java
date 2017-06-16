@@ -1,17 +1,17 @@
 package tk.internet.praktikum.foursquare.login;
 
-import android.app.FragmentTransaction;
-import android.content.Context;
-import android.net.Uri;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import tk.internet.praktikum.foursquare.R;
 
-
+/** Todo
+ * This fragment will be adapted later.
+ */
 public class  LoginGeneralFragment extends Fragment {
     private LoginFragment loginFragment;
     private RegisterFragment registerFragment;

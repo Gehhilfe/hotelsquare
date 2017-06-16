@@ -3,7 +3,6 @@ package tk.internet.praktikum.foursquare.login;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.Patterns;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.User;
@@ -129,8 +127,8 @@ public class RegisterFragment extends Fragment {
     private void successfulRegister() {
         Log.d(LOG_TAG, "Successful login.");
         registerBtn.setEnabled(true);
-        ((LoginActivity) getActivity()).changeFragment(0);
-        //loginGeneralFragment.changeFragment(0);
+       ((LoginActivity) getActivity()).changeFragment(0);
+       // loginGeneralFragment.changeFragment(0);
     }
 
     /**

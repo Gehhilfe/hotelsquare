@@ -21,8 +21,9 @@
     <string name="action_settings">Settings</string>
     <string name="reset_password_lbl">Enter your Email address to reset your password.</string>
     <string name="reset_password">Reset Password</string>
-    <string name="searching_question">What are you looking for?</string>
-
+    <string name="searching_question">What are you searching for?</string>
+    <string name="large_text">abcd demo</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

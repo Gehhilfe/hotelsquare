@@ -1,24 +1,18 @@
 package tk.internet.praktikum.foursquare;
 
-import android.content.Context;
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import tk.internet.praktikum.foursquare.login.LoginActivity;
-import tk.internet.praktikum.foursquare.login.LoginGeneralFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -38,8 +32,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        //SearchFragment searchFragment =new SearchFragment();
-        //getFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
+        FastSearchFragment searchFragment =new FastSearchFragment();
+        getFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
 
     }
 
@@ -94,16 +88,14 @@ public class MainActivity extends AppCompatActivity
             startActivityForResult(intent, 0);
             // Insert the fragment by replacing any existing fragment
 
-            try {
+           /* try {
                 fragment = (Fragment) LoginGeneralFragment.class.newInstance();
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-
-
-
+*/
 
         }
         else if (id == R.id.nav_manage) {
@@ -114,7 +106,7 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-       /* FragmentTransaction fragmentTransaction= getFragmentManager().beginTransaction();
+        /*FragmentTransaction fragmentTransaction= getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();

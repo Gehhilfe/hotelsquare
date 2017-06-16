@@ -2,6 +2,7 @@ package tk.internet.praktikum.foursquare.login;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.UserActivity;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
 import tk.internet.praktikum.foursquare.api.service.SessionService;
@@ -93,6 +95,8 @@ public class LoginFragment extends Fragment {
     private void successfulLogin() {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
+        Intent intent = new Intent(getActivity().getApplicationContext(), UserActivity.class);
+        startActivityForResult(intent, 1);
         getActivity().finish();
     }
 
@@ -115,7 +119,7 @@ public class LoginFragment extends Fragment {
 
     // TODO - Restore Password
     private void restorePassword() {
-        ((LoginActivity) getActivity()).changeFragment(2);
+       ((LoginActivity) getActivity()).changeFragment(2);
         //loginGeneralFragment.changeFragment(2);
     }
 
