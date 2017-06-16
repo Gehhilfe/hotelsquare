@@ -36,7 +36,7 @@
     <!-- This Block wont work like this. It overwrites the layout from the first include
     which also leads to a problem with the binding of the onSelectlistener
     <include
-        layout="@layout/activity_fast_search"
+        layout="@layout/activity_foursquare"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     -->

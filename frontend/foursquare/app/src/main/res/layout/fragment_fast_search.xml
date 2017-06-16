@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    tools:context="tk.internet.praktikum.foursquare.FoursquareActivity">
+    tools:context="tk.internet.praktikum.foursquare.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,11 +27,12 @@
 
         <!-- Logo -->
         <SearchView
+            android:id="@+id/fast_search"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="30dp"
-            android:queryHint="@string/searching_question"
+
             />
     </LinearLayout>
 
