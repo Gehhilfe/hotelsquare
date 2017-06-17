@@ -19,8 +19,9 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.UserActivity;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
+import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.SessionService;
-import tk.internet.praktikum.foursquare.api.service.UserService;
+import tk.internet.praktikum.storage.LocalStorage;
 
 public class LoginFragment extends Fragment {
     private static final String LOG_TAG = LoginFragment.class.getSimpleName();
@@ -76,10 +77,12 @@ public class LoginFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
                 .subscribe(
                         tokenInformation -> {
-                            UserService uservice = ServiceFactory.createRetrofitService(UserService.class, URL, tokenInformation.getToken());
+                            //UserService uservice = ServiceFactory.createRetrofitService(UserService.class, URL, tokenInformation.getToken());
                             successfulLogin();
                             progressDialog.dismiss();
-                            Toast.makeText(getActivity().getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getActivity().getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG).show();
+                            LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveLoggedinInformation(tokenInformation,new User(email,email));
+
                         },
                         throwable -> {
                             failedLogin();

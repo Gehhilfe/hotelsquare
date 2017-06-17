@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
@@ -21,12 +22,24 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
-            android:queryHint="@string/searching_question" />
+            android:queryHint="@string/searching_question">
 
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/mapView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+
+        </SearchView>
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="46dp"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_location_search" />
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="255dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name" />
 
 
     </LinearLayout>
@@ -34,7 +47,7 @@
     <ListView
         android:id="@+id/searching_results"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="329dp" />
 
 
 </LinearLayout>

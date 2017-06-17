@@ -1,6 +1,7 @@
 package tk.internet.praktikum.foursquare;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import tk.internet.praktikum.foursquare.login.LoginActivity;
+import tk.internet.praktikum.storage.LocalStorage;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        FastSearchFragment searchFragment =new FastSearchFragment();
+        FastSearchFragment searchFragment = new FastSearchFragment();
         getFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
 
     }
@@ -74,18 +76,38 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        Fragment fragment= null;
+        Fragment fragment = null;
         if (id == R.id.nav_search) {
-           // call Search activity
+            // call Search fast activity
+            try {
+                fragment = FastSearchFragment.class.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         } else if (id == R.id.nav_history) {
             // call history activity
 
-        }
-        else if(id==R.id.nav_me){
+        } else if (id == R.id.nav_me) {
             // call login activity if didn't login util now
+            if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivityForResult(intent, 0);
+            } else {
+                //Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                // startActivityForResult(intent, 1);
+                //finish();
+                try {
+                    fragment = MeFragment.class.newInstance();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
 
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivityForResult(intent, 0);
+
+            }
             // Insert the fragment by replacing any existing fragment
 
            /* try {
@@ -97,8 +119,7 @@ public class MainActivity extends AppCompatActivity
             }
 */
 
-        }
-        else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
 
@@ -106,11 +127,11 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        /*FragmentTransaction fragmentTransaction= getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-        item.setChecked(true);*/
+        item.setChecked(true);
         // Set action bar title
         //setTitle(item.getTitle());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
