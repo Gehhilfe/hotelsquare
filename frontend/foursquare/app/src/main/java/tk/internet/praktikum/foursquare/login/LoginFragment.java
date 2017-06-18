@@ -1,6 +1,7 @@
 package tk.internet.praktikum.foursquare.login;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,11 +17,11 @@ import android.widget.Toast;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.UserActivity;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.SessionService;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 import tk.internet.praktikum.storage.LocalStorage;
 
 public class LoginFragment extends Fragment {
@@ -101,6 +102,25 @@ public class LoginFragment extends Fragment {
         Intent intent = new Intent(getActivity().getApplicationContext(), UserActivity.class);
         startActivityForResult(intent, 1);
         getActivity().finish();
+/*
+        try {
+            Fragment fragment = MeFragment.class.newInstance();
+            redirectToFragment(fragment);
+        }
+        catch (java.lang.InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }*/
+
+
+    }
+    private void redirectToFragment(Fragment fragment){
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
     }
 
     /**
@@ -123,7 +143,7 @@ public class LoginFragment extends Fragment {
     // TODO - Restore Password
     private void restorePassword() {
        ((LoginActivity) getActivity()).changeFragment(2);
-        //loginGeneralFragment.changeFragment(2);
+       // loginGeneralFragment.changeFragment(2);
     }
 
     public LoginGeneralFragment getLoginGeneralFragment() {

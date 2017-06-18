@@ -44,7 +44,7 @@ public class RegisterFragment extends Fragment {
         registerBtn.setOnClickListener(v -> register());
 
        loginLbl.setOnClickListener(v -> ((LoginActivity) getActivity()).changeFragment(0));
-        //loginLbl.setOnClickListener(v -> loginGeneralFragment.changeFragment(0));
+       // loginLbl.setOnClickListener(v -> loginGeneralFragment.changeFragment(0));
 
         return view;
     }
@@ -128,7 +128,7 @@ public class RegisterFragment extends Fragment {
         Log.d(LOG_TAG, "Successful login.");
         registerBtn.setEnabled(true);
        ((LoginActivity) getActivity()).changeFragment(0);
-       // loginGeneralFragment.changeFragment(0);
+       //loginGeneralFragment.changeFragment(0);
     }
 
     /**

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="tk.internet.praktikum.foursquare.UserActivity">
+    tools:context="tk.internet.praktikum.foursquare.user.UserActivity">
 
 
 
@@ -39,7 +39,7 @@
                 tools:ignore="ContentDescription" />
 
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/user_avatar"
                 android:layout_width="107dp"
                 android:layout_height="87dp"

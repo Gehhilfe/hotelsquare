@@ -18,7 +18,7 @@
             android:name=".login.LoginActivity"
             android:theme="@style/AppTheme.Dark" />
         <activity
-            android:name=".UserActivity"
+            android:name=".user.UserActivity"
             android:label="@string/title_activity_profile"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

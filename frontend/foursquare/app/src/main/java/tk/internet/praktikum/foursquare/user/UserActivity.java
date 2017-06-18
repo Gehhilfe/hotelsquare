@@ -1,9 +1,11 @@
-package tk.internet.praktikum.foursquare;
+package tk.internet.praktikum.foursquare.user;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import tk.internet.praktikum.foursquare.R;
 
 public class UserActivity extends AppCompatActivity {
     TabLayout tabLayout;
