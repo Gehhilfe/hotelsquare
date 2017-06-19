@@ -1,7 +1,7 @@
 'use strict';
 
-const restify = require('restify');
-const Venue = require('../models/venue');
+//const restify = require('restify');
+//const Venue = require('../models/venue');
 const googleapilib = require('googleplaces');
 const config = require('config');
 
