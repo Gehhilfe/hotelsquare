@@ -15,11 +15,21 @@ const config = require('config');
  * @returns {undefined}
  */
 function queryVenue(request, response, next) {
+    const location = request.body.location;
+    const keyword = request.body.keyword;
+
+
+
+
+}
+
+function queryAllVenues(location){
     const api = googleapilib(config.googleapi.GOOGLE_PLACES_API_KEY, config.googleapi.GOOGLE_PLACES_OUTPUT_FORMAT);
 
     const params = {
-        location: request.body.location,
-        keyword: request.body.keyword
+        location: location,
+        radius: 50000,
+        language: en
     };
 
     api.nearBySearch(params, function (error, res) {
