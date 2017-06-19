@@ -1,9 +1,9 @@
 package tk.internet.praktikum.foursquare;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import tk.internet.praktikum.foursquare.login.LoginActivity;
+import tk.internet.praktikum.foursquare.search.FastSearchFragment;
+import tk.internet.praktikum.foursquare.user.MeFragment;
+import tk.internet.praktikum.storage.LocalStorage;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -23,15 +28,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -40,6 +36,9 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        FastSearchFragment searchFragment = new FastSearchFragment();
+        getFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
+
     }
 
     @Override
@@ -74,31 +73,79 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Fragment fragment = null;
 
         if (id == R.id.nav_search) {
-           // call Search activity
+            // call Search fast activity
+            try {
+                fragment = FastSearchFragment.class.newInstance();
+                redirectToFragment(fragment);
+                setTitle(item);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         } else if (id == R.id.nav_history) {
             // call history activity
 
-        }
-        else if(id==R.id.nav_me){
+        } else if (id == R.id.nav_me) {
             // call login activity if didn't login util now
-        }
-        else if (id == R.id.nav_manage) {
+            if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
+               Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivityForResult(intent, 0);
+               /*try {
+                    fragment = LoginGeneralFragment.class.newInstance();
+                    redirectToFragment(fragment);
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }*/
+            } else {
+                try {
+                fragment = MeFragment.class.newInstance();
+                redirectToFragment(fragment);
+                    setTitle(item);
+                }
+                catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
 
-        } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
+            }
 
-        }
+
+            // Insert the fragment by replacing any existing fragment
+
+    }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void redirectToFragment(Fragment fragment){
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, fragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+
+    }
+    private  void setTitle(MenuItem item){
+        item.setChecked(true);
+        // Set action bar title
+        setTitle(item.getTitle());
+
+    }
+
+
+
+
 }
