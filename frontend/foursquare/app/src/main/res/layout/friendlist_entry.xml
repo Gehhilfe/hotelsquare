@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="40dp"
+    android:background="?attr/selectableItemBackground" >
+
+    <ImageView
+        android:id="@+id/fl_avatar"
+        android:src="@mipmap/user_avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/fl_name"
+        android:paddingRight="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/fl_avatar"
+        android:layout_toStartOf="@+id/fl_msg"
+        android:layout_toEndOf="@+id/fl_avatar" />
+
+    <ImageView
+        android:id="@+id/fl_msg"
+        app:srcCompat="@mipmap/ic_mail_outline_black_24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>
