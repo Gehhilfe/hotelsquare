@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.user.MeFragment;
@@ -92,7 +93,8 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_history) {
             // call history activity
-
+            Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
+            startActivityForResult(intent, 0);
         } else if (id == R.id.nav_me) {
             // call login activity if didn't login util now
             if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {

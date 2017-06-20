@@ -18,6 +18,9 @@
             android:name=".login.LoginActivity"
             android:theme="@style/AppTheme.Dark" />
         <activity
+            android:name=".friendlist.DummyActivity"
+            android:theme="@style/AppTheme.Dark" />
+        <activity
             android:name=".user.UserActivity"
             android:label="@string/title_activity_profile"
             android:theme="@style/AppTheme.NoActionBar" />
