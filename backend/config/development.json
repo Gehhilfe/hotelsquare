@@ -11,12 +11,16 @@
   },
   "bootstrap": {
     "User": [
-      {"name": "admin", "email": "admin@test.de", "password": "123456"}
+      {"name": "Admin", "email": "admin@test.de", "password": "123456"}
     ]
   },
   "minio": {
     "key": "stimi-storage",
     "secret": "6!u40ws?}QwjhpFw",
     "bucket": "test"
+  },
+  "googleapi": {
+    "GOOGLE_PLACES_API_KEY": "AIzaSyCK1nUagKpUd3I5i415iNaiXz5Cl2l9QM8",
+    "GOOGLE_PLACES_OUTPUT_FORMAT": "json"
   }
 }

@@ -91,7 +91,7 @@ class UserClass {
             name = name.name;
         }
         return new Promise(function (resolve, reject) {
-            self.findOne({$or: [{displayName: name}, {email: name}]}).then(function (res) {
+            self.findOne({$or: [{displayName: name}, {email: name}, {name: name}]}).then(function (res) {
                 const foundUser = res;
                 if (res === null)
                     return reject();
@@ -167,7 +167,9 @@ class UserClass {
     toJSONPublic() {
         return {
             _id: this._id,
-            name: this.name
+            name: this.name,
+            displayName: this.displayName,
+            friends: this.friends.length
         };
     }
 }

@@ -7,25 +7,34 @@ const Schema = mongoose.Schema;
 // Schema
 // ---------------------------------------------------------------------------------------------------------------------
 
-const VenueSchema = new Schema({
-    name: String,
+const SearchRequestSchema = new Schema({
     location: {
         'type': { type: String, default: 'Point' },
         coordinates: { type: [Number], default: [0, 0] }
-    }
+    },
+    querytime: { type: Date, default: Date.now }
 });
 
 
 
-VenueSchema.index({location: '2dsphere'});
+SearchRequestSchema.index({location: '2dsphere'});
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Class
 // ---------------------------------------------------------------------------------------------------------------------
 
-class VenueClass {
+class SearchRequestClass {
+
+    static findClosestLocation(coords){
+        return this.find({
+            location: {
+                $nearsphere: coords
+            }
+        })
+            .limit(1);
+    }
 
 }
 
-VenueSchema.loadClass(VenueClass);
-module.exports = mongoose.model('Venue', VenueSchema);
+SearchRequestSchema.loadClass(SearchRequestClass);
+module.exports = mongoose.model('SearchRequest', SearchRequestSchema);
