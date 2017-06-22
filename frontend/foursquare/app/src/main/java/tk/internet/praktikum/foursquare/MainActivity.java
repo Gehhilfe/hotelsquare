@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
+import tk.internet.praktikum.foursquare.user.DummyProfile;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.storage.LocalStorage;
 
@@ -126,7 +127,11 @@ public class MainActivity extends AppCompatActivity
 
             // Insert the fragment by replacing any existing fragment
 
-    }
+    }else if (id == R.id.nav_manage) {
+            // call history activity
+            Intent intent = new Intent(getApplicationContext(), DummyProfile.class);
+            startActivityForResult(intent, 0);
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
