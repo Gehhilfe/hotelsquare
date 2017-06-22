@@ -11,6 +11,7 @@ public class LoginActivity extends AppCompatActivity {
     private RegisterFragment registerFragment;
     private RestorePasswordFragment restorePasswordFragment;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,9 +19,11 @@ public class LoginActivity extends AppCompatActivity {
         addFragment();
     }
 
+
+
     public void addFragment() {
         loginFragment = new LoginFragment();
-        getFragmentManager().beginTransaction().add(R.id.fragment_container, loginFragment).commit();
+        getFragmentManager().beginTransaction().add(R.id.login_layout, loginFragment).commit();
     }
 
     public void changeFragment(int fragmentId) {
@@ -28,21 +31,21 @@ public class LoginActivity extends AppCompatActivity {
 
         switch (fragmentId) {
             case 0:
-                fragmentTransaction.replace(R.id.fragment_container, loginFragment);
+                fragmentTransaction.replace(R.id.login_layout, loginFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 break;
             case 1:
                 if (registerFragment == null)
                     registerFragment = new RegisterFragment();
-                fragmentTransaction.replace(R.id.fragment_container, registerFragment);
+                fragmentTransaction.replace(R.id.login_layout, registerFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 break;
             case 2:
                 if (restorePasswordFragment == null)
                     restorePasswordFragment = new RestorePasswordFragment();
-                fragmentTransaction.replace(R.id.fragment_container, restorePasswordFragment);
+                fragmentTransaction.replace(R.id.login_layout, restorePasswordFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 break;

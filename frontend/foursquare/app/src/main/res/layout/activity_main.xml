@@ -8,19 +8,21 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-   <!-- <include
-        layout="@layout/fragment_fast_search"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" /> -->
+    <!-- <include
+         layout="@layout/fragment_fast_search"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent" /> -->
+    <!-- The main content view where fragments are loaded -->
+
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
     <include
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <!-- The main content view where fragments are loaded -->
 
 
 
@@ -41,3 +43,4 @@
         android:layout_height="match_parent" />
     -->
 </android.support.v4.widget.DrawerLayout>
+

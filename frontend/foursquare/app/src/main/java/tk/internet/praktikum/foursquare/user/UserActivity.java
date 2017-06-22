@@ -2,13 +2,17 @@ package tk.internet.praktikum.foursquare.user;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.abstracts.DrawerLayoutActivity;
 
-public class UserActivity extends AppCompatActivity {
+public class UserActivity extends DrawerLayoutActivity {
     TabLayout tabLayout;
+    //TabLayout.Tab homeTab;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,12 +23,25 @@ public class UserActivity extends AppCompatActivity {
 
         tabLayout= (TabLayout) findViewById(R.id.tabs);
 
+        TabLayout.Tab homeTab=tabLayout.newTab();
+        homeTab.setText("Home").setIcon(R.mipmap.user_home);
+        TabLayout.Tab profileTab=tabLayout.newTab();
+        profileTab.setText("Profile").setIcon(R.mipmap.user_profile);
+        TabLayout.Tab historyTab=tabLayout.newTab();
+        historyTab.setText("History").setIcon(R.mipmap.user_history);
 
-        tabLayout.addTab(tabLayout.newTab().setText("Home").setIcon(R.mipmap.user_home));
-        tabLayout.addTab(tabLayout.newTab().setText("Profile").setIcon(R.mipmap.user_profile));
-        tabLayout.addTab(tabLayout.newTab().setText("History").setIcon(R.mipmap.user_history));
-        tabLayout.addTab(tabLayout.newTab().setText("Friends").setIcon(R.mipmap.user_friends));
-        tabLayout.addTab(tabLayout.newTab().setText("Inbox").setIcon(R.mipmap.user_message));
+        TabLayout.Tab friendsTab=tabLayout.newTab();
+        friendsTab.setText("Friends").setIcon(R.mipmap.user_friends);
+
+        TabLayout.Tab inbox=tabLayout.newTab();
+        inbox.setText("Inbox").setIcon(R.mipmap.user_message);
+
+        tabLayout.addTab(homeTab);
+        tabLayout.addTab(profileTab);
+        tabLayout.addTab(historyTab);
+        tabLayout.addTab(friendsTab);
+        tabLayout.addTab(inbox);
+
 
 
 
