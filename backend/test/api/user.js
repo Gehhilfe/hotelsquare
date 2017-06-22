@@ -91,6 +91,23 @@ describe('User', () => {
                     return done();
                 });
         });
+        
+        it('should change the location', (done) => {
+            const before_location = u.location.coordinates;
+            
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({location:{ coordinates: [1.0, 1.0]}})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(u.name);
+                    res.body.gender.should.be.equal('m');
+                    res.body.location.coordinates.should.not.equal(before_location);
+                    return done();
+                });
+        });
 
         it('should change the password', (done) => {
             const before_password = u.password;

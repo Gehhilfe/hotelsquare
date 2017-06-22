@@ -132,6 +132,9 @@ class UserClass {
 
         if(data.password)
             self.password = data.password;
+            
+        if(data.location && data.location.coordinates)
+            self.location.coordinates = data.location.coordinates;
     }
 
     comparePassword(candidatePassword) {
