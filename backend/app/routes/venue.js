@@ -4,6 +4,7 @@
 //const Venue = require('../models/venue');
 const googleapilib = require('googleplaces');
 const config = require('config');
+const SearchRequest = require('../models/searchrequests');
 
 /**
  * queries for venues
@@ -14,13 +15,34 @@ const config = require('config');
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function queryVenue(request, response, next) {
+async function queryVenue(request, response, next) {
     const location = request.body.location;
     const keyword = request.body.keyword;
 
+    const closestSearch = await SearchRequest.findClosestLocation(location);
 
+    if(!(closestSearch.length !== 0 && closestSearch[0].dis < 30000)){
+        //load all google results into database
+    }
 
+    //search in our database for query
+    const venues = await searchVenuesInDB(location, keyword);
 
+    response.send(result);
+    return next();
+}
+
+async function searchVenuesInDB(location, keyword='', radius=30000) {
+    let query = await Venue.find({ location: { $nearSphere: Venue.location, $maxDistance: radius, $spherical: yes } });
+    if(keyword !== '' && query.length > 0){
+        query = query.filter(function(venue){return venue.name.contains(keyword);});
+    }
+    let result = await query;
+
+    if (result.length === 0)
+        return next(new restify.errors.NotFoundError());
+
+    return result;
 }
 
 function queryAllVenues(location){

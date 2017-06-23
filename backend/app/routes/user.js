@@ -58,7 +58,7 @@ async function search(request, response, next) {
 /**
  * Retrieves user profile
  *
- * @function register
+ * @function profile
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler
@@ -87,7 +87,7 @@ async function profile(request, response, next) {
 /**
  * Retrieves user profile information
  *
- * @function register
+ * @function updateUser
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler

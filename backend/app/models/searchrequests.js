@@ -31,7 +31,7 @@ class SearchRequestClass {
                 $nearsphere: coords
             }
         })
-            .limit(1);
+        .limit(1);
     }
 
 }
