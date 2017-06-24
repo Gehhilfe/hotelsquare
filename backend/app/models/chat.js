@@ -20,7 +20,7 @@ const ChatSchema = new Schema({
                 ref:'User'
             },
             read: Boolean,
-            delivered: Boolean,
+            delivered: Boolean
         }]
     }],
     sender: {
@@ -33,7 +33,7 @@ const ChatSchema = new Schema({
             ref: 'User'
         },
         read: Boolean,
-        delivered: Boolean,
+        delivered: Boolean
 
     }],
     is_group_message: {
