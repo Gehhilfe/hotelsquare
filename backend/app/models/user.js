@@ -51,8 +51,14 @@ const UserSchema = new Schema({
     updated_at: {
         type: Date,
         default: Date.now()
+    },
+    location: {
+        'type': { type: String, default: 'Point' },
+        coordinates: { type: [Number], default: [0, 0] }
     }
 });
+
+UserSchema.index({location: '2dsphere'});
 
 UserSchema.pre('save', function (next) {
     const self = this;
@@ -126,6 +132,9 @@ class UserClass {
 
         if(data.password)
             self.password = data.password;
+            
+        if(data.location && data.location.coordinates)
+            self.location.coordinates = data.location.coordinates;
     }
 
     comparePassword(candidatePassword) {

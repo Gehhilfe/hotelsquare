@@ -9,11 +9,15 @@ const Schema = mongoose.Schema;
 
 const VenueSchema = new Schema({
     name: String,
+    place_id: String,
+    reference: String,
+    types: [String],
     location: {
         'type': { type: String, default: 'Point' },
         coordinates: { type: [Number], default: [0, 0] }
     }
 });
+
 
 
 VenueSchema.index({location: '2dsphere'});
