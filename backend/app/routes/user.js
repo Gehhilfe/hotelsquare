@@ -40,7 +40,14 @@ const handleValidation = (next, func) => {
     });
 };
 
-
+/**
+ * Search for user by name and filters results by gender when gender is provided.
+ *
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
 async function search(request, response, next) {
     let query = User.find({ name: new RegExp(request.body.name, 'i')  });
     if(request.body.gender)
