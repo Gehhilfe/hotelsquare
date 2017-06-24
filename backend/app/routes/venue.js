@@ -20,13 +20,19 @@ async function queryVenue(request, response, next) {
     const location = request.body.location;
     const keyword = request.body.keyword;
 
-    const closestSearch = await SearchRequest.findClosestLocation(location);
+    const closestSearch = await SearchRequest.findClosestLocation(location, keyword, 5000);
 
-    if (!(closestSearch.length !== 0 && closestSearch[0].dis < 30000)) {
+    if (closestSearch.length === 0) {
         //load all google results into database
-        const googleResults = await queryAllVenues(location);
+        const googleResults = await queryAllVenues(location, keyword);
         await Promise.all(_.map(googleResults, importGoogleResult));
-        console.log(googleResults);
+        SearchRequest.create({
+            location: {
+                type: 'Point',
+                coordinates: location
+            },
+            keyword: keyword
+        });
     }
 
     //search in our database for query
@@ -94,42 +100,18 @@ async function searchVenuesInDB(location, keyword = '', radius = 30000) {
  * Lookups all venues nearby location
  *
  * @param {Number[]} location Center of lookup radius
+ * @param {string} keyword Search Keyword
  * @param {string} next_page_token token for next result page
  * @returns {Promise} Lookup result
  */
-function queryAllVenues(location, next_page_token = '') {
+function queryAllVenues(location, keyword, next_page_token = '') {
     const api = googleapilib(config.googleapi.GOOGLE_PLACES_API_KEY, config.googleapi.GOOGLE_PLACES_OUTPUT_FORMAT);
 
     const params = {
         location: location,
+        keyword: keyword,
         radius: 5000,
-        language: 'en',
-        types: [
-            'jewelry_store',
-            'laundry',
-            'bakery',
-            'liquor_store',
-            'bar',
-            'beauty_salon',
-            'bicycle_store',
-            'book_store',
-            'meal_delivery',
-            'meal_takeaway',
-            'bowling_alley',
-            'cafe',
-            'movie_rental',
-            'movie_theater',
-            'night_club',
-            'casino',
-            'pet_store',
-            'restaurant',
-            'shopping_mall',
-            'clothing_store',
-            'convenience_store',
-            'gym',
-            'hair_care',
-            'zoo'
-        ]
+        language: 'en'
     };
 
     if(!_.isEmpty(next_page_token)) {
@@ -142,7 +124,7 @@ function queryAllVenues(location, next_page_token = '') {
                 reject(error);
             } else {
                 if(res.next_page_token && !_.isElement(res.next_page_token)) {
-                    queryAllVenues(location, res.next_page_token).then((recvResult) => {
+                    queryAllVenues(location, keyword, res.next_page_token).then((recvResult) => {
                         resolve(_.concat(recvResult, res.results));
                     });
                 } else {

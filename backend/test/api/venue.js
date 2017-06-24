@@ -2,6 +2,7 @@
 //const config = require('config');
 const mongoose = require('mongoose');
 const Venue = require('../../app/models/venue');
+const SearchRequest = require('../../app/models/searchrequests');
 const Util = require('../../lib/util');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -18,6 +19,7 @@ describe('google api query', () => {
 
         await Util.connectDatabase(mongoose);
         await Venue.remove({});
+        await SearchRequest.remove({});
     });
 
 

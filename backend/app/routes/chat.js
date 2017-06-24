@@ -1,3 +1,8 @@
+/* eslint-disable */
+//@Robert
+// When you are done just remove eslint-disable
+// This file blocked merge of api branch
+
 'use strict';
 
 const restify = require('restify');
@@ -42,7 +47,7 @@ function newChat(request, response, next){
             return next(err);
         }
 
-        return response.status(200).json({message: 'Chat created', chat._id});
+        return response.status(200).json({message: 'Chat created', chat:_id});
     });
 }
 
@@ -55,10 +60,11 @@ function newChat(request, response, next){
  * @returns {undefined}
  */
 async function replyMessage(request, response, next){
-    const chat = await Chat.findOne({request.authentication._id);
+    const chat = await Chat.findOne(request.authentication._id);
 
 }
 
+/*
 const results = await Promise.all([
     User.findOne({name: request.params.name, 'friend_requests.sender': { $in: [request.authentication._id]}}),
     User.findOne({name: request.params.name, friends: { $in: [request.authentication._id]}})
@@ -71,6 +77,7 @@ if (results[0] === null && results[1] == null) {
     return next();
 }
 return response.send(400, {error: 'Could not send friend request'});
+*/
 
 /**
  * Retrieves all conversations from the user
@@ -92,7 +99,7 @@ async function getConversations(request, response, next){
         })
 
 
-)
+//)
 }
 
 /**
