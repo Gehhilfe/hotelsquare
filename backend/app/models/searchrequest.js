@@ -25,13 +25,10 @@ SearchRequestSchema.index({location: '2dsphere'});
 
 class SearchRequestClass {
 
-    static findClosestLocation(coords, keyword, radius) {
+    static findClosestLocation(location, keyword, radius) {
         const query = this.find({ keyword: new RegExp(keyword, 'i')  });
         return query.where('location').near({
-            center: {
-                type: 'Point',
-                coordinates: coords
-            },
+            center: location,
             maxDistance: radius
         });
     }

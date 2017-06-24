@@ -2,7 +2,7 @@
 //const config = require('config');
 const mongoose = require('mongoose');
 const Venue = require('../../app/models/venue');
-const SearchRequest = require('../../app/models/searchrequests');
+const SearchRequest = require('../../app/models/searchrequest');
 const Util = require('../../lib/util');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -28,8 +28,12 @@ describe('google api query', () => {
         request(server)
             .post('/venues/query')
             .send({
-                location: [40.7127, -74.0059],
-                keyword: 'bar'
+                location: {
+                    type: 'Point',
+                    coordinates: [-74.0059, 40.7127]
+                },
+                keyword: 'bar',
+                radius: 1000
             })
             .end((err, res) => {
                 res.should.have.status(200);

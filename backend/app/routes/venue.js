@@ -5,7 +5,7 @@ const restify = require('restify');
 const Venue = require('../models/venue');
 const googleapilib = require('googleplaces');
 const config = require('config');
-const SearchRequest = require('../models/searchrequests');
+const SearchRequest = require('../models/searchrequest');
 
 /**
  * queries for venues
@@ -49,7 +49,7 @@ async function queryVenue(request, response, next) {
  */
 async function importGoogleResult(entry) {
     //try {
-   //     const exisiting = await Venue.findOne({reference: entry.reference});
+    //     const exisiting = await Venue.findOne({reference: entry.reference});
     //}
     //catch (err) {
     //    console.log(err);
@@ -76,24 +76,12 @@ async function importGoogleResult(entry) {
  * @param {Number} radius search radius
  * @returns {Promise.<*>} result
  */
-async function searchVenuesInDB(location, keyword = '', radius = 30000) {
-    try {
-        // TODO: Use regex search for keyword search
-        return await Venue.geoNear(location, {maxDistance: radius, spherical: true});
-        /*if (keyword !== '' && query.length > 0) {
-         query = query.filter(function (venue) {
-         return venue.name.contains(keyword);
-         });
-         }*/
-        //const result = await query;
-
-        //if (result.length === 0)
-        //    return new restify.errors.NotFoundError();
-
-        //return result;
-    } catch (err) {
-        console.log(err);
-    }
+function searchVenuesInDB(location, keyword = '', radius = 30000) {
+    const query = Venue.find({name: new RegExp(keyword, 'i')});
+    return query.where('location').near({
+        center: location,
+        maxDistance: radius
+    });
 }
 
 /**
@@ -108,13 +96,16 @@ function queryAllVenues(location, keyword, next_page_token = '') {
     const api = googleapilib(config.googleapi.GOOGLE_PLACES_API_KEY, config.googleapi.GOOGLE_PLACES_OUTPUT_FORMAT);
 
     const params = {
-        location: location,
+        location: [
+            location.coordinates[1],
+            location.coordinates[0]
+        ],
         keyword: keyword,
         radius: 5000,
         language: 'en'
     };
 
-    if(!_.isEmpty(next_page_token)) {
+    if (!_.isEmpty(next_page_token)) {
         params.pagetoken = next_page_token;
     }
 
@@ -123,7 +114,7 @@ function queryAllVenues(location, keyword, next_page_token = '') {
             if (error) {
                 reject(error);
             } else {
-                if(res.next_page_token && !_.isElement(res.next_page_token)) {
+                if (res.next_page_token && !_.isElement(res.next_page_token)) {
                     queryAllVenues(location, keyword, res.next_page_token).then((recvResult) => {
                         resolve(_.concat(recvResult, res.results));
                     });
