@@ -1,6 +1,8 @@
 'use strict';
 //const config = require('config');
-//const mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const Venue = require('../../app/models/venue');
+const Util = require('../../lib/util');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../server');
@@ -10,6 +12,15 @@ chai.should();
 chai.use(chaiHttp);
 
 describe('google api query', () => {
+
+    beforeEach(async () => {
+        mongoose.Promise = global.Promise;
+
+        await Util.connectDatabase(mongoose);
+        await Venue.remove({});
+    });
+
+
     it('should return some places', (done) => {
 
         request(server)
@@ -23,7 +34,5 @@ describe('google api query', () => {
                 console.log(JSON.stringify(res.body));
                 return done();
             });
-
-        return done();
     });
 });

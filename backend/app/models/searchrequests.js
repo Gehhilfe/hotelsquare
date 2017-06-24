@@ -26,12 +26,12 @@ SearchRequestSchema.index({location: '2dsphere'});
 class SearchRequestClass {
 
     static findClosestLocation(coords){
-        return this.find({
+        /*return this.find({
             location: {
                 $nearsphere: coords
             }
-        })
-        .limit(1);
+        });*/
+        return this.geoNear(coords, { spherical: true });
     }
 
 }
