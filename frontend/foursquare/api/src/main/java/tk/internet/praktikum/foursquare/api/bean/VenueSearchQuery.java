@@ -7,7 +7,7 @@ public class VenueSearchQuery {
     private Location location;
     private Integer radius;
 
-    public VenueSearchQuery(String keyword, long longitude, long latitude) {
+    public VenueSearchQuery(String keyword, double longitude, double latitude) {
         this.keyword = keyword;
         this.location = new Location(longitude, latitude);
     }
