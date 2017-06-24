@@ -15,7 +15,7 @@ public interface VenueService {
      *
      * @return venues for requested parameters
      */
-    @POST("venue/query")
+    @POST("/venues/query")
     Observable<List<Venue>> queryVenue(@Body VenueSearchQuery query);
 
 }
