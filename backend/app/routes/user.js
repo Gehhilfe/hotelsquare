@@ -20,11 +20,19 @@ const handleValidation = (next, func) => {
     func().catch((error) => {
         switch (error.name) {
         case 'MongoError':
-            return next(new ValidationError([{
-                name: {
-                    message: 'Name or email is already taken'
-                }
-            }]));
+            if(error.errmsg.includes('name')) {
+                return next(new ValidationError({
+                    name: {
+                        message: 'Name is already taken'
+                    }}));
+            }
+            if(error.errmsg.includes('email')) {
+                return next(new ValidationError({
+                    email: {
+                        message: 'Email is already used'
+                    }}));
+            }
+            break;
 
         case 'ValidationError':
             return next(new ValidationError(error.errors));
@@ -32,12 +40,24 @@ const handleValidation = (next, func) => {
     });
 };
 
-
+/**
+ * Search for user by name and filters results by gender when gender is provided.
+ *
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
 async function search(request, response, next) {
     let query = User.find({ name: new RegExp(request.body.name, 'i')  });
     if(request.body.gender)
         query = query.where('gender').equals(request.body.gender);
-    const result = await query;
+    let result = await query;
+    result =  result.map( (user) => {
+        const obj = user.toJSONPublic();
+        obj.type = 'user';
+        return obj;
+    });
     response.send(result);
     return next();
 }
@@ -45,7 +65,7 @@ async function search(request, response, next) {
 /**
  * Retrieves user profile
  *
- * @function register
+ * @function profile
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler
@@ -60,7 +80,7 @@ async function profile(request, response, next) {
         selfRequest = true;
     }
 
-    let user = await User.findOne({name: request.params.name});
+    let user = await User.findOne({name: request.params.name}).populate('friend_requests.sender');
     if (user === null)
         return next(new restify.errors.NotFoundError());
     if (!selfRequest) {
@@ -74,7 +94,7 @@ async function profile(request, response, next) {
 /**
  * Retrieves user profile information
  *
- * @function register
+ * @function updateUser
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler

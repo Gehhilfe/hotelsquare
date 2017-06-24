@@ -259,9 +259,9 @@ describe('user', function () {
             json.should.not.have.property('email');
         });
 
-        it('should not contain friends', () => {
+        it('should contain friends as a number', () => {
             const json = aUser.toJSONPublic();
-            json.should.not.have.property('friends');
+            json.friends.should.be.a('number');
         });
 
         it('should not contain friend_requests', () => {
@@ -289,6 +289,12 @@ describe('user', function () {
         });
 
         it('should return the user with valid name and password', function () {
+            return expect(User.login(validUser.name, 'password').then(function (u) {
+                return Promise.resolve(u.equals(validUser));
+            })).to.eventually.equal(true);
+        });
+
+        it('should return the user with valid displayName and password', function () {
             return expect(User.login(validUser.displayName, 'password').then(function (u) {
                 return Promise.resolve(u.equals(validUser));
             })).to.eventually.equal(true);

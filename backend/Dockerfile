@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:7.10.0
 ENV NODE_ENV staging
 
 # Create app directory

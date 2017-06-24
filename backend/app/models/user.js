@@ -51,8 +51,14 @@ const UserSchema = new Schema({
     updated_at: {
         type: Date,
         default: Date.now()
+    },
+    location: {
+        'type': { type: String, default: 'Point' },
+        coordinates: { type: [Number], default: [0, 0] }
     }
 });
+
+UserSchema.index({location: '2dsphere'});
 
 UserSchema.pre('save', function (next) {
     const self = this;
@@ -91,7 +97,7 @@ class UserClass {
             name = name.name;
         }
         return new Promise(function (resolve, reject) {
-            self.findOne({$or: [{displayName: name}, {email: name}]}).then(function (res) {
+            self.findOne({$or: [{displayName: name}, {email: name}, {name: name}]}).then(function (res) {
                 const foundUser = res;
                 if (res === null)
                     return reject();
@@ -126,6 +132,9 @@ class UserClass {
 
         if(data.password)
             self.password = data.password;
+            
+        if(data.location && data.location.coordinates)
+            self.location.coordinates = data.location.coordinates;
     }
 
     comparePassword(candidatePassword) {
@@ -167,7 +176,9 @@ class UserClass {
     toJSONPublic() {
         return {
             _id: this._id,
-            name: this.name
+            name: this.name,
+            displayName: this.displayName,
+            friends: this.friends.length
         };
     }
 }

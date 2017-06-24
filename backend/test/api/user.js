@@ -10,6 +10,8 @@ const jsonwt = require('jsonwebtoken');
 const expect = chai.expect;
 chai.should();
 chai.use(chaiHttp);
+chai.use(require('chai-things'));
+
 const request = require('supertest');
 
 describe('User', () => {
@@ -86,6 +88,23 @@ describe('User', () => {
                     res.body.name.should.be.equal(u.name);
                     res.body.gender.should.be.equal('m');
                     res.body.updated_at.should.not.equal(before_updated_at);
+                    return done();
+                });
+        });
+        
+        it('should change the location', (done) => {
+            const before_location = u.location.coordinates;
+            
+            request(server)
+                .put('/user')
+                .set('x-auth', token)
+                .send({location:{ coordinates: [1.0, 1.0]}})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(u.name);
+                    res.body.gender.should.be.equal('m');
+                    res.body.location.coordinates.should.not.equal(before_location);
                     return done();
                 });
         });
@@ -184,6 +203,23 @@ describe('User', () => {
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
+                    res.body.errors.should.contain.an.item.with.property('field', 'name');
+                    return done();
+                });
+        });
+
+        it('should not register user with same email', (done) => {
+            const registrationData = {
+                name: 'peter2123123',
+                email: 'peter123@cool.de',
+                password: 'secret'
+            };
+            request(server)
+                .post('/user')
+                .send(registrationData)
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.body.errors.should.contain.an.item.with.property('field', 'email');
                     return done();
                 });
         });
@@ -456,6 +492,50 @@ describe('User', () => {
                     res.body.length.should.equal(0);
                     return done();
                 });
+        });
+
+        describe('results', () => {
+
+            let results;
+
+            beforeEach((done) => {
+                request(server)
+                    .post('/users')
+                    .set('x-auth', token)
+                    .send({ name: 'pet'})
+                    .end((err, res) => {
+                        results = res.body;
+                        return done();
+                    });
+            });
+
+            it('should contain name', () => {
+                results.should.all.contain.item.with.property('name');
+            });
+
+            it('should contain displayName', () => {
+                results.should.all.contain.item.with.property('displayName');
+            });
+
+            it('should contain type', () => {
+                results.should.all.contain.item.with.property('type', 'user');
+            });
+
+            it('should not contain email', () => {
+                results.should.not.contain.an.item.with.property('email');
+            });
+
+            it('should not contain password', () => {
+                results.should.not.contain.an.item.with.property('password');
+            });
+
+            it('should contain friends as number', () => {
+                results[0].friends.should.be.a('number');
+            });
+
+            it('should not contain friend_requests', () => {
+                results.should.not.contain.an.item.with.property('friend_requests');
+            });
         });
     });
 });

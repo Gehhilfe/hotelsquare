@@ -22,5 +22,9 @@
   "logstash": {
     "host": "logstash",
     "port": 5000
+  },
+  "googleapi": {
+    "GOOGLE_PLACES_API_KEY": "AIzaSyCK1nUagKpUd3I5i415iNaiXz5Cl2l9QM8",
+    "GOOGLE_PLACES_OUTPUT_FORMAT": "json"
   }
 }
