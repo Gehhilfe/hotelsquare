@@ -6,6 +6,7 @@ const session = require('./app/routes/session');
 const user = require('./app/routes/user');
 const venue = require('./app/routes/venue');
 const chat = require('./app/routes/chat');
+const chatsocket = require('./app/routes/chatsocket');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
@@ -13,10 +14,12 @@ const bunyan = require('bunyan');
 const restifyBunyanLogger = require('restify-bunyan-logger');
 const fs = require('fs');
 
-
 mongoose.Promise = global.Promise;
 
 const server = restify.createServer();
+
+const io = require('socket.io').listen(server);
+chatsocket(io);
 
 util.connectDatabase(mongoose).then(() => {
     //Bootstrap database

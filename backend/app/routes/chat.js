@@ -1,8 +1,3 @@
-/* eslint-disable */
-//@Robert
-// When you are done just remove eslint-disable
-// This file blocked merge of api branch
-
 'use strict';
 
 const restify = require('restify');
