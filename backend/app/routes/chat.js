@@ -6,8 +6,9 @@
 'use strict';
 
 const restify = require('restify');
-const sio = require('socket.io');
 const Chat = require('../models/chat');
+const Message = require('../models/message');
+const User = require('../models/user');
 
 /**
  * Starts new Chat
@@ -24,21 +25,13 @@ function newChat(request, response, next){
         return next();
     }
 
-    if(request.body.messages.length < 1){
-        response.status(422).send({error: 'You must send at least one message.'});
-        return next();
-    }
-
-    if(request.body.messages[0].message = ''){
+    if(request.body.message.message = ''){
         response.status(422).send({error: 'You must not send empty messages.'});
         return next();
     }
 
     const chat = new Chat({
-        sender: request.authentication._id,
-        messages: request.body.messages,
-        participants: request.body.participants,
-        is_group_message: request.body.is_group_message
+        participants: [request.authentication._id, request.body.recipients]
     });
 
     chat.save((err, chat) => {
@@ -47,7 +40,23 @@ function newChat(request, response, next){
             return next(err);
         }
 
-        return response.status(200).json({message: 'Chat created', chat:_id});
+        const msg = new Message({
+            chatId: chat._id,
+            message: request.body.message,
+            sender: request.authentication._id
+        });
+
+        msg.save((err, new_msg) => {
+            if(err){
+                response.send({error: err});
+                return next(err);
+            }
+
+            return response.status(200).json({
+                message: 'New Chat',
+                chatId: chat._id
+            });
+        });
     });
 }
 
@@ -59,25 +68,24 @@ function newChat(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function replyMessage(request, response, next){
-    const chat = await Chat.findOne(request.authentication._id);
+function replyMessage(request, response, next){
+    const reply = new Message({
+        chatId: request.params.chatId,
+        message: request.body.message,
+        sender: request.authentication._id
+    });
 
-}
+    reply.save((err, new_reply) => {
+        if(err){
+            response.send({error: err});
+            return next(err);
+        }
 
-/*
-const results = await Promise.all([
-    User.findOne({name: request.params.name, 'friend_requests.sender': { $in: [request.authentication._id]}}),
-    User.findOne({name: request.params.name, friends: { $in: [request.authentication._id]}})
-]);
-if (results[0] === null && results[1] == null) {
-    const res = await User.findOne({name: request.params.name});
-    res.addFriendRequest(request.authentication);
-    await res.save();
-    response.json(res);
-    return next();
+        return res.status(200).json({
+            message: 'replied to message'
+        });
+    })
 }
-return response.send(400, {error: 'Could not send friend request'});
-*/
 
 /**
  * Retrieves all conversations from the user
@@ -87,20 +95,43 @@ return response.send(400, {error: 'Could not send friend request'});
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function getConversations(request, response, next){
-    const chats = await Chat.find({ participants: request.authentication._id })
+function getConversations(request, response, next){
+    Chat.find({
+        participants: request.authentication._id
+    })
         .select('_id')
         .exec((err, chats) => {
-        if(err){
-            response.send({error: err});
+        if(err) {
+            response.send({ error: err });
             return next(err);
         }
-            return reponse.status(200).json({})
-        })
 
-
-//)
-}
+        const allChats = [];
+        chats.forEach((chat) => {
+            Message.find({
+                chatId: chat._id
+            })
+                .sort('-date')
+                .limit(1)
+                .populate({
+                    path: 'sender',
+                    select: 'displayName'
+                })
+                .exec((err, message) => {
+                if(err){
+                    response.send({ error: err });
+                    return next(err);
+                }
+                allChats.push(message);
+                if(allChats.length === chats.length){
+                    return response.status(200).json({
+                        chats: allChats
+                    });
+                }
+                });
+        });
+        });
+};
 
 /**
  * Retrieves whole conversation history of a chat
@@ -110,9 +141,27 @@ async function getConversations(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function getConversation(){
+function getConversation(request, response, next){
+    Message.find({
+        chatId: request.params.chatId
+    })
+        .select('date message sender')
+        .sort('-date')
+        .populate({
+            path: 'sender',
+            select: 'displayName'
+        })
+        .exec((err, message) => {
+        if(err){
+            response.send({error: err });
+            return next(err);
+        }
 
-}
+        return response.status(200).json({
+            chat: messages
+        });
+        });
+};
 
 /**
  * Confirms or declines a friend request
