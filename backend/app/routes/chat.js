@@ -58,7 +58,7 @@ function newChat(request, response, next){
         msg.save((err, new_msg) => {
             if(err){
                 response.send({error: err});
-                return next(err);
+                return next();
             }
 
             return response.send(200, {
