@@ -5,6 +5,7 @@ const restify = require('restify');
 const session = require('./app/routes/session');
 const user = require('./app/routes/user');
 const venue = require('./app/routes/venue');
+const chat = require('./app/routes/chat');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
@@ -61,7 +62,6 @@ if(config.logstash) {
         level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO)
     });
 }
-
 
 server.on('after', restifyBunyanLogger({
     skip: function(req) {
@@ -125,6 +125,15 @@ server.post('profile/avatar', auth, user.uploadAvatar);
 server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
 server.del('profile/avatar', auth, user.deleteAvatar);
+
+//Chat
+server.post('chat', auth, chat.newChat);
+
+server.post('chat/reply', auth, chat.replyMessage);
+
+server.get('chat', auth, chat.getConversation);
+
+server.get('chat/all', auth, chat.getConversations);
 
 //Venue
 server.post('venues/query', venue.queryVenue);
