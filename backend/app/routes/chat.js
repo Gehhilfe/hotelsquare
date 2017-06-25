@@ -163,54 +163,6 @@ function getConversation(request, response, next){
         });
 };
 
-/**
- * Confirms or declines a friend request
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-async function confirmFriendRequest(request, response, next) {
-    // Find both users
-    const results = await Promise.all([
-        User.findOne({name: request.authentication.name}),
-        User.findOne({name: request.params.name})
-    ]);
-
-    const receiver = results[0];
-    const sender = results[1];
-
-    // Check if a friend requests exists
-    const friendRequest = receiver.friend_requests.find(((e) => {
-        return e.sender.equals(sender._id);
-    }));
-
-    if (friendRequest === undefined) {
-        response.send(400, {error: 'No friend request existing'});
-        return next();
-    }
-
-    // Remove friend request
-    receiver.removeFriendRequest(friendRequest);
-
-    if (request.body.accept) {
-        // Request accepted
-        User.connectFriends(sender, receiver);
-        await Promise.all([
-            sender.save(),
-            receiver.save()
-        ]);
-        response.json({message: 'Friend request accepted'});
-        return next();
-    } else {
-        // Request declined
-        await receiver.save();
-        response.json({message: 'Friend request declined'});
-        return next();
-    }
-}
-
 module.exports = {
     newChat,
     replyMessage,

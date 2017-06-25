@@ -127,9 +127,9 @@ server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 server.del('profile/avatar', auth, user.deleteAvatar);
 
 //Chat
-server.post('chat', auth, chat.newChat);
+server.post('chat/:id', auth, chat.newChat);
 
-server.post('chat/reply', auth, chat.replyMessage);
+server.post('chat/reply/:id', auth, chat.replyMessage);
 
 server.get('chat', auth, chat.getConversation);
 
