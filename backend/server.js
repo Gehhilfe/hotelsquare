@@ -129,9 +129,9 @@ server.del('profile/avatar', auth, user.deleteAvatar);
 //Chat
 server.post('chat', auth, chat.newChat);
 
-server.post('chat/reply/:id', auth, chat.replyMessage);
+server.post('chat/reply', auth, chat.replyMessage);
 
-server.get('chat/:id', auth, chat.getConversation);
+server.get('chat', auth, chat.getConversation);
 
 server.get('chat/all', auth, chat.getConversations);
 

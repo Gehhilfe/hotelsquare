@@ -38,7 +38,7 @@ describe('Chat', () => {
                     User.create({name: 'peter2', email: 'peter1223@cool.de', password: 'peter99', gender: 'f'}).then((user) => {
                         other = user;
                         otherToken = jsonwt.sign(other.toJSON(), config.jwt.secret, config.jwt.options);
-                        User.create({name: 'peter3', email: 'peter1223@cool.de', password: 'peter99'}).then((user) => {
+                        User.create({name: 'peter3', email: 'peter1223@cool.de', password: 'peter99', gender: 'unspecified'}).then((user) => {
                             third = user;
                             thirdToken = jsonwt.sign(third.toJSON(), config.jwt.secret, config.jwt.options);
                             return done();
@@ -72,8 +72,9 @@ describe('Chat', () => {
     describe('GET chat', () => {
         it('should retrieve the respective chat history of the passed id', (done) => {
             request(server)
-                .get('/chat/'+chat._id)
+                .get('/chat')
                 .set('x-auth', token)
+                .query({chatId: chat._id})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
