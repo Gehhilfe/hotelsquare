@@ -32,13 +32,13 @@ describe('Chat', () => {
     beforeEach((done) => {
         Util.connectDatabase(mongoose).then(function () {
             User.remove({}).then(() => {
-                User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99', gender: 'm'}).then((user) => {
+                User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99', gender: 'm'}).then((user) => {
                     u = user;
                     token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
-                    User.create({name: 'peter2', email: 'peter1223@cool.de', password: 'peter99', gender: 'f'}).then((user) => {
+                    User.create({name: 'peter2', email: 'peter2@cool.de', password: 'peter99', gender: 'f'}).then((user) => {
                         other = user;
                         otherToken = jsonwt.sign(other.toJSON(), config.jwt.secret, config.jwt.options);
-                        User.create({name: 'peter3', email: 'peter1223@cool.de', password: 'peter99', gender: 'unspecified'}).then((user) => {
+                        User.create({name: 'peter3', email: 'peter3@cool.de', password: 'peter99', gender: 'unspecified'}).then((user) => {
                             third = user;
                             thirdToken = jsonwt.sign(third.toJSON(), config.jwt.secret, config.jwt.options);
                             return done();
@@ -72,20 +72,21 @@ describe('Chat', () => {
     describe('GET chat', () => {
         it('should retrieve the respective chat history of the passed id', (done) => {
             request(server)
-                .get('/chat')
+                .get('/chat/with/' + chat._id)
                 .set('x-auth', token)
-                .query({chatId: chat._id})
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.participants.should.be.equal([u, other]);
+                    res.body.should.be.a('array');
+                    res.body.length.should.be.eql(1);
+                    res.body[0].sender.displayName.should.be.equal('peter');
+                    res.body[0].message.should.be.equal('first chat');
                     return done();
                 });
         });
 
         it('should respond with 404 if no chat is available', (done) => {
             request(server)
-                .get('/chat/' + mongoose.Types.ObjectId())
+                .get('/chat/with/' + mongoose.Types.ObjectId())
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(404);
@@ -98,27 +99,26 @@ describe('Chat', () => {
     describe('POST chat', () => {
         it('should start a chat with an initial message', (done) => {
             const chatdata = {
-                participants: [other],
                 message: 'test message'
             };
             request(server)
-                .post('/chat')
+                .post('/chat/' + other._id)
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.contain.an.item.with.property('chatId', 'message');
+                    res.body.should.have.property('message', 'New Chat');
+                    res.body.should.have.property('chatId')
                     return done();
                 });
         });
 
         it('should respond with error message if no participant set', (done) => {
             const chatdata = {
-                participants: [],
                 message: 'test message'
             };
             request(server)
-                .post('/chat')
+                .post('/chat/' + [])
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
@@ -129,11 +129,11 @@ describe('Chat', () => {
 
         it('should respond with error message if no message set', (done) => {
             const chatdata = {
-                participants: [u, other],
                 message: ''
             };
             request(server)
-                .post('/chat')
+                .post('/chat/' + [other._id, third._id])
+                .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
                     res.should.have.status(422);
@@ -144,16 +144,37 @@ describe('Chat', () => {
     });
 
     describe('GET chat/all', () => {
-        it('should return the chat between u and other and the one between all three users', (done) => {
+        it('should return the chat between u and other', (done) => {
             request(server)
                 .get('/chat/all')
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.length.should.equal(2);
-                    res.body.should.contain.an.item.with.property('chats');
+                    console.log(res.body);
+                    res.body.chats[0].length.should.be.eql(1);
+                    res.body.chats.length.should.be.eql(2);
                     return done();
                 });
         });
+    });
+
+    describe('POST chat/reply', () => {
+        it('should reply to a message', (done) => {
+            const chatdata = {
+                chatId: chat._id,
+                message: 'test reply'
+            };
+            request(server)
+                .post('/chat/reply/' + chat._id)
+                .set('x-auth', token)
+                .send(chatdata)
+                .end((err, res) => {
+                console.log(res.body);
+                    res.should.have.status(200);
+                    res.body.should.have.property('message', 'replied to message');
+                    return done();
+                });
+        });
+
     });
 });

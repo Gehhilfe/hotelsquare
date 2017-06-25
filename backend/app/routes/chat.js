@@ -19,25 +19,34 @@ const User = require('../models/user');
  * @returns {undefined}
  */
 function newChat(request, response, next){
-    if(request.body.participants.length < 1)
+    if(!request.params.recipients)
     {
-        response.status(422).send({error: 'You must at least have one recipient for the message.'});
+        response.send(422, { error: 'You must at least have one recipient for the message.' });
         return next();
     }
 
-    if(request.body.message.message = ''){
-        response.status(422).send({error: 'You must not send empty messages.'});
+    if(request.body.message === ''){
+        response.send(422, { error: 'You must not send empty messages.' });
         return next();
     }
+
+    //request.params.recipients.forEach((userid) => {
+    //    User.count({ _id: userid }, (err, count) => {
+    //        if(count < 1){
+    //            response.send(422, { error: 'recipient not known' });
+    //            return next();
+    //        }
+    //    })
+    //})
 
     const chat = new Chat({
-        participants: [request.authentication._id, request.body.recipients]
+        participants: [request.authentication._id, request.params.recipients]
     });
 
     chat.save((err, chat) => {
         if(err) {
-            response.send({error: err});
-            return next(err);
+            response.send({ error: err });
+            return next();
         }
 
         const msg = new Message({
@@ -52,7 +61,7 @@ function newChat(request, response, next){
                 return next(err);
             }
 
-            return response.status(200).json({
+            return response.send(200, {
                 message: 'New Chat',
                 chatId: chat._id
             });
@@ -72,16 +81,17 @@ function replyMessage(request, response, next){
     const reply = new Message({
         chatId: request.params.chatId,
         message: request.body.message,
-        sender: request.authentication._id
+        sender: request.authentication._id,
+        date: Date.now()
     });
 
     reply.save((err, new_reply) => {
         if(err){
             response.send({error: err});
-            return next(err);
+            return next();
         }
 
-        return res.status(200).json({
+        return response.send(200, {
             message: 'replied to message'
         });
     })
@@ -108,6 +118,7 @@ function getConversations(request, response, next){
 
         const allChats = [];
         chats.forEach((chat) => {
+
             Message.find({
                 chatId: chat._id
             })
@@ -118,15 +129,14 @@ function getConversations(request, response, next){
                     select: 'displayName'
                 })
                 .exec((err, message) => {
+
                 if(err){
                     response.send({ error: err });
                     return next(err);
                 }
                 allChats.push(message);
                 if(allChats.length === chats.length){
-                    return response.status(200).json({
-                        chats: allChats
-                    });
+                    return response.send(200, { chats: allChats });
                 }
                 });
         });
@@ -151,15 +161,15 @@ function getConversation(request, response, next){
             path: 'sender',
             select: 'displayName'
         })
-        .exec((err, message) => {
-        if(err){
-            response.send({error: err });
-            return next(err);
-        }
-
-        return response.status(200).json({
-            chat: messages
-        });
+        .exec((err, messages) => {
+            if (err) {
+                response.send({error: err});
+                return next();
+            }
+            if(!messages.length){
+                return response.send(404, { message: 'no chat found'});
+            }
+            return response.send(200, messages);
         });
 };
 
