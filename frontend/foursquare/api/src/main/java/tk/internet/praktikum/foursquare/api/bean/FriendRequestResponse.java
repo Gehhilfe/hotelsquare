@@ -1,14 +1,14 @@
 package tk.internet.praktikum.foursquare.api.bean;
 
-public class Answer {
+public class FriendRequestResponse {
 
     private boolean accept;
 
-    public Answer() {
+    public FriendRequestResponse() {
         this(false);
     };
 
-    public Answer(boolean accept) {
+    public FriendRequestResponse(boolean accept) {
         this.accept = false;
     };
 
