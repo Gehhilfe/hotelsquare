@@ -112,7 +112,7 @@ server.get('user/:name', user.profile);
 server.get('user/:name/avatar', auth, user.getAvatar);
 
 server.post('user', user.register, (request, response, next) => {
-    io.sockets.emit('new user', "hello");
+    io.sockets.emit('new user', 'hello');
 });
 server.post('user/:name/friend_requests', auth, user.sendFriendRequest);
 
