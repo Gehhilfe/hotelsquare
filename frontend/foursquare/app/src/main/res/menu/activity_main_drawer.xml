@@ -26,10 +26,10 @@
             android:height="24dp"
             android:viewportHeight="24.0"
             android:viewportWidth="24.0"/>
-    <!--    <item
+        <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />-->
+            android:title="Tools" />
     </group>
 
    <!-- <item android:title="Communicate">

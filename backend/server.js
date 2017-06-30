@@ -5,6 +5,8 @@ const restify = require('restify');
 const session = require('./app/routes/session');
 const user = require('./app/routes/user');
 const venue = require('./app/routes/venue');
+const chat = require('./app/routes/chat');
+const chatsocket = require('./app/routes/chatsocket');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
@@ -12,10 +14,12 @@ const bunyan = require('bunyan');
 const restifyBunyanLogger = require('restify-bunyan-logger');
 const fs = require('fs');
 
-
 mongoose.Promise = global.Promise;
 
 const server = restify.createServer();
+
+const io = require('socket.io').listen(server);
+chatsocket(io);
 
 util.connectDatabase(mongoose).then(() => {
     //Bootstrap database
@@ -62,7 +66,6 @@ if(config.logstash) {
     });
 }
 
-
 server.on('after', restifyBunyanLogger({
     skip: function(req) {
         return req.method === 'OPTIONS';
@@ -108,7 +111,9 @@ server.post('users', auth, user.search);
 server.get('user/:name', user.profile);
 server.get('user/:name/avatar', auth, user.getAvatar);
 
-server.post('user', user.register);
+server.post('user', user.register, (request, response, next) => {
+    io.sockets.emit('new user', 'hello');
+});
 server.post('user/:name/friend_requests', auth, user.sendFriendRequest);
 
 server.put('user', auth, user.updateUser);
@@ -125,6 +130,15 @@ server.post('profile/avatar', auth, user.uploadAvatar);
 server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
 server.del('profile/avatar', auth, user.deleteAvatar);
+
+//Chat
+server.post('chat/:recipients', auth, chat.newChat);
+
+server.post('chat/reply/:chatId', auth, chat.replyMessage);
+
+server.get('chat/with/:chatId', auth, chat.getConversation);
+
+server.get('chat/all', auth, chat.getConversations);
 
 //Venue
 server.post('venues/query', venue.queryVenue);

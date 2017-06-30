@@ -31,6 +31,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".friendlist.DummyActivity"
+            android:theme="@style/AppTheme.Dark" />
+        <activity
+            android:name=".user.DummyProfile"
+            android:theme="@style/AppTheme.Dark" />
     </application>
 
 </manifest>
