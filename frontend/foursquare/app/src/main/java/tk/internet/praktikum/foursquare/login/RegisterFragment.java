@@ -1,44 +1,52 @@
-package tk.internet.praktikum.foursquare;
+package tk.internet.praktikum.foursquare.login;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterFragment extends Fragment {
 
-    private static final String LOG_TAG = RegisterActivity.class.getSimpleName();
+    private static final String LOG_TAG = RegisterFragment.class.getSimpleName();
     private final String URL = "https://dev.ip.stimi.ovh/";
 
     private EditText nameInput, emailInput, passwordInput;
     private AppCompatButton registerBtn;
     private TextView loginLbl;
+    private  LoginGeneralFragment loginGeneralFragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signup);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_signup, container, false);
 
-        nameInput = (EditText) findViewById(R.id.register_name_input);
-        emailInput = (EditText) findViewById(R.id.user_input);
-        passwordInput = (EditText) findViewById(R.id.register_password_input);
-        registerBtn = (AppCompatButton) findViewById(R.id.create_acc_btn);
-        loginLbl = (TextView) findViewById(R.id.login_link);
+        nameInput = (EditText) view.findViewById(R.id.register_name_input);
+        emailInput = (EditText) view.findViewById(R.id.user_input);
+        passwordInput = (EditText) view.findViewById(R.id.register_password_input);
+        registerBtn = (AppCompatButton) view.findViewById(R.id.create_acc_btn);
+        loginLbl = (TextView) view.findViewById(R.id.login_link);
+
 
         registerBtn.setOnClickListener(v -> register());
 
-        loginLbl.setOnClickListener(v -> finish());
+       loginLbl.setOnClickListener(v -> ((LoginActivity) getActivity()).changeFragment(0));
+       // loginLbl.setOnClickListener(v -> loginGeneralFragment.changeFragment(0));
+
+        return view;
     }
 
     /**
@@ -52,7 +60,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         registerBtn.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this, 0);
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity(), 0);
+
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Waiting for the Registration...");
         progressDialog.show();
@@ -70,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity {
                         user -> {
                             successfulRegister();
                             progressDialog.dismiss();
-                            Toast.makeText(getApplicationContext(), "Registration complete.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity().getApplicationContext(), "Registration complete.", Toast.LENGTH_LONG).show();
                         },
                         throwable -> {
                             failedRegister();
@@ -118,8 +127,8 @@ public class RegisterActivity extends AppCompatActivity {
     private void successfulRegister() {
         Log.d(LOG_TAG, "Successful login.");
         registerBtn.setEnabled(true);
-        setResult(RESULT_OK, null);
-        finish();
+       ((LoginActivity) getActivity()).changeFragment(0);
+       //loginGeneralFragment.changeFragment(0);
     }
 
     /**
@@ -128,6 +137,13 @@ public class RegisterActivity extends AppCompatActivity {
     private void failedRegister() {
         Log.d(LOG_TAG, "Failed login.");
         registerBtn.setEnabled(true);
-        Toast.makeText(getBaseContext(), "Failed to register.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity().getBaseContext(), "Failed to register.", Toast.LENGTH_LONG).show();
+    }
+    public LoginGeneralFragment getLoginGeneralFragment() {
+        return loginGeneralFragment;
+    }
+
+    public void setLoginGeneralFragment(LoginGeneralFragment loginGeneralFragment) {
+        this.loginGeneralFragment = loginGeneralFragment;
     }
 }

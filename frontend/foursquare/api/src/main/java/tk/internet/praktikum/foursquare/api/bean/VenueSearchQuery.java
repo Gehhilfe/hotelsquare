@@ -4,13 +4,12 @@ package tk.internet.praktikum.foursquare.api.bean;
 public class VenueSearchQuery {
 
     private String keyword;
-    private long longitude;
-    private long latitude;
+    private Location location;
+    private Integer radius;
 
-    public VenueSearchQuery(String keyword, long latitude, long longitude) {
+    public VenueSearchQuery(String keyword, double longitude, double latitude) {
         this.keyword = keyword;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.location = new Location(longitude, latitude);
     }
 
     public String getKeyword() {
@@ -21,19 +20,19 @@ public class VenueSearchQuery {
         this.keyword = keyword;
     }
 
-    public long getLatitude() {
-        return latitude;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setLatitude(long latitude) {
-        this.latitude = latitude;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
-    public long getLongitude() {
-        return longitude;
+    public Integer getRadius() {
+        return radius;
     }
 
-    public void setLongitude(long longitude) {
-        this.longitude = longitude;
+    public void setRadius(Integer radius) {
+        this.radius = radius;
     }
 }

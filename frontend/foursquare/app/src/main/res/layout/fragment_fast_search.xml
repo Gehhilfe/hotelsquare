@@ -1,68 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    tools:context="tk.internet.praktikum.foursquare.FoursquareActivity">
+    android:layout_marginTop="20dp"
+    tools:context="tk.internet.praktikum.foursquare.MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="35dp">
-        <!-- android:paddingLeft="24dp"
-        android:paddingRight="24dp"-->
-
-
-      <!--  <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="72dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="30dp"
-            android:orientation="vertical"
-            android:src="@mipmap/foursquare_logo_2" />-->
-
-        <!-- Logo -->
-        <SearchView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="30dp"
-            />
-    </LinearLayout>
-
-
-    <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="-1dp">
-
-        <TableRow
-            android:layout_width="wrap_content"
-            android:orientation="horizontal"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="8dp">
-
-
-
-        </TableRow>
-
-
-    </TableLayout>
 
     <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:shrinkColumns="0"
         android:stretchColumns="*"
-        android:visibility="visible"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="-1dp">
+        android:visibility="visible">
 
         <TableRow
             android:layout_weight="1"
@@ -127,4 +78,4 @@
     </TableLayout>
 
 
-</LinearLayout>
+</RelativeLayout>

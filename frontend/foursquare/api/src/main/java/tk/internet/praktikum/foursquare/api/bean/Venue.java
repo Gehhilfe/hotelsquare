@@ -1,50 +1,15 @@
 package tk.internet.praktikum.foursquare.api.bean;
 
+import java.util.List;
+
 public class Venue {
 
-    String name;
-    float longitude;
-    float latitude;
+    private String name;
+    private String place_id;
+    private String reference;
+    private List<String> types;
 
-    public Venue(){
+    private Location location;
 
-    };
-
-    public Venue(String name, float longitude, float latitude)
-    {
-        this.name = name;
-        this.longitude = longitude;
-        this.latitude = latitude;
-    }
-
-    void setName(String name)
-    {
-        this.name = name;
-    }
-
-    String getName()
-    {
-        return name;
-    }
-
-    void setLongitude(float longitude)
-    {
-        this.longitude = longitude;
-    }
-
-    float getLongitude()
-    {
-        return longitude;
-    }
-
-    void setLatitude()
-    {
-        this.latitude = latitude;
-    }
-
-    float getLatitude()
-    {
-        return latitude;
-    }
-
+    public Venue() {};
 }
