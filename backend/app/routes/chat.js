@@ -13,15 +13,14 @@ const User = require('../models/user');
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function newChat(request, response, next){
-    if(!request.params.recipients)
-    {
-        response.send(422, { error: 'You must at least have one recipient for the message.' });
+function newChat(request, response, next) {
+    if (!request.params.recipients) {
+        response.send(422, {error: 'You must at least have one recipient for the message.'});
         return next();
     }
 
-    if(request.body.message === ''){
-        response.send(422, { error: 'You must not send empty messages.' });
+    if (request.body.message === '') {
+        response.send(422, {error: 'You must not send empty messages.'});
         return next();
     }
 
@@ -39,8 +38,8 @@ function newChat(request, response, next){
     });
 
     chat.save((err, chat) => {
-        if(err) {
-            response.send({ error: err });
+        if (err) {
+            response.send({error: err});
             return next();
         }
 
@@ -51,7 +50,7 @@ function newChat(request, response, next){
         });
 
         msg.save((err, new_msg) => {
-            if(err){
+            if (err) {
                 response.send({error: err});
                 return next();
             }
@@ -72,7 +71,7 @@ function newChat(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function replyMessage(request, response, next){
+function replyMessage(request, response, next) {
     const reply = new Message({
         chatId: request.params.chatId,
         message: request.body.message,
@@ -81,7 +80,7 @@ function replyMessage(request, response, next){
     });
 
     reply.save((err, new_reply) => {
-        if(err){
+        if (err) {
             response.send({error: err});
             return next();
         }
@@ -89,7 +88,7 @@ function replyMessage(request, response, next){
         return response.send(200, {
             message: 'replied to message'
         });
-    })
+    });
 }
 
 /**
@@ -100,43 +99,43 @@ function replyMessage(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function getConversations(request, response, next){
+function getConversations(request, response, next) {
     Chat.find({
         participants: request.authentication._id
     })
         .select('_id')
         .exec((err, chats) => {
-        if(err) {
-            response.send({ error: err });
-            return next(err);
-        }
+            if (err) {
+                response.send({error: err});
+                return next(err);
+            }
 
-        const allChats = [];
-        chats.forEach((chat) => {
+            const allChats = [];
+            chats.forEach((chat) => {
 
-            Message.find({
-                chatId: chat._id
-            })
-                .sort('-date')
-                .limit(1)
-                .populate({
-                    path: 'sender',
-                    select: 'displayName'
+                Message.find({
+                    chatId: chat._id
                 })
-                .exec((err, message) => {
+                    .sort('-date')
+                    .limit(1)
+                    .populate({
+                        path: 'sender',
+                        select: 'displayName'
+                    })
+                    .exec((err, message) => {
 
-                if(err){
-                    response.send({ error: err });
-                    return next(err);
-                }
-                allChats.push(message);
-                if(allChats.length === chats.length){
-                    return response.send(200, { chats: allChats });
-                }
-                });
+                        if (err) {
+                            response.send({error: err});
+                            return next(err);
+                        }
+                        allChats.push(message);
+                        if (allChats.length === chats.length) {
+                            return response.send(200, {chats: allChats});
+                        }
+                    });
+            });
         });
-        });
-};
+}
 
 /**
  * Retrieves whole conversation history of a chat
@@ -146,7 +145,7 @@ function getConversations(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function getConversation(request, response, next){
+function getConversation(request, response, next) {
     Message.find({
         chatId: request.params.chatId
     })
@@ -161,12 +160,12 @@ function getConversation(request, response, next){
                 response.send({error: err});
                 return next();
             }
-            if(!messages.length){
-                return response.send(404, { message: 'no chat found'});
+            if (!messages.length) {
+                return response.send(404, {message: 'no chat found'});
             }
             return response.send(200, messages);
         });
-};
+}
 
 module.exports = {
     newChat,

@@ -1,7 +1,7 @@
 
 
 exports = module.exports = function(io) {
-    io.connection('connection', (socket) => {
+    io.on('connection', (socket) => {
         socket.on('enter', (chat) => {
             socket.join(chat);
         });

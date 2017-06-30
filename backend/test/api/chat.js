@@ -108,7 +108,7 @@ describe('Chat', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.have.property('message', 'New Chat');
-                    res.body.should.have.property('chatId')
+                    res.body.should.have.property('chatId');
                     return done();
                 });
         });
@@ -169,7 +169,6 @@ describe('Chat', () => {
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
-                console.log(res.body);
                     res.should.have.status(200);
                     res.body.should.have.property('message', 'replied to message');
                     return done();

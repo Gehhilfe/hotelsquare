@@ -9,8 +9,8 @@ const Schema = mongoose.Schema;
 
 const ChatSchema = new Schema({
     participants: [{
-            type: Schema.Types.ObjectId,
-            ref: 'User'
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }]
 });
 
