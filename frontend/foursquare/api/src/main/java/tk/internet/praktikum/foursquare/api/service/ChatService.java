@@ -1,16 +1,17 @@
 package tk.internet.praktikum.foursquare.api.service;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.socket.client.IO;
+import io.socket.client.Socket;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.Message;
-import tk.internet.praktikum.foursquare.api.bean.Venue;
-import tk.internet.praktikum.foursquare.api.bean.VenueSearchQuery;
 
 public interface ChatService {
 
