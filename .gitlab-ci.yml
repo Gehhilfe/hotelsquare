@@ -17,7 +17,7 @@ cache:
 stages:
   - test
   - build
-  - backend-deploy
+  - deploy
 
 backend-test:
   services:
