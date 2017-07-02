@@ -13,8 +13,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
+import tk.internet.praktikum.foursquare.user.DummyProfile;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.storage.LocalStorage;
 
@@ -92,27 +94,32 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_history) {
             // call history activity
-           /* Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
-            startActivityForResult(intent, 0);*/
+            Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
+            startActivityForResult(intent, 0);
         } else if (id == R.id.nav_me) {
             // call login activity if didn't login util now
             if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+               Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivityForResult(intent, 0);
-
-            } else {
-                try {
-                    fragment = MeFragment.class.newInstance();
+               /*try {
+                    fragment = LoginGeneralFragment.class.newInstance();
                     redirectToFragment(fragment);
-                    setTitle(item);
                 } catch (InstantiationException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
+                }*/
+            } else {
+                try {
+                fragment = MeFragment.class.newInstance();
+                redirectToFragment(fragment);
+                    setTitle(item);
                 }
-               /* Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-                startActivityForResult(intent, 0);
-                finish();*/
+                catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
 
 
             }
@@ -120,6 +127,10 @@ public class MainActivity extends AppCompatActivity
 
             // Insert the fragment by replacing any existing fragment
 
+    }else if (id == R.id.nav_manage) {
+            // call history activity
+            Intent intent = new Intent(getApplicationContext(), DummyProfile.class);
+            startActivityForResult(intent, 0);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -127,20 +138,21 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void redirectToFragment(Fragment fragment) {
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+    private void redirectToFragment(Fragment fragment){
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, fragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
 
     }
-
-    private void setTitle(MenuItem item) {
+    private  void setTitle(MenuItem item){
         item.setChecked(true);
         // Set action bar title
         setTitle(item.getTitle());
 
     }
+
+
 
 
 }
