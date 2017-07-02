@@ -1,18 +1,18 @@
-package tk.internet.praktikum.foursquare.api.NotificationTypes;
+package tk.internet.praktikum.foursquare.api.notification;
 
 import android.location.Location;
 
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
-public class LocationNotification extends Notification {
+public class LocationNotification extends NotificationBase {
 
     private User user;
     private Location location;
 
-    public LocationNotification(String title, String type, String content, User user, Venue venue)
+    public LocationNotification(User user, Venue venue)
     {
-        super(title, type, content);
+        super();
     }
 
     public User getUser() {
