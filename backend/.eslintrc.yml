@@ -28,7 +28,7 @@ rules:
   no-redeclare: error
   no-self-assign: error
   no-useless-return: error
-  no-unused-vars: error
+  no-unused-vars: warn
   callback-return: error
   brace-style:
    - error

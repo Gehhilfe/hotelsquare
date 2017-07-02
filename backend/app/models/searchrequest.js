@@ -9,12 +9,12 @@ const Schema = mongoose.Schema;
 
 const SearchRequestSchema = new Schema({
     location: {
-        'type': { type: String, default: 'Point' },
-        coordinates: { type: [Number], default: [0, 0] }
+        'type': {type: String, default: 'Point'},
+        coordinates: {type: [Number], default: [0, 0]}
     },
-    querytime: { type: Date, default: Date.now }
+    querytime: {type: Date, default: Date.now},
+    keyword: String
 });
-
 
 
 SearchRequestSchema.index({location: '2dsphere'});
@@ -25,13 +25,12 @@ SearchRequestSchema.index({location: '2dsphere'});
 
 class SearchRequestClass {
 
-    static findClosestLocation(coords){
-        return this.find({
-            location: {
-                $nearsphere: coords
-            }
-        })
-            .limit(1);
+    static findClosestLocation(location, keyword, radius) {
+        const query = this.find({ keyword: new RegExp(keyword, 'i')  });
+        return query.where('location').near({
+            center: location,
+            maxDistance: radius
+        });
     }
 
 }

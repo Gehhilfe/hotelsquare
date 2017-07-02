@@ -1,8 +1,15 @@
 package tk.internet.praktikum.foursquare.api.bean;
 
-/**
- * Created by robert on 06.06.2017.
- */
+import java.util.List;
 
 public class Venue {
+
+    private String name;
+    private String place_id;
+    private String reference;
+    private List<String> types;
+
+    private Location location;
+
+    public Venue() {};
 }

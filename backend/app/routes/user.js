@@ -40,7 +40,14 @@ const handleValidation = (next, func) => {
     });
 };
 
-
+/**
+ * Search for user by name and filters results by gender when gender is provided.
+ *
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
 async function search(request, response, next) {
     let query = User.find({ name: new RegExp(request.body.name, 'i')  });
     if(request.body.gender)
@@ -58,7 +65,7 @@ async function search(request, response, next) {
 /**
  * Retrieves user profile
  *
- * @function register
+ * @function profile
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler
@@ -87,7 +94,7 @@ async function profile(request, response, next) {
 /**
  * Retrieves user profile information
  *
- * @function register
+ * @function updateUser
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler
