@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
     android:layout_marginTop="35dp"
+    android:orientation="vertical"
     tools:context="tk.internet.praktikum.foursquare.MainActivity">
 
     <LinearLayout
@@ -19,61 +19,76 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <SearchView
-                android:id="@+id/filter_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:icon="@mipmap/ic_location_search"
-                android:title="@string/action_search"
-                app:actionViewClass="android.support.v7.widget.SearchView"
-                app:showAsAction="always|collapseActionView" />
             <ImageView
-                android:id="@+id/nearMe"
+                android:id="@+id/imageViewLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_gravity="right"
-                android:layout_marginRight="15dp"
-                app:srcCompat="@mipmap/near_by_me" />
+                android:layout_marginStart="13dp"
+                app:srcCompat="@mipmap/ic_location_search" />
+
+            <EditText
+                android:id="@+id/location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@+id/imageViewLocation"
+                android:enabled="true"
+                android:hint="Near me"
+                android:inputType="textPersonName" />
         </RelativeLayout>
 
-        <GridLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="5">
-            <TextView
-                android:id="@+id/textView"
+            android:paddingTop="5dp">
+
+
+            <ImageView
+                android:id="@+id/imageViewRadius"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_gravity="left|top"
-                android:layout_row="0"
-                android:text="Radius" />
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="13dp"
+                app:srcCompat="@mipmap/radius" />
 
             <SeekBar
-                android:id="@+id/seekBar2"
+                android:id="@+id/seekBarRadius"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_columnSpan="4"
-                android:layout_marginRight="20dp"
-                android:layout_gravity="fill_horizontal"
-                android:layout_row="0" />
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@+id/imageViewRadius" />
 
 
+        </RelativeLayout>
+     <RelativeLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content">
 
-        </GridLayout>
 
+     </RelativeLayout>
 
     </LinearLayout>
 
-    <ListView
+   <!-- <ListView
         android:id="@+id/searching_results"
         android:layout_width="match_parent"
-        android:layout_height="329dp" >
+        android:layout_height="wrap_content">
 
 
-    </ListView>
+    </ListView>-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/searching_results"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+    </android.support.v7.widget.RecyclerView>
+
 
 
 </LinearLayout>

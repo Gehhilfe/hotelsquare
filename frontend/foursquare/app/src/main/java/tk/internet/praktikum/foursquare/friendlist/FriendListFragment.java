@@ -45,8 +45,8 @@ public class FriendListFragment extends Fragment {
         users.add(new User("Uwe", ""));
 
 
-        //View view = inflater.inflate(R.layout.fragment_friendlist, container, false);
-        View view = inflater.inflate(R.layout.content_user, container, false);
+        View view = inflater.inflate(R.layout.fragment_friendlist, container, false);
+       // View view = inflater.inflate(R.layout.content_user, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fl_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), users));

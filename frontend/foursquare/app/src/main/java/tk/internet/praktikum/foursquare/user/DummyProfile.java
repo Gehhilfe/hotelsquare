@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
 
 /**
  * Created by Christian on 22.06.2017.
@@ -19,6 +18,6 @@ public class DummyProfile extends AppCompatActivity {
     }
 
     public void addFragment() {
-        getFragmentManager().beginTransaction().add(R.id.fragment_container, new ProfileFragment()).commit();
+        getFragmentManager().beginTransaction().add(R.id.login_layout, new ProfileFragment()).commit();
     }
 }
