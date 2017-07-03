@@ -8,41 +8,6 @@ const config = require('config');
 const SearchRequest = require('../models/searchrequest');
 
 /**
- * queries for venues
- *
- * @function query
- * @param {Object} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-async function queryVenue(request, response, next) {
-    const location = request.body.location;
-    const keyword = request.body.keyword;
-
-    const closestSearch = await SearchRequest.findClosestLocation(location, keyword, 5000);
-
-    if (closestSearch.length === 0) {
-        //load all google results into database
-        const googleResults = await queryAllVenues(location, keyword);
-        await Promise.all(_.map(googleResults, importGoogleResult));
-        SearchRequest.create({
-            location: {
-                type: 'Point',
-                coordinates: location
-            },
-            keyword: keyword
-        });
-    }
-
-    //search in our database for query
-    const venues = await searchVenuesInDB(location, keyword);
-
-    response.send(venues);
-    return next();
-}
-
-/**
  * Imports/Updates a google result into our database
  * @param {Object} entry result entry
  * @returns {Promise.<void>} entry in out database
@@ -65,6 +30,44 @@ async function importGoogleResult(entry) {
             coordinates: [entry.geometry.location.lng, entry.geometry.location.lat]
         }
     });
+}
+
+
+
+/**
+ * queries for venues
+ *
+ * @function query
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function queryVenue(request, response, next) {
+    const location = request.body.location;
+    const locationName = request.body.locationName;
+    const keyword = request.body.keyword;
+
+    const closestSearch = await SearchRequest.findClosestLocation(location, keyword, 5000);
+
+    if (closestSearch.length === 0) {
+        //load all google results into database
+        const googleResults = await queryAllVenues(location, keyword);
+        await Promise.all(_.map(googleResults, importGoogleResult));
+        SearchRequest.create({
+            location: {
+                type: 'Point',
+                coordinates: location
+            },
+            keyword: keyword
+        });
+    }
+
+    //search in our database for query
+    const venues = await searchVenuesInDB(location, keyword);
+
+    response.send(venues);
+    return next();
 }
 
 
