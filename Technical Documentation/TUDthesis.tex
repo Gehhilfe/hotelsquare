@@ -1,6 +1,6 @@
 \documentclass[12pt,
 article,
-type=prosem, %sta, diplom, bsc, pp, msc, dr, drfinal, sem, prosem, bsc
+type=sta, %sta, diplom, bsc, pp, msc, dr, drfinal, sem, prosem, bsc
 colorbacktitle,
 instlogo,
 english,
@@ -12,7 +12,8 @@ accentcolor=tud9c,
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-%\usepackage[applemac]{inputenc}
+
+\usepackage[ngerman]{todonotes}
 
 % linebreak for urls in bitex
 \usepackage{url}
@@ -153,6 +154,8 @@ accentcolor=tud9c,
 
 \begin{document}
 	
+	\renewcommand{\floatpagefraction}{.8}
+	
 	\selectlanguage{english}
 	\counterwithin{lstlisting}{section}
 	\thesistitle{Internet Praktikum - HOTEL Square}{Technical Documentation}
@@ -165,11 +168,14 @@ accentcolor=tud9c,
 		\\ 64289 Darmstadt \\\\www.tk.informatik.tu-darmstadt.de}
 	\group{Telecooperation Group}
 	
+	\selectlanguage{ngerman}
 	\makethesistitle
+	\selectlanguage{english}
 	\affidavit{Tim Burkert, Christian Hack, Marco Huber, Truong, Robert K\"onigstein}
 	
 	\cleardoublepage
-	
+	\listoftodos
+	\cleardoublepage
 	
 	\pagenumbering{Roman}
 
