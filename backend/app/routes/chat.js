@@ -1,13 +1,9 @@
-/* eslint-disable */
-//@Robert
-// When you are done just remove eslint-disable
-// This file blocked merge of api branch
-
 'use strict';
 
 const restify = require('restify');
-const sio = require('socket.io');
 const Chat = require('../models/chat');
+const Message = require('../models/message');
+const User = require('../models/user');
 
 /**
  * Starts new Chat
@@ -17,37 +13,53 @@ const Chat = require('../models/chat');
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function newChat(request, response, next){
-    if(request.body.participants.length < 1)
-    {
-        response.status(422).send({error: 'You must at least have one recipient for the message.'});
+function newChat(request, response, next) {
+    if (!request.params.recipients) {
+        response.send(422, {error: 'You must at least have one recipient for the message.'});
         return next();
     }
 
-    if(request.body.messages.length < 1){
-        response.status(422).send({error: 'You must send at least one message.'});
+    if (request.body.message === '') {
+        response.send(422, {error: 'You must not send empty messages.'});
         return next();
     }
 
-    if(request.body.messages[0].message = ''){
-        response.status(422).send({error: 'You must not send empty messages.'});
-        return next();
-    }
+    //request.params.recipients.forEach((userid) => {
+    //    User.count({ _id: userid }, (err, count) => {
+    //        if(count < 1){
+    //            response.send(422, { error: 'recipient not known' });
+    //            return next();
+    //        }
+    //    })
+    //})
 
     const chat = new Chat({
-        sender: request.authentication._id,
-        messages: request.body.messages,
-        participants: request.body.participants,
-        is_group_message: request.body.is_group_message
+        participants: [request.authentication._id, request.params.recipients]
     });
 
     chat.save((err, chat) => {
-        if(err) {
+        if (err) {
             response.send({error: err});
-            return next(err);
+            return next();
         }
 
-        return response.status(200).json({message: 'Chat created', chat:_id});
+        const msg = new Message({
+            chatId: chat._id,
+            message: request.body.message,
+            sender: request.authentication._id
+        });
+
+        msg.save((err, new_msg) => {
+            if (err) {
+                response.send({error: err});
+                return next();
+            }
+
+            return response.send(200, {
+                message: 'New Chat',
+                chatId: chat._id
+            });
+        });
     });
 }
 
@@ -59,25 +71,25 @@ function newChat(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function replyMessage(request, response, next){
-    const chat = await Chat.findOne(request.authentication._id);
+function replyMessage(request, response, next) {
+    const reply = new Message({
+        chatId: request.params.chatId,
+        message: request.body.message,
+        sender: request.authentication._id,
+        date: Date.now()
+    });
 
-}
+    reply.save((err, new_reply) => {
+        if (err) {
+            response.send({error: err});
+            return next();
+        }
 
-/*
-const results = await Promise.all([
-    User.findOne({name: request.params.name, 'friend_requests.sender': { $in: [request.authentication._id]}}),
-    User.findOne({name: request.params.name, friends: { $in: [request.authentication._id]}})
-]);
-if (results[0] === null && results[1] == null) {
-    const res = await User.findOne({name: request.params.name});
-    res.addFriendRequest(request.authentication);
-    await res.save();
-    response.json(res);
-    return next();
+        return response.send(200, {
+            message: 'replied to message'
+        });
+    });
 }
-return response.send(400, {error: 'Could not send friend request'});
-*/
 
 /**
  * Retrieves all conversations from the user
@@ -87,19 +99,42 @@ return response.send(400, {error: 'Could not send friend request'});
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function getConversations(request, response, next){
-    const chats = await Chat.find({ participants: request.authentication._id })
+function getConversations(request, response, next) {
+    Chat.find({
+        participants: request.authentication._id
+    })
         .select('_id')
         .exec((err, chats) => {
-        if(err){
-            response.send({error: err});
-            return next(err);
-        }
-            return reponse.status(200).json({})
-        })
+            if (err) {
+                response.send({error: err});
+                return next(err);
+            }
 
+            const allChats = [];
+            chats.forEach((chat) => {
 
-//)
+                Message.find({
+                    chatId: chat._id
+                })
+                    .sort('-date')
+                    .limit(1)
+                    .populate({
+                        path: 'sender',
+                        select: 'displayName'
+                    })
+                    .exec((err, message) => {
+
+                        if (err) {
+                            response.send({error: err});
+                            return next(err);
+                        }
+                        allChats.push(message);
+                        if (allChats.length === chats.length) {
+                            return response.send(200, {chats: allChats});
+                        }
+                    });
+            });
+        });
 }
 
 /**
@@ -110,56 +145,26 @@ async function getConversations(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function getConversation(){
-
-}
-
-/**
- * Confirms or declines a friend request
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-async function confirmFriendRequest(request, response, next) {
-    // Find both users
-    const results = await Promise.all([
-        User.findOne({name: request.authentication.name}),
-        User.findOne({name: request.params.name})
-    ]);
-
-    const receiver = results[0];
-    const sender = results[1];
-
-    // Check if a friend requests exists
-    const friendRequest = receiver.friend_requests.find(((e) => {
-        return e.sender.equals(sender._id);
-    }));
-
-    if (friendRequest === undefined) {
-        response.send(400, {error: 'No friend request existing'});
-        return next();
-    }
-
-    // Remove friend request
-    receiver.removeFriendRequest(friendRequest);
-
-    if (request.body.accept) {
-        // Request accepted
-        User.connectFriends(sender, receiver);
-        await Promise.all([
-            sender.save(),
-            receiver.save()
-        ]);
-        response.json({message: 'Friend request accepted'});
-        return next();
-    } else {
-        // Request declined
-        await receiver.save();
-        response.json({message: 'Friend request declined'});
-        return next();
-    }
+function getConversation(request, response, next) {
+    Message.find({
+        chatId: request.params.chatId
+    })
+        .select('date message sender')
+        .sort('-date')
+        .populate({
+            path: 'sender',
+            select: 'displayName'
+        })
+        .exec((err, messages) => {
+            if (err) {
+                response.send({error: err});
+                return next();
+            }
+            if (!messages.length) {
+                return response.send(404, {message: 'no chat found'});
+            }
+            return response.send(200, messages);
+        });
 }
 
 module.exports = {

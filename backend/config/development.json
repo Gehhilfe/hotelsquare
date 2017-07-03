@@ -11,7 +11,12 @@
   },
   "bootstrap": {
     "User": [
-      {"name": "Admin", "email": "admin@test.de", "password": "123456"}
+      {"name": "Admin", "email": "admin@test.de", "password": "123456"},
+      {"name": "Peter", "email": "peter@wunderlich.de", "password": "peterw"},
+      {"name": "Janus", "email": "janus@wunderlich.de", "password": "janusw"},
+      {"name": "Birte", "email": "birte@wunderlich.de", "password": "birtew"},
+      {"name": "Rosamunde", "email": "rosamunde@wunderlich.de", "password": "rosamunde"},
+      {"name": "Waldi", "email": "waldi@wunderlich.de", "password": "waldiw"}
     ]
   },
   "minio": {

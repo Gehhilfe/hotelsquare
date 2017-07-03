@@ -7,11 +7,23 @@ const Schema = mongoose.Schema;
 // Schema
 // ---------------------------------------------------------------------------------------------------------------------
 
-const ChatSchema = new Schema({
-    participants: [{
+const MessageSchema = new Schema({
+    sender: {
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    },
+    message: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now()
+    },
+    chatId: {
+        type: Schema.Types.ObjectId,
+        required: true
+    }
 });
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -19,9 +31,9 @@ const ChatSchema = new Schema({
 // ---------------------------------------------------------------------------------------------------------------------
 
 
-class ChatClass {
+class MessageClass {
 
 }
 
-ChatSchema.loadClass(ChatClass);
-module.exports = mongoose.model('Chat', ChatSchema);
+MessageSchema.loadClass(MessageClass);
+module.exports = mongoose.model('Message', MessageSchema);

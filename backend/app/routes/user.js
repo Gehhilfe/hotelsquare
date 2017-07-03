@@ -32,7 +32,7 @@ const handleValidation = (next, func) => {
                         message: 'Email is already used'
                     }}));
             }
-            break;
+            return next();
 
         case 'ValidationError':
             return next(new ValidationError(error.errors));
