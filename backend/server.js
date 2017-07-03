@@ -41,6 +41,24 @@ util.connectDatabase(mongoose).then(async () => {
             if (config.bootstrap.User) {
                 await User.remove({});
                 util.bootstrap(User, config.bootstrap.User);
+                const peter = User.findOne({name: 'Peter'});
+                const admin = User.findOne({name: 'Admin'});
+                const janus = User.findOne({name: 'Janus'});
+                const waldi = User.findOne({name: 'Waldi'});
+                const rosamunde = User.findOne({name: 'Rosamunde'});
+                const birte = User.findOne({name: 'Birte'});
+                User.connectFriends(admin, peter);
+                User.connectFriends(admin, janus);
+                User.connectFriends(admin, waldi);
+                User.connectFriends(admin, rosamunde);
+                User.connectFriends(admin, birte);
+                User.connectFriends(peter, rosamunde);
+                User.connectFriends(waldi, peter);
+                User.connectFriends(waldi, rosamunde);
+                User.connectFriends(waldi, birte);
+                User.connectFriends(rosamunde, janus);
+                User.connectFriends(rosamunde, birte);
+                User.connectFriends(waldi, janus);
             }
         }
     }
