@@ -1,2 +1,98 @@
-\section*{Introduction}
+\section{Introduction}
 \label{sec:introduction}
+The following technical documentation will give further information for the implementation of the \textit{Internet Praktikum} from the group \texttt{HOTEL-Square}. The \textit{Internet Praktikum} aims at getting in touch with current web technologies, which "are becoming the basic building blocks of the next generation of Internet services"\footnote{\url{https://www.tk.informatik.tu-darmstadt.de/de/teaching/sommersemester-2017/internet-praktikum-tk-p4/}, 03.07.2017}. Therefore, state-of-the-art protocols and technologies are used to implement a specific task in a web based context.
+
+\subsection{Task}
+\label{subsec:task}
+The task of the \textit{Internet Praktikum} in summer term 2017 is to reimplement a clone of the \textit{Foursquare Android} app. The task includes a well defined extend of compulsory features, which the app should support. There is the possibility of extending this compulsory feature list by some bonus features. 
+
+In general, the task of the project includes the implementation of a well defined architecture, which comprises a development task for an \textit{Android} app (frontend) and a development task including a server in \textit{NodeJS} (backend). The backend should include a \textit{NoSQL} database and is allowed to query some third-party API-services. In opposite, the frontend is limited to communicate with the \textit{NodeJS}-server via some well-defined API. 
+\newline\newline
+The compulsory features of the app are:
+\begin{itemize}
+	\item User management:
+	\begin{itemize}
+		\item Create new account
+		\item Login
+		\item Delete account
+		\item Reset password
+	\end{itemize}
+	\item Venue data:
+	\begin{itemize}
+		\item Pull venue data from the backend
+	\end{itemize}
+	\item Possible User Actions:
+	\begin{itemize}
+		\item Venue Search (at current location and in other location)
+		\item Venue Search via text input and via predefined categories
+		\item Search results must be displayed in a list and on a map
+	\end{itemize}
+	\item Venue view 
+	\begin{itemize}
+		\item Venue overview page showing photos and important information about the venue
+		\item Look at photos that where uploaded to the venue in a photo albu with swiping
+		\item Add comments with text and photos, like/dislike them and read other's comments
+		\item Check into venues to show you where there
+		\item Rate the venues
+		\item Show the current top visitors of a venue
+	\end{itemize}	
+	\item Map
+	\begin{itemize}
+		\item Show venues on the map, click on them to get to the venue overview
+		\item Show the user's location on the map
+		\item Show the user's friends location on the map
+	\end{itemize}
+	\item User profile
+	\begin{itemize}
+		\item Profile view
+		\item Profile fields containing the user name, real name, age and city
+		\item Picture
+		\item Profile editing for the user's own profile
+	\end{itemize}
+	\item Friends
+	\begin{itemize}
+		\item Find friends by name/user name, through comments on venues or on the map
+		\item Friend list showing the user's friends with links to their profile
+		\item Chat/messaging with the user's friends
+	\end{itemize}
+	\item Venue Gamification
+	\begin{itemize}
+		\item User with the must "checkins" in a venue is the "king"
+	\end{itemize}
+\end{itemize}
+
+Proposed bonus features for the app are:
+\begin{itemize}
+	\item User management:
+	\begin{itemize}
+		\item Facebook/other login
+		\item E-Mail confirmation
+	\end{itemize}
+	\item Search Results:
+	\begin{itemize}
+		\item must be filterable
+	\end{itemize}
+	\item Map
+	\begin{itemize}
+		\item Live update of the user's friends location
+	\end{itemize}
+	\item Friends
+	\begin{itemize}
+		\item Privacy measures
+	\end{itemize}
+	\item Venue Gamification
+	\begin{itemize}
+		\item Any gamification is a bonus
+	\end{itemize}
+\end{itemize}
+
+The compulsory features of the server are:
+\begin{itemize}
+	\item Implementation of the server in \textit{NodeJS}
+	\item Usage of a \textit{NoSQL} database for storage
+	\item Implementation of a \texttt{REST}-ful API for the app-calls (\texttt{CRUD} for comments, ratings, pictures and ALL possible acitons)
+	\item Hosting of the server
+	\item Pull venue data from \textit{Google} (or similar service)	
+\end{itemize}
+
+\todo[inline]{finish introduction maybe with some general infos about Android, NodeJS, etc.}
