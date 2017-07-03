@@ -9,25 +9,22 @@ chai.should();
 
 
 const mochaAsync = (fn) => {
-    return async (done) => {
-        try {
-            await fn();
-            done();
-        } catch (err) {
-            done(err);
-        }
+    return (done) => {
+        fn.call().then(done, (err) => {
+            return done(err);
+        });
     };
 };
 
 describe('geocoderesult', () => {
-    
+
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
 
         await Util.connectDatabase(mongoose);
         await GeocodeResult.remove({});
     }));
-    
+
     describe('keyword', () => {
         it('should be lowercase when saved', mochaAsync(async () => {
             const result = await GeocodeResult.create({

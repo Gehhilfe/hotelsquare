@@ -9,7 +9,10 @@ const Schema = mongoose.Schema;
 
 const GeocodeResultSchema = new Schema({
     querytime: {type: Date, default: Date.now},
-    keyword: String,
+    keyword: {
+        type: String,
+        index: true
+    },
     result: Object
 });
 
