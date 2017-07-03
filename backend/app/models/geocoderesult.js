@@ -32,7 +32,7 @@ GeocodeResultSchema.pre('save', function (next) {
 class GeocodeResultClass {
 
     static findByKeyword(keyword) {
-        const query = this.find({ keyword: keyword.toLowerCase()  });
+        const query = this.findOne({ keyword: keyword.toLowerCase()  });
         return query;
     }
 
