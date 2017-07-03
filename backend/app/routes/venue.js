@@ -4,43 +4,10 @@ const _ = require('lodash');
 const restify = require('restify');
 const Venue = require('../models/venue');
 const googleapilib = require('googleplaces');
+const NodeGeocoder = require('node-geocoder');
 const config = require('config');
 const SearchRequest = require('../models/searchrequest');
-
-/**
- * queries for venues
- *
- * @function query
- * @param {Object} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-async function queryVenue(request, response, next) {
-    const location = request.body.location;
-    const keyword = request.body.keyword;
-
-    const closestSearch = await SearchRequest.findClosestLocation(location, keyword, 5000);
-
-    if (closestSearch.length === 0) {
-        //load all google results into database
-        const googleResults = await queryAllVenues(location, keyword);
-        await Promise.all(_.map(googleResults, importGoogleResult));
-        SearchRequest.create({
-            location: {
-                type: 'Point',
-                coordinates: location
-            },
-            keyword: keyword
-        });
-    }
-
-    //search in our database for query
-    const venues = await searchVenuesInDB(location, keyword);
-
-    response.send(venues);
-    return next();
-}
+const GeocodeResult = require('../models/geocoderesult');
 
 /**
  * Imports/Updates a google result into our database
@@ -69,6 +36,87 @@ async function importGoogleResult(entry) {
 
 
 /**
+ * queries for venues
+ *
+ * @function query
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function queryVenue(request, response, next) {
+    let location = request.body.location;
+    let locationName = request.body.locationName;
+    let radius = request.body.radius;
+    if (!radius) {
+        radius = 5000;
+    } else {
+        radius = Math.min(5000, Math.max(1000, radius));
+    }
+    const keyword = request.body.keyword;
+
+    if (locationName) {
+        // Check if result cached
+        let result = await GeocodeResult.findByKeyword(locationName);
+        if (!result) {
+            // Get result from google
+            const geocoder = NodeGeocoder({
+                provider: 'google',
+                httpAdapter: 'https',
+                apiKey: config.googleapi.GOOGLE_PLACES_API_KEY,
+                formatter: null
+            });
+            result = await geocoder.geocode(locationName);
+
+            if (!result || result.length === 0) {
+                throw new restify.errors.BadRequestError({
+                    message: 'No valid location for location name found.'
+                });
+            }
+            // Cache result
+            GeocodeResult.create({
+                keyword: locationName,
+                result: result
+            });
+        } else {
+            result = result.result;
+        }
+
+        location = {
+            type: 'Point',
+            coordinates: [result[0].longitude, result[0].latitude]
+        };
+
+        locationName = result[0].formattedAddress;
+    }
+
+
+    const closestSearch = await SearchRequest.findClosestLocation(location, keyword, 5000);
+
+    if (closestSearch.length === 0) {
+        //load all google results into database
+        const googleResults = await queryAllVenues(location, keyword);
+        await Promise.all(_.map(googleResults, importGoogleResult));
+        SearchRequest.create({
+            location: location,
+            keyword: keyword
+        });
+    }
+
+    //search in our database for query
+    const venues = await searchVenuesInDB(location, keyword, radius);
+
+    response.send({
+        location: location,
+        locationName: locationName,
+        radius: radius,
+        results: venues
+    });
+    return next();
+}
+
+
+/**
  * Retrieves venues inside search radius filtered by keyword
  *
  * @param {Number[]} location center point
@@ -76,8 +124,13 @@ async function importGoogleResult(entry) {
  * @param {Number} radius search radius
  * @returns {Promise.<*>} result
  */
-function searchVenuesInDB(location, keyword = '', radius = 30000) {
-    const query = Venue.find({name: new RegExp(keyword, 'i')});
+function searchVenuesInDB(location, keyword = '', radius = 5000) {
+    const query = Venue.find({
+        $or: [
+            {name: new RegExp(keyword, 'i')},
+            {types: new RegExp(keyword, 'i')}
+        ]
+    });
     return query.where('location').near({
         center: location,
         maxDistance: radius

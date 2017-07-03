@@ -11,10 +11,11 @@ const server = require('../../server');
 const request = require('supertest');
 chai.should();
 chai.use(chaiHttp);
+chai.use(require('chai-things'));
 
 describe('google api query', () => {
 
-    beforeEach(async () => {
+    before(async () => {
         mongoose.Promise = global.Promise;
 
         await Util.connectDatabase(mongoose);
@@ -24,7 +25,6 @@ describe('google api query', () => {
 
 
     it('should return some places', (done) => {
-
         request(server)
             .post('/venues/query')
             .send({
@@ -37,7 +37,51 @@ describe('google api query', () => {
             })
             .end((err, res) => {
                 res.should.have.status(200);
-                console.log(JSON.stringify(res.body));
+                return done();
+            });
+    });
+
+    it('should return krone in darmstadt for Krone', (done) => {
+        request(server)
+            .post('/venues/query')
+            .send({
+                locationName: 'Hügelstraße, Darmstadt',
+                keyword: 'Krone',
+                radius: 5000
+            })
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.results.should.contain.a.thing.with.property('name', 'Goldene Krone');
+                return done();
+            });
+    });
+
+    it('should return krone in darmstadt when searching for bar', (done) => {
+        request(server)
+            .post('/venues/query')
+            .send({
+                locationName: 'Schustergasse 18, 64283 Darmstadt',
+                keyword: 'bar',
+                radius: 5000
+            })
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.results.should.contain.a.thing.with.property('name', 'Goldene Krone');
+                return done();
+            });
+    });
+
+    it('should return hobbit in darmstadt', (done) => {
+        request(server)
+            .post('/venues/query')
+            .send({
+                locationName: 'Kantplatz, Darmstadt',
+                keyword: 'Hobbit',
+                radius: 5000
+            })
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.results.should.contain.a.thing.with.property('name', 'Hobbit');
                 return done();
             });
     });

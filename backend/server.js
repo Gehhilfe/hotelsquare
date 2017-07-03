@@ -21,23 +21,33 @@ const server = restify.createServer();
 const io = require('socket.io').listen(server);
 chatsocket(io);
 
-util.connectDatabase(mongoose).then(() => {
+util.connectDatabase(mongoose).then(async () => {
     //Bootstrap database
     if (process.env.NODE_ENV !== 'production') {
         const User = require('./app/models/user');
+        const Venue = require('./app/models/venue');
+        const Message = require('./app/models/message');
+        const SearchRequest = require('./app/models/searchrequest');
+        const GeocodeResult = require('./app/models/geocoderesult');
+
+        await Promise.all([
+            Venue.remove({}),
+            Message.remove({}),
+            SearchRequest.remove({}),
+            GeocodeResult.remove({})
+        ]);
 
         if (config.bootstrap) {
             if (config.bootstrap.User) {
-                User.remove({}).then(() => {
-                    util.bootstrap(User, config.bootstrap.User);
-                });
+                await User.remove({});
+                util.bootstrap(User, config.bootstrap.User);
             }
         }
     }
 });
 
 server.use(restify.bodyParser({
-    maxBodySize: 1024*1024,
+    maxBodySize: 1024 * 1024,
     mapParams: true,
     mapFiles: true,
     overrideParams: false,
@@ -49,28 +59,28 @@ server.use(restify.bodyParser({
 
 let streams = undefined;
 let bunyanLogger;
-if(config.logstash) {
+if (config.logstash) {
     streams = [{
         type: 'raw',
         stream: require('bunyan-logstash').createStream(config.logstash)
     }];
     bunyanLogger = bunyan.createLogger({
         name: 'hotel-square',
-        level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO),
+        level: ((process.env.HOTEL_QUIET) ? bunyan.FATAL + 1 : bunyan.INFO),
         streams: streams
     });
 } else {
     bunyanLogger = bunyan.createLogger({
         name: 'hotel-square',
-        level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO)
+        level: ((process.env.HOTEL_QUIET) ? bunyan.FATAL + 1 : bunyan.INFO)
     });
 }
 
 server.on('after', restifyBunyanLogger({
-    skip: function(req) {
+    skip: function (req) {
         return req.method === 'OPTIONS';
     },
-    custom: function(req, res, route, err, log) {
+    custom: function (req, res, route, err, log) {
         // This will not work when using gzip.
         log.res.length = res.get('Content-Length');
 
@@ -82,7 +92,7 @@ server.on('after', restifyBunyanLogger({
     logger: bunyanLogger
 }));
 
-if(process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') {
     server.use(restify.CORS({
 
         // Defaults to ['*'].
@@ -145,10 +155,11 @@ server.post('venues/query', venue.queryVenue);
 
 // Delete downloads
 server.on('after', (request) => {
-    if(request.files) {
+    if (request.files) {
         const key = Object.keys(request.files);
         key.forEach((k) => {
-            fs.unlink(request.files[k].path, () => {});
+            fs.unlink(request.files[k].path, () => {
+            });
         });
     }
 });
