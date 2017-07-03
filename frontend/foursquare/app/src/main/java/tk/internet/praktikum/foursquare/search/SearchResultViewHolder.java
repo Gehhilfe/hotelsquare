@@ -28,12 +28,15 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
     }
     public void render(Venue searchResult){
         this.name.setText(searchResult.getName());
-        this.address.setText(searchResult.getPlace_id());
-        this.rating.setText(searchResult.getRating());
-        this.image.setImageBitmap(Utils.decodeResponsedInputStreamImage(searchResult.getImage()));
+       //this.address.setText(searchResult.getPlace_id());
+        this.address.setText(searchResult.getReference());
+       // this.rating.setText(searchResult.getRating());
+        //this.image.setImageBitmap(Utils.decodeResponsedInputStreamImage(searchResult.getImage()));
     }
     @Override
     public void onClick(View v) {
+        //TODO
+        // views each Venue in details
 
     }
 }
