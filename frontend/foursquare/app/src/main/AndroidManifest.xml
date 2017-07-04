@@ -68,19 +68,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".LocationService"/>
 
-        <service
-            android:name=".old_LocationService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
-            android:name=".LocationService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
-            android:name=".LocationTracker"
-            android:enabled="true"
-            android:exported="true"></service>
+
     </application>
 
 </manifest>
