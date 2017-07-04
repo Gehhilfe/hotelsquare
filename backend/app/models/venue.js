@@ -15,7 +15,25 @@ const VenueSchema = new Schema({
     location: {
         'type': { type: String, default: 'Point' },
         coordinates: { type: [Number], default: [0, 0] }
-    }
+    },
+    comments: [{
+        author: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        text: String,
+        likes: Number,
+        dislikes: Number,
+        date: {
+            type: Date,
+            default: Date.now()
+        },
+        isimage: {
+            type: Boolean,
+            default: false
+        },
+        imagenames: String
+    }]
 });
 
 

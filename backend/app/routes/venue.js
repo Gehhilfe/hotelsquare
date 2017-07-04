@@ -171,6 +171,8 @@ function delImage(request, response, next) {
     });
 }*/
 
+
+
 /**
  * Imports/Updates a google result into our database
  * @param {Object} entry result entry
