@@ -2,16 +2,18 @@ package tk.internet.praktikum.foursquare.user;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.abstracts.DrawerLayoutActivity;
+import tk.internet.praktikum.foursquare.UserStatePagerAdapter;
+import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
 
-public class UserActivity extends DrawerLayoutActivity {
-    TabLayout tabLayout;
-    //TabLayout.Tab homeTab;
-
-
+public class UserActivity extends AppCompatActivity {
+    private TabLayout tabLayout;
+    private UserStatePagerAdapter userStatePagerAdapter;
+    private ViewPager fragmentContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +22,9 @@ public class UserActivity extends DrawerLayoutActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
-
         tabLayout= (TabLayout) findViewById(R.id.tabs);
+
+        //fragmentContainer = (ViewPager) findViewById(R.id.user_fragment_container);
 
         TabLayout.Tab homeTab=tabLayout.newTab();
         homeTab.setText("Home").setIcon(R.mipmap.user_home);
@@ -42,8 +45,19 @@ public class UserActivity extends DrawerLayoutActivity {
         tabLayout.addTab(friendsTab);
         tabLayout.addTab(inbox);
 
-
-
-
+        userStatePagerAdapter = new UserStatePagerAdapter(getSupportFragmentManager());
+        //initialiseFragmentContainer(fragmentContainer);
     }
+
+    private void initialiseFragmentContainer(ViewPager container) {
+        userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
+        userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
+        container.setAdapter(userStatePagerAdapter);
+    }
+
+    public void setFragment(int fragmentId) {
+        fragmentContainer.setCurrentItem(fragmentId);
+    }
+
+
 }
