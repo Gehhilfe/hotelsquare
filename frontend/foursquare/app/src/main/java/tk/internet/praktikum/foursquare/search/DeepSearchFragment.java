@@ -165,7 +165,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
             @Override
             public void afterTextChanged(Editable s) {
-                deepSearch(searchView.getQuery().toString());
+                deepSearch(searchView.getQuery().toString().trim());
             }
         };
 
@@ -189,7 +189,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-               deepSearch(searchView.getQuery().toString());
+               deepSearch(searchView.getQuery().toString().trim());
             }
         };
     }
