@@ -3,7 +3,6 @@ package tk.internet.praktikum.foursquare.login;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.Patterns;
@@ -11,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import tk.internet.praktikum.foursquare.R;
@@ -63,8 +61,8 @@ public class RestorePasswordFragment extends Fragment {
     private void successfulReset() {
         Log.d(LOG_TAG, "Successfully reset the password.");
         resetPwBtn.setEnabled(true);
-        ((LoginActivity) getActivity()).changeFragment(0);
-        //loginGeneralFragment.changeFragment(0);
+       ((LoginActivity) getActivity()).changeFragment(0);
+       // loginGeneralFragment.changeFragment(0);
     }
 
     /**

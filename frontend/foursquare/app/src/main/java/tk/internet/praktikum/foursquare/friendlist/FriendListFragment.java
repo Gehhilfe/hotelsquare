@@ -19,6 +19,8 @@ public class FriendListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+
         List<User> users = new ArrayList<>();
         users.add(new User("Alex", ""));
         users.add(new User("Bob", ""));
@@ -44,6 +46,7 @@ public class FriendListFragment extends Fragment {
 
 
         View view = inflater.inflate(R.layout.fragment_friendlist, container, false);
+       // View view = inflater.inflate(R.layout.content_user, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fl_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), users));

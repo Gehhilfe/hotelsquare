@@ -99,11 +99,11 @@ public class LoginFragment extends Fragment {
     private void successfulLogin() {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
-        Intent intent = new Intent(getActivity().getApplicationContext(), UserActivity.class);
+      Intent intent = new Intent(getActivity().getApplicationContext(), UserActivity.class);
         startActivityForResult(intent, 1);
         getActivity().finish();
-/*
-        try {
+
+    /* try {
             Fragment fragment = MeFragment.class.newInstance();
             redirectToFragment(fragment);
         }
@@ -117,7 +117,7 @@ public class LoginFragment extends Fragment {
     }
     private void redirectToFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.replace(R.id.login_layout, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 
