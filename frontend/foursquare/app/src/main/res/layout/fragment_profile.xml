@@ -106,29 +106,19 @@
             android:inputType="text" />
     </android.support.design.widget.TextInputLayout>
 
-    <android.support.v7.widget.SwitchCompat
-        android:id="@+id/profile_gender"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:enabled="false"
-        android:text="Gender"
-        app:showText="true"
-        app:switchPadding="25dp" />
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gender"
-            android:paddingRight="10dp"
-            android:id="@+id/textView2"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_alignParentStart="true" />
+            android:paddingRight="10dp"
+            android:text="Gender" />
 
         <RadioGroup
             android:layout_width="wrap_content"
@@ -141,32 +131,34 @@
                 android:id="@+id/radioButton2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/textView2"
                 android:layout_weight="1"
                 android:enabled="false"
-                android:text="Male"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/textView2" />
+                android:text="Male" />
 
             <RadioButton
                 android:id="@+id/radioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Female"
-                android:enabled="false"
                 android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/radioButton2" />
-        </RadioGroup>
-    </RelativeLayout>
+                android:layout_toEndOf="@+id/radioButton2"
+                android:layout_weight="1"
+                android:enabled="false"
+                android:text="Female" />
 
-    <ToggleButton
-        android:id="@+id/toggleButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="Gender"
-        android:textOff="Female"
-        android:textOn="Male" />
+            <RadioButton
+                android:id="@+id/radioButton3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/radioButton2"
+                android:layout_weight="1"
+                android:enabled="false"
+                android:text="Anonymous" />
+        </RadioGroup>
+
+    </RelativeLayout>
 
 
 </LinearLayout>
