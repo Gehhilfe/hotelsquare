@@ -14,7 +14,7 @@ public class DummyActivity extends AppCompatActivity {
     }
 
     public void addFragment() {
-        getFragmentManager().beginTransaction().add(R.id.fragment_container, new FriendListFragment()).commit();
+        //getFragmentManager().beginTransaction().add(R.id.login_layout, new FriendListFragment()).commit();
     }
 
 }

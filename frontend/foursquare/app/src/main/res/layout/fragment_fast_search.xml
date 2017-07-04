@@ -22,17 +22,17 @@
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:text="Category_1" />
+                android:text="@string/suggestion_1" />
 
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:text="Category_2" />
+                android:text="@string/suggestion_2" />
 
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:text="Category_3" />
+                android:text="@string/suggestion_3" />
         </TableRow>
 
         <TableRow
@@ -42,17 +42,17 @@
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:text="Category_4" />
+                android:text="@string/suggestion_4" />
 
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:text="Category_5" />
+                android:text="@string/suggestion_2" />
 
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:text="Category_6" />
+                android:text="@string/suggestion_2" />
         </TableRow>
 
         <TableRow
@@ -62,17 +62,17 @@
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:text="Category_7" />
+                android:text="@string/suggestion_2" />
 
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:text="Category_8" />
+                android:text="@string/suggestion_2" />
 
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:text="Category_9" />
+                android:text="@string/suggestion_2" />
         </TableRow>
 
     </TableLayout>

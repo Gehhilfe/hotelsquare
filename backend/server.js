@@ -5,6 +5,8 @@ const restify = require('restify');
 const session = require('./app/routes/session');
 const user = require('./app/routes/user');
 const venue = require('./app/routes/venue');
+const chat = require('./app/routes/chat');
+const chatsocket = require('./app/routes/chatsocket');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
@@ -12,28 +14,58 @@ const bunyan = require('bunyan');
 const restifyBunyanLogger = require('restify-bunyan-logger');
 const fs = require('fs');
 
-
 mongoose.Promise = global.Promise;
 
 const server = restify.createServer();
 
-util.connectDatabase(mongoose).then(() => {
+const io = require('socket.io').listen(server);
+chatsocket(io);
+
+util.connectDatabase(mongoose).then(async () => {
     //Bootstrap database
     if (process.env.NODE_ENV !== 'production') {
         const User = require('./app/models/user');
+        const Venue = require('./app/models/venue');
+        const Message = require('./app/models/message');
+        const SearchRequest = require('./app/models/searchrequest');
+        const GeocodeResult = require('./app/models/geocoderesult');
+
+        await Promise.all([
+            Venue.remove({}),
+            Message.remove({}),
+            SearchRequest.remove({}),
+            GeocodeResult.remove({})
+        ]);
 
         if (config.bootstrap) {
             if (config.bootstrap.User) {
-                User.remove({}).then(() => {
-                    util.bootstrap(User, config.bootstrap.User);
-                });
+                await User.remove({});
+                util.bootstrap(User, config.bootstrap.User);
+                const peter = User.findOne({name: 'Peter'});
+                const admin = User.findOne({name: 'Admin'});
+                const janus = User.findOne({name: 'Janus'});
+                const waldi = User.findOne({name: 'Waldi'});
+                const rosamunde = User.findOne({name: 'Rosamunde'});
+                const birte = User.findOne({name: 'Birte'});
+                User.connectFriends(admin, peter);
+                User.connectFriends(admin, janus);
+                User.connectFriends(admin, waldi);
+                User.connectFriends(admin, rosamunde);
+                User.connectFriends(admin, birte);
+                User.connectFriends(peter, rosamunde);
+                User.connectFriends(waldi, peter);
+                User.connectFriends(waldi, rosamunde);
+                User.connectFriends(waldi, birte);
+                User.connectFriends(rosamunde, janus);
+                User.connectFriends(rosamunde, birte);
+                User.connectFriends(waldi, janus);
             }
         }
     }
 });
 
 server.use(restify.bodyParser({
-    maxBodySize: 1024*1024,
+    maxBodySize: 1024 * 1024,
     mapParams: true,
     mapFiles: true,
     overrideParams: false,
@@ -45,29 +77,28 @@ server.use(restify.bodyParser({
 
 let streams = undefined;
 let bunyanLogger;
-if(config.logstash) {
+if (config.logstash) {
     streams = [{
         type: 'raw',
         stream: require('bunyan-logstash').createStream(config.logstash)
     }];
     bunyanLogger = bunyan.createLogger({
         name: 'hotel-square',
-        level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO),
+        level: ((process.env.HOTEL_QUIET) ? bunyan.FATAL + 1 : bunyan.INFO),
         streams: streams
     });
 } else {
     bunyanLogger = bunyan.createLogger({
         name: 'hotel-square',
-        level: ((process.env.HOTEL_QUIET)?bunyan.FATAL + 1 : bunyan.INFO)
+        level: ((process.env.HOTEL_QUIET) ? bunyan.FATAL + 1 : bunyan.INFO)
     });
 }
 
-
 server.on('after', restifyBunyanLogger({
-    skip: function(req) {
+    skip: function (req) {
         return req.method === 'OPTIONS';
     },
-    custom: function(req, res, route, err, log) {
+    custom: function (req, res, route, err, log) {
         // This will not work when using gzip.
         log.res.length = res.get('Content-Length');
 
@@ -79,7 +110,7 @@ server.on('after', restifyBunyanLogger({
     logger: bunyanLogger
 }));
 
-if(process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') {
     server.use(restify.CORS({
 
         // Defaults to ['*'].
@@ -108,7 +139,9 @@ server.post('users', auth, user.search);
 server.get('user/:name', user.profile);
 server.get('user/:name/avatar', auth, user.getAvatar);
 
-server.post('user', user.register);
+server.post('user', user.register, (request, response, next) => {
+    io.sockets.emit('new user', 'hello');
+});
 server.post('user/:name/friend_requests', auth, user.sendFriendRequest);
 
 server.put('user', auth, user.updateUser);
@@ -126,15 +159,25 @@ server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
 server.del('profile/avatar', auth, user.deleteAvatar);
 
+//Chat
+server.post('chat/:recipients', auth, chat.newChat);
+
+server.post('chat/reply/:chatId', auth, chat.replyMessage);
+
+server.get('chat/with/:chatId', auth, chat.getConversation);
+
+server.get('chat/all', auth, chat.getConversations);
+
 //Venue
 server.post('venues/query', venue.queryVenue);
 
 // Delete downloads
 server.on('after', (request) => {
-    if(request.files) {
+    if (request.files) {
         const key = Object.keys(request.files);
         key.forEach((k) => {
-            fs.unlink(request.files[k].path, () => {});
+            fs.unlink(request.files[k].path, () => {
+            });
         });
     }
 });

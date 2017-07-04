@@ -7,6 +7,7 @@ import retrofit2.http.Body;
 import retrofit2.http.POST;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueSearchQuery;
+import tk.internet.praktikum.foursquare.api.bean.VenueSearchResult;
 
 public interface VenueService {
 
@@ -16,6 +17,6 @@ public interface VenueService {
      * @return venues for requested parameters
      */
     @POST("/venues/query")
-    Observable<List<Venue>> queryVenue(@Body VenueSearchQuery query);
+    Observable<VenueSearchResult> queryVenue(@Body VenueSearchQuery query);
 
 }

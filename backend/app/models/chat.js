@@ -8,39 +8,10 @@ const Schema = mongoose.Schema;
 // ---------------------------------------------------------------------------------------------------------------------
 
 const ChatSchema = new Schema({
-    messages: [{
-        type: String,
-        date: {
-            type: Date,
-            default: Date.now()
-        },
-        meta: [{
-            user: {
-                type: Schema.Types.ObjectId,
-                ref:'User'
-            },
-            read: Boolean,
-            delivered: Boolean
-        }]
-    }],
-    sender: {
+    participants: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
-    },
-    participants: [{
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-        },
-        read: Boolean,
-        delivered: Boolean
-
-    }],
-    is_group_message: {
-        type: Boolean,
-        default: false
-    }
-    //possible extensions: location where msg was sent, expiry date
+    }]
 });
 
 // ---------------------------------------------------------------------------------------------------------------------

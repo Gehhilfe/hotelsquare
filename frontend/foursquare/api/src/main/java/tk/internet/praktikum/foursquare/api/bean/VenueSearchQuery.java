@@ -5,11 +5,17 @@ public class VenueSearchQuery {
 
     private String keyword;
     private Location location;
+    private String locationName;
     private Integer radius;
 
     public VenueSearchQuery(String keyword, double longitude, double latitude) {
         this.keyword = keyword;
         this.location = new Location(longitude, latitude);
+    }
+
+    public VenueSearchQuery(String keyword, String locationName) {
+        this.keyword = keyword;
+        this.locationName = locationName;
     }
 
     public String getKeyword() {
@@ -34,5 +40,13 @@ public class VenueSearchQuery {
 
     public void setRadius(Integer radius) {
         this.radius = radius;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 }
