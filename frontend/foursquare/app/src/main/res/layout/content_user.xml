@@ -14,4 +14,11 @@
         android:layout_margin="@dimen/text_margin"
         android:text="@string/large_text" />
 
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/user_fragment_container">
+
+    </android.support.v4.view.ViewPager>
+
 </android.support.v4.widget.NestedScrollView>
