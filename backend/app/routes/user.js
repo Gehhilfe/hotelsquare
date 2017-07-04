@@ -19,25 +19,25 @@ const minioClient = new minio.Client({
 const handleValidation = (next, func) => {
     func().catch((error) => {
         switch (error.name) {
-            case 'MongoError':
-                if (error.errmsg.includes('name')) {
-                    return next(new ValidationError({
-                        name: {
-                            message: 'Name is already taken'
-                        }
-                    }));
-                }
-                if (error.errmsg.includes('email')) {
-                    return next(new ValidationError({
-                        email: {
-                            message: 'Email is already used'
-                        }
-                    }));
-                }
-                return next();
+        case 'MongoError':
+            if (error.errmsg.includes('name')) {
+                return next(new ValidationError({
+                    name: {
+                        message: 'Name is already taken'
+                    }
+                }));
+            }
+            if (error.errmsg.includes('email')) {
+                return next(new ValidationError({
+                    email: {
+                        message: 'Email is already used'
+                    }
+                }));
+            }
+            return next();
 
-            case 'ValidationError':
-                return next(new ValidationError(error.errors));
+        case 'ValidationError':
+            return next(new ValidationError(error.errors));
         }
     });
 };
