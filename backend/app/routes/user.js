@@ -19,23 +19,25 @@ const minioClient = new minio.Client({
 const handleValidation = (next, func) => {
     func().catch((error) => {
         switch (error.name) {
-        case 'MongoError':
-            if(error.errmsg.includes('name')) {
-                return next(new ValidationError({
-                    name: {
-                        message: 'Name is already taken'
-                    }}));
-            }
-            if(error.errmsg.includes('email')) {
-                return next(new ValidationError({
-                    email: {
-                        message: 'Email is already used'
-                    }}));
-            }
-            return next();
+            case 'MongoError':
+                if (error.errmsg.includes('name')) {
+                    return next(new ValidationError({
+                        name: {
+                            message: 'Name is already taken'
+                        }
+                    }));
+                }
+                if (error.errmsg.includes('email')) {
+                    return next(new ValidationError({
+                        email: {
+                            message: 'Email is already used'
+                        }
+                    }));
+                }
+                return next();
 
-        case 'ValidationError':
-            return next(new ValidationError(error.errors));
+            case 'ValidationError':
+                return next(new ValidationError(error.errors));
         }
     });
 };
@@ -49,11 +51,11 @@ const handleValidation = (next, func) => {
  * @returns {undefined}
  */
 async function search(request, response, next) {
-    let query = User.find({ name: new RegExp(request.body.name, 'i')  });
-    if(request.body.gender)
+    let query = User.find({name: new RegExp(request.body.name, 'i')});
+    if (request.body.gender)
         query = query.where('gender').equals(request.body.gender);
     let result = await query;
-    result =  result.map( (user) => {
+    result = result.map((user) => {
         const obj = user.toJSONPublic();
         obj.type = 'user';
         return obj;
@@ -200,8 +202,22 @@ function getAvatar(request, response, next) {
     // When no name provided use authenticated user
     if (request.params.name === undefined)
         request.params.name = request.authentication.name;
+    minioClient.statObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', (err, stat) => {
+        if (err)
+            return next(new restify.errors.NotFoundError());
+        else
+            minioClient.presignedGetObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', 30 * 60, (err, url) => {
+                if (err) {
+                    return next(new restify.errors.NotFoundError());
+                } else {
+                    response.redirect(url, next);
+                }
+            });
+    });
 
-    minioClient.getObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', (err, buffer) => {
+
+    /**
+     minioClient.getObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', (err, buffer) => {
         if (err) {
             response.send(404, '');
         } else {
@@ -210,6 +226,7 @@ function getAvatar(request, response, next) {
         }
         return next();
     });
+     */
 }
 
 /**
@@ -222,8 +239,8 @@ function getAvatar(request, response, next) {
  */
 async function sendFriendRequest(request, response, next) {
     const results = await Promise.all([
-        User.findOne({name: request.params.name, 'friend_requests.sender': { $in: [request.authentication._id]}}),
-        User.findOne({name: request.params.name, friends: { $in: [request.authentication._id]}})
+        User.findOne({name: request.params.name, 'friend_requests.sender': {$in: [request.authentication._id]}}),
+        User.findOne({name: request.params.name, friends: {$in: [request.authentication._id]}})
     ]);
     if (results[0] === null && results[1] == null) {
         const res = await User.findOne({name: request.params.name});
