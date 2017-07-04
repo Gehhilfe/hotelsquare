@@ -99,6 +99,11 @@ server.on('after', restifyBunyanLogger({
         return req.method === 'OPTIONS';
     },
     custom: function (req, res, route, err, log) {
+        
+        if(req.method !== 'GET') {
+            log.req.body = req.body;
+        }
+
         // This will not work when using gzip.
         log.res.length = res.get('Content-Length');
 

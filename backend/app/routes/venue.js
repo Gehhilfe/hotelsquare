@@ -106,6 +106,10 @@ async function queryVenue(request, response, next) {
     //search in our database for query
     const venues = await searchVenuesInDB(location, keyword, radius);
 
+    request.log.res.venues = _.map(venues, (e) => {
+        return e.name;
+    });
+
     response.send({
         location: location,
         locationName: locationName,
