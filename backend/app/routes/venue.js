@@ -153,7 +153,7 @@ function queryAllVenues(location, keyword, next_page_token = '') {
             location.coordinates[0]
         ],
         keyword: keyword,
-        radius: 5000,
+        rankby: 'distance',
         language: 'en'
     };
 
@@ -171,6 +171,7 @@ function queryAllVenues(location, keyword, next_page_token = '') {
                         resolve(_.concat(recvResult, res.results));
                     });
                 } else {
+                    console.log(JSON.stringify(res.results));
                     resolve(res.results);
                 }
             }
