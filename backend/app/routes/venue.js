@@ -12,6 +12,8 @@ const minio = require('minio');
 const VenueImages = require('../models/venueimages');
 const User = require('../models/user');
 
+const bucket_name_venues = "venue_images";
+
 const minioClient = new minio.Client({
     endPoint: 'stimi.ovh',
     port: 9000,
@@ -35,17 +37,17 @@ async function putImage(request, response, next) {
         .toFormat('jpeg')
         .toBuffer();
 
-    minioClient.bucketExists(request.body.venueid, function(err) {
+    minioClient.bucketExists(bucket_name_venues, function(err) {
         if(err){
             if(err.code == 'NoSuchBucket'){
-                minioClient.makeBucket(request.body.venueid, 'eu-west-1', function (err) {
+                minioClient.makeBucket(bucket_name_venues, 'eu-west-1', function (err) {
                     if(err) {
                         response.send(500, "new bucket could not be created");
                         return next();
                     }
                     let no = 0;
                     const imagename = 'venue_' + request.body.venueid + no.toString() + '.jpeg';
-                    minioClient.putObject(request.body.venueid, imagename, buffer, 'image/jpeg', (err, etag) => {
+                    minioClient.putObject(bucket_name_venues, imagename, buffer, 'image/jpeg', (err, etag) => {
                         if(err){
                             response.send(500, err);
                             return next();
@@ -63,9 +65,9 @@ async function putImage(request, response, next) {
                 })
             }
             if(err == null) {
-                let itemsinbucket = minioClient.listObjects(request.body.venueid, '', true).length();
+                let itemsinbucket = minioClient.listObjects(bucket_name_venues, '', true).length();
                 const imagename = 'venue_' + request.body.venueid + itemsinbucket.toString() + '.jpeg';
-                minioClient.putObject(request.body.venueid, imagename, buffer, 'image/jpeg', (err, etag) => {
+                minioClient.putObject(bucket_name_venues, imagename, buffer, 'image/jpeg', (err, etag) => {
                     if (err) {
                         response.send(500, err);
                         return next();
@@ -99,7 +101,7 @@ async function putImage(request, response, next) {
  * @returns {undefined}
  */
 function delImage(request, response, next) {
-    minioClient.bucketExists(request.body.venueid, function(err) {
+    minioClient.bucketExists(bucket_name_venues, function(err) {
         if(err) {
             if (err.code === 'NoSuchBucket') {
                 response.send('404', 'Bucket for ' + request.body.venueid + ' not found');
@@ -108,7 +110,7 @@ function delImage(request, response, next) {
             if(err === null){
                 VenueImages.findOne({ imagename: request.body.imagename}, function(err, obj) {
                     if(obj.name === request.authentication.name) {
-                        minioClient.removeObject(request.body.venueid, request.body.imagename, (err) => {
+                        minioClient.removeObject(bucket_name_venues, request.body.imagename, (err) => {
                             if (err) {
                                 response.send('404', 'Image for ' + request.body.imagename + ' not found');
                             } else {
@@ -128,14 +130,14 @@ function delImage(request, response, next) {
 }
 
 /**
- * Retrieves stored images for a venue
+ * Retrieves a list with all image names of a venue to be queried later on
  *
  * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
  */
-/**function getImages(request, response, next) {
+function getImageNames(request, response, next){
     // When no name provided return error
     if (request.params.venueid === undefined){
         response.send(404, 'you must request a valid venueid');
@@ -143,33 +145,51 @@ function delImage(request, response, next) {
     }
 
     let allimageurls = [];
-    let objectsstream = minioClient.listObjects(request.body.venueid, '', true);
+    let objectsstream = minioClient.listObjects(bucket_name_venues, '', true);
     objectsstream.on('data', function(obj) {
-        let publicurl = minioClient.protocol + '//' + minioClient.host + ':' + minioClient.port + '/' + request.body.venueid + '/' + obj.name;
-        assets.pust(publicurl);
+        let objectname = obj.name;
+        assets.pust(objectname);
     });
     objectsstream.on('error'), function(e){
-        response.send(500, ' error requesting minio image list for venue ' + request.body.venueid);
+        response.send(500, ' error requesting minio image list for venue ' + bucket_name_venues);
         return next();
     }
     objectsstream.on('end', function (e) {
-
-    })
-    minioClient.getObject(config.minio.bucket, 'venue_' + request.params.venuename + '.jpeg', (err, buffer) => {
-        if (buffer.length()<1) {
-            response.send(404, 'No image in database');
-            return next();
-        }
-
-        if (err) {
-            response.send(404, '');
-        } else {
-            response.setHeader('Content-Type', 'image/jpeg');
-            buffer.pipe(response);
-        }
+        response.json(assets);
         return next();
+    })
+    response.send(500, 'undefined internal error requesting image names of bucket ' + bucket_name_venues);
+    return next();
+}
+
+/**
+ * Retrieves stored images for a venue
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function getImage(request, response, next) {
+    // When no name provided return error
+    if (request.params.imagename === undefined){
+        response.send(404, 'you must request a valid venueid');
+        return next();
+    }
+
+    minioClient.statObject(bucket_name_venues, request.params.imagename, (err, stat) => {
+        if (err)
+            return next(new restify.errors.NotFoundError());
+        else
+            minioClient.presignedGetObject(bucket_name_venues, request.params.imagename, 30 * 60, (err, url) => {
+                if (err) {
+                    return next(new restify.errors.NotFoundError());
+                } else {
+                    response.redirect(url, next);
+                }
+            });
     });
-}*/
+}
 
 
 

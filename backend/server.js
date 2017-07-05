@@ -154,12 +154,10 @@ server.del('profile/avatar', auth, user.deleteAvatar);
 server.post('chats', auth, chat.newChat);
 
 server.post('chats/:chatId/messages', auth, chat.replyMessage);
-<<<<<<< HEAD
 
 server.get('chats/:chatId', auth, chat.getConversation);
 
 server.get('chats', auth, chat.getConversations);
-
 
 // Search
 
@@ -170,9 +168,9 @@ server.post('searches/venues', venue.queryVenue);
 
 
 server.post('venues/image', venue.putImage);
-server.get('venues/images', venue.getImages);
+server.get('venues/images', venue.getImage);
 server.del('venues/images', venue.delImage);
-=======
+server.get('venues/images', venue.getImageNames);
 
 server.get('chats/:chatId', auth, chat.getConversation);
 
@@ -185,8 +183,6 @@ server.get('chats', auth, chat.getConversations);
 server.post('searches/users', auth, user.search);
 // Venue
 server.post('searches/venues', venue.queryVenue);
-
->>>>>>> f253c0b49a10d75051bbc9ef0c792945ef7069da
 
 // Delete downloads
 server.on('after', (request) => {
