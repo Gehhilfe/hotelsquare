@@ -175,6 +175,7 @@ server.post('venues/dislike', auth, venue.dislike);
 server.post('searches/users', auth, user.search);
 // Venue
 server.post('searches/venues', venue.queryVenue);
+server.post('searches/venues/:page', venue.queryVenue);
 
 // Delete downloads
 server.on('after', (request) => {

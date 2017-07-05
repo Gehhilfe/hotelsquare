@@ -220,9 +220,8 @@ async function importGoogleResult(entry) {
 
 
 /**
- * queries for venues
+ * Search query for venues
  *
- * @function query
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler
@@ -232,6 +231,10 @@ async function queryVenue(request, response, next) {
     let location = request.body.location;
     let locationName = request.body.locationName;
     let radius = request.body.radius;
+    let page = 0;
+    if(request.params.page)
+        page = request.params.page;
+
     if (!radius) {
         radius = 5000;
     } else {
@@ -279,21 +282,23 @@ async function queryVenue(request, response, next) {
 
     if (closestSearch.length === 0) {
         //load all google results into database
-        const googleResults = await queryAllVenues(location, keyword);
+        const googleResults = await queryAllVenuesFromGoogle(location, keyword);
         await Promise.all(_.map(googleResults, importGoogleResult));
-        SearchRequest.create({
+        await SearchRequest.create({
             location: location,
             keyword: keyword
         });
     }
 
     //search in our database for query
-    const venues = await searchVenuesInDB(location, keyword, radius);
+    const venues = await searchVenuesInDB(location, keyword, radius, page, 20);
 
     response.send({
         location: location,
         locationName: locationName,
         radius: radius,
+        page: page,
+        limit: 20,
         results: venues
     });
     return next();
@@ -306,15 +311,17 @@ async function queryVenue(request, response, next) {
  * @param {Number[]} location center point
  * @param {string} keyword keyword
  * @param {Number} radius search radius
+ * @param {Number} page result page
+ * @param {Number} limit  number of results on page
  * @returns {Promise.<*>} result
  */
-function searchVenuesInDB(location, keyword = '', radius = 5000) {
+function searchVenuesInDB(location, keyword = '', radius = 5000, page = 0, limit = 20) {
     const query = Venue.find({
         $or: [
             {name: new RegExp(keyword, 'i')},
             {types: new RegExp(keyword, 'i')}
         ]
-    });
+    }).limit(limit).skip(page * limit);
     return query.where('location').near({
         center: location,
         maxDistance: radius
@@ -329,7 +336,7 @@ function searchVenuesInDB(location, keyword = '', radius = 5000) {
  * @param {string} next_page_token token for next result page
  * @returns {Promise} Lookup result
  */
-function queryAllVenues(location, keyword, next_page_token = '') {
+function queryAllVenuesFromGoogle(location, keyword, next_page_token = '') {
     const api = googleapilib(config.googleapi.GOOGLE_PLACES_API_KEY, config.googleapi.GOOGLE_PLACES_OUTPUT_FORMAT);
 
     const params = {
@@ -352,7 +359,7 @@ function queryAllVenues(location, keyword, next_page_token = '') {
                 reject(error);
             } else {
                 if (res.next_page_token && !_.isElement(res.next_page_token)) {
-                    queryAllVenues(location, keyword, res.next_page_token).then((recvResult) => {
+                    queryAllVenuesFromGoogle(location, keyword, res.next_page_token).then((recvResult) => {
                         resolve(_.concat(recvResult, res.results));
                     });
                 } else {
@@ -476,6 +483,6 @@ function delComment(request, response, next){
 }
 
 module.exports = {
-    queryVenue, queryAllVenues, searchVenuesInDB, getImage, getImageNames, delImage, putImage, like, dislike, addComment, getComments, delComment
+    queryVenue, queryAllVenuesFromGoogle, searchVenuesInDB, getImage, getImageNames, delImage, putImage, like, dislike, addComment, getComments, delComment
 };
 
