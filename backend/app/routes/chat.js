@@ -14,7 +14,7 @@ const User = require('../models/user');
  * @returns {undefined}
  */
 function newChat(request, response, next) {
-    if (!request.params.recipients) {
+    if (!request.body.recipients) {
         response.send(422, {error: 'You must at least have one recipient for the message.'});
         return next();
     }
@@ -34,7 +34,7 @@ function newChat(request, response, next) {
     //})
 
     const chat = new Chat({
-        participants: [request.authentication._id, request.params.recipients]
+        participants: [request.authentication._id, request.body.recipients]
     });
 
     chat.save((err, chat) => {

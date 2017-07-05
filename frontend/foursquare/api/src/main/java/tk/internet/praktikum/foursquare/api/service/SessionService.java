@@ -9,7 +9,7 @@ import tk.internet.praktikum.foursquare.api.bean.TokenInformation;
 
 public interface SessionService {
 
-    @POST("/session")
+    @POST("/sessions")
     Observable<TokenInformation> postSession(@Body LoginCredentials loginCredentials);
 
 }

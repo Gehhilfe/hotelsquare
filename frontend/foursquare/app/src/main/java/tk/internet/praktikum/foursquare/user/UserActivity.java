@@ -54,7 +54,7 @@ public class UserActivity extends AppCompatActivity {
     }
 
     private void initialiseFragmentContainer(ViewPager container) {
-        userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
+        //userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         container.setAdapter(userStatePagerAdapter);
     }

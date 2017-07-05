@@ -15,12 +15,11 @@ const GeocodeResult = require('../models/geocoderesult');
  * @returns {Promise.<void>} entry in out database
  */
 async function importGoogleResult(entry) {
-    //try {
-    //     const exisiting = await Venue.findOne({reference: entry.reference});
-    //}
-    //catch (err) {
-    //    console.log(err);
-    //}
+    // Check if venues is already existing
+    const existing = await Venue.find({place_id: entry.place_id});
+
+    if(existing.length > 0)
+        return;
 
     return await Venue.create({
         name: entry.name,
