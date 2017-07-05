@@ -42,7 +42,7 @@ describe('Session', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/session')
+                .post('/sessions')
                 .send(loginDetails)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -60,7 +60,7 @@ describe('Session', () => {
                 password: 'wrong'
             };
             request(server)
-                .post('/session')
+                .post('/sessions')
                 .send(loginDetails)
                 .end((err, res) => {
                     res.should.have.status(401);
