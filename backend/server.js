@@ -160,7 +160,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Session
-server.post('session', session.postSession);
+server.post('sessions', session.postSession);
 
 // User
 server.get('users', auth, user.profile);
