@@ -151,22 +151,19 @@ server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
 server.del('profile/avatar', auth, user.deleteAvatar);
 
-//Chat
-server.post('chats', auth, chat.newChat);
-
-server.post('chats/:chatId/messages', auth, chat.replyMessage);
-
+// Chat
 server.get('chats/:chatId', auth, chat.getConversation);
-
+server.post('chats', auth, chat.newChat);
+server.post('chats/:chatId/messages', auth, chat.replyMessage);
 server.get('chats', auth, chat.getConversations);
 
-//Venue
+// Venue
 server.post('venues/images', auth, venue.putImage);
 server.get('venues/images', auth, venue.getImage);
 server.del('venues/images', auth, venue.delImage);
 server.get('venues/imagenames', auth, venue.getImageNames);
 
-server.post('venues/comment', auth, venue.addComment);
+server.post('venues/:id/comments', auth, venue.addComment);
 server.get('venues/comments', venue.getComments);
 server.del('venues/comment', auth, venue.delComment);
 server.post('venues/like', auth, venue.like);

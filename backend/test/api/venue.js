@@ -25,58 +25,21 @@ const mochaAsync = (fn) => {
 
 describe('comment api query', () => {
 
-    let aVenue, bVenue;
+    let aVenue;
     let u;
     let token;
 
-    /**beforeEach((done) => {
-
-        Util.connectDatabase(mongoose).then(function () {
-            Venue.remove({}).then(() => {
-                User.remove({}).then(() => {
-                    User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'}).then((user) =>{
-                        u = user;
-                        token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
-
-                        Venue.create({
-                            name: 'aVenue',
-                            place_id: 'a',
-                            location: {
-                                type: 'Point',
-                                coordinates: [5, 5]
-                            }
-                        }).then((avenue) => {
-                            aVenue = avenue;
-                            Venue.create({
-                                name: 'bVenue',
-                                place_id: 'b',
-                                location: {
-                                    type: 'Point',
-                                    coordinates: [-5, -5]
-                                }
-                            }).then((bvenue) => {
-                                bVenue = bvenue;
-                                return done();
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });*/
-
-    beforeEach(mochaAsync(async() => {
+    beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
 
         await Util.connectDatabase(mongoose);
         await Venue.remove({});
         await User.remove({});
 
-        const user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
-        u = user;
+        u = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
         token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
 
-        const avenue = await Venue.create({
+        aVenue = await Venue.create({
             name: 'aVenue',
             place_id: 'a',
             location: {
@@ -84,60 +47,20 @@ describe('comment api query', () => {
                 coordinates: [5, 5]
             }
         });
-        aVenue = avenue;
-        const bvenue = Venue.create({
-            name: 'bVenue',
-            place_id: 'b',
-            location: {
-                type: 'Point',
-                coordinates: [-5, -5]
-            }
-        });
-        bVenue = bvenue;
     }));
 
     describe('POST comments to venue', () => {
-        it('should add a comment to aVenue', (done) => {
-            request(server)
-                .post('/venues/comment')
+        it('should add a comment to aVenue', (mochaAsync(async () => {
+            const res = await request(server)
+                .post('/venues/' + aVenue._id + '/comments')
                 .set('x-auth', token)
                 .send({
-                    venueid: 'a',
                     comment: 'this is a comment'
-                })
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    return done();
                 });
-        });
-
-        it('should add another comment to aVenue', (done) => {
-            request(server)
-                .post('/venues/comment')
-                .set('x-auth', token)
-                .send({
-                    venueid: 'a',
-                    comment: 'this is a second comment'
-                })
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    return done();
-                });
-        });
-
-        it('should add a comment to bVenue', (done) => {
-            request(server)
-                .post('/venues/comment')
-                .set('x-auth', token)
-                .send({
-                    venueid: 'b',
-                    comment: 'this is a comment'
-                })
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    return done();
-                });
-        });
+            res.should.have.status(200);
+            const v = await Venue.findOne({_id: aVenue._id});
+            v.comments.length.should.be.equal(1);
+        })));
     });
 });
 
