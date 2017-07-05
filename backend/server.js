@@ -151,13 +151,13 @@ server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 server.del('profile/avatar', auth, user.deleteAvatar);
 
 //Chat
-server.post('chat/:recipients', auth, chat.newChat);
+server.post('chats', auth, chat.newChat);
 
-server.post('chat/reply/:chatId', auth, chat.replyMessage);
+server.post('chats/:chatId/messages', auth, chat.replyMessage);
 
-server.get('chat/with/:chatId', auth, chat.getConversation);
+server.get('chats/:chatId', auth, chat.getConversation);
 
-server.get('chat/all', auth, chat.getConversations);
+server.get('chats', auth, chat.getConversations);
 
 
 // Search
