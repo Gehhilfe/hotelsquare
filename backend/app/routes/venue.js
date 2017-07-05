@@ -418,8 +418,16 @@ function dislike(request, response, next){
  */
 async function addComment(request, response, next){
     const venue = await Venue.findOne({place_id: request.body.venueid});
+        //if(err){
+        //    response.send(404, 'venue could not be found in database');
+        //    return next();
+        //}
     const user = await User.findOne({_id: request.authentication._id});
-    const comment = {'author': user.name, 'text': request.body.comment, 'likes': 0, 'dislikes': 0, 'date': Date.now()};
+            //if(err){
+            //    response.send(404, 'user could not be found in database');
+            //    return next();
+            //}
+    const comment = {'author': user, 'text': request.body.comment, 'likes': 0, 'dislikes': 0, 'date': Date.now()};
     venue.comments.push(comment);
     await venue.save();
     return next();

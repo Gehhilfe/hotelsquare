@@ -29,17 +29,54 @@ describe('comment api query', () => {
     let u;
     let token;
 
-    beforeEach(mochaAsync(async () => {
+    /**beforeEach((done) => {
+
+        Util.connectDatabase(mongoose).then(function () {
+            Venue.remove({}).then(() => {
+                User.remove({}).then(() => {
+                    User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'}).then((user) =>{
+                        u = user;
+                        token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
+
+                        Venue.create({
+                            name: 'aVenue',
+                            place_id: 'a',
+                            location: {
+                                type: 'Point',
+                                coordinates: [5, 5]
+                            }
+                        }).then((avenue) => {
+                            aVenue = avenue;
+                            Venue.create({
+                                name: 'bVenue',
+                                place_id: 'b',
+                                location: {
+                                    type: 'Point',
+                                    coordinates: [-5, -5]
+                                }
+                            }).then((bvenue) => {
+                                bVenue = bvenue;
+                                return done();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });*/
+
+    beforeEach(mochaAsync(async() => {
         mongoose.Promise = global.Promise;
 
         await Util.connectDatabase(mongoose);
         await Venue.remove({});
         await User.remove({});
 
-        u = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
-        token = await jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
+        const user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
+        u = user;
+        token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
 
-        aVenue = await Venue.create({
+        const avenue = await Venue.create({
             name: 'aVenue',
             place_id: 'a',
             location: {
@@ -47,8 +84,8 @@ describe('comment api query', () => {
                 coordinates: [5, 5]
             }
         });
-
-        bVenue = await Venue.create({
+        aVenue = avenue;
+        const bvenue = Venue.create({
             name: 'bVenue',
             place_id: 'b',
             location: {
@@ -56,6 +93,7 @@ describe('comment api query', () => {
                 coordinates: [-5, -5]
             }
         });
+        bVenue = bvenue;
     }));
 
     describe('POST comments to venue', () => {
@@ -71,7 +109,6 @@ describe('comment api query', () => {
                     res.should.have.status(200);
                     return done();
                 });
-            return done();
         });
 
         it('should add another comment to aVenue', (done) => {
@@ -86,7 +123,6 @@ describe('comment api query', () => {
                     res.should.have.status(200);
                     return done();
                 });
-            return done();
         });
 
         it('should add a comment to bVenue', (done) => {
@@ -101,10 +137,8 @@ describe('comment api query', () => {
                     res.should.have.status(200);
                     return done();
                 });
-            return done();
         });
     });
-
 });
 
 describe('google api query', () => {
