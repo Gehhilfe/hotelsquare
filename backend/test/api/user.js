@@ -448,7 +448,7 @@ describe('User', () => {
     describe('search', () => {
         it('should find both users', (done) => {
             request(server)
-                .post('/users')
+                .post('/searches/users')
                 .set('x-auth', token)
                 .send({ name: 'pet'})
                 .end((err, res) => {
@@ -460,7 +460,7 @@ describe('User', () => {
 
         it('should find only peter2', (done) => {
             request(server)
-                .post('/users')
+                .post('/searches/users')
                 .set('x-auth', token)
                 .send({ name: 'er2'})
                 .end((err, res) => {
@@ -472,7 +472,7 @@ describe('User', () => {
 
         it('should filter by gender male', (done) => {
             request(server)
-                .post('/users')
+                .post('/searches/users')
                 .set('x-auth', token)
                 .send({ name: 'p', gender: 'f'})
                 .end((err, res) => {
@@ -484,7 +484,7 @@ describe('User', () => {
 
         it('should filter by gender female', (done) => {
             request(server)
-                .post('/users')
+                .post('/searches/users')
                 .set('x-auth', token)
                 .send({ name: '2', gender: 'm'})
                 .end((err, res) => {
@@ -500,7 +500,7 @@ describe('User', () => {
 
             beforeEach((done) => {
                 request(server)
-                    .post('/users')
+                    .post('/searches/users')
                     .set('x-auth', token)
                     .send({ name: 'pet'})
                     .end((err, res) => {

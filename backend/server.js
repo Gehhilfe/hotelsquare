@@ -127,7 +127,6 @@ server.post('session', session.postSession);
 
 // User
 server.get('user', auth, user.profile);
-server.post('users', auth, user.search);
 
 server.get('user/:name', user.profile);
 server.get('user/:name/avatar', auth, user.getAvatar);
@@ -161,8 +160,14 @@ server.get('chat/with/:chatId', auth, chat.getConversation);
 
 server.get('chat/all', auth, chat.getConversations);
 
-//Venue
-server.post('venues/query', venue.queryVenue);
+
+// Search
+
+// User
+server.post('searches/users', auth, user.search);
+// Venue
+server.post('searches/venues', venue.queryVenue);
+
 
 // Delete downloads
 server.on('after', (request) => {
