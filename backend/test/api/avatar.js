@@ -58,30 +58,29 @@ describe('User Avatar', () => {
                 .attach('avatar', imagePath)
                 .end((err, res) => {
                     expect(err).to.be.null;
-                    res.should.have.status(200);
+                    res.status.should.be.equal(200);
                     return done();
                 });
         });
 
-        it('should retrieve stored image', (done) => {
+        it('should redirect to stored image', (done) => {
             request(server)
                 .get('/profile/avatar')
                 .set('x-auth', token)
                 .end((err, res) => {
                     expect(err).to.be.null;
-                    res.should.have.status(200);
-                    res.should.have.header('content-type', /jpeg/);
+                    res.status.should.be.equal(302);
                     return done();
                 });
         });
 
-        it('should respond with 404 when image not found', (done) => {
+        it('should respond with error when image not found', (done) => {
             request(server)
                 .get('/user/unknown/avatar')
                 .set('x-auth', token)
                 .end((err, res) => {
                     expect(err).to.be.null;
-                    res.should.have.status(404);
+                    res.status.should.be.not.equal(200);
                     return done();
                 });
         });
@@ -103,7 +102,7 @@ describe('User Avatar', () => {
                                 .set('x-auth', token)
                                 .end((err, res) => {
                                     expect(err).to.be.null;
-                                    res.should.have.status(404);
+                                    res.status.should.be.equal(404);
                                     return done();
                                 });
                         });

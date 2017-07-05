@@ -40,25 +40,13 @@ util.connectDatabase(mongoose).then(async () => {
         if (config.bootstrap) {
             if (config.bootstrap.User) {
                 await User.remove({});
-                util.bootstrap(User, config.bootstrap.User);
-                const peter = User.findOne({name: 'Peter'});
-                const admin = User.findOne({name: 'Admin'});
-                const janus = User.findOne({name: 'Janus'});
-                const waldi = User.findOne({name: 'Waldi'});
-                const rosamunde = User.findOne({name: 'Rosamunde'});
-                const birte = User.findOne({name: 'Birte'});
-                User.connectFriends(admin, peter);
-                User.connectFriends(admin, janus);
-                User.connectFriends(admin, waldi);
-                User.connectFriends(admin, rosamunde);
-                User.connectFriends(admin, birte);
-                User.connectFriends(peter, rosamunde);
-                User.connectFriends(waldi, peter);
-                User.connectFriends(waldi, rosamunde);
-                User.connectFriends(waldi, birte);
-                User.connectFriends(rosamunde, janus);
-                User.connectFriends(rosamunde, birte);
-                User.connectFriends(waldi, janus);
+                await util.bootstrap(User, config.bootstrap.User);
+            }
+            if(config.bootstrap.UserFriend) {
+                await util.bootstrapFriends(config.bootstrap.UserFriend);
+            }
+            if(config.bootstrap.UserFriendRequest) {
+                await util.bootstrapFriendRequets(config.bootstrap.UserFriendRequest);
             }
         }
     }
@@ -99,6 +87,11 @@ server.on('after', restifyBunyanLogger({
         return req.method === 'OPTIONS';
     },
     custom: function (req, res, route, err, log) {
+        
+        if(req.method !== 'GET') {
+            log.req.body = req.body;
+        }
+
         // This will not work when using gzip.
         log.res.length = res.get('Content-Length');
 
@@ -130,23 +123,21 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Session
-server.post('session', session.postSession);
+server.post('sessions', session.postSession);
 
 // User
-server.get('user', auth, user.profile);
-server.post('users', auth, user.search);
+server.get('users', auth, user.profile);
 
-server.get('user/:name', user.profile);
-server.get('user/:name/avatar', auth, user.getAvatar);
+server.get('users/:name', user.profile);
+server.get('users/:name/avatar', auth, user.getAvatar);
 
-server.post('user', user.register, (request, response, next) => {
+server.post('users', user.register, (request, response, next) => {
     io.sockets.emit('new user', 'hello');
 });
-server.post('user/:name/friend_requests', auth, user.sendFriendRequest);
+server.post('users/:name/friend_requests', auth, user.sendFriendRequest);
 
-server.put('user', auth, user.updateUser);
-
-server.del('user', auth, user.deleteUser);
+server.put('users', auth, user.updateUser);
+server.del('users', auth, user.deleteUser);
 
 server.get('profile', auth, user.profile);
 server.get('profile/avatar', auth, user.getAvatar);
@@ -160,16 +151,22 @@ server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 server.del('profile/avatar', auth, user.deleteAvatar);
 
 //Chat
-server.post('chat/:recipients', auth, chat.newChat);
+server.post('chats', auth, chat.newChat);
 
-server.post('chat/reply/:chatId', auth, chat.replyMessage);
+server.post('chats/:chatId/messages', auth, chat.replyMessage);
 
-server.get('chat/with/:chatId', auth, chat.getConversation);
+server.get('chats/:chatId', auth, chat.getConversation);
 
-server.get('chat/all', auth, chat.getConversations);
+server.get('chats', auth, chat.getConversations);
 
-//Venue
-server.post('venues/query', venue.queryVenue);
+
+// Search
+
+// User
+server.post('searches/users', auth, user.search);
+// Venue
+server.post('searches/venues', venue.queryVenue);
+
 
 // Delete downloads
 server.on('after', (request) => {

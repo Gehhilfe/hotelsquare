@@ -10,19 +10,11 @@ import java.util.List;
 
 public interface UserService {
     /**
-     * Retrieves profile of current authenticated user
-     *
-     * @return profile of authenticated user
-     */
-    @GET("profile")
-    Observable<User> profile();
-
-    /**
      * Retrives profile of user with name
      * @param name user name
      * @return profile of user
      */
-    @GET("user/{name}")
+    @GET("users/{name}")
     Observable<User> profile(@Path("name") String name);
 
     /**
@@ -30,7 +22,7 @@ public interface UserService {
      *
      * @return deleted user
      */
-    @DELETE("user")
+    @DELETE("users")
     Observable<User> deleteUser();
 
     /**
@@ -38,7 +30,7 @@ public interface UserService {
      * @param user user which will be registered
      * @return registered user
      */
-    @POST("user")
+    @POST("users")
     Observable<User> register(@Body User user);
 
     /**
@@ -48,7 +40,7 @@ public interface UserService {
      * @param user changed user
      * @return new user model
      */
-    @PUT("user")
+    @PUT("users")
     Observable<User> update(@Body User user);
 
     /**
@@ -56,21 +48,13 @@ public interface UserService {
      * @param name User name
      * @return profile of user
      */
-    @POST("user/{name}/friend_requests")
+    @POST("users/{name}/friend_requests")
     Observable<Object> sendFriendRequest(@Path("name") String name);
-
-    /**
-     * Answers pending friend request
-     * @param name User name of request sender
-     * @param response Accept or decline answer
-     */
-    @PUT("profile/friend_requests/{name}")
-    Observable<Object> answerFriendRequest(@Path("name") String name, @Body FriendRequestResponse response);
 
     /**
      * Search for users with a given name and gender
      * @param query Search query
      */
-    @POST("users")
+    @POST("searches/users")
     Observable<List<User>> search(@Body UserSearchQuery query);
 }
