@@ -126,19 +126,18 @@ if (process.env.NODE_ENV !== 'production') {
 server.post('session', session.postSession);
 
 // User
-server.get('user', auth, user.profile);
+server.get('users', auth, user.profile);
 
-server.get('user/:name', user.profile);
-server.get('user/:name/avatar', auth, user.getAvatar);
+server.get('users/:name', user.profile);
+server.get('users/:name/avatar', auth, user.getAvatar);
 
-server.post('user', user.register, (request, response, next) => {
+server.post('users', user.register, (request, response, next) => {
     io.sockets.emit('new user', 'hello');
 });
-server.post('user/:name/friend_requests', auth, user.sendFriendRequest);
+server.post('users/:name/friend_requests', auth, user.sendFriendRequest);
 
-server.put('user', auth, user.updateUser);
-
-server.del('user', auth, user.deleteUser);
+server.put('users', auth, user.updateUser);
+server.del('users', auth, user.deleteUser);
 
 server.get('profile', auth, user.profile);
 server.get('profile/avatar', auth, user.getAvatar);
