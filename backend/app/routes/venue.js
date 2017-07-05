@@ -11,8 +11,9 @@ const GeocodeResult = require('../models/geocoderesult');
 const minio = require('minio');
 const VenueImages = require('../models/venueimages');
 const User = require('../models/user');
+const sharp = require('sharp');
 
-const bucket_name_venues = "venue_images";
+const bucket_name_venues = 'venue_images';
 
 const minioClient = new minio.Client({
     endPoint: 'stimi.ovh',
@@ -32,20 +33,20 @@ const minioClient = new minio.Client({
  */
 async function putImage(request, response, next) {
     //Convert to jpeg
-    const buffer = await sharp(request.files.avatar.path)
+    const buffer = await sharp(request.files.venueimage.path)
         .resize(200, 200)
         .toFormat('jpeg')
         .toBuffer();
 
     minioClient.bucketExists(bucket_name_venues, function(err) {
         if(err){
-            if(err.code == 'NoSuchBucket'){
+            if(err.code === 'NoSuchBucket'){
                 minioClient.makeBucket(bucket_name_venues, 'eu-west-1', function (err) {
                     if(err) {
-                        response.send(500, "new bucket could not be created");
+                        response.send(500, 'new bucket could not be created');
                         return next();
                     }
-                    let no = 0;
+                    const no = 0;
                     const imagename = 'venue_' + request.body.venueid + no.toString() + '.jpeg';
                     minioClient.putObject(bucket_name_venues, imagename, buffer, 'image/jpeg', (err, etag) => {
                         if(err){
@@ -61,11 +62,11 @@ async function putImage(request, response, next) {
                             response.json(etag);
                             return next();
                         }
-                    })
-                })
+                    });
+                });
             }
-            if(err == null) {
-                let itemsinbucket = minioClient.listObjects(bucket_name_venues, '', true).length();
+            if(err === null) {
+                const itemsinbucket = minioClient.listObjects(bucket_name_venues, '', true).length();
                 const imagename = 'venue_' + request.body.venueid + itemsinbucket.toString() + '.jpeg';
                 minioClient.putObject(bucket_name_venues, imagename, buffer, 'image/jpeg', (err, etag) => {
                     if (err) {
@@ -82,7 +83,7 @@ async function putImage(request, response, next) {
                             return next();
                         });
                     }
-                })
+                });
             }
             response.send(500, err);
             return next();
@@ -144,20 +145,20 @@ function getImageNames(request, response, next){
         return next();
     }
 
-    let allimageurls = [];
-    let objectsstream = minioClient.listObjects(bucket_name_venues, '', true);
+    const allimageurls = [];
+    const objectsstream = minioClient.listObjects(bucket_name_venues, '', true);
     objectsstream.on('data', function(obj) {
-        let objectname = obj.name;
-        assets.pust(objectname);
+        const objectname = obj.name;
+        allimageurls.put(objectname);
     });
-    objectsstream.on('error'), function(e){
+    objectsstream.on('error', function(e){
         response.send(500, ' error requesting minio image list for venue ' + bucket_name_venues);
         return next();
-    }
+    });
     objectsstream.on('end', function (e) {
-        response.json(assets);
+        response.json(allimageurls);
         return next();
-    })
+    });
     response.send(500, 'undefined internal error requesting image names of bucket ' + bucket_name_venues);
     return next();
 }
@@ -362,7 +363,129 @@ function queryAllVenues(location, keyword, next_page_token = '') {
     });
 }
 
+/**
+ * adds a like to a comment of a venue
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function like(request, response, next){
+    Venue.findOne({place_id: request.body.venueid}, (err, obj) => {
+        if(err){
+            response.send(404, 'venue could not be found');
+            return next();
+        }
+        let comment = obj.comments.find({text: request.body.comment});
+        comment.likes += 1;
+        obj.comments = comment;
+        obj.save();
+        response.json({message: 'likes: ' + comment.likes});
+        return next();
+    });
+}
+
+/**
+ * adds a dislike to a comment of a venue
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function dislike(request, response, next){
+    Venue.findOne({place_id: request.body.venueid}, (err, obj) => {
+        if(err){
+            response.send(404, 'venue could not be found');
+            return next();
+        }
+        let comment = obj.comments.find({text: request.body.comment});
+        comment.dislikes += 1;
+        obj.comments = comment;
+        obj.save();
+        response.json({message: 'dislikes: ' + comment.dislikes});
+        return next();
+    });
+}
+
+/**
+ * adds a comment to a venue
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function addComment(request, response, next){
+    Venue.findOne({place_id: request.body.venueid}, (err, venue) => {
+        if(err){
+            response.send(404, 'venue could not be found in database');
+            return next();
+        }
+        User.findOne({'user_id': request.authentication._id}, (err, obj) => {
+            if(err){
+                response.send(404, 'user could not be found in database');
+                return next();
+            }
+            const comment = {'author': obj.name, 'text': request.body.comment, 'likes': 0, 'dislikes': 0, 'date': Date.now()};
+            venue.comments.push(comment);
+            venue.save();
+            return next();
+        });
+    });
+}
+
+/**
+ * gets comments of a venue
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function getComments(request, response, next){
+    Venue.findOne({place_id: request.body.venueid}, (err, obj) => {
+        if(err){
+            response.send(404, 'venue could not be found in database');
+            return next();
+        }
+        response.json(obj.comments);
+        return next();
+    });
+}
+
+/**
+ * deletes comment of a venue if the requesting person is the author
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+function delComment(request, response, next){
+    Venue.findOne({place_id: request.body.venueid}, (err, venue) => {
+        if(err){
+            response.send(404, 'venue could not be found in database');
+            return next();
+        }
+        User.findOne({'user_id': request.authentication._id}, (err, obj) => {
+            if(err){
+                response.send(404, 'user could not be found in database');
+                return next();
+            }
+            let comment = obj.comments.find({text: request.body.comment});
+            if(comment.author._id.equals(obj._id)){
+                obj.comments.pull({'text': request.body.comment});
+                obj.save();
+            }
+            response.send(200, 'comment deleted');
+            return next();
+        });
+    });
+}
+
 module.exports = {
-    queryVenue, queryAllVenues, searchVenuesInDB
+    queryVenue, queryAllVenues, searchVenuesInDB, getImage, getImageNames, delImage, putImage, like, dislike, addComment, getComments
 };
 

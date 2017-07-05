@@ -159,23 +159,17 @@ server.get('chats/:chatId', auth, chat.getConversation);
 
 server.get('chats', auth, chat.getConversations);
 
-// Search
-
-// User
-server.post('searches/users', auth, user.search);
-// Venue
-server.post('searches/venues', venue.queryVenue);
-
-
-server.post('venues/image', venue.putImage);
+//Venue
+server.post('venues/images', venue.putImage);
 server.get('venues/images', venue.getImage);
 server.del('venues/images', venue.delImage);
-server.get('venues/images', venue.getImageNames);
+server.get('venues/imagenames', venue.getImageNames);
 
-server.get('chats/:chatId', auth, chat.getConversation);
-
-server.get('chats', auth, chat.getConversations);
-
+server.post('venues/comment', venue.addComment);
+server.get('venues/comments', venue.getComments);
+server.del('venues/comment', venue.delComment);
+server.post('venues/like', venue.like);
+server.post('venues/dislike', venue.dislike);
 
 // Search
 

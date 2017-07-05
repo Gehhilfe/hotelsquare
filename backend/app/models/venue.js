@@ -22,8 +22,14 @@ const VenueSchema = new Schema({
             ref: 'User'
         },
         text: String,
-        likes: Number,
-        dislikes: Number,
+        likes: {
+            type: Number,
+            default: 0
+        },
+        dislikes: {
+            type: Number,
+            default: 0
+        },
         date: {
             type: Date,
             default: Date.now()
@@ -32,7 +38,10 @@ const VenueSchema = new Schema({
             type: Boolean,
             default: false
         },
-        imagenames: String
+        imagename: {
+            type: String,
+            default: ''
+        }
     }]
 });
 
