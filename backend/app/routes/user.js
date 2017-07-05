@@ -202,7 +202,7 @@ function getAvatar(request, response, next) {
     // When no name provided use authenticated user
     if (request.params.name === undefined)
         request.params.name = request.authentication.name;
-    minioClient.statObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', (err, stat) => {
+    minioClient.statObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', (err) => {
         if (err)
             return next(new restify.errors.NotFoundError());
         else

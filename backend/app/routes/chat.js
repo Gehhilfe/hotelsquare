@@ -1,9 +1,6 @@
 'use strict';
-
-const restify = require('restify');
 const Chat = require('../models/chat');
 const Message = require('../models/message');
-const User = require('../models/user');
 
 /**
  * Starts new Chat
@@ -49,7 +46,7 @@ function newChat(request, response, next) {
             sender: request.authentication._id
         });
 
-        msg.save((err, new_msg) => {
+        msg.save((err) => {
             if (err) {
                 response.send({error: err});
                 return next();
@@ -79,7 +76,7 @@ function replyMessage(request, response, next) {
         date: Date.now()
     });
 
-    reply.save((err, new_reply) => {
+    reply.save((err) => {
         if (err) {
             response.send({error: err});
             return next();

@@ -133,6 +133,7 @@ server.get('users/:name/avatar', auth, user.getAvatar);
 
 server.post('users', user.register, (request, response, next) => {
     io.sockets.emit('new user', 'hello');
+    return next();
 });
 server.post('users/:name/friend_requests', auth, user.sendFriendRequest);
 
