@@ -9,7 +9,6 @@ const Chat = require('../../app/models/chat');
 const Message = require('../../app/models/message');
 const User = require('../../app/models/user');
 const jsonwt = require('jsonwebtoken');
-const expect = chai.expect;
 chai.should();
 chai.use(chaiHttp);
 chai.use(require('chai-things'));
@@ -151,7 +150,6 @@ describe('Chat', () => {
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    console.log(res.body);
                     res.body.chats[0].length.should.be.eql(1);
                     res.body.chats.length.should.be.eql(2);
                     return done();
