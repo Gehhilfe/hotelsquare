@@ -15,7 +15,34 @@ const VenueSchema = new Schema({
     location: {
         'type': { type: String, default: 'Point' },
         coordinates: { type: [Number], default: [0, 0] }
-    }
+    },
+    comments: [{
+        author: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        text: String,
+        likes: {
+            type: Number,
+            default: 0
+        },
+        dislikes: {
+            type: Number,
+            default: 0
+        },
+        date: {
+            type: Date,
+            default: Date.now()
+        },
+        isimage: {
+            type: Boolean,
+            default: false
+        },
+        imagename: {
+            type: String,
+            default: ''
+        }
+    }]
 });
 
 
@@ -28,6 +55,13 @@ VenueSchema.index({location: '2dsphere'});
 
 class VenueClass {
 
+    toJSONSearchResult() {
+        return {
+            _id: this._id,
+            name: this.name,
+            location: this.location
+        };
+    }
 }
 
 VenueSchema.loadClass(VenueClass);

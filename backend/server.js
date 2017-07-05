@@ -133,6 +133,7 @@ server.get('users/:name/avatar', auth, user.getAvatar);
 
 server.post('users', user.register, (request, response, next) => {
     io.sockets.emit('new user', 'hello');
+    return next();
 });
 server.post('users/:name/friend_requests', auth, user.sendFriendRequest);
 
@@ -150,15 +151,24 @@ server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
 server.del('profile/avatar', auth, user.deleteAvatar);
 
-//Chat
-server.post('chats', auth, chat.newChat);
-
-server.post('chats/:chatId/messages', auth, chat.replyMessage);
-
+// Chat
 server.get('chats/:chatId', auth, chat.getConversation);
-
+server.post('chats', auth, chat.newChat);
+server.post('chats/:chatId/messages', auth, chat.replyMessage);
 server.get('chats', auth, chat.getConversations);
 
+// Venue
+server.get('venues/:id', venue.getVenue);
+server.post('venues/images', auth, venue.putImage);
+server.get('venues/images', auth, venue.getImage);
+server.del('venues/images', auth, venue.delImage);
+server.get('venues/imagenames', auth, venue.getImageNames);
+
+server.post('venues/:id/comments', auth, venue.addComment);
+server.get('venues/comments', venue.getComments);
+server.del('venues/comment', auth, venue.delComment);
+server.post('venues/like', auth, venue.like);
+server.post('venues/dislike', auth, venue.dislike);
 
 // Search
 
@@ -166,7 +176,7 @@ server.get('chats', auth, chat.getConversations);
 server.post('searches/users', auth, user.search);
 // Venue
 server.post('searches/venues', venue.queryVenue);
-
+server.post('searches/venues/:page', venue.queryVenue);
 
 // Delete downloads
 server.on('after', (request) => {
