@@ -40,50 +40,13 @@ util.connectDatabase(mongoose).then(async () => {
         if (config.bootstrap) {
             if (config.bootstrap.User) {
                 await User.remove({});
-                util.bootstrap(User, config.bootstrap.User);
-                let peter = User.findOne({name: 'Peter'});
-                let admin = User.findOne({name: 'Admin'});
-                let janus = User.findOne({name: 'Janus'});
-                let waldi = User.findOne({name: 'Waldi'});
-                let rosamunde = User.findOne({name: 'Rosamunde'});
-                let birte = User.findOne({name: 'Birte'});
-                admin, peter = User.connectFriends(admin, peter);
-                User.update(admin);
-                User.update(peter);
-                [admin, janus] = User.connectFriends(admin, janus);
-                User.update(admin);
-                User.update(janus);
-                [admin, waldi] = User.connectFriends(admin, waldi);
-                User.update(admin);
-                User.update(waldi);
-                [admin, rosamunde] = User.connectFriends(admin, rosamunde);
-                User.update(admin);
-                User.update(rosamunde);
-                [admin, birte] = User.connectFriends(admin, birte);
-                User.update(admin);
-                User.update(birte);
-                [admin, rosamunde] = User.connectFriends(peter, rosamunde);
-                User.update(peter);
-                User.update(rosamunde);
-                [waldi, peter] = User.connectFriends(waldi, peter);
-                User.update(waldi);
-                User.update(peter);
-                [waldi, rosamunde] = User.connectFriends(waldi, rosamunde);
-                User.update(waldi);
-                User.update(rosamunde);
-                [waldi, birte] = User.connectFriends(waldi, birte);
-                User.update(waldi);
-                User.update(birte);
-                [rosamunde, janus] = User.connectFriends(rosamunde, janus);
-                User.update(rosamunde);
-                User.update(janus);
-                [rosamunde, birte] = User.connectFriends(rosamunde, birte);
-                User.update(rosamunde);
-                User.update(birte);
-                [waldi, janus] = User.connectFriends(waldi, janus);
-                User.update(waldi);
-                User.update(janus);
-
+                await util.bootstrap(User, config.bootstrap.User);
+            }
+            if(config.bootstrap.UserFriend) {
+                await util.bootstrapFriends(config.bootstrap.UserFriend);
+            }
+            if(config.bootstrap.UserFriendRequest) {
+                await util.bootstrapFriendRequets(config.bootstrap.UserFriendRequest);
             }
         }
     }
@@ -191,6 +154,7 @@ server.del('profile/avatar', auth, user.deleteAvatar);
 server.post('chats', auth, chat.newChat);
 
 server.post('chats/:chatId/messages', auth, chat.replyMessage);
+<<<<<<< HEAD
 
 server.get('chats/:chatId', auth, chat.getConversation);
 
@@ -208,6 +172,21 @@ server.post('searches/venues', venue.queryVenue);
 server.post('venues/image', venue.putImage);
 server.get('venues/images', venue.getImages);
 server.del('venues/images', venue.delImage);
+=======
+
+server.get('chats/:chatId', auth, chat.getConversation);
+
+server.get('chats', auth, chat.getConversations);
+
+
+// Search
+
+// User
+server.post('searches/users', auth, user.search);
+// Venue
+server.post('searches/venues', venue.queryVenue);
+
+>>>>>>> f253c0b49a10d75051bbc9ef0c792945ef7069da
 
 // Delete downloads
 server.on('after', (request) => {
