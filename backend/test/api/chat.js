@@ -16,6 +16,15 @@ chai.use(require('chai-things'));
 
 const request = require('supertest');
 
+const mochaAsync = (fn) => {
+    return (done) => {
+        fn.call().then(done, (err) => {
+            return done(err);
+        });
+    };
+};
+
+
 describe('Chat', () => {
 
     let u;
@@ -29,39 +38,33 @@ describe('Chat', () => {
     let message;
     let othermessage;
 
-    beforeEach((done) => {
-        Util.connectDatabase(mongoose).then(function () {
-            User.remove({}).then(() => {
-                User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99', gender: 'm'}).then((user) => {
-                    u = user;
-                    token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
-                    User.create({name: 'peter2', email: 'peter2@cool.de', password: 'peter99', gender: 'f'}).then((user) => {
-                        other = user;
-                        otherToken = jsonwt.sign(other.toJSON(), config.jwt.secret, config.jwt.options);
-                        User.create({name: 'peter3', email: 'peter3@cool.de', password: 'peter99', gender: 'unspecified'}).then((user) => {
-                            third = user;
-                            thirdToken = jsonwt.sign(third.toJSON(), config.jwt.secret, config.jwt.options);
-                            Chat.remove({}).then(() => {
-                                Chat.create({participants: [u, other]}).then((c) => {
-                                    chat = c;
-                                    Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id}).then((msg) => {
-                                        message = msg;
-                                        Chat.create({participants: [u, other, third]}).then((c) => {
-                                            otherchat = c;
-                                            Message.create({sender: other, message: 'second chat', date: Date.now(), chatId: otherchat._id}).then((msg) => {
-                                                othermessage = msg;
-                                                return done();
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
+    beforeEach(mochaAsync(async () => {
+        mongoose.Promise = global.Promise;
+
+        await Util.connectDatabase(mongoose);
+        await Promise.all([
+            User.remove({}),
+            Chat.remove({})
+        ]);
+
+        const users = await Promise.all([
+            User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99', gender: 'm'}),
+            User.create({name: 'peter2', email: 'peter2@cool.de', password: 'peter99', gender: 'f'}),
+            User.create({name: 'peter3', email: 'peter3@cool.de', password: 'peter99', gender: 'unspecified'})
+        ]);
+
+        u = users[0];
+        token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
+        other = users[0];
+        otherToken = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
+        third = users[0];
+        thirdToken = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
+
+        chat = await Chat.create({participants: [u, other]});
+        otherchat = await Chat.create({participants: [u, other, third]});
+        message = await Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id});
+        othermessage = await Message.create({sender: other, message: 'second chat', date: Date.now(), chatId: otherchat._id});
+    }));
 
     describe('GET chat', () => {
         it('should retrieve the respective chat history of the passed id', (done) => {
