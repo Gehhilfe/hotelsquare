@@ -40,7 +40,7 @@ describe('User', () => {
     describe('GET user', () => {
         it('should retrieve user information when name given', (done) => {
             request(server)
-                .get('/user/'+u.name)
+                .get('/users/'+u.name)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
@@ -52,7 +52,7 @@ describe('User', () => {
 
         it('should respond with 404 if user is unkown', (done) => {
             request(server)
-                .get('/user/unkown')
+                .get('/users/unkown')
                 .end((err, res) => {
                     res.should.have.status(404);
                     return done();
@@ -61,7 +61,7 @@ describe('User', () => {
 
         it('should retrieve own user information when authenticated and no name given', (done) => {
             request(server)
-                .get('/user')
+                .get('/users')
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -79,7 +79,7 @@ describe('User', () => {
             const before_updated_at = u.updated_at;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', token)
                 .send({gender: 'm'})
                 .end((err, res) => {
@@ -96,7 +96,7 @@ describe('User', () => {
             const before_location = u.location.coordinates;
             
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', token)
                 .send({location:{ coordinates: [1.0, 1.0]}})
                 .end((err, res) => {
@@ -113,7 +113,7 @@ describe('User', () => {
             const before_password = u.password;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', token)
                 .send({password: 'leetpassword'})
                 .end((err, res) => {
@@ -129,7 +129,7 @@ describe('User', () => {
             const before_password = u.password;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', token)
                 .send({gender: 's'})
                 .end((err, res) => {
@@ -146,7 +146,7 @@ describe('User', () => {
             const before_password = u.password;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', token)
                 .send({password: 'short'})
                 .end((err, res) => {
@@ -163,7 +163,7 @@ describe('User', () => {
             const before_updated_at = u.updated_at;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', token)
                 .send({})
                 .end((err, res) => {
@@ -184,7 +184,7 @@ describe('User', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -199,7 +199,7 @@ describe('User', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -215,7 +215,7 @@ describe('User', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -230,7 +230,7 @@ describe('User', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -244,7 +244,7 @@ describe('User', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -258,7 +258,7 @@ describe('User', () => {
                 name: 'test'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -271,7 +271,7 @@ describe('User', () => {
 
         it('should delete user if authenticated', (done) => {
             request(server)
-                .delete('/user')
+                .delete('/users')
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -336,7 +336,7 @@ describe('User', () => {
     describe('friend requests', () => {
         it('should be able to send a friend request', (done) => {
             request(server)
-                .post('/user/'+other.name+'/friend_requests')
+                .post('/users/'+other.name+'/friend_requests')
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -368,7 +368,7 @@ describe('User', () => {
 
             it('should not add another request', (done) => {
                 request(server)
-                    .post('/user/'+other.name+'/friend_requests')
+                    .post('/users/'+other.name+'/friend_requests')
                     .set('x-auth', token)
                     .end((err, res) => {
                         res.should.have.status(400);
@@ -432,7 +432,7 @@ describe('User', () => {
 
             it('should result in error', (done) => {
                 request(server)
-                    .post('/user/'+other.name+'/friend_requests')
+                    .post('/users/'+other.name+'/friend_requests')
                     .set('x-auth', token)
                     .end((err, res) => {
                         res.should.have.status(400);
