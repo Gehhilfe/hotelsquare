@@ -158,6 +158,7 @@ server.post('chats/:chatId/messages', auth, chat.replyMessage);
 server.get('chats', auth, chat.getConversations);
 
 // Venue
+server.get('venues/:id', venue.getVenue);
 server.post('venues/images', auth, venue.putImage);
 server.get('venues/images', auth, venue.getImage);
 server.del('venues/images', auth, venue.delImage);

@@ -23,7 +23,7 @@ const mochaAsync = (fn) => {
     };
 };
 
-describe('comment api query', () => {
+describe('venue', () => {
 
     let aVenue;
     let u;
@@ -49,6 +49,15 @@ describe('comment api query', () => {
         });
     }));
 
+    it('GET venue details', (mochaAsync(async () => {
+        const res = await request(server)
+            .get('/venues/' + aVenue._id + '');
+        res.should.have.status(200);
+        res.body.should.have.property('name');
+        res.body.should.have.property('location');
+        res.body.should.have.property('comments');
+    })));
+
     describe('POST comments to venue', () => {
         it('should add a comment to aVenue', (mochaAsync(async () => {
             const res = await request(server)
@@ -64,7 +73,7 @@ describe('comment api query', () => {
     });
 });
 
-describe('google api query', () => {
+describe('venue search', () => {
 
     before(async () => {
         mongoose.Promise = global.Promise;
@@ -88,6 +97,7 @@ describe('google api query', () => {
             })
             .end((err, res) => {
                 res.should.have.status(200);
+                res.body.results.should.all.not.have.property('comments');
                 return done();
             });
     });

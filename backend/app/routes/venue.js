@@ -24,6 +24,20 @@ const minioClient = new minio.Client({
 });
 
 /**
+ * Get details for a given venue id
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function getVenue(request, response, next) {
+    const venue = await Venue.findOne({_id: request.params.id});
+    response.send(venue);
+    return next();
+}
+
+/**
  * Uploads an image for a venue to the database
  *
  * @param {IncomingMessage} request request
@@ -38,18 +52,18 @@ async function putImage(request, response, next) {
         .toFormat('jpeg')
         .toBuffer();
 
-    minioClient.bucketExists(bucket_name_venues, function(err) {
-        if(err){
-            if(err.code === 'NoSuchBucket'){
+    minioClient.bucketExists(bucket_name_venues, function (err) {
+        if (err) {
+            if (err.code === 'NoSuchBucket') {
                 minioClient.makeBucket(bucket_name_venues, 'eu-west-1', function (err) {
-                    if(err) {
+                    if (err) {
                         response.send(500, 'new bucket could not be created');
                         return next();
                     }
                     const no = 0;
                     const imagename = 'venue_' + request.body.venueid + no.toString() + '.jpeg';
                     minioClient.putObject(bucket_name_venues, imagename, buffer, 'image/jpeg', (err, etag) => {
-                        if(err){
+                        if (err) {
                             response.send(500, err);
                             return next();
                         } else {
@@ -65,7 +79,7 @@ async function putImage(request, response, next) {
                     });
                 });
             }
-            if(err === null) {
+            if (err === null) {
                 const itemsinbucket = minioClient.listObjects(bucket_name_venues, '', true).length();
                 const imagename = 'venue_' + request.body.venueid + itemsinbucket.toString() + '.jpeg';
                 minioClient.putObject(bucket_name_venues, imagename, buffer, 'image/jpeg', (err, etag) => {
@@ -102,15 +116,15 @@ async function putImage(request, response, next) {
  * @returns {undefined}
  */
 function delImage(request, response, next) {
-    minioClient.bucketExists(bucket_name_venues, function(err) {
-        if(err) {
+    minioClient.bucketExists(bucket_name_venues, function (err) {
+        if (err) {
             if (err.code === 'NoSuchBucket') {
                 response.send('404', 'Bucket for ' + request.body.venueid + ' not found');
                 return next();
             }
-            if(err === null){
-                VenueImages.findOne({ imagename: request.body.imagename}, function(err, obj) {
-                    if(obj.name === request.authentication.name) {
+            if (err === null) {
+                VenueImages.findOne({imagename: request.body.imagename}, function (err, obj) {
+                    if (obj.name === request.authentication.name) {
                         minioClient.removeObject(bucket_name_venues, request.body.imagename, (err) => {
                             if (err) {
                                 response.send('404', 'Image for ' + request.body.imagename + ' not found');
@@ -138,20 +152,20 @@ function delImage(request, response, next) {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function getImageNames(request, response, next){
+function getImageNames(request, response, next) {
     // When no name provided return error
-    if (request.params.venueid === undefined){
+    if (request.params.venueid === undefined) {
         response.send(404, 'you must request a valid venueid');
         return next();
     }
 
     const allimageurls = [];
     const objectsstream = minioClient.listObjects(bucket_name_venues, '', true);
-    objectsstream.on('data', function(obj) {
+    objectsstream.on('data', function (obj) {
         const objectname = obj.name;
         allimageurls.put(objectname);
     });
-    objectsstream.on('error', function(e){
+    objectsstream.on('error', function (e) {
         response.send(500, ' error requesting minio image list for venue ' + bucket_name_venues);
         return next();
     });
@@ -173,7 +187,7 @@ function getImageNames(request, response, next){
  */
 function getImage(request, response, next) {
     // When no name provided return error
-    if (request.params.imagename === undefined){
+    if (request.params.imagename === undefined) {
         response.send(404, 'you must request a valid venueid');
         return next();
     }
@@ -193,7 +207,6 @@ function getImage(request, response, next) {
 }
 
 
-
 /**
  * Imports/Updates a google result into our database
  * @param {Object} entry result entry
@@ -203,7 +216,7 @@ async function importGoogleResult(entry) {
     // Check if venues is already existing
     const existing = await Venue.find({place_id: entry.place_id});
 
-    if(existing.length > 0)
+    if (existing.length > 0)
         return;
 
     return await Venue.create({
@@ -232,7 +245,7 @@ async function queryVenue(request, response, next) {
     let locationName = request.body.locationName;
     let radius = request.body.radius;
     let page = 0;
-    if(request.params.page)
+    if (request.params.page)
         page = request.params.page;
 
     if (!radius) {
@@ -380,9 +393,9 @@ function queryAllVenuesFromGoogle(location, keyword, next_page_token = '') {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function like(request, response, next){
+async function like(request, response, next) {
     const venue = await Venue.findOne({place_id: request.body.venueid});
-    if(venue){
+    if (venue) {
         const comment = await venue.comments.find({text: request.body.comment});
         comment.likes += 1;
         venue.comments = comment;
@@ -402,9 +415,9 @@ async function like(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function dislike(request, response, next){
+function dislike(request, response, next) {
     Venue.findOne({place_id: request.body.venueid}, (err, obj) => {
-        if(err){
+        if (err) {
             response.send(404, 'venue could not be found');
             return next();
         }
@@ -425,7 +438,7 @@ function dislike(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function addComment(request, response, next){
+async function addComment(request, response, next) {
     const venue = await Venue.findOne({_id: request.params.id});
     const user = await User.findOne({_id: request.authentication._id});
     const comment = {'author': user, 'text': request.body.comment, 'likes': 0, 'dislikes': 0, 'date': Date.now()};
@@ -443,9 +456,9 @@ async function addComment(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function getComments(request, response, next){
+function getComments(request, response, next) {
     Venue.findOne({place_id: request.body.venueid}, (err, obj) => {
-        if(err){
+        if (err) {
             response.send(404, 'venue could not be found in database');
             return next();
         }
@@ -462,19 +475,19 @@ function getComments(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function delComment(request, response, next){
+function delComment(request, response, next) {
     Venue.findOne({place_id: request.body.venueid}, (err, venue) => {
-        if(err){
+        if (err) {
             response.send(404, 'venue could not be found in database');
             return next();
         }
         User.findOne({_id: request.authentication._id}, (err, obj) => {
-            if(err){
+            if (err) {
                 response.send(404, 'user could not be found in database');
                 return next();
             }
             const comment = obj.comments.find({text: request.body.comment});
-            if(comment.author._id.equals(obj._id)){
+            if (comment.author._id.equals(obj._id)) {
                 obj.comments.pull({'text': request.body.comment});
                 obj.save();
             }
@@ -485,6 +498,18 @@ function delComment(request, response, next){
 }
 
 module.exports = {
-    queryVenue, queryAllVenuesFromGoogle, searchVenuesInDB, getImage, getImageNames, delImage, putImage, like, dislike, addComment, getComments, delComment
+    queryVenue,
+    queryAllVenuesFromGoogle,
+    searchVenuesInDB,
+    getImage,
+    getImageNames,
+    delImage,
+    putImage,
+    like,
+    dislike,
+    addComment,
+    getComments,
+    delComment,
+    getVenue
 };
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
@@ -27,4 +28,13 @@ public interface VenueService {
      */
     @POST("searches/venues")
     Observable<VenueSearchResult> queryVenue(@Body VenueSearchQuery query);
+
+    /**
+     * Retrieves detailed information
+     *
+     * @param id venue id
+     * @return detail information
+     */
+    @GET("venues/{id}")
+    Observable<Venue> getDetails(@Path("id") String id);
 }
