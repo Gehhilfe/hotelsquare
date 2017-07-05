@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare.search;
+package tk.internet.praktikum.foursquare.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
