@@ -71,6 +71,6 @@ public interface UserService {
      * Search for users with a given name and gender
      * @param query Search query
      */
-    @POST("users")
+    @POST("searches/users")
     Observable<List<User>> search(@Body UserSearchQuery query);
 }

@@ -26,7 +26,7 @@ describe('google api query', () => {
 
     it('should return some places', (done) => {
         request(server)
-            .post('/venues/query')
+            .post('/searches/venues')
             .send({
                 location: {
                     type: 'Point',
@@ -43,7 +43,7 @@ describe('google api query', () => {
 
     it('should return krone in darmstadt for Krone', (done) => {
         request(server)
-            .post('/venues/query')
+            .post('/searches/venues')
             .send({
                 locationName: 'Hügelstraße, Darmstadt',
                 keyword: 'Krone',
@@ -58,7 +58,7 @@ describe('google api query', () => {
 
     it('should return krone in darmstadt when searching for bar', (done) => {
         request(server)
-            .post('/venues/query')
+            .post('/searches/venues')
             .send({
                 locationName: 'Schustergasse 18, 64283 Darmstadt',
                 keyword: 'bar',
@@ -73,7 +73,7 @@ describe('google api query', () => {
 
     it('should return hobbit in darmstadt', (done) => {
         request(server)
-            .post('/venues/query')
+            .post('/searches/venues')
             .send({
                 locationName: 'Kantplatz, Darmstadt',
                 keyword: 'Hobbit',
