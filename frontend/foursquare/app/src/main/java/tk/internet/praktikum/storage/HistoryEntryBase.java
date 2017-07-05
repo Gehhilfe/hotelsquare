@@ -23,6 +23,7 @@ public abstract  class HistoryEntryBase {
         this.date = date;
     }
 
+
     public String getUid() {
         return uid;
     }

@@ -1,10 +1,12 @@
 package tk.internet.praktikum.foursquare;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+//import android.app.Fragment;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,6 +21,8 @@ import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.user.DummyProfile;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.storage.LocalStorage;
+
+//import android.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -39,7 +43,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         FastSearchFragment searchFragment = new FastSearchFragment();
-        getFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
+        //getFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
 
     }
 
@@ -139,7 +144,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void redirectToFragment(Fragment fragment){
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            //FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, fragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
