@@ -55,6 +55,13 @@ VenueSchema.index({location: '2dsphere'});
 
 class VenueClass {
 
+    toJSONSearchResult() {
+        return {
+            _id: this._id,
+            name: this.name,
+            location: this.location
+        };
+    }
 }
 
 VenueSchema.loadClass(VenueClass);
