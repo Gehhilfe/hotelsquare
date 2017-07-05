@@ -74,13 +74,13 @@ describe('User Avatar', () => {
                 });
         });
 
-        it('should respond with 404 when image not found', (done) => {
+        it('should respond with error when image not found', (done) => {
             request(server)
                 .get('/user/unknown/avatar')
                 .set('x-auth', token)
                 .end((err, res) => {
                     expect(err).to.be.null;
-                    res.status.should.be.equal(404);
+                    res.status.should.be.not.equal(200);
                     return done();
                 });
         });

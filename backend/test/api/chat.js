@@ -41,26 +41,20 @@ describe('Chat', () => {
                         User.create({name: 'peter3', email: 'peter3@cool.de', password: 'peter99', gender: 'unspecified'}).then((user) => {
                             third = user;
                             thirdToken = jsonwt.sign(third.toJSON(), config.jwt.secret, config.jwt.options);
-                            return done();
-                        });
-                    });
-                });
-            });
-        });
-    });
-
-    beforeEach((done) => {
-        Util.connectDatabase(mongoose).then(function () {
-            Chat.remove({}).then(() => {
-                Chat.create({participants: [u, other]}).then((c) => {
-                    chat = c;
-                    Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id}).then((msg) => {
-                        message = msg;
-                        Chat.create({participants: [u, other, third]}).then((c) => {
-                            otherchat = c;
-                            Message.create({sender: other, message: 'second chat', date: Date.now(), chatId: otherchat._id}).then((msg) => {
-                                othermessage = msg;
-                                return done();
+                            Chat.remove({}).then(() => {
+                                Chat.create({participants: [u, other]}).then((c) => {
+                                    chat = c;
+                                    Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id}).then((msg) => {
+                                        message = msg;
+                                        Chat.create({participants: [u, other, third]}).then((c) => {
+                                            otherchat = c;
+                                            Message.create({sender: other, message: 'second chat', date: Date.now(), chatId: otherchat._id}).then((msg) => {
+                                                othermessage = msg;
+                                                return done();
+                                            });
+                                        });
+                                    });
+                                });
                             });
                         });
                     });
@@ -72,7 +66,7 @@ describe('Chat', () => {
     describe('GET chat', () => {
         it('should retrieve the respective chat history of the passed id', (done) => {
             request(server)
-                .get('/chat/with/' + chat._id)
+                .get('/chats/' + chat._id)
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -86,7 +80,7 @@ describe('Chat', () => {
 
         it('should respond with 404 if no chat is available', (done) => {
             request(server)
-                .get('/chat/with/' + mongoose.Types.ObjectId())
+                .get('/chats/' + mongoose.Types.ObjectId())
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(404);
@@ -99,10 +93,13 @@ describe('Chat', () => {
     describe('POST chat', () => {
         it('should start a chat with an initial message', (done) => {
             const chatdata = {
+                recipients: [
+                    other._id
+                ],
                 message: 'test message'
             };
             request(server)
-                .post('/chat/' + other._id)
+                .post('/chats')
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
@@ -118,7 +115,7 @@ describe('Chat', () => {
                 message: 'test message'
             };
             request(server)
-                .post('/chat/' + [])
+                .post('/chats')
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
@@ -129,10 +126,11 @@ describe('Chat', () => {
 
         it('should respond with error message if no message set', (done) => {
             const chatdata = {
+                recipients: [other._id, third._id],
                 message: ''
             };
             request(server)
-                .post('/chat/' + [other._id, third._id])
+                .post('/chats')
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
@@ -143,10 +141,10 @@ describe('Chat', () => {
 
     });
 
-    describe('GET chat/all', () => {
+    describe('GET chat', () => {
         it('should return the chat between u and other', (done) => {
             request(server)
-                .get('/chat/all')
+                .get('/chats')
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -158,14 +156,14 @@ describe('Chat', () => {
         });
     });
 
-    describe('POST chat/reply', () => {
+    describe('POST chat/:chatid/messages', () => {
         it('should reply to a message', (done) => {
             const chatdata = {
                 chatId: chat._id,
                 message: 'test reply'
             };
             request(server)
-                .post('/chat/reply/' + chat._id)
+                .post('/chats/' + chat._id + '/messages')
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
