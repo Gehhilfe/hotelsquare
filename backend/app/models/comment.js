@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const extend = require('mongoose-schema-extend');
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Schema
@@ -25,7 +26,7 @@ const CommentSchema = new Schema({
         type: Date,
         default: Date.now()
     }
-});
+}, {collection: 'comments', discriminatorKey: '_type'});
 
 const ImageCommentSchema = CommentSchema.extend({
     image: {
