@@ -18,9 +18,9 @@ import android.view.MenuItem;
 import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.DummyProfile;
 import tk.internet.praktikum.foursquare.user.MeFragment;
-import tk.internet.praktikum.storage.LocalStorage;
 
 //import android.app.FragmentTransaction;
 

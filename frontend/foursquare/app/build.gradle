@@ -1,5 +1,20 @@
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.6.1'
+    }
+}
+
+// Required because retrolambda is on maven central
+repositories {
+    mavenCentral()
+}
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
@@ -11,11 +26,15 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        jackOptions {
+    /*    jackOptions {
             enabled true
             additionalParameters('jack.incremental': 'true')
-        }
+        }*/
+       /* dexOptions {
+            javaMaxHeapSize "4g"
+        }*/
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -29,6 +48,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+
     }
 }
 
@@ -55,7 +75,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:10.2.4'
     compile 'com.google.android.gms:play-services-base:10.2.4'
     compile 'org.greenrobot:eventbus:3.0.0'
-    //compile 'com.google.android.gms:play-services:10.2.4'
+    compile 'com.google.android.gms:play-services:10.2.4'
 
     testCompile 'junit:junit:4.12'
 }

@@ -1,12 +1,9 @@
-package tk.internet.praktikum.foursquare;
+package tk.internet.praktikum.foursquare.location;
 
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 
 /**
  * Location Service which handle the LocationTracker

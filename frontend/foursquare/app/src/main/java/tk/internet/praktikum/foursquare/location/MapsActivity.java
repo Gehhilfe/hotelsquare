@@ -1,25 +1,23 @@
-package tk.internet.praktikum.foursquare;
+package tk.internet.praktikum.foursquare.location;
 
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.support.v4.app.FragmentActivity;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import tk.internet.praktikum.foursquare.R;
+//implements OnMapReadyCallback
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap map;
@@ -30,12 +28,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        MapFragment mapFragment =((MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map));
+
+       mapFragment.getMapAsync(this);
+
     }
 
-    /**
+   /**
      * On Map Ready
      */
     @Override

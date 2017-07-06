@@ -26,7 +26,7 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.UserService;
-import tk.internet.praktikum.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 import static android.app.Activity.RESULT_OK;
 

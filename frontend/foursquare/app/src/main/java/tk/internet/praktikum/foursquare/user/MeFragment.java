@@ -17,9 +17,8 @@ import android.view.ViewGroup;
 
 import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.UserStatePagerAdapter;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
-import tk.internet.praktikum.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 
 public class MeFragment extends Fragment {

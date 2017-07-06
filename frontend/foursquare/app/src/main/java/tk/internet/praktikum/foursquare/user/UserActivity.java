@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.UserStatePagerAdapter;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
 
 public class UserActivity extends AppCompatActivity {

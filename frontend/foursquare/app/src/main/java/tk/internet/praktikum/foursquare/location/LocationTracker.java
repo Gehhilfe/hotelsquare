@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare;
+package tk.internet.praktikum.foursquare.location;
 
 import android.Manifest;
 import android.content.Context;
@@ -126,10 +126,6 @@ public class LocationTracker implements
     public static boolean isGooglePlayServicesAvailable(Context context) {
         // deprecated, but no way to fix due to version issues?
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
-        if (ConnectionResult.SUCCESS == resultCode) {
-            return true;
-        } else {
-            return false;
-        }
+        return ConnectionResult.SUCCESS == resultCode;
     }
 }

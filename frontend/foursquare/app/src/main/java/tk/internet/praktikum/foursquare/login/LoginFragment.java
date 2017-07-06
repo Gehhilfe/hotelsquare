@@ -23,8 +23,8 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.SessionService;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.MeFragment;
-import tk.internet.praktikum.storage.LocalStorage;
 
 public class LoginFragment extends Fragment {
     private static final String LOG_TAG = LoginFragment.class.getSimpleName();
