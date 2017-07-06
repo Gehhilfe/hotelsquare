@@ -29,7 +29,7 @@ describe('comment api query', () => {
     let u;
     let token;
 
-    beforeEach(mochaAsync(async () => {
+    before(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
 
         await Util.connectDatabase(mongoose);
@@ -58,6 +58,76 @@ describe('comment api query', () => {
                     comment: 'this is a comment'
                 });
             res.should.have.status(200);
+            const v = await Venue.findOne({_id: aVenue._id});
+            v.comments.length.should.be.equal(1);
+        })));
+
+        it('should add another comment to aVenue', (mochaAsync(async () => {
+            const res = await request(server)
+                .post('/venues/' + aVenue._id + '/comments')
+                .set('x-auth', token)
+                .send({
+                    comment: 'this is another comment'
+                });
+            res.should.have.status(200);
+            const v = await Venue.findOne({_id: aVenue._id});
+            v.comments.length.should.be.equal(2);
+        })));
+
+        it('should return 400 because auth is missing', (mochaAsync(async () => {
+            const res = await request(server)
+                .post('/venues/' + aVenue._id + '/comments')
+                .send({
+                    comment: 'this is another comment'
+                });
+            res.should.have.property('status',403);
+            const v = await Venue.findOne({_id: aVenue._id});
+            v.comments.length.should.be.equal(2);
+        })));
+
+    });
+
+    describe('GET comments from venue', () => {
+        it('should get all comments from aVenue', (mochaAsync(async () => {
+            const res = await request(server)
+                .get('/venues/' + aVenue._id + '/comments')
+                .send({
+                    venueid: 'a'
+                });
+            res.should.have.status(200);
+            const v = await Venue.findOne({_id: aVenue._id});
+            v.comments.length.should.be.equal(2);
+            res.body.should.be.a('array');
+            res.body[0].text.should.be.equal('this is a comment');
+            res.body[1].text.should.be.equal('this is another comment');
+            res.body.length.should.be.equal(2);
+        })));
+    });
+
+    describe('DEL a comment from venue', () => {
+        it('should delete a comment from aVenue', (mochaAsync(async () => {
+            const res = await request(server)
+                .del('/venues/' + aVenue._id + '/comment')
+                .set('x-auth', token)
+                .send({
+                    venueid: 'a',
+                    comment: 'this is a comment'
+                });
+            res.should.have.status(200);
+            const v = await Venue.findOne({_id: aVenue._id});
+            v.comments.length.should.be.equal(1);
+            res.body.should.be.a('object');
+            res.body.venue.comments.should.be.equal(['this is another comment']);
+        })));
+
+        it('should not delete a comment from aVenue because user is not authenticated', (mochaAsync(async () => {
+            const res = await request(server)
+                .del('/venues/' + aVenue._id + '/comment')
+                .send({
+                    venueid: 'a',
+                    comment: 'this is a comment'
+                });
+            res.should.have.property('status', 403);
             const v = await Venue.findOne({_id: aVenue._id});
             v.comments.length.should.be.equal(1);
         })));

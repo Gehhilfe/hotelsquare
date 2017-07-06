@@ -164,10 +164,10 @@ server.del('venues/images', auth, venue.delImage);
 server.get('venues/imagenames', auth, venue.getImageNames);
 
 server.post('venues/:id/comments', auth, venue.addComment);
-server.get('venues/comments', venue.getComments);
-server.del('venues/comment', auth, venue.delComment);
-server.post('venues/like', auth, venue.like);
-server.post('venues/dislike', auth, venue.dislike);
+server.get('venues/:id/comments', venue.getComments);
+server.del('venues/:id/comment', auth, venue.delComment);
+server.post('venues/:id/like', auth, venue.like);
+server.post('venues/:id/dislike', auth, venue.dislike);
 
 // Search
 

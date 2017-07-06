@@ -372,7 +372,7 @@ function queryAllVenues(location, keyword, next_page_token = '') {
  * @returns {undefined}
  */
 async function like(request, response, next){
-    const venue = await Venue.findOne({place_id: request.body.venueid});
+    const venue = await Venue.findOne({_id: request.params.id});
     if(venue){
         const comment = await venue.comments.find({text: request.body.comment});
         comment.likes += 1;
@@ -394,7 +394,7 @@ async function like(request, response, next){
  * @returns {undefined}
  */
 function dislike(request, response, next){
-    Venue.findOne({place_id: request.body.venueid}, (err, obj) => {
+    Venue.findOne({_id: request.params.id}, (err, obj) => {
         if(err){
             response.send(404, 'venue could not be found');
             return next();
@@ -422,7 +422,7 @@ async function addComment(request, response, next){
     const comment = {'author': user, 'text': request.body.comment, 'likes': 0, 'dislikes': 0, 'date': Date.now()};
     venue.comments.push(comment);
     await venue.save();
-    response.send(venue.commments);
+    response.json(venue.comments);
     return next();
 }
 
@@ -434,15 +434,10 @@ async function addComment(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function getComments(request, response, next){
-    Venue.findOne({place_id: request.body.venueid}, (err, obj) => {
-        if(err){
-            response.send(404, 'venue could not be found in database');
-            return next();
-        }
-        response.json(obj.comments);
-        return next();
-    });
+async function getComments(request, response, next){
+    const venue = await Venue.findOne({_id: request.params.id});
+    response.json(venue.comments);
+    return next();
 }
 
 /**
@@ -453,26 +448,16 @@ function getComments(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function delComment(request, response, next){
-    Venue.findOne({place_id: request.body.venueid}, (err, venue) => {
-        if(err){
-            response.send(404, 'venue could not be found in database');
-            return next();
-        }
-        User.findOne({_id: request.authentication._id}, (err, obj) => {
-            if(err){
-                response.send(404, 'user could not be found in database');
-                return next();
-            }
-            const comment = obj.comments.find({text: request.body.comment});
-            if(comment.author._id.equals(obj._id)){
-                obj.comments.pull({'text': request.body.comment});
-                obj.save();
-            }
-            response.send(200, 'comment deleted');
-            return next();
-        });
-    });
+async function delComment(request, response, next){
+    const venue = await Venue.findOne({_id: request.params.id});
+    const user = await User.findOne({_id: request.authentication._id});
+    const comment = await Venue.find({'text': request.body.comment}).exec(); ///arrrrrrghhh
+    if(comment.author._id.equals(user._id)){
+        venue.comments.pull({'text': request.body.comment});
+        await venue.save();
+    }
+    response.send(200, 'comment deleted');
+    return next();
 }
 
 module.exports = {
