@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare;
+package tk.internet.praktikum.foursquare.user;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

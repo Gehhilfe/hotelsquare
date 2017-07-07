@@ -1,8 +1,11 @@
 package tk.internet.praktikum.foursquare.login;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+/*import android.app.Fragment;
+import android.app.FragmentTransaction;*/
+
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
