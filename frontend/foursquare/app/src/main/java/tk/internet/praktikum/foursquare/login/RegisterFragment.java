@@ -1,8 +1,10 @@
 package tk.internet.praktikum.foursquare.login;
 
-import android.app.Fragment;
+//import android.app.Fragment;
+
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.Patterns;

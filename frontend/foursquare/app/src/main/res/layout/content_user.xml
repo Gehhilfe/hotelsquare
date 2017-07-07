@@ -8,14 +8,21 @@
     tools:context="tk.internet.praktikum.foursquare.user.UserActivity"
     tools:showIn="@layout/activity_user">
 
-    <FrameLayout
+<!--    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fragment_user_container"/>
+        android:id="@+id/fragment_user_container"/>-->
 
 
 
 
 
+
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/user_fragment_container">
+
+    </android.support.v4.view.ViewPager>
 
 </android.support.v4.widget.NestedScrollView>
