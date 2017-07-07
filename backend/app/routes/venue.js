@@ -33,6 +33,13 @@ const minioClient = new minio.Client({
  */
 async function getVenue(request, response, next) {
     const venue = await Venue.findOne({_id: request.params.id});
+
+    // check if details are loaded
+    if(!venue.details_loaded) {
+        await venue.loadDetails();
+        await venue.save();
+    }
+
     response.send(venue);
     return next();
 }
@@ -46,65 +53,6 @@ async function getVenue(request, response, next) {
  * @returns {undefined}
  */
 async function putImage(request, response, next) {
-    //Convert to jpeg
-    const buffer = await sharp(request.files.venueimage.path)
-        .resize(200, 200)
-        .toFormat('jpeg')
-        .toBuffer();
-
-    minioClient.bucketExists(bucket_name_venues, function (err) {
-        if (err) {
-            if (err.code === 'NoSuchBucket') {
-                minioClient.makeBucket(bucket_name_venues, 'eu-west-1', function (err) {
-                    if (err) {
-                        response.send(500, 'new bucket could not be created');
-                        return next();
-                    }
-                    const no = 0;
-                    const imagename = 'venue_' + request.body.venueid + no.toString() + '.jpeg';
-                    minioClient.putObject(bucket_name_venues, imagename, buffer, 'image/jpeg', (err, etag) => {
-                        if (err) {
-                            response.send(500, err);
-                            return next();
-                        } else {
-                            const user = User.findOne({_id: request.authentication._id});
-                            VenueImages.create({
-                                venueid: request.body.venueid,
-                                imagename: imagename,
-                                user: user
-                            });
-                            response.json(etag);
-                            return next();
-                        }
-                    });
-                });
-            }
-            if (err === null) {
-                const itemsinbucket = minioClient.listObjects(bucket_name_venues, '', true).length();
-                const imagename = 'venue_' + request.body.venueid + itemsinbucket.toString() + '.jpeg';
-                minioClient.putObject(bucket_name_venues, imagename, buffer, 'image/jpeg', (err, etag) => {
-                    if (err) {
-                        response.send(500, err);
-                        return next();
-                    } else {
-                        User.findOne({_id: request.authentication._id}, function (err, obj) {
-                            VenueImages.create({
-                                venueid: request.body.venueid,
-                                imagename: imagename,
-                                user: obj
-                            });
-                            response.json(etag);
-                            return next();
-                        });
-                    }
-                });
-            }
-            response.send(500, err);
-            return next();
-        }
-        response.send(500, err);
-        return next();
-    });
 }
 
 /**
@@ -116,32 +64,6 @@ async function putImage(request, response, next) {
  * @returns {undefined}
  */
 function delImage(request, response, next) {
-    minioClient.bucketExists(bucket_name_venues, function (err) {
-        if (err) {
-            if (err.code === 'NoSuchBucket') {
-                response.send('404', 'Bucket for ' + request.body.venueid + ' not found');
-                return next();
-            }
-            if (err === null) {
-                VenueImages.findOne({imagename: request.body.imagename}, function (err, obj) {
-                    if (obj.name === request.authentication.name) {
-                        minioClient.removeObject(bucket_name_venues, request.body.imagename, (err) => {
-                            if (err) {
-                                response.send('404', 'Image for ' + request.body.imagename + ' not found');
-                            } else {
-                                response.send();
-                            }
-                            return next();
-                        });
-                    }
-                    response.send('400', 'Image not in database');
-                    return next();
-                });
-            }
-        }
-        response.send(500, err);
-        return next();
-    });
 }
 
 /**
@@ -153,28 +75,6 @@ function delImage(request, response, next) {
  * @returns {undefined}
  */
 function getImageNames(request, response, next) {
-    // When no name provided return error
-    if (request.params.venueid === undefined) {
-        response.send(404, 'you must request a valid venueid');
-        return next();
-    }
-
-    const allimageurls = [];
-    const objectsstream = minioClient.listObjects(bucket_name_venues, '', true);
-    objectsstream.on('data', function (obj) {
-        const objectname = obj.name;
-        allimageurls.put(objectname);
-    });
-    objectsstream.on('error', function (e) {
-        response.send(500, ' error requesting minio image list for venue ' + bucket_name_venues);
-        return next();
-    });
-    objectsstream.on('end', function (e) {
-        response.json(allimageurls);
-        return next();
-    });
-    response.send(500, 'undefined internal error requesting image names of bucket ' + bucket_name_venues);
-    return next();
 }
 
 /**
@@ -186,24 +86,6 @@ function getImageNames(request, response, next) {
  * @returns {undefined}
  */
 function getImage(request, response, next) {
-    // When no name provided return error
-    if (request.params.imagename === undefined) {
-        response.send(404, 'you must request a valid venueid');
-        return next();
-    }
-
-    minioClient.statObject(bucket_name_venues, request.params.imagename, (err, stat) => {
-        if (err)
-            return next(new restify.errors.NotFoundError());
-        else
-            minioClient.presignedGetObject(bucket_name_venues, request.params.imagename, 30 * 60, (err, url) => {
-                if (err) {
-                    return next(new restify.errors.NotFoundError());
-                } else {
-                    response.redirect(url, next);
-                }
-            });
-    });
 }
 
 
@@ -219,16 +101,52 @@ async function importGoogleResult(entry) {
     if (existing.length > 0)
         return;
 
-    return await Venue.create({
+    return Venue.create({
         name: entry.name,
         place_id: entry.place_id,
         reference: entry.reference,
         types: entry.types,
+        rating_google: entry.rating,
         location: {
             type: 'Point',
             coordinates: [entry.geometry.location.lng, entry.geometry.location.lat]
         }
     });
+}
+
+/**
+ * Resolve a formal location name into location coordinates
+ *
+ * @param {String} locationName formal name of location e.g. TU Darmstadt
+ * @returns {Promise.<*>} Geocoding result
+ */
+async function getLocationForName(locationName) {
+    // Check if result cached
+    let result = await GeocodeResult.findByKeyword(locationName);
+    if (!result) {
+        // Get result from google
+        const geocoder = NodeGeocoder({
+            provider: 'google',
+            httpAdapter: 'https',
+            apiKey: config.googleapi.GOOGLE_PLACES_API_KEY,
+            formatter: null
+        });
+        result = await geocoder.geocode(locationName);
+
+        if (!result || result.length === 0) {
+            throw new restify.errors.BadRequestError({
+                message: 'No valid location for location name found.'
+            });
+        }
+        // Cache result
+        GeocodeResult.create({
+            keyword: locationName,
+            result: result
+        });
+    } else {
+        result = result.result;
+    }
+    return result;
 }
 
 
@@ -255,32 +173,16 @@ async function queryVenue(request, response, next) {
     }
     const keyword = request.body.keyword;
 
+    if(keyword.length < 3) {
+        return next(new restify.errors.BadRequestError({
+            field: 'keyword',
+            message: 'The search keyword needs to be at least 3 characters'
+        }));
+    }
+
     if (locationName) {
         // Check if result cached
-        let result = await GeocodeResult.findByKeyword(locationName);
-        if (!result) {
-            // Get result from google
-            const geocoder = NodeGeocoder({
-                provider: 'google',
-                httpAdapter: 'https',
-                apiKey: config.googleapi.GOOGLE_PLACES_API_KEY,
-                formatter: null
-            });
-            result = await geocoder.geocode(locationName);
-
-            if (!result || result.length === 0) {
-                throw new restify.errors.BadRequestError({
-                    message: 'No valid location for location name found.'
-                });
-            }
-            // Cache result
-            GeocodeResult.create({
-                keyword: locationName,
-                result: result
-            });
-        } else {
-            result = result.result;
-        }
+        const result = await getLocationForName(locationName);
 
         location = {
             type: 'Point',
@@ -304,16 +206,14 @@ async function queryVenue(request, response, next) {
     }
 
     //search in our database for query
-    let venues = await searchVenuesInDB(location, keyword, radius, page, 20);
-    venues = _.map(venues, (v) => {
-        return v.toJSONSearchResult();
-    });
+    let venues = await searchVenuesInDB(location, keyword, radius, page, 10);
+    venues = _.map(venues, (v) => v.toJSONSearchResult());
     response.send({
         location: location,
         locationName: locationName,
         radius: radius,
         page: page,
-        limit: 20,
+        limit: 10,
         results: venues
     });
     return next();

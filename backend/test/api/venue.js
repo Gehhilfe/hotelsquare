@@ -39,14 +39,14 @@ describe('venue', () => {
         u = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
         token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
 
-        aVenue = await Venue.create({
-            name: 'aVenue',
-            place_id: 'a',
-            location: {
-                type: 'Point',
-                coordinates: [5, 5]
-            }
-        });
+        const res = await request(server)
+            .post('/searches/venues')
+            .send({
+                locationName: 'Hügelstraße, Darmstadt',
+                keyword: 'Krone',
+                radius: 5000
+            });
+        aVenue = res.body.results[0];
     }));
 
     it('GET venue details', (mochaAsync(async () => {
@@ -55,22 +55,7 @@ describe('venue', () => {
         res.should.have.status(200);
         res.body.should.have.property('name');
         res.body.should.have.property('location');
-        res.body.should.have.property('comments');
     })));
-
-    describe('POST comments to venue', () => {
-        it('should add a comment to aVenue', (mochaAsync(async () => {
-            const res = await request(server)
-                .post('/venues/' + aVenue._id + '/comments')
-                .set('x-auth', token)
-                .send({
-                    comment: 'this is a comment'
-                });
-            res.should.have.status(200);
-            const v = await Venue.findOne({_id: aVenue._id});
-            v.comments.length.should.be.equal(1);
-        })));
-    });
 });
 
 describe('venue search', () => {
