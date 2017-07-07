@@ -80,7 +80,8 @@ public class ProfileFragment extends Fragment {
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.profile(name.getText().toString())
+            service.profile(LocalStorage.
+                    getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.NAME, ""))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
