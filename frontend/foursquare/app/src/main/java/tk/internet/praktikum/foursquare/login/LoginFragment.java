@@ -4,6 +4,7 @@ package tk.internet.praktikum.foursquare.login;
 import android.app.FragmentTransaction;*/
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -24,7 +25,7 @@ import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.SessionService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.MeFragment;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 
 public class LoginFragment extends Fragment {
     private static final String LOG_TAG = LoginFragment.class.getSimpleName();
@@ -101,11 +102,10 @@ public class LoginFragment extends Fragment {
     private void successfulLogin() {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
-   /*   Intent intent = new Intent(getActivity().getApplicationContext(), UserActivity.class);
+      Intent intent = new Intent(getActivity().getApplicationContext(), UserActivity.class);
         startActivityForResult(intent, 1);
         getActivity().finish();
-*/
-     try {
+    /* try {
             Fragment fragment = MeFragment.class.newInstance();
             redirectToFragment(fragment);
         }
@@ -113,7 +113,7 @@ public class LoginFragment extends Fragment {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
     }
