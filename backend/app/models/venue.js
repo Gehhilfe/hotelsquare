@@ -2,6 +2,8 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const googleapilib = require('googleplaces');
+const config = require('config');
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Schema
@@ -13,9 +15,32 @@ const VenueSchema = new Schema({
     reference: String,
     types: [String],
     location: {
-        'type': { type: String, default: 'Point' },
-        coordinates: { type: [Number], default: [0, 0] }
+        'type': {type: String, default: 'Point'},
+        coordinates: {type: [Number], default: [0, 0]}
     },
+    images: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Image'
+    }],
+    details_loaded: {
+        type: Boolean,
+        default: false
+    },
+    opening_hours: {
+        periods: [{
+            close: {
+                day: Number,
+                time: String
+            },
+            open: {
+                day: Number,
+                time: String
+            }
+        }]
+    },
+    utc_offset: Number,
+    website: String,
+    rating_google: Number,
     comments: [{
         author: {
             type: Schema.Types.ObjectId,
@@ -46,7 +71,6 @@ const VenueSchema = new Schema({
 });
 
 
-
 VenueSchema.index({location: '2dsphere'});
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -55,11 +79,33 @@ VenueSchema.index({location: '2dsphere'});
 
 class VenueClass {
 
+    _getPlaceDetails(place_id) {
+        const api = googleapilib(config.googleapi.GOOGLE_PLACES_API_KEY, config.googleapi.GOOGLE_PLACES_OUTPUT_FORMAT);
+        return new Promise((resolve, reject) => {
+            api.placeDetailsRequest({
+                placeid: place_id
+            }, (err, details) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve(details);
+            });
+        });
+    }
+
+    async loadDetails() {
+        const details = await this._getPlaceDetails(this.place_id);
+        this.opening_hours = details.result.opening_hours;
+        this.utc_offest = details.result.utc_offset;
+        this.details_loaded = true;
+    }
+
     toJSONSearchResult() {
         return {
             _id: this._id,
             name: this.name,
-            location: this.location
+            location: this.location,
+            types: this.types
         };
     }
 }
