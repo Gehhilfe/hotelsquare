@@ -21,6 +21,8 @@ const server = restify.createServer();
 const io = require('socket.io').listen(server);
 chatsocket(io);
 
+const Image = require('./app/models/image');
+
 util.connectDatabase(mongoose).then(async () => {
     //Bootstrap database
     if (process.env.NODE_ENV !== 'production') {
@@ -129,10 +131,10 @@ server.post('sessions', session.postSession);
 server.get('users', auth, user.profile);
 
 server.get('users/:name', user.profile);
-server.get('users/:name/avatar', auth, user.getAvatar);
 
 server.post('users', user.register, (request, response, next) => {
     io.sockets.emit('new user', 'hello');
+    return next();
 });
 server.post('users/:name/friend_requests', auth, user.sendFriendRequest);
 
@@ -140,25 +142,38 @@ server.put('users', auth, user.updateUser);
 server.del('users', auth, user.deleteUser);
 
 server.get('profile', auth, user.profile);
-server.get('profile/avatar', auth, user.getAvatar);
-
-server.del('profile/friends/:name', auth, user.removeFriend);
 
 server.post('profile/avatar', auth, user.uploadAvatar);
-
-server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
-
 server.del('profile/avatar', auth, user.deleteAvatar);
 
-//Chat
-server.post('chats', auth, chat.newChat);
+server.del('profile/friends/:name', auth, user.removeFriend);
+server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
-server.post('chats/:chatId/messages', auth, chat.replyMessage);
+// Image
+server.post('images', async (request, response, next) => {
+    const img = await Image.upload(request.files.image.path);
+    response.json(img);
+    return next();
+});
 
+// Chat
 server.get('chats/:chatId', auth, chat.getConversation);
-
+server.post('chats', auth, chat.newChat);
+server.post('chats/:chatId/messages', auth, chat.replyMessage);
 server.get('chats', auth, chat.getConversations);
 
+// Venue
+server.get('venues/:id', venue.getVenue);
+server.post('venues/images', auth, venue.putImage);
+server.get('venues/images', auth, venue.getImage);
+server.del('venues/images', auth, venue.delImage);
+server.get('venues/imagenames', auth, venue.getImageNames);
+
+server.post('venues/:id/comments', auth, venue.addComment);
+server.get('venues/comments', venue.getComments);
+server.del('venues/comment', auth, venue.delComment);
+server.post('venues/like', auth, venue.like);
+server.post('venues/dislike', auth, venue.dislike);
 
 // Search
 
@@ -166,7 +181,7 @@ server.get('chats', auth, chat.getConversations);
 server.post('searches/users', auth, user.search);
 // Venue
 server.post('searches/venues', venue.queryVenue);
-
+server.post('searches/venues/:page', venue.queryVenue);
 
 // Delete downloads
 server.on('after', (request) => {

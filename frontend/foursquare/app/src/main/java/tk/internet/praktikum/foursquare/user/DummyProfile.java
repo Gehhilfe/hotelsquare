@@ -18,6 +18,7 @@ public class DummyProfile extends AppCompatActivity {
     }
 
     public void addFragment() {
-        getFragmentManager().beginTransaction().add(R.id.login_layout, new ProfileFragment()).commit();
+        //getFragmentManager().beginTransaction().add(R.id.login_layout, new ProfileFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.login_layout, new ProfileFragment()).commit();
     }
 }

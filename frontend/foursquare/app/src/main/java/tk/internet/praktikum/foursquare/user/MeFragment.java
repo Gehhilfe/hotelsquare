@@ -1,9 +1,12 @@
 package tk.internet.praktikum.foursquare.user;
 
-import android.app.Fragment;
+//import android.app.Fragment;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,12 +17,15 @@ import android.view.ViewGroup;
 
 import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 
 public class MeFragment extends Fragment {
 
-    TabLayout tabLayout;
+    private TabLayout tabLayout;
+    private UserStatePagerAdapter userStatePagerAdapter;
+    private ViewPager fragmentContainer;
     private View view;
 
     @Override
@@ -28,12 +34,35 @@ public class MeFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_me, container, false);
         setHasOptionsMenu(true);
-        tabLayout = (TabLayout) view.findViewById(R.id.tabs);
-        tabLayout.addTab(tabLayout.newTab().setText("Home").setIcon(R.mipmap.user_home));
-        tabLayout.addTab(tabLayout.newTab().setText("Profile").setIcon(R.mipmap.user_profile));
-        tabLayout.addTab(tabLayout.newTab().setText("History").setIcon(R.mipmap.user_history));
-        tabLayout.addTab(tabLayout.newTab().setText("Friends").setIcon(R.mipmap.user_friends));
-        tabLayout.addTab(tabLayout.newTab().setText("Inbox").setIcon(R.mipmap.user_message));
+        tabLayout= (TabLayout) view.findViewById(R.id.tabs);
+
+        fragmentContainer = (ViewPager) view.findViewById(R.id.user_fragment_container);
+
+        TabLayout.Tab homeTab=tabLayout.newTab();
+
+        homeTab.setText("Home").setIcon(R.mipmap.user_home);
+        TabLayout.Tab profileTab=tabLayout.newTab();
+        profileTab.setText("Profile").setIcon(R.mipmap.user_profile);
+        TabLayout.Tab historyTab=tabLayout.newTab();
+        historyTab.setText("History").setIcon(R.mipmap.user_history);
+
+        TabLayout.Tab friendsTab=tabLayout.newTab();
+        friendsTab.setText("Friends").setIcon(R.mipmap.user_friends);
+
+        TabLayout.Tab inbox=tabLayout.newTab();
+        inbox.setText("Inbox").setIcon(R.mipmap.user_message);
+
+        tabLayout.addTab(homeTab);
+        tabLayout.addTab(profileTab);
+        tabLayout.addTab(historyTab);
+        tabLayout.addTab(friendsTab);
+        tabLayout.addTab(inbox);
+
+        userStatePagerAdapter = new UserStatePagerAdapter(getFragmentManager());
+        initialiseFragmentContainer(fragmentContainer);
+        fragmentContainer.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setupWithViewPager(fragmentContainer);
+        tabLayout.addOnTabSelectedListener(createOnTabSelectedListener());
         return view;
     }
 
@@ -57,6 +86,36 @@ public class MeFragment extends Fragment {
         });
 
     }
+
+    private void initialiseFragmentContainer(ViewPager container) {
+        userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
+        userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
+        container.setAdapter(userStatePagerAdapter);
+    }
+
+    public void setFragment(int fragmentId) {
+        fragmentContainer.setCurrentItem(fragmentId);
+    }
+
+    public  TabLayout.OnTabSelectedListener createOnTabSelectedListener(){
+        return new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                setFragment(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        };
+    }
+
 
 
 }

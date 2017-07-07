@@ -1,4 +1,4 @@
-package tk.internet.praktikum.storage;
+package tk.internet.praktikum.foursquare.history;
 
 import java.util.Date;
 
