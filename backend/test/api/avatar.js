@@ -73,7 +73,7 @@ describe('User Avatar', () => {
             request(server)
                 .post('/profile/avatar')
                 .set('x-auth', token)
-                .attach('avatar', imagePath)
+                .attach('image', imagePath)
                 .end((err, res) => {
                     expect(err).to.be.null;
                     console.log(res.body);
@@ -86,7 +86,7 @@ describe('User Avatar', () => {
             request(server)
                 .post('/profile/avatar')
                 .set('x-auth', token)
-                .attach('avatar', imagePath)
+                .attach('image', imagePath)
                 .end((err) => {
                     expect(err).to.be.null;
                     request(server)

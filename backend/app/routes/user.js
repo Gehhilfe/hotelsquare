@@ -160,7 +160,7 @@ async function uploadAvatar(request, response, next) {
     if(user.avatar) {
         await Image.destroy(user.avatar);
     }
-    user.avatar = await Image.upload(request.files.avatar.path, user, user);
+    user.avatar = await Image.upload(request.files.image.path, user, user);
     user = await user.save();
     response.json(user);
     return next();
