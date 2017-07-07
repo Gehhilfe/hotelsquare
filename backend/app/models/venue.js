@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const googleapilib = require('googleplaces');
@@ -38,6 +39,20 @@ const VenueSchema = new Schema({
             }
         }]
     },
+    check_ins: [{
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        count: {
+            type: Number,
+            default: 0
+        },
+        last: {
+            type: Date,
+            default: Date.now()
+        }
+    }],
     utc_offset: Number,
     website: String,
     rating_google: Number,
@@ -93,6 +108,42 @@ class VenueClass {
         });
     }
 
+    /**
+     * Check ins user
+     *
+     * @param {User} user to check in
+     * @returns {undefined}
+     */
+    checkIn(user) {
+        // Search for checkin
+        let index = -1;
+        let checkin = _.find(this.check_ins, (v, i) =>{
+            if(v.user === user) {
+                index = i;
+                return true;
+            } else
+                return false;
+        });
+
+        // Create new checkin when non found
+        if(!checkin) {
+            checkin = {
+                user: user,
+                count: 0
+            };
+        }
+
+        // Increment counter and reset last visit date
+        checkin.count += 1;
+        checkin.last = Date.now();
+
+        // Update element in collection
+        if(index === -1)
+            this.check_ins.push(checkin);
+        else
+            this.check_ins[index] = checkin;
+    }
+
     async loadDetails() {
         const details = await this._getPlaceDetails(this.place_id);
         this.opening_hours = details.result.opening_hours;
@@ -105,7 +156,19 @@ class VenueClass {
             _id: this._id,
             name: this.name,
             location: this.location,
-            types: this.types
+            types: this.types,
+            check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0)
+        };
+    }
+
+    toJSONDetails() {
+        return {
+            _id: this._id,
+            name: this.name,
+            location: this.location,
+            types: this.types,
+            check_ins: _.sortBy(this.check_ins, 'last'),
+            opening_hours: this.opening_hours
         };
     }
 }

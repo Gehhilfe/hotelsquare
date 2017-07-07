@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const User = require('../app/models/user');
 const Image = require('../app/models/image');
 const Util = require('../lib/util');
-const jsonwt = require('jsonwebtoken');
 const config = require('config');
 const minio = require('minio');
 const minioClient = new minio.Client({
@@ -36,8 +35,6 @@ const mochaAsync = (fn) => {
 
 describe('image', () => {
 
-    let user, token;
-
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
 
@@ -46,9 +43,6 @@ describe('image', () => {
             Image.remove({}),
             User.remove({})
         ]);
-
-        user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
-        token = jsonwt.sign(user.toJSON(), config.jwt.secret, config.jwt.options);
     }));
 
 
