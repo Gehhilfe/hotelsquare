@@ -15,6 +15,7 @@ import okhttp3.RequestBody;
 
 
 public class UploadHelper {
+    private static final String LOG_TAG = UploadHelper.class.getSimpleName();
 
     private static Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
         if (maxHeight > 0 && maxWidth > 0) {
@@ -31,27 +32,29 @@ public class UploadHelper {
                 finalHeight = (int) ((float)maxWidth / ratioBitmap);
             }
             image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
+            Log.i(LOG_TAG, "Image resized");
             return image;
         } else {
             return image;
         }
     }
 
-    private byte[] persistImage(Bitmap bitmap) {
+    private static byte[] persistImage(Bitmap bitmap) {
         Bitmap resized = resize(bitmap, 1920, 1080);
         try {
+            Log.i(LOG_TAG, "Render image as bitmap with 80% quality");
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             resized.compress(Bitmap.CompressFormat.JPEG, 80, os);
             os.flush();
             os.close();
             return os.toByteArray();
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), "Error writing bitmap", e);
+            Log.e(LOG_TAG, "Error writing bitmap", e);
         }
         return null;
     }
 
-    public MultipartBody.Part createMultipartBodySync(Bitmap bm, Context context) {
+    public static MultipartBody.Part createMultipartBodySync(Bitmap bm, Context context) {
         byte[] payload = persistImage(bm);
         if(payload == null)
             throw new UnsupportedOperationException();
@@ -64,6 +67,7 @@ public class UploadHelper {
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("image", "upload.jpg", requestFile);
 
+        Log.i(LOG_TAG, "Multipart body for image created");
         return body;
     }
 }
