@@ -8,20 +8,7 @@ const NodeGeocoder = require('node-geocoder');
 const config = require('config');
 const SearchRequest = require('../models/searchrequest');
 const GeocodeResult = require('../models/geocoderesult');
-const minio = require('minio');
-const VenueImages = require('../models/venueimages');
 const User = require('../models/user');
-const sharp = require('sharp');
-
-const bucket_name_venues = 'venue_images';
-
-const minioClient = new minio.Client({
-    endPoint: 'stimi.ovh',
-    port: 9000,
-    secure: false,
-    accessKey: config.minio.key,
-    secretKey: config.minio.secret
-});
 
 /**
  * Get details for a given venue id
@@ -35,57 +22,13 @@ async function getVenue(request, response, next) {
     const venue = await Venue.findOne({_id: request.params.id});
 
     // check if details are loaded
-    if(!venue.details_loaded) {
+    if (!venue.details_loaded) {
         await venue.loadDetails();
         await venue.save();
     }
 
-    response.send(venue);
+    response.send(venue.toJSONDetails());
     return next();
-}
-
-/**
- * Uploads an image for a venue to the database
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-async function putImage(request, response, next) {
-}
-
-/**
- * Deletes a stored image from the database in case the requesting user is the creator of the image
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-function delImage(request, response, next) {
-}
-
-/**
- * Retrieves a list with all image names of a venue to be queried later on
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-function getImageNames(request, response, next) {
-}
-
-/**
- * Retrieves stored images for a venue
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-function getImage(request, response, next) {
 }
 
 
@@ -173,7 +116,7 @@ async function queryVenue(request, response, next) {
     }
     const keyword = request.body.keyword;
 
-    if(keyword.length < 3) {
+    if (keyword.length < 3) {
         return next(new restify.errors.BadRequestError({
             field: 'keyword',
             message: 'The search keyword needs to be at least 3 characters'
@@ -181,7 +124,7 @@ async function queryVenue(request, response, next) {
     }
 
     if (locationName) {
-        // Check if result cached
+        // Resolve name into location
         const result = await getLocationForName(locationName);
 
         location = {
@@ -192,20 +135,7 @@ async function queryVenue(request, response, next) {
         locationName = result[0].formattedAddress;
     }
 
-
-    const closestSearch = await SearchRequest.findClosestLocation(location, keyword, 5000);
-
-    if (closestSearch.length === 0) {
-        //load all google results into database
-        const googleResults = await queryAllVenuesFromGoogle(location, keyword);
-        await Promise.all(_.map(googleResults, importGoogleResult));
-        await SearchRequest.create({
-            location: location,
-            keyword: keyword
-        });
-    }
-
-    //search in our database for query
+    // search in our database for query
     let venues = await searchVenuesInDB(location, keyword, radius, page, 10);
     venues = _.map(venues, (v) => v.toJSONSearchResult());
     response.send({
@@ -230,14 +160,26 @@ async function queryVenue(request, response, next) {
  * @param {Number} limit  number of results on page
  * @returns {Promise.<*>} result
  */
-function searchVenuesInDB(location, keyword = '', radius = 5000, page = 0, limit = 20) {
+async function searchVenuesInDB(location, keyword = '', radius = 5000, page = 0, limit = 20) {
+    const closestSearch = await SearchRequest.findClosestLocation(location, keyword, 5000);
+
+    if (closestSearch.length === 0) {
+        //load all google results into database
+        const googleResults = await queryAllVenuesFromGoogle(location, keyword);
+        await Promise.all(_.map(googleResults, importGoogleResult));
+        await SearchRequest.create({
+            location: location,
+            keyword: keyword
+        });
+    }
+
     const query = Venue.find({
         $or: [
             {name: new RegExp(keyword, 'i')},
             {types: new RegExp(keyword, 'i')}
         ]
     }).limit(limit).skip(page * limit);
-    return query.where('location').near({
+    return await query.where('location').near({
         center: location,
         maxDistance: radius
     });
@@ -376,7 +318,7 @@ function getComments(request, response, next) {
  * @returns {undefined}
  */
 function delComment(request, response, next) {
-    Venue.findOne({place_id: request.body.venueid}, (err, venue) => {
+    Venue.findOne({place_id: request.body.venueid}, (err) => {
         if (err) {
             response.send(404, 'venue could not be found in database');
             return next();
@@ -401,10 +343,6 @@ module.exports = {
     queryVenue,
     queryAllVenuesFromGoogle,
     searchVenuesInDB,
-    getImage,
-    getImageNames,
-    delImage,
-    putImage,
     like,
     dislike,
     addComment,

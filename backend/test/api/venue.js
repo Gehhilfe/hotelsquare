@@ -1,5 +1,4 @@
 'use strict';
-const config = require('config');
 const mongoose = require('mongoose');
 const Venue = require('../../app/models/venue');
 const SearchRequest = require('../../app/models/searchrequest');
@@ -8,8 +7,6 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../server');
 const User = require('../../app/models/user');
-const jsonwt = require('jsonwebtoken');
-const expect = chai.expect;
 const request = require('supertest');
 chai.should();
 chai.use(chaiHttp);
@@ -26,8 +23,6 @@ const mochaAsync = (fn) => {
 describe('venue', () => {
 
     let aVenue;
-    let u;
-    let token;
 
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
@@ -35,9 +30,6 @@ describe('venue', () => {
         await Util.connectDatabase(mongoose);
         await Venue.remove({});
         await User.remove({});
-
-        u = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
-        token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
 
         const res = await request(server)
             .post('/searches/venues')

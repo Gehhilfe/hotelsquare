@@ -4,19 +4,8 @@ const restify = require('restify');
 const User = require('../models/user');
 const Image = require('../models/image');
 
-const minio = require('minio');
-const config = require('config');
-const sharp = require('sharp');
-
 const ValidationError = require('../errors/ValidationError');
 
-const minioClient = new minio.Client({
-    endPoint: 'stimi.ovh',
-    port: 9000,
-    secure: false,
-    accessKey: config.minio.key,
-    secretKey: config.minio.secret
-});
 
 const handleValidation = (next, func) => {
     func().catch((error) => {
