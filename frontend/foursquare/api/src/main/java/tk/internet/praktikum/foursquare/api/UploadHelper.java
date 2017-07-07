@@ -39,8 +39,12 @@ public class UploadHelper {
         }
     }
 
-    private static byte[] persistImage(Bitmap bitmap) {
-        Bitmap resized = resize(bitmap, 1920, 1080);
+    private static byte[] persistImage(Bitmap bitmap, boolean resize) {
+        Bitmap resized;
+        if(resize)
+            resized = resize(bitmap, 1920, 1080);
+        else
+            resized = bitmap;
         try {
             Log.i(LOG_TAG, "Render image as bitmap with 80% quality");
             ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -50,12 +54,12 @@ public class UploadHelper {
             return os.toByteArray();
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error writing bitmap", e);
+            throw new UnsupportedOperationException();
         }
-        return null;
     }
 
-    public static MultipartBody.Part createMultipartBodySync(Bitmap bm, Context context) {
-        byte[] payload = persistImage(bm);
+    public static MultipartBody.Part createMultipartBodySync(Bitmap bm, Context context, boolean resize) {
+        byte[] payload = persistImage(bm, resize);
         if(payload == null)
             throw new UnsupportedOperationException();
 
