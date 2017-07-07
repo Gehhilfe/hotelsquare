@@ -34,6 +34,13 @@ const ImageSchema = new Schema({
             return Buffer.from(arr);
         }
     },
+    assigned: {
+        kind: String,
+        to: {
+            type: Schema.Types.ObjectId,
+            refPath: 'assigned.kind'
+        }
+    },
     created_at: {
         type: Date,
         default: Date.now()
@@ -77,7 +84,6 @@ class ImageClass {
         });
     }
 
-
     /**
      * Uploads jpeg buffer onto cloud storage
      * @param {Buffer} buffer Buffer containing jpeg image
@@ -110,23 +116,26 @@ class ImageClass {
         });
     }
 
-
     /**
      * Stores a image into cloud storage and creates a corresponding document
      *
      * @param {String} path image buffer
      * @param {User|null} user uploader
-     * @returns {ImageClass} created image
+     * @param {Object} assigned_to model image is assigned to
+     * @returns {Promise} created image
      */
-    static async upload(path, user = null) {
+    static async upload(path, user = null, assigned_to = null) {
         const self = this;
         const img = new self();
         img.uploader = user;
-
+        if (assigned_to) {
+            img.assigned.to = assigned_to;
+            img.assigned.kind = assigned_to.constructor.modelName;
+        }
         // const exif = await this._getExifInformation(path);
 
         // Resize images
-        const [small, middle, large] = await Promise.all([
+        const buffers = await Promise.all([
             sharp(path)
                 .resize(200, 200)
                 .max()
@@ -143,6 +152,9 @@ class ImageClass {
                 .toFormat('jpeg')
                 .toBuffer()
         ]);
+        const small = buffers[0];
+        const middle = buffers[1];
+        const large = buffers[2];
         const baseFileName = URLSafeBase64.encode(img.uuid);
 
         try {
@@ -153,7 +165,7 @@ class ImageClass {
                 this._uploadImage(large, baseFileName + '_' + 'large.jpeg')
             ]);
             // Images a stored
-            return await img.save();
+            return img.save();
         } catch (err) {
             // Error happened try to clean up storage
             await  Promise.all([
@@ -186,8 +198,44 @@ class ImageClass {
             this._tryRemoveImage(baseFileName + '_' + 'middle.jpeg'),
             this._tryRemoveImage(baseFileName + '_' + 'large.jpeg')
         ]);
-        return await img.remove();
+        return img.remove();
     }
+
+    toJSON() {
+        const obj = this.toObject({
+            depopulate: true
+        });
+        return obj;
+    }
+
+    get baseFileName() {
+        return URLSafeBase64.encode(this.uuid);
+    }
+
+    _getUrl(postfix) {
+        return new Promise((resolve, reject) => {
+            minioClient.presignedGetObject(config.minio.bucket, this.baseFileName + '_' + postfix + '.jpeg',
+                24 * 60 * 60, function (err, presignedUrl) {
+                    if (err)
+                        reject(err);
+                    else
+                        resolve(presignedUrl);
+                });
+        });
+    }
+
+    smallUrl() {
+        return this._getUrl('small');
+    }
+
+    middleUrl() {
+        return this._getUrl('middle');
+    }
+
+    largeUrl() {
+        return this._getUrl('large');
+    }
+
 }
 
 ImageSchema.loadClass(ImageClass);

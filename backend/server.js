@@ -129,7 +129,6 @@ server.post('sessions', session.postSession);
 server.get('users', auth, user.profile);
 
 server.get('users/:name', user.profile);
-server.get('users/:name/avatar', auth, user.getAvatar);
 
 server.post('users', user.register, (request, response, next) => {
     io.sockets.emit('new user', 'hello');
@@ -141,15 +140,14 @@ server.put('users', auth, user.updateUser);
 server.del('users', auth, user.deleteUser);
 
 server.get('profile', auth, user.profile);
-server.get('profile/avatar', auth, user.getAvatar);
-
-server.del('profile/friends/:name', auth, user.removeFriend);
 
 server.post('profile/avatar', auth, user.uploadAvatar);
+server.del('profile/avatar', auth, user.deleteAvatar);
 
+server.del('profile/friends/:name', auth, user.removeFriend);
 server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
-server.del('profile/avatar', auth, user.deleteAvatar);
+
 
 // Chat
 server.get('chats/:chatId', auth, chat.getConversation);
