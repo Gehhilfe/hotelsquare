@@ -21,6 +21,8 @@ const server = restify.createServer();
 const io = require('socket.io').listen(server);
 chatsocket(io);
 
+const Image = require('./app/models/image');
+
 util.connectDatabase(mongoose).then(async () => {
     //Bootstrap database
     if (process.env.NODE_ENV !== 'production') {
@@ -147,7 +149,12 @@ server.del('profile/avatar', auth, user.deleteAvatar);
 server.del('profile/friends/:name', auth, user.removeFriend);
 server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 
-
+// Image
+server.post('images', async (request, response, next) => {
+    const img = await Image.upload(request.files.image.path);
+    response.json(img);
+    return next();
+});
 
 // Chat
 server.get('chats/:chatId', auth, chat.getConversation);
