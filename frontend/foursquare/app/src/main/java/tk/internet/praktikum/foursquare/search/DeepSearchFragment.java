@@ -76,7 +76,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             }
         });
         filterRadius = (SeekBar) view.findViewById(R.id.seekBarRadius);
+        filterRadius.setMax(50);
         seekBarView=(TextView)view.findViewById(R.id.seekBarView);
+
         mapViewButton=(ToggleButton)view.findViewById(R.id.is_map_view);
         isMapView=false;
         mapViewButton.setChecked(true);
@@ -270,5 +272,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
          };
 
      }
+
+
 
 }
