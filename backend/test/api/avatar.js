@@ -79,6 +79,29 @@ describe('User Avatar', () => {
                 });
         }).timeout(10000);
 
+        it('should retrieve a image', (done) => {
+            request(server)
+                .post('/profile/avatar')
+                .set('x-auth', token)
+                .attach('image', imagePath)
+                .end((err, res) => {
+                    request(server)
+                        .get('/images/' + res.body.avatar._id + '/0/image.jpeg')
+                        .end((err, innerRes) => {
+                            expect(err).to.be.null;
+                            res.status.should.be.equal(200);
+                            request(server)
+                                .get('/images/' + res.body.avatar._id + '/0/image.jpeg')
+                                .set('If-None-Match', innerRes.header.etag)
+                                .end((err, res) => {
+                                    expect(err).to.be.null;
+                                    res.status.should.be.equal(304);
+                                    return done();
+                                });
+                        });
+                });
+        }).timeout(10000);
+
         it('should delete the stored image', (done) => {
             request(server)
                 .post('/profile/avatar')
@@ -96,4 +119,5 @@ describe('User Avatar', () => {
                 });
         });
     });
-});
+})
+;
