@@ -20,8 +20,6 @@ const tempWrite = require('temp-write');
 const fs = require('fs');
 const path = require('path');
 
-const testHelpers = require('../../lib/test_helpers');
-
 const mochaAsync = (fn) => {
     return (done) => {
         fn.call().then(done, (err) => {
@@ -76,7 +74,6 @@ describe('User Avatar', () => {
                 .attach('image', imagePath)
                 .end((err, res) => {
                     expect(err).to.be.null;
-                    console.log(res.body);
                     res.status.should.be.equal(200);
                     return done();
                 });

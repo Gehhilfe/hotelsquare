@@ -164,10 +164,6 @@ server.get('chats', auth, chat.getConversations);
 
 // Venue
 server.get('venues/:id', venue.getVenue);
-server.post('venues/images', auth, venue.putImage);
-server.get('venues/images', auth, venue.getImage);
-server.del('venues/images', auth, venue.delImage);
-server.get('venues/imagenames', auth, venue.getImageNames);
 
 server.post('venues/:id/comments', auth, venue.addComment);
 server.get('venues/comments', venue.getComments);
