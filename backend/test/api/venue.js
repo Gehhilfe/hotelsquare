@@ -30,6 +30,7 @@ describe('venue', () => {
         await Util.connectDatabase(mongoose);
         await Venue.remove({});
         await User.remove({});
+        await SearchRequest.remove({});
 
         const res = await request(server)
             .post('/searches/venues')
