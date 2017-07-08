@@ -10,7 +10,7 @@ import java.util.List;
 public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
 
     private final List<Fragment> fragmentList = new ArrayList<>();
-    private final List<String> fragmentTitletList = new ArrayList<>();
+    private final List<String> fragmentTitleList = new ArrayList<>();
 
     public UserStatePagerAdapter(FragmentManager fm) {
         super(fm);
@@ -18,7 +18,7 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
 
     public void addFragment(Fragment fragment, String title) {
         fragmentList.add(fragment);
-        fragmentTitletList.add(title);
+        fragmentTitleList.add(title);
     }
 
     @Override
@@ -29,5 +29,17 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return fragmentList.size();
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        String title = "";
+        if (position == 0) {
+            title = "profile";
+        }else if (position == 1) {
+            title = "friendlist";
+        }
+
+        return title;
     }
 }
