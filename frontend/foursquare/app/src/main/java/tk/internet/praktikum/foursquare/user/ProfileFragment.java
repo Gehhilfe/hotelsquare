@@ -1,12 +1,13 @@
 package tk.internet.praktikum.foursquare.user;
 
 
+import android.support.v4.app.Fragment;
 import android.app.AlertDialog;
+//import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +30,6 @@ import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 import static android.app.Activity.RESULT_OK;
-
-//import android.app.Fragment;
 
 public class ProfileFragment extends Fragment {
     private TextView name, email, password, city;
@@ -80,7 +79,8 @@ public class ProfileFragment extends Fragment {
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.profile(name.getText().toString())
+            service.profile(LocalStorage.
+                    getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.NAME, ""))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(

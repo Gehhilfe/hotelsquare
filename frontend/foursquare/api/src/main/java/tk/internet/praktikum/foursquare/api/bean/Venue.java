@@ -17,7 +17,10 @@ public class Venue {
     private int rating;
     private int utc_offset;
 
-    public Venue() {}
+    private int check_ins_count = -1;
+
+    public Venue() {
+    }
 
     public int getRating() {
         return rating;
@@ -73,5 +76,9 @@ public class Venue {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public int getCheckInCount() {
+        return check_ins_count;
     }
 }

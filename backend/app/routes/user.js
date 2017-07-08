@@ -42,8 +42,8 @@ const handleValidation = (next, func) => {
  * @returns {undefined}
  */
 async function search(request, response, next) {
-    let query = User.find({name: new RegExp(request.body.name, 'i')});
-    if (request.body.gender)
+    let query = User.find({ name: new RegExp(request.body.name, 'i'), _id: {$ne: request.authentication._id}  });
+    if(request.body.gender)
         query = query.where('gender').equals(request.body.gender);
     let result = await query;
     result = result.map((user) => {
