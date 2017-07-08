@@ -11,19 +11,11 @@ public class FriendRequest {
     @SerializedName("created_at")
     private Date createdAt;
 
-    public String getSender() {
+    public String getSenderID() {
         return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
     }
 
     public Date getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 }
