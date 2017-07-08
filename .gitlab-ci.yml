@@ -80,15 +80,15 @@ backend-deploy-container-dev:
   script:
    - upgrade --stack ip-dev --service node-app
    
-frontend-build:
-  stage: test
-  only:
-   - /frontend/
-   - dev
-   - master
-  image: jangrewe/gitlab-ci-android
-  script:
-   - cd frontend/foursquare
-   - export GRADLE_USER_HOME=$(pwd)/.gradle
-   - chmod +x ./gradlew
-   - ./gradlew assembleDebug
+#frontend-build:
+#  stage: test
+#  only:
+#   - /frontend/
+#   - dev
+#   - master
+#  image: jangrewe/gitlab-ci-android
+#  script:
+#   - cd frontend/foursquare
+#   - export GRADLE_USER_HOME=$(pwd)/.gradle
+#   - chmod +x ./gradlew
+#   - ./gradlew assembleDebug

@@ -1,28 +1,23 @@
 package tk.internet.praktikum.foursquare.api.bean;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.InputStream;
 import java.util.List;
 
 public class Venue {
 
+    @SerializedName("_id")
+    private String id;
     private String name;
     private String place_id;
     private String reference;
     private List<String> types;
     private Location location;
-    private String address;
     private int rating;
-    private InputStream image;
+    private int utc_offset;
 
     public Venue() {}
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     public int getRating() {
         return rating;
@@ -31,15 +26,6 @@ public class Venue {
     public void setRating(int rating) {
         this.rating = rating;
     }
-
-    public InputStream getImage() {
-        return image;
-    }
-
-    public void setImage(InputStream image) {
-        this.image = image;
-    }
-
 
     public String getName() {
         return name;
@@ -79,5 +65,13 @@ public class Venue {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
