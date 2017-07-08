@@ -33,15 +33,15 @@ public interface UserService {
     @POST("users")
     Observable<User> register(@Body User user);
 
-    /**
-     * Allows to change user properties
-     * Fields that should not changed should be null
-     *
-     * @param user changed user
-     * @return new user model
-     */
-    @PUT("users")
-    Observable<User> update(@Body User user);
+        /**
+         * Allows to change user properties
+         * Fields that should not changed should be null
+         *
+         * @param user changed user
+         * @return new user model
+         */
+        @PUT("users")
+        Observable<User> update(@Body User user);
 
     /**
      * Retrives profile of user with name

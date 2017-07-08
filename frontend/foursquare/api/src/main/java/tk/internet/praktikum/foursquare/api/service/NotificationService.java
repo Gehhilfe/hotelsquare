@@ -26,7 +26,7 @@ public class NotificationService {
 
     public void connect(TokenInformation tokenInformation) {
         _socket.connect();
-        _socket.on(tokenInformation.getId(), new Emitter.Listener() {
+        _socket.on(tokenInformation.getUser().getId(), new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 JSONObject data = (JSONObject) args[0];

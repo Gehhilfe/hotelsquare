@@ -19,6 +19,7 @@ public class User implements Serializable
 
     @SerializedName("friend_requests")
     List<FriendRequest> friendRequests;
+    private String _id;
 
     public User() {}
 
@@ -71,5 +72,17 @@ public class User implements Serializable
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getId() {
+        return _id;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
     }
 }
