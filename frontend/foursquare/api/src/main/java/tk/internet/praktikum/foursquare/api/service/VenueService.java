@@ -6,7 +6,9 @@ import io.reactivex.Observable;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import tk.internet.praktikum.foursquare.api.bean.CheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueSearchQuery;
 import tk.internet.praktikum.foursquare.api.bean.VenueSearchResult;
@@ -37,4 +39,12 @@ public interface VenueService {
      */
     @GET("venues/{id}")
     Observable<Venue> getDetails(@Path("id") String id);
+
+    /**
+     * Checks user authenticated with token into venue with id
+     * @param id venue id
+     * @return checkin information
+     */
+    @PUT("venues/{id}/checkin")
+    Observable<CheckinInformation> checkin(@Path("id") String id);
 }
