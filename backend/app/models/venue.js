@@ -118,7 +118,7 @@ class VenueClass {
         // Search for checkin
         let index = -1;
         let checkin = _.find(this.check_ins, (v, i) =>{
-            if(v.user === user) {
+            if(v.user.equals(user._id)) {
                 index = i;
                 return true;
             } else
@@ -142,6 +142,12 @@ class VenueClass {
             this.check_ins.push(checkin);
         else
             this.check_ins[index] = checkin;
+
+        return {
+            user: user._id,
+            count: checkin.count,
+            last: checkin.last
+        };
     }
 
     async loadDetails() {

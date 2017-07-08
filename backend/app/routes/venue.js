@@ -339,6 +339,21 @@ function delComment(request, response, next) {
     });
 }
 
+/**
+ * Checkins authenticated user into venue given per parameter id
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function checkin(request, response, next) {
+    const venue = await Venue.findOne({_id: request.params.id});
+    response.send(venue.checkIn(request.authentication));
+    await venue.save();
+    return next();
+}
+
 module.exports = {
     queryVenue,
     queryAllVenuesFromGoogle,
@@ -348,6 +363,7 @@ module.exports = {
     addComment,
     getComments,
     delComment,
-    getVenue
+    getVenue,
+    checkin
 };
 

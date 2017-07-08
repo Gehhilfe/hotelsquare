@@ -53,6 +53,18 @@ describe('User', () => {
                 });
         });
 
+        it('should retrieve user information when id given', (done) => {
+            request(server)
+                .get('/users/id/'+peter._id)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(peter.name);
+                    expect(res.body.email).to.be.undefined;
+                    return done();
+                });
+        });
+
         it('should respond with 404 if user is unkown', (done) => {
             request(server)
                 .get('/users/unkown')

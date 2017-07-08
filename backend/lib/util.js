@@ -71,11 +71,11 @@ function bootstrapFriendRequets(data) {
 async function initDatabase() {
 //Bootstrap database
     if (process.env.NODE_ENV !== 'production') {
-        const User = require('./app/models/user');
-        const Venue = require('./app/models/venue');
-        const Message = require('./app/models/message');
-        const SearchRequest = require('./app/models/searchrequest');
-        const GeocodeResult = require('./app/models/geocoderesult');
+        const User = require('./../app/models/user');
+        const Venue = require('./../app/models/venue');
+        const Message = require('./../app/models/message');
+        const SearchRequest = require('./../app/models/searchrequest');
+        const GeocodeResult = require('./../app/models/geocoderesult');
 
         await Promise.all([
             Venue.remove({}),
