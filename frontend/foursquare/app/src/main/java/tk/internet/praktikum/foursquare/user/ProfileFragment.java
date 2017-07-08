@@ -26,6 +26,7 @@ import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -74,13 +75,12 @@ public class ProfileFragment extends Fragment {
     }
 
     private void initialiseProfile() {
-        UserService service = ServiceFactory
-                .createRetrofitService(UserService.class, URL, LocalStorage.
+        ProfileService service = ServiceFactory
+                .createRetrofitService(ProfileService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.profile(LocalStorage.
-                    getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.NAME, ""))
+            service.profile()
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
@@ -91,7 +91,7 @@ public class ProfileFragment extends Fragment {
                                 city.setText(currentUser.getName());
                             },
                             throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), "Error fetching user Informations.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                     );
         }catch (Exception e) {
