@@ -2,37 +2,30 @@
 
 const restify = require('restify');
 const User = require('../models/user');
-const minio = require('minio');
-const config = require('config');
-const sharp = require('sharp');
+const Image = require('../models/image');
 
 const ValidationError = require('../errors/ValidationError');
 
-const minioClient = new minio.Client({
-    endPoint: 'stimi.ovh',
-    port: 9000,
-    secure: false,
-    accessKey: config.minio.key,
-    secretKey: config.minio.secret
-});
 
 const handleValidation = (next, func) => {
     func().catch((error) => {
         switch (error.name) {
         case 'MongoError':
-            if(error.errmsg.includes('name')) {
+            if (error.errmsg.includes('name')) {
                 return next(new ValidationError({
                     name: {
                         message: 'Name is already taken'
-                    }}));
+                    }
+                }));
             }
-            if(error.errmsg.includes('email')) {
+            if (error.errmsg.includes('email')) {
                 return next(new ValidationError({
                     email: {
                         message: 'Email is already used'
-                    }}));
+                    }
+                }));
             }
-            break;
+            return next();
 
         case 'ValidationError':
             return next(new ValidationError(error.errors));
@@ -40,13 +33,20 @@ const handleValidation = (next, func) => {
     });
 };
 
-
+/**
+ * Search for user by name and filters results by gender when gender is provided.
+ *
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
 async function search(request, response, next) {
     let query = User.find({ name: new RegExp(request.body.name, 'i'), _id: {$ne: request.authentication._id}  });
     if(request.body.gender)
         query = query.where('gender').equals(request.body.gender);
     let result = await query;
-    result =  result.map( (user) => {
+    result = result.map((user) => {
         const obj = user.toJSONPublic();
         obj.type = 'user';
         return obj;
@@ -58,7 +58,7 @@ async function search(request, response, next) {
 /**
  * Retrieves user profile
  *
- * @function register
+ * @function profile
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler
@@ -87,7 +87,7 @@ async function profile(request, response, next) {
 /**
  * Retrieves user profile information
  *
- * @function register
+ * @function updateUser
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler
@@ -145,64 +145,33 @@ async function deleteUser(request, response, next) {
  * @returns {undefined}
  */
 async function uploadAvatar(request, response, next) {
-    //Convert to jpeg
-    const buffer = await sharp(request.files.avatar.path)
-        .resize(200, 200)
-        .toFormat('jpeg')
-        .toBuffer();
-
-    minioClient.putObject(config.minio.bucket, 'avatar_' + request.authentication.name + '.jpeg', buffer, 'image/jpeg', (err, etag) => {
-        if (err) {
-            response.send(500, err);
-            return next();
-        } else {
-            response.json(etag);
-            return next();
-        }
-    });
+    let user = await User.findOne({name: request.authentication.name});
+    if(user.avatar) {
+        await Image.destroy(user.avatar);
+    }
+    user.avatar = await Image.upload(request.files.image.path, user, user);
+    user = await user.save();
+    response.json(user);
+    return next();
 }
 
 /**
- * Deletes a stored avater image for the authenticated user.
+ * Deletes a stored avatar image for the authenticated user.
  *
  * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function deleteAvatar(request, response, next) {
-    minioClient.removeObject(config.minio.bucket, 'avatar_' + request.authentication.name + '.jpeg', (err) => {
-        if (err) {
-            response.send('404', 'Avatar for ' + request.authentication.name + ' not found');
-        } else {
-            response.send();
-        }
-        return next();
-    });
-}
-
-/**
- * Retrieves a stored avater image for a user.
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-function getAvatar(request, response, next) {
-    // When no name provided use authenticated user
-    if (request.params.name === undefined)
-        request.params.name = request.authentication.name;
-
-    minioClient.getObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', (err, buffer) => {
-        if (err) {
-            response.send(404, '');
-        } else {
-            response.setHeader('Content-Type', 'image/jpeg');
-            buffer.pipe(response);
-        }
-        return next();
-    });
+async function deleteAvatar(request, response, next) {
+    let user = await User.findOne({name: request.authentication.name}).populate('avatar');
+    if(user.avatar) {
+        await Image.destroy(user.avatar);
+    }
+    user.avatar = undefined;
+    user = await user.save();
+    response.json(user);
+    return next();
 }
 
 /**
@@ -215,8 +184,8 @@ function getAvatar(request, response, next) {
  */
 async function sendFriendRequest(request, response, next) {
     const results = await Promise.all([
-        User.findOne({name: request.params.name, 'friend_requests.sender': { $in: [request.authentication._id]}}),
-        User.findOne({name: request.params.name, friends: { $in: [request.authentication._id]}})
+        User.findOne({name: request.params.name, 'friend_requests.sender': {$in: [request.authentication._id]}}),
+        User.findOne({name: request.params.name, friends: {$in: [request.authentication._id]}})
     ]);
     if (results[0] === null && results[1] == null) {
         const res = await User.findOne({name: request.params.name});
@@ -309,7 +278,6 @@ module.exports = {
     register,
     deleteUser,
     uploadAvatar,
-    getAvatar,
     deleteAvatar,
     profile,
     sendFriendRequest,

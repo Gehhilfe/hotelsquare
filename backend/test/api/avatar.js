@@ -3,7 +3,13 @@
 const mongoose = require('mongoose');
 const chai = require('chai');
 const server = require('../../server');
-const util = require('../../lib/util');
+const Util = require('../../lib/util');
+const jsonwt = require('jsonwebtoken');
+const config = require('config');
+
+const User = require('../../app/models/user');
+const Image = require('../../app/models/image');
+
 chai.should();
 
 const expect = chai.expect;
@@ -14,20 +20,30 @@ const tempWrite = require('temp-write');
 const fs = require('fs');
 const path = require('path');
 
-const testHelpers = require('../../lib/test_helpers');
+const mochaAsync = (fn) => {
+    return (done) => {
+        fn.call().then(done, (err) => {
+            return done(err);
+        });
+    };
+};
 
 describe('User Avatar', () => {
 
-    const token = testHelpers.createToken({
-        _id: '0815d3241212',
-        name: 'testUser',
-        email: 'test@test.de'
-    });
+    let user, token;
 
-    beforeEach((done) => {
-        util.connectDatabase(mongoose);
-        return done();
-    });
+    beforeEach(mochaAsync(async () => {
+        mongoose.Promise = global.Promise;
+
+        await Util.connectDatabase(mongoose);
+        await Promise.all([
+            Image.remove({}),
+            User.remove({})
+        ]);
+
+        user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
+        token = jsonwt.sign(user.toJSON(), config.jwt.secret, config.jwt.options);
+    }));
 
     describe('/profile/avatar', () => {
 
@@ -55,57 +71,27 @@ describe('User Avatar', () => {
             request(server)
                 .post('/profile/avatar')
                 .set('x-auth', token)
-                .attach('avatar', imagePath)
+                .attach('image', imagePath)
                 .end((err, res) => {
                     expect(err).to.be.null;
-                    res.should.have.status(200);
+                    res.status.should.be.equal(200);
                     return done();
                 });
-        });
-
-        it('should retrieve stored image', (done) => {
-            request(server)
-                .get('/profile/avatar')
-                .set('x-auth', token)
-                .end((err, res) => {
-                    expect(err).to.be.null;
-                    res.should.have.status(200);
-                    res.should.have.header('content-type', /jpeg/);
-                    return done();
-                });
-        });
-
-        it('should respond with 404 when image not found', (done) => {
-            request(server)
-                .get('/user/unknown/avatar')
-                .set('x-auth', token)
-                .end((err, res) => {
-                    expect(err).to.be.null;
-                    res.should.have.status(404);
-                    return done();
-                });
-        });
+        }).timeout(10000);
 
         it('should delete the stored image', (done) => {
             request(server)
                 .post('/profile/avatar')
                 .set('x-auth', token)
-                .attach('avatar', imagePath)
+                .attach('image', imagePath)
                 .end((err) => {
                     expect(err).to.be.null;
                     request(server)
                         .del('/profile/avatar')
                         .set('x-auth', token)
-                        .end((err) => {
-                            expect(err).to.be.null;
-                            request(server)
-                                .get('/profile/avatar')
-                                .set('x-auth', token)
-                                .end((err, res) => {
-                                    expect(err).to.be.null;
-                                    res.should.have.status(404);
-                                    return done();
-                                });
+                        .end((err, res) => {
+                            expect(res.body.avatar).to.be.undefined;
+                            return done();
                         });
                 });
         });

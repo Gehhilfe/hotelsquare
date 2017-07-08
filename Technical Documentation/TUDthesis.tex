@@ -1,0 +1,208 @@
+\documentclass[12pt,
+article,
+type=sta, %sta, diplom, bsc, pp, msc, dr, drfinal, sem, prosem, bsc
+colorbacktitle,
+instlogo,
+english,
+accentcolor=tud9c,
+%twoside
+]{tudthesis}
+
+\usepackage[english,ngerman]{babel}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[ngerman]{todonotes}
+
+% linebreak for urls in bitex
+\usepackage{url}
+\urlstyle{rm}
+
+%listings
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usepackage{color}
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+\lstdefinelanguage{JavaScript}{
+	keywords={break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with},
+	morecomment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]',
+	morestring=[b]",
+	ndkeywords={class, export, boolean, throw, implements, import, this},
+	keywordstyle=\color{blue}\bfseries,
+	ndkeywordstyle=\color{darkgray}\bfseries,
+	identifierstyle=\color{black},
+	commentstyle=\color{purple}\ttfamily,
+	stringstyle=\color{red}\ttfamily,
+	sensitive=true
+}
+
+\lstset{
+	language=JavaScript,
+	backgroundcolor=\color{lightgray},
+	extendedchars=true,
+	basicstyle=\footnotesize\ttfamily,
+	showstringspaces=false,
+	showspaces=false,
+	numbers=left,
+	numberstyle=\footnotesize,
+	numbersep=9pt,
+	tabsize=2,
+	breaklines=true,
+	showtabs=false,
+	captionpos=b
+}
+
+\definecolor{pblue}{rgb}{0.13,0.13,1}
+\definecolor{pgreen}{rgb}{0,0.5,0}
+\definecolor{pred}{rgb}{0.9,0,0}
+\definecolor{pgrey}{rgb}{0.46,0.45,0.48}
+
+\lstset{language=Java,
+	showspaces=false,
+	showtabs=false,
+	breaklines=true,
+	showstringspaces=false,
+	breakatwhitespace=true,
+	commentstyle=\color{pgreen},
+	keywordstyle=\color{pblue},
+	stringstyle=\color{pred},
+	basicstyle=\ttfamily,
+	moredelim=[il][\textcolor{pgrey}]{\$\$},
+	moredelim=[is][\textcolor{pgrey}]{\%\%}{\%\%}
+}
+
+\newcommand\JSONnumbervaluestyle{\color{blue}}
+\newcommand\JSONstringvaluestyle{\color{red}}
+
+% switch used as state variable
+\newif\ifcolonfoundonthisline
+
+\makeatletter
+
+\lstdefinestyle{json}
+{
+	showstringspaces    = false,
+	keywords            = {false,true},
+	alsoletter          = 0123456789.,
+	morestring          = [s]{"}{"},
+	stringstyle         = \ifcolonfoundonthisline\JSONstringvaluestyle\fi,
+	MoreSelectCharTable =%
+	\lst@DefSaveDef{`:}\colon@json{\processColon@json},
+	basicstyle          = \ttfamily,
+	keywordstyle        = \ttfamily\bfseries,
+}
+
+% flip the switch if a colon is found in Pmode
+\newcommand\processColon@json{%
+	\colon@json%
+	\ifnum\lst@mode=\lst@Pmode%
+	\global\colonfoundonthislinetrue%
+	\fi
+}
+
+\lst@AddToHook{Output}{%
+	\ifcolonfoundonthisline%
+	\ifnum\lst@mode=\lst@Pmode%
+	\def\lst@thestyle{\JSONnumbervaluestyle}%
+	\fi
+	\fi
+	%override by keyword style if a keyword is detected!
+	\lsthk@DetectKeywords% 
+}
+
+% reset the switch at the end of line
+\lst@AddToHook{EOL}%
+{\global\colonfoundonthislinefalse}
+
+\makeatother
+
+\newcommand{\getmydate}{%
+	\iflanguage{ngerman}{%
+		\ifcase\month%
+		\or Januar\or Februar\or M\"arz%
+		\or April\or Mai\or Juni\or Juli%
+		\or August\or September\or Oktober%
+		\or November\or Dezember%
+		\fi\ \number\year%
+	}%
+	\iflanguage{english}{%
+		\ifcase\month%
+		\or January\or February\or March%
+		\or April\or May\or June\or July%
+		\or August\or September\or October%
+		\or November\or December%
+		\fi\ \number\year%
+	}
+}
+% changed counter for section wise counting
+\usepackage{chngcntr}
+\counterwithin{figure}{section} 
+\counterwithin{table}{section} 
+
+\setinstitutionlogo[height]{logo/tk_logo.jpg}
+
+\usepackage{float}
+
+\setlength{\parindent}{0pt} 
+
+\begin{document}
+	
+	\renewcommand{\floatpagefraction}{.8}
+	
+	\selectlanguage{english}
+	\counterwithin{lstlisting}{section}
+	\thesistitle{Internet Praktikum - HOTEL Square}{Technical Documentation}
+	
+	\author{Tim Burkert, Christian Hack, Marco Huber, Truong, Robert Königstein}
+	
+	\referee{Prof. Dr. M\"uhlh\"auser}{Dipl.-Inform. Sebastian Kauschke}[M.Sc. Christian Meurisch]
+	
+	\department{\mbox{Department of Computer Science}\\ (FB20)\\\\\\\\Prof. Dr. M\"uhlh\"auser\\\ Hochschulstr. 10
+		\\ 64289 Darmstadt \\\\www.tk.informatik.tu-darmstadt.de}
+	\group{Telecooperation Group}
+	
+	\selectlanguage{ngerman}
+	\makethesistitle
+	\selectlanguage{english}
+	\affidavit{Tim Burkert, Christian Hack, Marco Huber, Truong, Robert K\"onigstein}
+	
+	\cleardoublepage
+	\listoftodos
+	\cleardoublepage
+	
+	\pagenumbering{Roman}
+
+	\cleardoublepage
+	\tableofcontents
+	\cleardoublepage
+	\listoffigures
+	\cleardoublepage
+	\listoftables
+	\cleardoublepage
+	
+	\pagenumbering{arabic}
+	
+	%all chapters	
+	\input{chapters/Introduction}
+	\cleardoublepage
+	\input{chapters/Frontend}
+	\cleardoublepage
+	\input{chapters/Backend}
+	\cleardoublepage
+	
+	
+	%\bibliographystyle{alphadin}
+	%\bibliography{literature}
+	
+	%\begin{appendix}
+	%\section{Erster Anhang}
+	%\end{appendix}
+	
+\end{document}

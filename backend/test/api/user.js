@@ -18,24 +18,20 @@ describe('User', () => {
 
     let peter;
     let peter2;
-    let peter3;
     let peterToken;
     let peter2Token;
-    let peter3Token;
 
 
     beforeEach((done) => {
         Util.connectDatabase(mongoose).then(function () {
             User.remove({}).then(() => {
-                User.create({name: 'peter', email: 'peter123@cool.de', password: 'peter99', gender: 'm'}).then((user) => {
+                User.create({name: 'peter111', email: 'peter123@cool.de', password: 'peter99', gender: 'm'}).then((user) => {
                     peter = user;
                     peterToken = jsonwt.sign(peter.toJSON(), config.jwt.secret, config.jwt.options);
-                    User.create({name: 'peter2', email: 'peter1223@cool.de', password: 'peter99', gender: 'f'}).then((user) => {
+                    User.create({name: 'peter1112', email: 'peter1223@cool.de', password: 'peter99', gender: 'f'}).then((user) => {
                         peter2 = user;
                         peter2Token = jsonwt.sign(peter2.toJSON(), config.jwt.secret, config.jwt.options);
-                        User.create({name: 'peter3', email: 'peter12223@cool.de', password: 'peter99'}).then((user) => {
-                            peter3 = user;
-                            peter3Token = jsonwt.sign(peter3.toJSON(), config.jwt.secret, config.jwt.options);
+                        User.create({name: 'peter1113', email: 'peter12223@cool.de', password: 'peter99'}).then(() => {
                             return done();
                         });
                     });
@@ -47,7 +43,7 @@ describe('User', () => {
     describe('GET user', () => {
         it('should retrieve user information when name given', (done) => {
             request(server)
-                .get('/user/'+peter.name)
+                .get('/users/'+peter.name)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
@@ -59,7 +55,7 @@ describe('User', () => {
 
         it('should respond with 404 if user is unkown', (done) => {
             request(server)
-                .get('/user/unkown')
+                .get('/users/unkown')
                 .end((err, res) => {
                     res.should.have.status(404);
                     return done();
@@ -68,7 +64,7 @@ describe('User', () => {
 
         it('should retrieve own user information when authenticated and no name given', (done) => {
             request(server)
-                .get('/user')
+                .get('/profile')
                 .set('x-auth', peterToken)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -86,7 +82,7 @@ describe('User', () => {
             const before_updated_at = peter.updated_at;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', peterToken)
                 .send({gender: 'm'})
                 .end((err, res) => {
@@ -98,12 +94,29 @@ describe('User', () => {
                     return done();
                 });
         });
+        
+        it('should change the location', (done) => {
+            const before_location = peter.location.coordinates;
+            
+            request(server)
+                .put('/users')
+                .set('x-auth', peterToken)
+                .send({location:{ coordinates: [1.0, 1.0]}})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.name.should.be.equal(peter.name);
+                    res.body.gender.should.be.equal('m');
+                    res.body.location.coordinates.should.not.equal(before_location);
+                    return done();
+                });
+        });
 
         it('should change the password', (done) => {
             const before_password = peter.password;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', peterToken)
                 .send({password: 'leetpassword'})
                 .end((err, res) => {
@@ -119,7 +132,7 @@ describe('User', () => {
             const before_password = peter.password;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', peterToken)
                 .send({gender: 's'})
                 .end((err, res) => {
@@ -136,7 +149,7 @@ describe('User', () => {
             const before_password = peter.password;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', peterToken)
                 .send({password: 'short'})
                 .end((err, res) => {
@@ -153,7 +166,7 @@ describe('User', () => {
             const before_updated_at = peter.updated_at;
 
             request(server)
-                .put('/user')
+                .put('/users')
                 .set('x-auth', peterToken)
                 .send({})
                 .end((err, res) => {
@@ -174,7 +187,7 @@ describe('User', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -184,12 +197,12 @@ describe('User', () => {
 
         it('should not register user with same name', (done) => {
             const registrationData = {
-                name: 'peter',
+                name: peter.name,
                 email: 'mail@online.de',
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -205,7 +218,7 @@ describe('User', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -220,7 +233,7 @@ describe('User', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -234,7 +247,7 @@ describe('User', () => {
                 password: 'secret'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -248,7 +261,7 @@ describe('User', () => {
                 name: 'test'
             };
             request(server)
-                .post('/user')
+                .post('/users')
                 .send(registrationData)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -261,7 +274,7 @@ describe('User', () => {
 
         it('should delete user if authenticated', (done) => {
             request(server)
-                .delete('/user')
+                .delete('/users')
                 .set('x-auth', peterToken)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -326,7 +339,7 @@ describe('User', () => {
     describe('friend requests', () => {
         it('should be able to send a friend request', (done) => {
             request(server)
-                .post('/user/'+peter2.name+'/friend_requests')
+                .post('/users/'+peter2.name+'/friend_requests')
                 .set('x-auth', peterToken)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -358,7 +371,7 @@ describe('User', () => {
 
             it('should not add another request', (done) => {
                 request(server)
-                    .post('/user/'+peter2.name+'/friend_requests')
+                    .post('/users/'+peter2.name+'/friend_requests')
                     .set('x-auth', peterToken)
                     .end((err, res) => {
                         res.should.have.status(400);
@@ -422,7 +435,7 @@ describe('User', () => {
 
             it('should result in error', (done) => {
                 request(server)
-                    .post('/user/'+peter2.name+'/friend_requests')
+                    .post('/users/'+peter2.name+'/friend_requests')
                     .set('x-auth', peterToken)
                     .end((err, res) => {
                         res.should.have.status(400);
@@ -438,7 +451,7 @@ describe('User', () => {
     describe('search', () => {
         it('should not include themselfs', (done) => {
             request(server)
-                .post('/users')
+                .post('/searches/users')
                 .set('x-auth', peterToken)
                 .send({ name: 'pet'})
                 .end((err, res) => {
@@ -450,7 +463,7 @@ describe('User', () => {
 
         it('should find both users', (done) => {
             request(server)
-                .post('/users')
+                .post('/searches/users')
                 .set('x-auth', peterToken)
                 .send({ name: 'pet'})
                 .end((err, res) => {
@@ -462,9 +475,9 @@ describe('User', () => {
 
         it('should find only peter2', (done) => {
             request(server)
-                .post('/users')
+                .post('/searches/users')
                 .set('x-auth', peterToken)
-                .send({ name: 'er2'})
+                .send({ name: '12'})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.length.should.equal(1);
@@ -474,7 +487,7 @@ describe('User', () => {
 
         it('should filter by gender male', (done) => {
             request(server)
-                .post('/users')
+                .post('/searches/users')
                 .set('x-auth', peterToken)
                 .send({ name: 'p', gender: 'f'})
                 .end((err, res) => {
@@ -486,7 +499,7 @@ describe('User', () => {
 
         it('should filter by gender female', (done) => {
             request(server)
-                .post('/users')
+                .post('/searches/users')
                 .set('x-auth', peterToken)
                 .send({ name: '2', gender: 'm'})
                 .end((err, res) => {
@@ -502,7 +515,7 @@ describe('User', () => {
 
             beforeEach((done) => {
                 request(server)
-                    .post('/users')
+                    .post('/searches/users')
                     .set('x-auth', peterToken)
                     .send({ name: 'pet'})
                     .end((err, res) => {

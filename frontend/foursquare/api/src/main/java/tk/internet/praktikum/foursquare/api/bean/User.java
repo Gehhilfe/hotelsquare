@@ -2,9 +2,9 @@ package tk.internet.praktikum.foursquare.api.bean;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.io.Serializable;
 
 public class User implements Serializable
 {
@@ -19,8 +19,14 @@ public class User implements Serializable
 
     @SerializedName("friend_requests")
     List<FriendRequest> friendRequests;
+    private String _id;
 
-    public User() {};
+    public User() {}
+
+    public User (String name,String email){
+        this.name=name;
+        this.email=email;
+    }
 
     public User(String name, String email, String password) {
         this.name = name;
@@ -66,5 +72,17 @@ public class User implements Serializable
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getId() {
+        return _id;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
     }
 }

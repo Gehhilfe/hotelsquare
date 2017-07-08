@@ -15,15 +15,14 @@ cache:
   - backend/node_modules/
 
 stages:
-  - backend
-  - backend-build
-  - backend-deploy
-  - frontend
+  - test
+  - build
+  - deploy
 
 backend-test:
   services:
    - mongo:3.5.6
-  stage: backend
+  stage: test
   coverage: '/^Statements[\s]*:[\s]*(\d+\.*\d*%)/'
   script:
    - cd backend
@@ -35,7 +34,7 @@ backend-test:
      - backend/coverage
    
 backend-lint:
-  stage: backend
+  stage: test
   script:
    - cd backend
    - export NODE_ENV=test
@@ -51,7 +50,7 @@ build-backend-container:
     DOCKER_DRIVER: overlay
   services:
     - docker:dind
-  stage: backend-build
+  stage: build
   script:
    - cd backend
    - export IMAGE_TAG=$(echo -en $CI_COMMIT_REF_NAME | tr -c '[:alnum:]_.-' '-')
@@ -65,7 +64,7 @@ backend-deploy-container-master:
   environment:
     name: staging
     url: https://staging.ip.stimi.ovh
-  stage: backend-deploy
+  stage: deploy
   image: cdrx/rancher-gitlab-deploy
   script:
    - upgrade --stack ip-master --service node-app
@@ -76,20 +75,20 @@ backend-deploy-container-dev:
   environment:
     name: dev
     url: https://dev.ip.stimi.ovh
-  stage: backend-deploy
+  stage: deploy
   image: cdrx/rancher-gitlab-deploy
   script:
    - upgrade --stack ip-dev --service node-app
    
-frontend-build:
-  stage: frontend
-  only:
-   - /frontend/
-   - dev
-   - master
-  image: jangrewe/gitlab-ci-android
-  script:
-   - cd frontend/foursquare
-   - export GRADLE_USER_HOME=$(pwd)/.gradle
-   - chmod +x ./gradlew
-   - ./gradlew assembleDebug
+#frontend-build:
+#  stage: test
+#  only:
+#   - /frontend/
+#   - dev
+#   - master
+#  image: jangrewe/gitlab-ci-android
+#  script:
+#   - cd frontend/foursquare
+#   - export GRADLE_USER_HOME=$(pwd)/.gradle
+#   - chmod +x ./gradlew
+#   - ./gradlew assembleDebug
