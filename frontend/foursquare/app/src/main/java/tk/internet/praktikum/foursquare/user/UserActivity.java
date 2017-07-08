@@ -48,12 +48,12 @@ public class UserActivity extends AppCompatActivity {
 
         userStatePagerAdapter = new UserStatePagerAdapter(getSupportFragmentManager());
         initialiseFragmentContainer(fragmentContainer);
-        //fragmentContainer.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        //tabLayout.addOnTabSelectedListener(createOnTabSelectedListener());
+        fragmentContainer.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(createOnTabSelectedListener());
     }
 
     private void initialiseFragmentContainer(ViewPager container) {
-        userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
+        //userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         container.setAdapter(userStatePagerAdapter);
     }
