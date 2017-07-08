@@ -7,18 +7,18 @@
     android:layout_marginTop="35dp"
     android:orientation="vertical"
     tools:context="tk.internet.praktikum.foursquare.MainActivity">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="35dp"
         android:orientation="vertical">
-        <!-- android:paddingLeft="24dp"
-        android:paddingRight="24dp"-->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true"
             android:weightSum="100">
 
 
@@ -44,7 +44,7 @@
                 tools:background="@drawable/edit_text_location_search" />
 
 
-            <ImageButton
+            <ToggleButton
                 android:id="@+id/is_map_view"
                 style="@android:style/Widget.DeviceDefault.Light.ImageButton"
                 android:layout_width="0dp"
@@ -52,7 +52,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_weight="10"
                 android:visibility="visible"
-                app:srcCompat="@mipmap/is_map_view" />
+                android:background="@mipmap/ic_list_view" />
 
 
         </LinearLayout>
@@ -76,7 +76,6 @@
                 android:id="@+id/seekBarRadius"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-
                 android:layout_toEndOf="@+id/imageViewRadius"
                 android:layout_weight="80" />
 
@@ -111,7 +110,7 @@
                     android:background="@drawable/optional_filter_button"
                     android:filterTouchesWhenObscured="false"
                     android:text="@string/price"
-                    android:textSize="18px" />
+                    android:textSize="25px" />
 
                 <Button
                     android:id="@+id/liked_optional_filter"
@@ -122,7 +121,7 @@
                     android:layout_weight="20"
                     android:background="@drawable/optional_filter_button"
                     android:text="@string/liked"
-                    android:textSize="18px" />
+                    android:textSize="25px" />
 
                 <Button
                     android:id="@+id/open_now_optional_filter"
@@ -133,7 +132,7 @@
                     android:layout_weight="25"
                     android:background="@drawable/optional_filter_button"
                     android:text="@string/open_now"
-                    android:textSize="18px" />
+                    android:textSize="25px" />
 
                 <Button
                     android:id="@+id/saved_optional_filter"
@@ -144,7 +143,7 @@
                     android:layout_weight="20"
                     android:background="@drawable/optional_filter_button"
                     android:text="@string/saved"
-                    android:textSize="18px" />
+                    android:textSize="25px" />
 
                 <Button
                     android:id="@+id/more_optional_filter"
@@ -155,7 +154,7 @@
                     android:layout_weight="15"
                     android:background="@drawable/optional_filter_button"
                     android:text="@string/more"
-                    android:textSize="18px" />
+                    android:textSize="25px" />
 
 
             </LinearLayout>

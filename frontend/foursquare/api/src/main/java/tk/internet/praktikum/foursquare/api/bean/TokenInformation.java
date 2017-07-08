@@ -4,8 +4,6 @@ import android.util.Base64;
 
 import com.google.gson.Gson;
 
-import org.json.JSONObject;
-
 public class TokenInformation {
 
     private String token;
