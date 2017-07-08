@@ -1,5 +1,7 @@
 package tk.internet.praktikum.foursquare.api.service;
 
+import android.os.Bundle;
+
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
