@@ -3,6 +3,7 @@ const os = require('os');
 const restify = require('restify');
 const session = require('./app/routes/session');
 const user = require('./app/routes/user');
+const image = require('./app/routes/image');
 const venue = require('./app/routes/venue');
 const chat = require('./app/routes/chat');
 const chatsocket = require('./app/routes/chatsocket');
@@ -39,15 +40,11 @@ server.post('sessions', session.postSession);
 
 // User
 server.get('users', auth, user.profile);
-
 server.get('users/:name', user.profile);
+server.get('users/id/:id', user.profileByID);
 
-server.post('users', user.register, (request, response, next) => {
-    io.sockets.emit('new user', 'hello');
-    return next();
-});
+server.post('users', user.register);
 server.post('users/:name/friend_requests', auth, user.sendFriendRequest);
-
 server.put('users', auth, user.updateUser);
 server.del('users', auth, user.deleteUser);
 
@@ -69,15 +66,23 @@ server.get('chats', auth, chat.getConversations);
 server.get('venues/:id', venue.getVenue);
 
 server.post('venues/:id/comments', auth, venue.addComment);
+
+server.put('venues/:id/checkin', auth, venue.checkin);
+
 server.get('venues/comments', venue.getComments);
 server.del('venues/comment', auth, venue.delComment);
 server.post('venues/like', auth, venue.like);
 server.post('venues/dislike', auth, venue.dislike);
 
+// Images
+server.get('images/:id/:size/image.jpeg', image.getStat, restify.conditionalRequest(), image.getData);
+
+
 // Search
 
 // User
 server.post('searches/users', auth, user.search);
+
 // Venue
 server.post('searches/venues', venue.queryVenue);
 server.post('searches/venues/:page', venue.queryVenue);

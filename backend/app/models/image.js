@@ -236,6 +236,42 @@ class ImageClass {
         return this._getUrl('large');
     }
 
+    /**
+     * Get object stat
+     * @param {Number} size 0 to 2 small to large
+     * @returns {Promise} stat
+     */
+    getStat(size) {
+        return new Promise((resolve, reject) => {
+            minioClient.statObject(config.minio.bucket, this.filenames()[size], (err, stat) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve(stat);
+            });
+        });
+    }
+
+    getObject(size) {
+        return new Promise((resolve, reject) => {
+            minioClient.getObject(config.minio.bucket, this.filenames()[size], (err, datastream) => {
+                if (err)
+                    reject(err);
+                else {
+                    let buffer = Buffer.alloc(0);
+                    datastream.on('data', (chunk) => {
+                        buffer = Buffer.concat([buffer, chunk]);
+                    });
+                    datastream.on('end', () => {
+                        resolve(buffer);
+                    });
+                    datastream.on('error', (e) => {
+                        reject(e);
+                    });
+                }
+            });
+        });
+    }
 }
 
 ImageSchema.loadClass(ImageClass);
