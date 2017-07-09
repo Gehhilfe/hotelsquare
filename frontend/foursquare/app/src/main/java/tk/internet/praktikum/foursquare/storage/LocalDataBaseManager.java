@@ -1,4 +1,4 @@
-package tk.internet.praktikum.storage;
+package tk.internet.praktikum.foursquare.storage;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

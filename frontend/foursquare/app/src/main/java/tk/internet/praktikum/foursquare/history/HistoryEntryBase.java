@@ -1,4 +1,4 @@
-package tk.internet.praktikum.storage;
+package tk.internet.praktikum.foursquare.history;
 
 import android.support.annotation.NonNull;
 
@@ -22,6 +22,7 @@ public abstract  class HistoryEntryBase {
         this.historyName = historyName;
         this.date = date;
     }
+
 
     public String getUid() {
         return uid;

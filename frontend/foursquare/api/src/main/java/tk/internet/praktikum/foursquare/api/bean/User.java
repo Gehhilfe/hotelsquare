@@ -6,8 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class User implements Serializable
-{
+public class User implements Serializable {
     private String name;
     private String displayName;
     private String email;
@@ -19,12 +18,14 @@ public class User implements Serializable
 
     @SerializedName("friend_requests")
     List<FriendRequest> friendRequests;
+    private String _id;
 
-    public User() {}
+    public User() {
+    }
 
-    public User (String name,String email){
-        this.name=name;
-        this.email=email;
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
     }
 
     public User(String name, String email, String password) {
@@ -71,5 +72,9 @@ public class User implements Serializable
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getId() {
+        return _id;
     }
 }

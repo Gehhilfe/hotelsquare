@@ -2,19 +2,10 @@
 
 const restify = require('restify');
 const User = require('../models/user');
-const minio = require('minio');
-const config = require('config');
-const sharp = require('sharp');
+const Image = require('../models/image');
 
 const ValidationError = require('../errors/ValidationError');
 
-const minioClient = new minio.Client({
-    endPoint: 'stimi.ovh',
-    port: 9000,
-    secure: false,
-    accessKey: config.minio.key,
-    secretKey: config.minio.secret
-});
 
 const handleValidation = (next, func) => {
     func().catch((error) => {
@@ -51,8 +42,8 @@ const handleValidation = (next, func) => {
  * @returns {undefined}
  */
 async function search(request, response, next) {
-    let query = User.find({name: new RegExp(request.body.name, 'i')});
-    if (request.body.gender)
+    let query = User.find({ name: new RegExp(request.body.name, 'i'), _id: {$ne: request.authentication._id}  });
+    if(request.body.gender)
         query = query.where('gender').equals(request.body.gender);
     let result = await query;
     result = result.map((user) => {
@@ -82,7 +73,7 @@ async function profile(request, response, next) {
         selfRequest = true;
     }
 
-    let user = await User.findOne({name: request.params.name}).populate('friend_requests.sender');
+    let user = await User.findOne({name: request.params.name});
     if (user === null)
         return next(new restify.errors.NotFoundError());
     if (!selfRequest) {
@@ -90,6 +81,21 @@ async function profile(request, response, next) {
         user = user.toJSONPublic();
     }
     response.send(user);
+    return next();
+}
+
+/**
+ * Retrieves user profile by id
+ *
+ * @function profile
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function profileByID(request, response, next) {
+    const user = await User.findOne({_id: request.params.id});
+    response.send(user.toJSONPublic());
     return next();
 }
 
@@ -154,79 +160,33 @@ async function deleteUser(request, response, next) {
  * @returns {undefined}
  */
 async function uploadAvatar(request, response, next) {
-    //Convert to jpeg
-    const buffer = await sharp(request.files.avatar.path)
-        .resize(200, 200)
-        .toFormat('jpeg')
-        .toBuffer();
-
-    minioClient.putObject(config.minio.bucket, 'avatar_' + request.authentication.name + '.jpeg', buffer, 'image/jpeg', (err, etag) => {
-        if (err) {
-            response.send(500, err);
-            return next();
-        } else {
-            response.json(etag);
-            return next();
-        }
-    });
+    let user = await User.findOne({name: request.authentication.name});
+    if(user.avatar) {
+        await Image.destroy(user.avatar);
+    }
+    user.avatar = await Image.upload(request.files.image.path, user, user);
+    user = await user.save();
+    response.json(user);
+    return next();
 }
 
 /**
- * Deletes a stored avater image for the authenticated user.
+ * Deletes a stored avatar image for the authenticated user.
  *
  * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function deleteAvatar(request, response, next) {
-    minioClient.removeObject(config.minio.bucket, 'avatar_' + request.authentication.name + '.jpeg', (err) => {
-        if (err) {
-            response.send('404', 'Avatar for ' + request.authentication.name + ' not found');
-        } else {
-            response.send();
-        }
-        return next();
-    });
-}
-
-/**
- * Retrieves a stored avater image for a user.
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-function getAvatar(request, response, next) {
-    // When no name provided use authenticated user
-    if (request.params.name === undefined)
-        request.params.name = request.authentication.name;
-    minioClient.statObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', (err) => {
-        if (err)
-            return next(new restify.errors.NotFoundError());
-        else
-            minioClient.presignedGetObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', 30 * 60, (err, url) => {
-                if (err) {
-                    return next(new restify.errors.NotFoundError());
-                } else {
-                    response.redirect(url, next);
-                }
-            });
-    });
-
-
-    /**
-     minioClient.getObject(config.minio.bucket, 'avatar_' + request.params.name + '.jpeg', (err, buffer) => {
-        if (err) {
-            response.send(404, '');
-        } else {
-            response.setHeader('Content-Type', 'image/jpeg');
-            buffer.pipe(response);
-        }
-        return next();
-    });
-     */
+async function deleteAvatar(request, response, next) {
+    let user = await User.findOne({name: request.authentication.name}).populate('avatar');
+    if(user.avatar) {
+        await Image.destroy(user.avatar);
+    }
+    user.avatar = undefined;
+    user = await user.save();
+    response.json(user);
+    return next();
 }
 
 /**
@@ -333,9 +293,9 @@ module.exports = {
     register,
     deleteUser,
     uploadAvatar,
-    getAvatar,
     deleteAvatar,
     profile,
+    profileByID,
     sendFriendRequest,
     confirmFriendRequest,
     updateUser,

@@ -53,8 +53,12 @@ const UserSchema = new Schema({
         default: Date.now()
     },
     location: {
-        'type': { type: String, default: 'Point' },
-        coordinates: { type: [Number], default: [0, 0] }
+        'type': {type: String, default: 'Point'},
+        coordinates: {type: [Number], default: [0, 0]}
+    },
+    avatar: {
+        type: Schema.Types.ObjectId,
+        ref: 'Image'
     }
 });
 
@@ -63,7 +67,7 @@ UserSchema.index({location: '2dsphere'});
 UserSchema.pre('save', function (next) {
     const self = this;
 
-    if(self.isModified())
+    if (self.isModified())
         self.updated_at = Date.now();
 
     if (self.isModified('name')) {
@@ -127,13 +131,13 @@ class UserClass {
     update(data) {
         const self = this;
 
-        if(data.gender)
+        if (data.gender)
             self.gender = data.gender;
 
-        if(data.password)
+        if (data.password)
             self.password = data.password;
-            
-        if(data.location && data.location.coordinates)
+
+        if (data.location && data.location.coordinates)
             self.location.coordinates = data.location.coordinates;
     }
 
@@ -168,8 +172,14 @@ class UserClass {
     }
 
     toJSON() {
-        const obj = this.toObject();
+        const obj = this.toObject({
+            depopulate: true
+        });
         delete obj.password;
+        if (this.avatar)
+            obj.avatar = this.avatar.toJSON();
+        else
+            delete obj.avatar;
         return obj;
     }
 

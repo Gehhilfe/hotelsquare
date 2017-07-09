@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint *.js ./app/**/*.js *.js ./test/*.js ./test/**/*.js ./lib/*.js ./lib/**/*.js",
     "test": "mocha test test/api test/middleware/filter --timeout 10000",
-    "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- test test/api test/middleware/filter --timeout 10000"
+    "coverage": "node node_modules/istanbul/lib/cli.js cover -x **/lib/** ./node_modules/mocha/bin/_mocha -- test test/api test/middleware/filter --timeout 10000"
   },
   "engines": {
     "node": ">= 5.12.0"
@@ -15,8 +15,10 @@
     "bunyan": "^1.8.10",
     "bunyan-logstash": "^0.3.4",
     "config": "^1.26.1",
+    "exif": "^0.6.0",
     "googleplaces": "^0.6.1",
     "jsonwebtoken": "^7.4.1",
+    "lodash": "^4.17.4",
     "minio": "^3.1.3",
     "mongodb": "^2.2.27",
     "mongoose": "4.10.8",
@@ -25,7 +27,8 @@
     "restify-bunyan-logger": "^2.0.7",
     "sharp": "^0.17.3",
     "socket.io": "^2.0.3",
-    "mongoose-schema-extend": "^0.2.2"
+    "urlsafe-base64": "^1.0.0",
+    "uuid": "^3.1.0"
   },
   "author": "",
   "license": "MIT",
@@ -36,6 +39,7 @@
     "chai-http": "^3.0.0",
     "chai-things": "^0.2.0",
     "eslint": "^3.19.0",
+    "eslint-plugin-security": "^1.4.0",
     "istanbul": "^1.0.0-alpha.1",
     "js-image-generator": "^1.0.2",
     "mocha": "^3.3.0",

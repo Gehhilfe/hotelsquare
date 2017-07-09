@@ -1,32 +1,39 @@
 package tk.internet.praktikum.foursquare.api.service;
 
+import java.util.List;
+
 import io.reactivex.Observable;
-import retrofit2.http.*;
-import tk.internet.praktikum.foursquare.api.bean.FriendRequestResponse;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.UserSearchQuery;
-
-import java.util.List;
 
 public interface UserService {
     /**
      * Retrives profile of user with name
+     *
      * @param name user name
      * @return profile of user
      */
     @GET("users/{name}")
-    Observable<User> profile(@Path("name") String name);
+    Observable<User> detailsByName(@Path("name") String name);
 
     /**
-     * Deletes currently authenticated user
+     * Retrives profile of user with id
      *
-     * @return deleted user
+     * @param id user id
+     * @return profile of user
      */
-    @DELETE("users")
-    Observable<User> deleteUser();
+    @GET("users/id/{name}")
+    Observable<User> profileByID(@Path("id") String id);
 
     /**
      * Registers a new user
+     *
      * @param user user which will be registered
      * @return registered user
      */
@@ -45,6 +52,7 @@ public interface UserService {
 
     /**
      * Retrives profile of user with name
+     *
      * @param name User name
      * @return profile of user
      */
@@ -53,6 +61,7 @@ public interface UserService {
 
     /**
      * Search for users with a given name and gender
+     *
      * @param query Search query
      */
     @POST("searches/users")

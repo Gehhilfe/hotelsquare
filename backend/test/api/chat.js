@@ -30,12 +30,8 @@ describe('Chat', () => {
     let other;
     let third;
     let token;
-    let otherToken;
-    let thirdToken;
     let chat;
     let otherchat;
-    let message;
-    let othermessage;
 
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
@@ -55,14 +51,12 @@ describe('Chat', () => {
         u = users[0];
         token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
         other = users[0];
-        otherToken = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
         third = users[0];
-        thirdToken = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
 
         chat = await Chat.create({participants: [u, other]});
         otherchat = await Chat.create({participants: [u, other, third]});
-        message = await Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id});
-        othermessage = await Message.create({sender: other, message: 'second chat', date: Date.now(), chatId: otherchat._id});
+        await Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id});
+        await Message.create({sender: other, message: 'second chat', date: Date.now(), chatId: otherchat._id});
     }));
 
     describe('GET chat', () => {
