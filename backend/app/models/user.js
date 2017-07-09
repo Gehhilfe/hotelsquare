@@ -188,7 +188,8 @@ class UserClass {
             _id: this._id,
             name: this.name,
             displayName: this.displayName,
-            friends: this.friends.length
+            friends_count: this.friends.length,
+            avatar: this.avatar
         };
     }
 }

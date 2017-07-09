@@ -26,13 +26,19 @@ public class ImageCacheLoader {
     private static String baseUrl = "https://dev.ip.stimi.ovh/images/";
     private final OkHttpClient client;
 
-    ImageCacheLoader(Context context) {
+    public ImageCacheLoader(Context context) {
         Cache cache = new Cache(context.getCacheDir(), cacheSize);
         client = new OkHttpClient.Builder()
                 .cache(cache)
                 .build();
     }
 
+    /**
+     * Loads image asynchronously while using  
+     * @param image
+     * @param size
+     * @return
+     */
     public Observable<Bitmap> loadBitmap(Image image, ImageSize size) {
         String url = baseUrl + image.getId() + "/" + size.getValue() + "/image.jpeg";
         return Observable.defer(() -> {
