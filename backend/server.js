@@ -5,6 +5,7 @@ const session = require('./app/routes/session');
 const user = require('./app/routes/user');
 const image = require('./app/routes/image');
 const venue = require('./app/routes/venue');
+const comment = require('./app/routes/comment');
 const chat = require('./app/routes/chat');
 const chatsocket = require('./app/routes/chatsocket');
 const util = require('./lib/util');
@@ -65,18 +66,21 @@ server.get('chats', auth, chat.getConversations);
 // Venue
 server.get('venues/:id', venue.getVenue);
 
-server.post('venues/:id/comments', auth, venue.addComment);
-
 server.put('venues/:id/checkin', auth, venue.checkin);
 
-server.get('venues/comments', venue.getComments);
-server.del('venues/comment', auth, venue.delComment);
-server.post('venues/like', auth, venue.like);
-server.post('venues/dislike', auth, venue.dislike);
+server.get('venues/:id/comments', venue.getComments);
+
+// Comment
+
+server.post('comments/:id/like', auth, comment.like);
+server.post('comments/:id/dislike', auth, comment.dislike);
+server.del('comments/:id', auth, comment.delComment);
+server.post('comments', auth, comment.addComment);
+server.get('comments/:id', comment.getComment);
 
 // Images
 server.get('images/:id/:size/image.jpeg', image.getStat, restify.conditionalRequest(), image.getData);
-
+server.get('images/:id/comments', image.getComments);
 
 // Search
 

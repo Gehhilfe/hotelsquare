@@ -8,10 +8,12 @@ const extend = require('mongoose-schema-extend');
 // Schema
 // ---------------------------------------------------------------------------------------------------------------------
 
+const options = {discriminatorKey: 'kind'};
+
 const CommentSchema = new Schema({
     author: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'User'
     },
     text: String,
     likes: {
@@ -26,28 +28,7 @@ const CommentSchema = new Schema({
         type: Date,
         default: Date.now()
     }
-}, {collection: 'comments', discriminatorKey: '_type'});
-
-const ImageCommentSchema = CommentSchema.extend({
-    image: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
-    }
-});
-
-const CommentCommentSchema = CommentSchema.extend({
-    comment: {
-        type: Schema.Types.ObjectId,
-        ref: 'Comment'
-    }
-});
-
-const VenueCommentSchema = CommentSchema.extend({
-    venue: {
-        type: Schema.Types.ObjectId,
-        ref: 'Venue'
-    }
-});
+}, options);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Class
@@ -57,23 +38,25 @@ class CommentClass {
 
 }
 
-class CommentCommentClass {
-
-}
-
-class ImageCommentClass {
-
-}
-
-class VenueCommentClass {
-
-}
-
 CommentSchema.loadClass(CommentClass);
-CommentCommentSchema.loadClass(CommentCommentClass);
-ImageCommentSchema.loadClass(ImageCommentClass);
-VenueCommentSchema.loadClass(VenueCommentClass);
-module.exports = mongoose.model('Comment', CommentSchema);
-module.exports = mongoose.model('CommentComment', CommentCommentSchema);
-module.exports = mongoose.model('ImageComment', ImageCommentSchema);
-module.exports = mongoose.model('VenueComment', VenueCommentSchema);
+
+const comment = mongoose.model('Comment', CommentSchema);
+
+const TextCommentSchema = comment.discriminator('TextComment',
+    new mongoose.Schema({
+        comment: {
+            type: Schema.Types.ObjectId, ref: 'TextComment'},
+        comments: [{
+            type: Schema.Types.ObjectId,
+            ref: 'TextComment'
+        }]
+    }));
+
+const ImageCommentSchema = comment.discriminator('ImageComment',
+    new mongoose.Schema({image: {type: Schema.Types.ObjectId, ref: 'Image'}}));
+
+const VenueCommentSchema = comment.discriminator('VenueComment',
+    new mongoose.Schema({venue: {type: Schema.Types.ObjectId, ref: 'Venue'}}));
+
+
+module.exports = comment;

@@ -228,115 +228,17 @@ function queryAllVenuesFromGoogle(location, keyword, next_page_token = '') {
 }
 
 /**
- * adds a like to a comment of a venue
+ * Gets comments of a venue
  *
  * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function like(request, response, next) {
-    const venue = await Venue.findOne({place_id: request.body.venueid});
-    if (venue) {
-        const comment = await venue.comments.find({text: request.body.comment});
-        comment.likes += 1;
-        venue.comments = comment;
-        await venue.save();
-        response.json({message: 'likes: ' + comment.likes});
-        return next();
-    }
-    response.send(404, 'venue could not be found');
-    return next();
-}
-
-/**
- * adds a dislike to a comment of a venue
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-function dislike(request, response, next) {
-    Venue.findOne({place_id: request.body.venueid}, (err, obj) => {
-        if (err) {
-            response.send(404, 'venue could not be found');
-            return next();
-        }
-        const comment = obj.comments.find({text: request.body.comment});
-        comment.dislikes += 1;
-        obj.comments = comment;
-        obj.save();
-        response.json({message: 'dislikes: ' + comment.dislikes});
-        return next();
-    });
-}
-
-/**
- * adds a comment to a venue
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-async function addComment(request, response, next) {
+async function getComments(request, response, next){
     const venue = await Venue.findOne({_id: request.params.id});
-    const user = await User.findOne({_id: request.authentication._id});
-    const comment = {'author': user, 'text': request.body.comment, 'likes': 0, 'dislikes': 0, 'date': Date.now()};
-    venue.comments.push(comment);
-    await venue.save();
-    response.send(venue.commments);
+    response.json(venue.comments);
     return next();
-}
-
-/**
- * gets comments of a venue
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-function getComments(request, response, next) {
-    Venue.findOne({place_id: request.body.venueid}, (err, obj) => {
-        if (err) {
-            response.send(404, 'venue could not be found in database');
-            return next();
-        }
-        response.json(obj.comments);
-        return next();
-    });
-}
-
-/**
- * deletes comment of a venue if the requesting person is the author
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-function delComment(request, response, next) {
-    Venue.findOne({place_id: request.body.venueid}, (err) => {
-        if (err) {
-            response.send(404, 'venue could not be found in database');
-            return next();
-        }
-        User.findOne({_id: request.authentication._id}, (err, obj) => {
-            if (err) {
-                response.send(404, 'user could not be found in database');
-                return next();
-            }
-            const comment = obj.comments.find({text: request.body.comment});
-            if (comment.author._id.equals(obj._id)) {
-                obj.comments.pull({'text': request.body.comment});
-                obj.save();
-            }
-            response.send(200, 'comment deleted');
-            return next();
-        });
-    });
 }
 
 /**
@@ -358,11 +260,7 @@ module.exports = {
     queryVenue,
     queryAllVenuesFromGoogle,
     searchVenuesInDB,
-    like,
-    dislike,
-    addComment,
     getComments,
-    delComment,
     getVenue,
     checkin
 };

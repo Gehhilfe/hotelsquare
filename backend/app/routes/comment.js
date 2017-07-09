@@ -3,18 +3,9 @@
 const _ = require('lodash');
 const restify = require('restify');
 const Comment = require('../models/comment');
-const config = require('config');
-const minio = require('minio');
+const Image = require('../models/image');
+const Venue = require('../models/venue');
 const User = require('../models/user');
-const sharp = require('sharp');
-
-const minioClient = new minio.Client({
-    endPoint: 'stimi.ovh',
-    port: 9000,
-    secure: false,
-    accessKey: config.minio.key,
-    secretKey: config.minio.secret
-});
 
 /**
  * adds a like to a comment
@@ -57,35 +48,67 @@ async function dislike(request, response, next){
 }
 
 /**
- * add a comment
+ * adds a comment to a venue
  *
  * @param {IncomingMessage} request request
  * @param {Object} response response
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function addComment(request, response, next){
-    const type = request.body.type;
-    switch(type){
-        case 'venue':
-            break;
-        case 'comment':
-            break;
-        case 'image':
-            break;
-        default:
-
-            break;
-    }
+async function addComment(request, response, next) {
     const user = await User.findOne({_id: request.authentication._id});
-    const comment = await Comment.create({
-        author: user,
-        text: request.body.comment,
-        likes: 0,
-        dislikes: 0,
-        date: Date.now()
-    });
-    response.json(comment);
+    if(request.body.venueID){
+        const venue = await Venue.findOne({_id: request.body.venueID});
+        if(venue){
+            const newcomment = {'kind': 'VenueComment', 'venue': venue, 'author': user, 'text': request.body.text, 'likes': 0, 'dislikes': 0, 'date': Date.now()};
+            const c = await Comment.create(newcomment);
+            if(c) {
+                venue.comments.push(c);
+                await venue.save();
+                response.json(c);
+                return next();
+            }
+            response.send(500, 'comment could not be created');
+            return next();
+        }
+        response.send(404, 'venue not found');
+        return next();
+    }
+    if(request.body.imageID){
+        const image = await Image.findOne({_id: request.body.imageID});
+        if(image){
+            const newcomment = {'kind': 'ImageComment', 'image': image, 'author': user, 'text': request.body.text, 'likes': 0, 'dislikes': 0, 'date': Date.now()};
+            const c = await Comment.create(newcomment);
+            if(c) {
+                image.comments.push(c);
+                await image.save();
+                response.json(c);
+                return next();
+            }
+            response.send(500, 'comment could not be created');
+            return next();
+        }
+        response.send(404, 'image not found');
+        return next();
+    }
+    if(request.body.textID){
+        const comment = await Comment.findOne({_id: request.body.textID});
+        if(comment){
+            const newcomment = {'kind': 'TextComment', 'comment': comment, 'author': user, 'text': request.body.text, 'likes': 0, 'dislikes': 0, 'date': Date.now()};
+            const c = await Comment.create(newcomment);
+            if(c) {
+                comment.comments.push(c);
+                await comment.save();
+                response.json(c);
+                return next();
+            }
+            response.send(500, 'comment could not be created');
+            return next();
+        }
+        response.send(404, 'comment not found');
+        return next();
+    }
+    response.send(500, 'not defined comment category');
     return next();
 }
 
@@ -97,9 +120,13 @@ async function addComment(request, response, next){
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function getComments(request, response, next){
-    const comments = await Venue.findOne({_id: request.params.id});
-    response.json(venue.comments);
+async function getComment(request, response, next){
+    const comment = await Comment.findOne({_id: request.params.id});
+    if(comment){
+        response.json(comment);
+        return next();
+    }
+    response.send(404, 'comment not found');
     return next();
 }
 
@@ -114,12 +141,26 @@ async function getComments(request, response, next){
 async function delComment(request, response, next){
     const user = await User.findOne({_id: request.authentication._id});
     if(user){
-        const comment = await Comment.find({'text': request.body.comment}); ///arrrrrrghhh
+        const comment = await Comment.findOne({_id: request.params.id});
         if(comment){
             if(comment.author._id.equals(user._id)){
-                await Comment.find({'text': request.body.comment}).remove();
+                switch(comment.kind){
+                case 'ImageComment':
+                    await Image.update({_id: comment.image._id}, {$pull: {'comments': {_id: comment._id}}});
+                    break;
+                case 'TextComment':
+                    await Comment.update({_id: comment.image._id}, {$pull: {'comments': {_id: comment._id}}});
+                    break;
+                case 'VenueComment':
+                    await Venue.update({_id: comment.image._id}, {$pull: {'comments': {_id: comment._id}}});
+                    break;
+                }
+                //await Comment.findOne({_id: request.params._id}).remove();
+                await comment.remove();
+                response.send(200, 'comment deleted');
+                return next();
             }
-            response.send(200, 'comment deleted');
+            response.send(500, 'comment not found');
             return next();
         }
         response.send(404, 'comment not found');
@@ -129,6 +170,6 @@ async function delComment(request, response, next){
 }
 
 module.exports = {
-    queryVenue, queryAllVenues, searchVenuesInDB, getImage, getImageNames, delImage, putImage, like, dislike, addComment, getComments, delComment
+    like, dislike, addComment, getComment, delComment
 };
 

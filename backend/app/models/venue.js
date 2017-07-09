@@ -57,31 +57,8 @@ const VenueSchema = new Schema({
     website: String,
     rating_google: Number,
     comments: [{
-        author: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-        },
-        text: String,
-        likes: {
-            type: Number,
-            default: 0
-        },
-        dislikes: {
-            type: Number,
-            default: 0
-        },
-        date: {
-            type: Date,
-            default: Date.now()
-        },
-        isimage: {
-            type: Boolean,
-            default: false
-        },
-        imagename: {
-            type: String,
-            default: ''
-        }
+        type: Schema.Types.ObjectId,
+        ref: 'VenueComment'
     }]
 });
 

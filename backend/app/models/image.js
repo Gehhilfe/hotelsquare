@@ -54,7 +54,11 @@ const ImageSchema = new Schema({
         coordinates: {
             type: [Number], default: [0, 0]
         }
-    }
+    },
+    comments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'ImageComment'
+    }]
 });
 
 ImageSchema.index({location: '2dsphere'});
