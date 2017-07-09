@@ -46,7 +46,7 @@ public class UserActivity extends AppCompatActivity {
         tabLayout.addTab(friendsTab);
         tabLayout.addTab(inbox);
 
-        userStatePagerAdapter = new UserStatePagerAdapter(getSupportFragmentManager());
+        userStatePagerAdapter = new UserStatePagerAdapter(getSupportFragmentManager(), getApplicationContext());
         initialiseFragmentContainer(fragmentContainer);
         fragmentContainer.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(createOnTabSelectedListener());
