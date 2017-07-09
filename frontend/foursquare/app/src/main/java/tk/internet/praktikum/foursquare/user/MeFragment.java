@@ -58,7 +58,7 @@ public class MeFragment extends Fragment {
         tabLayout.addTab(friendsTab);
         tabLayout.addTab(inbox);
 
-        userStatePagerAdapter = new UserStatePagerAdapter(getFragmentManager());
+        userStatePagerAdapter = new UserStatePagerAdapter(getFragmentManager(), getContext());
         initialiseFragmentContainer(fragmentContainer);
         fragmentContainer.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setupWithViewPager(fragmentContainer);
