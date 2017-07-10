@@ -557,7 +557,7 @@ describe('User', () => {
             });
 
             it('should contain friends as number', () => {
-                results[0].friends.should.be.a('number');
+                results[0].friends_count.should.be.a('number');
             });
 
             it('should not contain friend_requests', () => {

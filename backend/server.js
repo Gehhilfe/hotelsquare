@@ -5,12 +5,18 @@ const session = require('./app/routes/session');
 const user = require('./app/routes/user');
 const image = require('./app/routes/image');
 const venue = require('./app/routes/venue');
+const comment = require('./app/routes/comment');
 const chat = require('./app/routes/chat');
 const chatsocket = require('./app/routes/chatsocket');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
 const fs = require('fs');
+
+
+const Venue = require('./app/models/venue');
+const Comments = require('./app/models/comments');
+const Comment = Comments.Comment;
 
 mongoose.Promise = global.Promise;
 
@@ -64,19 +70,28 @@ server.get('chats', auth, chat.getConversations);
 
 // Venue
 server.get('venues/:id', venue.getVenue);
-
-server.post('venues/:id/comments', auth, venue.addComment);
-
 server.put('venues/:id/checkin', auth, venue.checkin);
+server.get('venues/:id/comments', comment.getComments(Venue));
+server.get('venues/:id/comments/:page', comment.getComments(Venue));
 
-server.get('venues/comments', venue.getComments);
-server.del('venues/comment', auth, venue.delComment);
-server.post('venues/like', auth, venue.like);
-server.post('venues/dislike', auth, venue.dislike);
+server.post('venues/:id/comments/text', auth, comment.textComment(Venue));
+server.post('venues/:id/comments/image', auth, comment.imageComment(Venue));
+// Comment
+
+server.put('comments/:id/like', auth, comment.like);
+server.put('comments/:id/dislike', auth, comment.dislike);
+
+server.get('comments/:id/comments', comment.getComments(Comment));
+server.get('comments/:id/comments/:page', comment.getComments(Comment));
+
+server.post('comments/:id/comments/text', auth, comment.textComment(Comment));
+server.post('comments/:id/comments/image', auth, comment.imageComment(Comment));
+// server.del('comments/:id', auth, comment.delComment);
+// server.post('comments', auth, comment.addComment);
+// server.get('comments/:id', comment.getComment);
 
 // Images
 server.get('images/:id/:size/image.jpeg', image.getStat, restify.conditionalRequest(), image.getData);
-
 
 // Search
 

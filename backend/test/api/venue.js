@@ -1,6 +1,7 @@
 'use strict';
 const mongoose = require('mongoose');
 const Venue = require('../../app/models/venue');
+const Comment = require('../../app/models/comments');
 const SearchRequest = require('../../app/models/searchrequest');
 const Util = require('../../lib/util');
 const chai = require('chai');
@@ -25,6 +26,7 @@ const mochaAsync = (fn) => {
 describe('venue', () => {
 
     let aVenue;
+    let bVenue;
     let user, token;
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
@@ -43,6 +45,7 @@ describe('venue', () => {
             });
         aVenue = res.body.results[0];
         user = await User.create({name: 'peter111', email: 'peter123@cool.de', password: 'peter99', gender: 'm'});
+        const bVenue = await Venue.findOne({_id: aVenue._id});
         token = jsonwt.sign(user.toJSON(), config.jwt.secret, config.jwt.options);
     }));
 

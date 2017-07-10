@@ -54,6 +54,7 @@ async function getData(request, response, next) {
     return next();
 }
 
+
 module.exports = {
     getStat, getData
 };

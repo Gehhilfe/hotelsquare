@@ -2,10 +2,6 @@ package tk.internet.praktikum.foursquare.api.bean;
 
 import java.util.Date;
 
-/**
- * Created by gehhi on 08.07.2017.
- */
-
 public class CheckinInformation {
     private String user;
     private int count;

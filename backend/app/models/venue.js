@@ -57,31 +57,8 @@ const VenueSchema = new Schema({
     website: String,
     rating_google: Number,
     comments: [{
-        author: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-        },
-        text: String,
-        likes: {
-            type: Number,
-            default: 0
-        },
-        dislikes: {
-            type: Number,
-            default: 0
-        },
-        date: {
-            type: Date,
-            default: Date.now()
-        },
-        isimage: {
-            type: Boolean,
-            default: false
-        },
-        imagename: {
-            type: String,
-            default: ''
-        }
+        type: Schema.Types.ObjectId,
+        ref: 'Comment'
     }]
 });
 
@@ -155,6 +132,14 @@ class VenueClass {
         this.opening_hours = details.result.opening_hours;
         this.utc_offest = details.result.utc_offset;
         this.details_loaded = true;
+    }
+
+    addComment(comment) {
+        if(!comment.assigned.to.equals(this._id))
+            return;
+        if(_.indexOf(this.comments, comment._id) === -1) {
+            this.comments.push(comment);
+        }
     }
 
     toJSONSearchResult() {
