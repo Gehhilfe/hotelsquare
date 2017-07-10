@@ -1,20 +1,9 @@
 package tk.internet.praktikum.foursquare.api.bean;
 
 public class ImageComment extends Comment {
+    private Image image;
 
-    private String imageID;
-
-    public ImageComment(User author, String text, String imageID){
-        super(author, text);
-        this.imageID = imageID;
+    public Image getImage() {
+        return image;
     }
-
-    public String getImageID() {
-        return imageID;
-    }
-
-    public void setImageID(String imageID) {
-        this.imageID = imageID;
-    }
-
 }

@@ -1,5 +1,7 @@
 package tk.internet.praktikum.foursquare.api;
 
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -10,6 +12,9 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import tk.internet.praktikum.foursquare.api.bean.Comment;
+import tk.internet.praktikum.foursquare.api.bean.ImageComment;
+import tk.internet.praktikum.foursquare.api.bean.TextComment;
 
 
 public class ServiceFactory {
@@ -38,11 +43,17 @@ public class ServiceFactory {
             });
         }
 
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        CommentDeserializer deserializer = new CommentDeserializer("kind");
+        deserializer.registerComment("TextComment", TextComment.class);
+        deserializer.registerComment("ImageComment", ImageComment.class);
+        gsonBuilder.registerTypeAdapter(Comment.class, deserializer);
+
         OkHttpClient client = builder.build();
 
         final Retrofit retrofit = new Retrofit.Builder().baseUrl(endpoint)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
                 .client(client)
                 .build();
 

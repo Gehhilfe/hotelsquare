@@ -1,7 +1,7 @@
 'use strict';
 const mongoose = require('mongoose');
 const Venue = require('../../app/models/venue');
-const Comment = require('../../app/models/comment');
+const Comment = require('../../app/models/comments');
 const SearchRequest = require('../../app/models/searchrequest');
 const Util = require('../../lib/util');
 const chai = require('chai');
@@ -47,29 +47,6 @@ describe('venue', () => {
         user = await User.create({name: 'peter111', email: 'peter123@cool.de', password: 'peter99', gender: 'm'});
         const bVenue = await Venue.findOne({_id: aVenue._id});
         token = jsonwt.sign(user.toJSON(), config.jwt.secret, config.jwt.options);
-        const comment = await Comment.create({
-            kind: 'VenueComment',
-            author: user,
-            text: 'this is a comment',
-            likes: 0,
-            dislikes: 0,
-            date: Date.now(),
-            venue: bVenue
-        });
-        const bcomment = await Comment.create({
-            kind: 'VenueComment',
-            author: user,
-            text: 'this is a second comment',
-            likes: 0,
-            dislikes: 0,
-            date: Date.now(),
-            venue: bVenue
-        });
-        if(comment && bcomment) {
-            bVenue.comments.push(comment);
-            bVenue.comments.push(bcomment);
-            await bVenue.save();
-        }
     }));
 
     it('GET venue details', (mochaAsync(async () => {
@@ -91,15 +68,6 @@ describe('venue', () => {
                 .put('/venues/' + aVenue._id + '/checkin')
                 .set('x-auth', token);
             res.body.should.have.property('count', 2);
-        })));
-    });
-
-    describe('comments', () => {
-        it('should get all comments', (mochaAsync(async () => {
-            const res = await request(server)
-                .get('/venues/' + aVenue._id + '/comments');
-
-            res.body.length.should.equal(2);
         })));
     });
 });

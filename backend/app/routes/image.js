@@ -54,20 +54,7 @@ async function getData(request, response, next) {
     return next();
 }
 
-/**
- * Gets comments of a venue
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-async function getComments(request, response, next){
-    const image = await Image.findOne({_id: request.params.id});
-    response.json(image.comments);
-    return next();
-}
 
 module.exports = {
-    getStat, getData, getComments
+    getStat, getData
 };

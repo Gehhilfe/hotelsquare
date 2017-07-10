@@ -13,6 +13,11 @@ const mongoose = require('mongoose');
 const auth = require('./app/middleware/filter/authentication');
 const fs = require('fs');
 
+
+const Venue = require('./app/models/venue');
+const Comments = require('./app/models/comments');
+const Comment = Comments.Comment;
+
 mongoose.Promise = global.Promise;
 
 const server = restify.createServer();
@@ -65,22 +70,22 @@ server.get('chats', auth, chat.getConversations);
 
 // Venue
 server.get('venues/:id', venue.getVenue);
-
 server.put('venues/:id/checkin', auth, venue.checkin);
-
 server.get('venues/:id/comments', venue.getComments);
-
+server.post('venues/:id/comments/text', comment.textComment(Venue));
+server.post('venues/:id/comments/image', comment.imageComment(Venue));
 // Comment
 
-server.post('comments/:id/like', auth, comment.like);
-server.post('comments/:id/dislike', auth, comment.dislike);
-server.del('comments/:id', auth, comment.delComment);
-server.post('comments', auth, comment.addComment);
-server.get('comments/:id', comment.getComment);
+server.put('comments/:id/like', auth, comment.like);
+server.put('comments/:id/dislike', auth, comment.dislike);
+server.post('comments/:id/comments/text', comment.textComment(Comment));
+server.post('comments/:id/comments/image', comment.imageComment(Comment));
+// server.del('comments/:id', auth, comment.delComment);
+// server.post('comments', auth, comment.addComment);
+// server.get('comments/:id', comment.getComment);
 
 // Images
 server.get('images/:id/:size/image.jpeg', image.getStat, restify.conditionalRequest(), image.getData);
-server.get('images/:id/comments', image.getComments);
 
 // Search
 
