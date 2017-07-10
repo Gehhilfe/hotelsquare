@@ -57,8 +57,11 @@ const VenueSchema = new Schema({
     website: String,
     rating_google: Number,
     comments: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Comment'
+        kind: String,
+        item: {
+            type: Schema.Types.ObjectId,
+            refPath: 'comments.kind'
+        }
     }]
 });
 
@@ -138,7 +141,10 @@ class VenueClass {
         if(!comment.assigned.to.equals(this._id))
             return;
         if(_.indexOf(this.comments, comment._id) === -1) {
-            this.comments.push(comment);
+            this.comments.push({
+                item: comment,
+                kind: comment.constructor.modelName
+            });
         }
     }
 

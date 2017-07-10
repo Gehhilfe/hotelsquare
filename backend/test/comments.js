@@ -202,7 +202,20 @@ describe('comments', () => {
             await TextComment.build(user, 'Test', textComment);
             await TextComment.build(user, 'Test', textComment);
             await textComment.save();
-            const comment = await Comment.findOne({_id: textComment._id}).populate('comments');
+            const comment = await Comment.findOne({_id: textComment._id})
+                .populate('author')
+                .populate({
+                    path: 'comments.item',
+                    populate: {
+                        path: 'author'
+                    }
+                })
+                .populate({
+                    path: 'comments.item',
+                    populate: {
+                        path: 'image'
+                    }
+                });
             json = await comment.toJSONDetails();
         }));
 

@@ -56,7 +56,7 @@ function textComment(model) {
         const o = await model.findOne({_id: request.params.id});
         const textComment = await TextComment.build(request.authentication, request.body.text, o);
         await o.save();
-        response.send(await textComment.toJSONDetails());
+        response.send(textComment.toJSONDetails());
         return next();
     };
 }
@@ -71,7 +71,7 @@ function imageComment(model) {
         const o = await model.findOne({_id: request.params.id});
         const imageComment = await ImageComment.build(request.authentication, request.files.image.path, o);
         await o.save();
-        response.send(await imageComment.toJSONDetails());
+        response.send(imageComment.toJSONDetails());
         return next();
     };
 }
