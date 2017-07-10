@@ -22,6 +22,10 @@ const CommentSchema = new Schema(
                 refPath: 'assigned.kind'
             }
         },
+        author: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
         likes: [{
             type: Schema.Types.ObjectId,
             ref: 'User'
@@ -39,17 +43,20 @@ const CommentSchema = new Schema(
             default: Date.now()
         },
         comments: [{
-            type: Schema.Types.ObjectId,
-            ref: 'TextComment'
+            kind: String,
+            item: {
+                type: Schema.Types.ObjectId,
+                refPath: 'comments.kind'
+            }
         }]
     },
     options);
 
 CommentSchema.pre('save', (next) => {
     const self = this;
-    if(self.likes === undefined)
+    if (self.likes === undefined)
         self.likes = [];
-    if(self.dislikes === undefined)
+    if (self.dislikes === undefined)
         self.dislikes = [];
     self.rating = self.likes.length - self.dislikes.length;
     return next();
@@ -80,8 +87,13 @@ class CommentClass {
      * @returns {undefined}
      */
     addComment(o) {
+        if (!o.assigned.to.equals(this._id))
+            return;
         if (_.indexOf(this.comments, o._id) === -1) {
-            this.comments.push(o);
+            this.comments.push({
+                item: o,
+                kind: o.constructor.modelName
+            });
         }
     }
 
@@ -118,10 +130,13 @@ class CommentClass {
                 to: this.assigned.to,
                 kind: this.assigned.kind
             },
+            author: this.author.toJSONPublic(),
             date: this.date,
             rating: this.rating,
             comments_count: this.comments.length,
-            comments: _.take(this.comments, 5)
+            comments: _.map(_.take(this.comments, 5), e => {
+                return e.item.toJSONDetails();
+            })
         };
     }
 }
@@ -131,11 +146,31 @@ class TextCommentClass {
     static async build(user, text, assigned_to) {
         const self = this;
         const cmt = new self();
+        cmt.author = user;
         if (assigned_to) {
             cmt.assignTo(assigned_to);
         }
         cmt.text = text;
         return await cmt.save();
+    }
+
+    toJSONDetails() {
+        return {
+            _id: this._id,
+            assigned: {
+                to: this.assigned.to,
+                kind: this.assigned.kind
+            },
+            author: this.author.toJSONPublic(),
+            kind: 'TextComment',
+            date: this.date,
+            rating: this.rating,
+            text: this.text,
+            comments_count: this.comments.length,
+            comments: _.map(_.take(this.comments, 5), e => {
+                return e.item.toJSONDetails();
+            })
+        };
     }
 }
 
@@ -144,6 +179,7 @@ class ImageCommentClass {
     static async build(user, path, assigned_to) {
         const self = this;
         const icmt = new self();
+        icmt.author = user;
         if (assigned_to) {
             icmt.assignTo(assigned_to);
         }
@@ -154,6 +190,24 @@ class ImageCommentClass {
         return icmt;
     }
 
+    toJSONDetails() {
+        return {
+            _id: this._id,
+            assigned: {
+                to: this.assigned.to,
+                kind: this.assigned.kind
+            },
+            author: this.author.toJSONPublic(),
+            kind: 'ImageComment',
+            date: this.date,
+            rating: this.rating,
+            image: this.image,
+            comments_count: this.comments.length,
+            comments: _.map(_.take(this.comments, 5), e => {
+                return e.item.toJSONDetails();
+            })
+        };
+    }
 }
 
 CommentSchema.loadClass(CommentClass);

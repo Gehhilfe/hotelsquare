@@ -60,7 +60,7 @@ describe('comments', () => {
             comment.assignTo(aVenue);
             comment.assigned.to.should.be.equal(aVenue._id);
             comment.assigned.kind.should.be.equal(aVenue.constructor.modelName);
-            aVenue.comments.should.include.something.that.deep.equals(comment._id);
+            aVenue.comments[0].item.equals(comment._id);
         });
     });
 
@@ -202,7 +202,20 @@ describe('comments', () => {
             await TextComment.build(user, 'Test', textComment);
             await TextComment.build(user, 'Test', textComment);
             await textComment.save();
-            const comment = await Comment.findOne({_id: textComment._id}).populate('comments');
+            const comment = await Comment.findOne({_id: textComment._id})
+                .populate('author')
+                .populate({
+                    path: 'comments.item',
+                    populate: {
+                        path: 'author'
+                    }
+                })
+                .populate({
+                    path: 'comments.item',
+                    populate: {
+                        path: 'image'
+                    }
+                });
             json = await comment.toJSONDetails();
         }));
 
