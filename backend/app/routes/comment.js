@@ -56,7 +56,7 @@ function textComment(model) {
         const o = await model.findOne({_id: request.params.id});
         const textComment = await TextComment.build(request.authentication, request.body.text, o);
         await o.save();
-        response.send(textComment);
+        response.send(await textComment.toJSONDetails());
         return next();
     };
 }
@@ -71,7 +71,23 @@ function imageComment(model) {
         const o = await model.findOne({_id: request.params.id});
         const imageComment = await ImageComment.build(request.authentication, request.files.image.path, o);
         await o.save();
-        response.send(imageComment);
+        response.send(await imageComment.toJSONDetails());
+        return next();
+    };
+}
+
+/**
+ * Creates closure handler for retrieving comments from a given model
+ * @param {Object} model Model to add comments to e.g. User, Venue, Image ...
+ * @returns {function(*, *, *)} handler for text comment creation
+ */
+function getComments(model) {
+    return async (request, response, next) => {
+        let page = request.params.page;
+        if(!page)
+            page = 0;
+        const o = await model.findOne({_id: request.params.id}).populate('comments').limit(10).skip(page.params.page);
+        response.send(_.map(o.comments, (e) => e.toJSON()));
         return next();
     };
 }
@@ -80,5 +96,6 @@ module.exports = {
     like,
     dislike,
     textComment,
-    imageComment
+    imageComment,
+    getComments
 };

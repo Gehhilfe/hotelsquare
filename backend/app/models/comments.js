@@ -13,31 +13,47 @@ const Image = require('./image');
 
 const options = {discriminatorKey: 'kind'};
 
-const CommentSchema = new Schema({
-    assigned: {
-        kind: String,
-        to: {
+const CommentSchema = new Schema(
+    {
+        assigned: {
+            kind: String,
+            to: {
+                type: Schema.Types.ObjectId,
+                refPath: 'assigned.kind'
+            }
+        },
+        likes: [{
             type: Schema.Types.ObjectId,
-            refPath: 'assigned.kind'
-        }
+            ref: 'User'
+        }],
+        dislikes: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }],
+        rating: {
+            type: Number,
+            default: 0
+        },
+        date: {
+            type: Date,
+            default: Date.now()
+        },
+        comments: [{
+            type: Schema.Types.ObjectId,
+            ref: 'TextComment'
+        }]
     },
-    likes: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    dislikes: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    date: {
-        type: Date,
-        default: Date.now()
-    },
-    comments: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Comment'
-    }]
-}, options);
+    options);
+
+CommentSchema.pre('save', (next) => {
+    const self = this;
+    if(self.likes === undefined)
+        self.likes = [];
+    if(self.dislikes === undefined)
+        self.dislikes = [];
+    self.rating = self.likes.length - self.dislikes.length;
+    return next();
+});
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Class
@@ -94,6 +110,20 @@ class CommentClass {
         }
         this.likes.pull(user);
     }
+
+    async toJSONDetails() {
+        return {
+            _id: this._id,
+            assigned: {
+                to: this.assigned.to,
+                kind: this.assigned.kind
+            },
+            date: this.date,
+            rating: this.rating,
+            comments_count: this.comments.length,
+            comments: _.take(this.comments, 5)
+        };
+    }
 }
 
 class TextCommentClass {
@@ -127,6 +157,7 @@ class ImageCommentClass {
 }
 
 CommentSchema.loadClass(CommentClass);
+
 
 const Comment = mongoose.model('Comment', CommentSchema);
 

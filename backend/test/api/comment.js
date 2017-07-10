@@ -104,7 +104,6 @@ describe('comment api query', () => {
         before((done) => {
             imageGenerator.generateImage(1920, 1080, 80, (err, i) => {
                 expect(err).to.be.null;
-                image;
                 image = i;
                 imagePath = tempWrite.sync(image.data, 'image.jpeg');
                 return done();

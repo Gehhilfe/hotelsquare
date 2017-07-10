@@ -71,15 +71,21 @@ server.get('chats', auth, chat.getConversations);
 // Venue
 server.get('venues/:id', venue.getVenue);
 server.put('venues/:id/checkin', auth, venue.checkin);
-server.get('venues/:id/comments', venue.getComments);
-server.post('venues/:id/comments/text', comment.textComment(Venue));
-server.post('venues/:id/comments/image', comment.imageComment(Venue));
+server.get('venues/:id/comments', comment.getComments(Venue));
+server.get('venues/:id/comments/:page', comment.getComments(Venue));
+
+server.post('venues/:id/comments/text', auth, comment.textComment(Venue));
+server.post('venues/:id/comments/image', auth, comment.imageComment(Venue));
 // Comment
 
 server.put('comments/:id/like', auth, comment.like);
 server.put('comments/:id/dislike', auth, comment.dislike);
-server.post('comments/:id/comments/text', comment.textComment(Comment));
-server.post('comments/:id/comments/image', comment.imageComment(Comment));
+
+server.get('comments/:id/comments', comment.getComments(Comment));
+server.get('comments/:id/comments/:page', comment.getComments(Comment));
+
+server.post('comments/:id/comments/text', auth, comment.textComment(Comment));
+server.post('comments/:id/comments/image', auth, comment.imageComment(Comment));
 // server.del('comments/:id', auth, comment.delComment);
 // server.post('comments', auth, comment.addComment);
 // server.get('comments/:id', comment.getComment);

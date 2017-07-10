@@ -179,7 +179,7 @@ describe('comments', () => {
             });
         });
 
-        it('should cyclic assign image and comment when saved', mochaAsync(async() => {
+        it('should cyclic assign image and comment when saved', mochaAsync(async () => {
             const imageComment = await ImageComment.build(user, imagePath, comment);
             await imageComment.save();
             const img = await Image.findOne({_id: imageComment.image._id});
@@ -189,4 +189,30 @@ describe('comments', () => {
         }));
     });
 
+    describe('toJSON', () => {
+        let json;
+
+        beforeEach(mochaAsync(async () => {
+            await TextComment.build(user, 'Test', textComment);
+            await TextComment.build(user, 'Test', textComment);
+            await TextComment.build(user, 'Test', textComment);
+            await TextComment.build(user, 'Test', textComment);
+            await TextComment.build(user, 'Test', textComment);
+            await TextComment.build(user, 'Test', textComment);
+            await TextComment.build(user, 'Test', textComment);
+            await TextComment.build(user, 'Test', textComment);
+            await textComment.save();
+            const comment = await Comment.findOne({_id: textComment._id}).populate('comments');
+            json = await comment.toJSONDetails();
+        }));
+
+
+        it('should only contained the 5 sub comments', (mochaAsync(async () => {
+            json.comments.length.should.be.equal(5);
+        })));
+
+        it('should only contained total amount of comments as number', () => {
+            json.comments_count.should.be.equal(8);
+        });
+    });
 });

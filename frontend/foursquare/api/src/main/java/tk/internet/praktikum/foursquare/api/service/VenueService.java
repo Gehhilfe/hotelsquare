@@ -57,12 +57,13 @@ public interface VenueService {
     Observable<CheckinInformation> checkin(@Path("id") String id);
 
     /**
-     * Gets all comments of venue
+     * Get 10 comments to venue identified by id
      * @param id venue id
-     * @return öost of all venue comments
+     * @param page page number
+     * @return list of 10 comments
      */
-    @GET("venues/{id}/comments")
-    Observable<List<Comment>> getComments(@Path("id") String id);
+    @GET("venues/{id}/comments/{page}")
+    Observable<List<Comment>> getComments(@Path("id") String id, @Path("page") int page);
 
     /**
      * Adds a text comment to the venue
@@ -70,7 +71,7 @@ public interface VenueService {
      * @return comment
      */
     @POST("venues/{id}/comments/text")
-    Observable<TextComment> addTextComment(@Body TextComment venueComment, @Path("id") String id);
+    Observable<TextComment> addTextComment(@Body TextComment comment, @Path("id") String id);
 
     /**
      * Adds a image comment to the venue
@@ -78,6 +79,6 @@ public interface VenueService {
      * @return comment
      */
     @Multipart
-    @POST("profile/avatar")
+    @POST("venues/{id}/comments/image")
     Observable<ImageComment> uploadAvatar(@Part MultipartBody.Part image, @Path("id") String id);
 }
