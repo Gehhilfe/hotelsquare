@@ -56,7 +56,7 @@ function textComment(model) {
         const o = await model.findOne({_id: request.params.id});
         const textComment = await TextComment.build(request.authentication, request.body.text, o);
         await o.save();
-        response.send(textComment.toJSONDetails());
+        response.send(textComment);
         return next();
     };
 }
@@ -71,7 +71,7 @@ function imageComment(model) {
         const o = await model.findOne({_id: request.params.id});
         const imageComment = await ImageComment.build(request.authentication, request.files.image.path, o);
         await o.save();
-        response.send(imageComment.toJSONDetails());
+        response.send(imageComment);
         return next();
     };
 }
@@ -84,10 +84,23 @@ function imageComment(model) {
 function getComments(model) {
     return async (request, response, next) => {
         let page = request.params.page;
-        if(!page)
+        if (!page)
             page = 0;
-        const o = await model.findOne({_id: request.params.id}).populate('comments').limit(10).skip(page.params.page);
-        response.send(_.map(o.comments, (e) => e.toJSON()));
+        const o = await model.findOne({_id: request.params.id})
+            .populate({
+                path: 'comments.item',
+                populate: {
+                    path: 'author'
+                }
+            })
+            .populate({
+                path: 'comments.item',
+                populate: {
+                    path: 'image'
+                }
+            })
+            .limit(10).skip(page.params.page);
+        response.send(_.map(o.comments, (e) => e.toJSONDetails()));
         return next();
     };
 }

@@ -60,7 +60,7 @@ describe('comments', () => {
             comment.assignTo(aVenue);
             comment.assigned.to.should.be.equal(aVenue._id);
             comment.assigned.kind.should.be.equal(aVenue.constructor.modelName);
-            aVenue.comments.should.include.something.that.deep.equals(comment._id);
+            aVenue.comments[0].item.equals(comment._id);
         });
     });
 
