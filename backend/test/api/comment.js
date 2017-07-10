@@ -39,12 +39,10 @@ describe('comment api query', () => {
         await Util.connectDatabase(mongoose);
         await Venue.remove({});
         await User.remove({});
+        await Comment.remove({});
 
         u = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
         token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
-
-        aComment = await Comment.create({kind: 'VenueComment', author: u, text: 'venue1 comment'});
-        bComment = await Comment.create({kind: 'VenueComment', author: u, text: 'venue2 comment'});
 
         aVenue = await Venue.create({
             name: 'aVenue',
@@ -53,8 +51,16 @@ describe('comment api query', () => {
                 type: 'Point',
                 coordinates: [5, 5]
             },
-            comments: [aComment, bComment]
+            comments: []
         });
+
+        aComment = await Comment.create({kind: 'VenueComment', author: u, text: 'venue1 comment', venue: aVenue});
+        bComment = await Comment.create({kind: 'VenueComment', author: u, text: 'venue2 comment', venue: aVenue});
+
+        const venue = await Venue.findOne({_id: aVenue._id});
+        venue.comments.push(aComment);
+        venue.comments.push(bComment);
+        await venue.save();
 
         anImage = await Image.create({
             location: {
@@ -97,7 +103,7 @@ describe('comment api query', () => {
             com.kind.should.equal('VenueComment');
         })));
 
-        /**it('should add a comment to anImage', (mochaAsync(async () => {
+        it('should add a comment to anImage', (mochaAsync(async () => {
             const res = await request(server)
                 .post('/comments')
                 .set('x-auth', token)
@@ -106,15 +112,14 @@ describe('comment api query', () => {
                     text: 'this is an image comment'
                 });
             res.should.have.status(200);
-            const i = await Image.findOne({_id: anImage._id});
+            const i = await Image.findOne({_id: anImage._id}).populate({path: 'comments', model: 'Comment'});
             i.comments.length.should.be.equal(1);
-            const c = await Comment.findOne({text: 'this is an image comment'});
-            console.log(c);
-            c.kind.should.equal("ImageComment");
-        })));*/
+            const c = await Comment.findOne({text: 'this is an image comment'}).populate({path: 'author', model: 'User'});
+            c.kind.should.equal('ImageComment');
+        })));
 
-        /**it('should add a comment to the first venue comment', (mochaAsync(async () => {
-            const v = await Venue.findOne({_id: aVenue._id});
+        it('should add a comment to the first venue comment', (mochaAsync(async () => {
+            const v = await Venue.findOne({_id: aVenue._id}).populate({path: 'comments', model: 'Comment'});
             const res = await request(server)
                 .post('/comments')
                 .set('x-auth', token)
@@ -126,8 +131,8 @@ describe('comment api query', () => {
             const co = await Comment.findOne({_id: v.comments[0]._id});
             co.comments.length.should.be.equal(1);
             const c = await Comment.findOne({text: 'this is a comment comment'});
-            c.kind.should.equal("TextComment");
-        })));*/
+            c.kind.should.equal('TextComment');
+        })));
 
         it('should return 400 because auth is missing', (mochaAsync(async () => {
             const res = await request(server)
@@ -143,38 +148,52 @@ describe('comment api query', () => {
 
     });
 
-    /**describe('GET comments from venue', () => {
+    describe('GET comment by id', () => {
+        it('should get the image comment by id', (mochaAsync(async () => {
+            const i = await Image.findOne({_id: anImage._id}).populate({path: 'comments', model: 'Comment'});
+            const res = await request(server)
+                .get('/comments/' + i.comments[0]._id);
+            res.should.have.status(200);
+            res.body.should.be.a('object');
+            res.body.text.should.be.equal('this is an image comment');
+        })));
+    });
+
+
+    describe('GET comments from venue', () => {
         it('should get all comments from aVenue', (mochaAsync(async () => {
             const res = await request(server)
                 .get('/venues/' + aVenue._id + '/comments');
             res.should.have.status(200);
-            const v = await Venue.findOne({_id: aVenue._id});
+            const v = await Venue.findOne({_id: aVenue._id}).populate({path: 'comments', model: 'Comment'});
             v.comments.length.should.be.equal(4);
             res.body.should.be.a('array');
             res.body[0].text.should.be.equal('venue1 comment');
             res.body[1].text.should.be.equal('venue2 comment');
             res.body.length.should.be.equal(4);
         })));
-    });*/
+    });
 
-    /**describe('DEL a comment from venue', () => {
+    describe('DEL a comment from venue', () => {
         it('should delete a comment from aVenue', (mochaAsync(async () => {
+            const venue = await Venue.findOne({_id: aVenue._id}).populate({path: 'comments', model: 'Comment'});
             const res = await request(server)
-                .del('/comments/' + aVenue.comments[0]._id)
+                .del('/comments/' + venue.comments[0]._id)
                 .set('x-auth', token);
             res.should.have.status(200);
-            const v = await Venue.findOne({_id: aVenue._id});
-            v.comments.length.should.be.equal(1);
+            const v = await Venue.findOne({_id: aVenue._id}).populate({path: 'comments', model: 'Comment'});
+            v.comments.length.should.be.equal(3);
             res.body.should.be.a('object');
-            res.body.venue.comments.should.be.equal(['this is another comment']);
+            res.body.comments[2].text.should.be.equal('this is a comment');
         })));
 
         it('should not delete a comment from aVenue because user is not authenticated', (mochaAsync(async () => {
+            const venue = await Venue.findOne({_id: aVenue._id}).populate({path: 'comments', model: 'Comment'});
             const res = await request(server)
-                .del('/comments/' + aVenue.comments[0]._id);
+                .del('/comments/' + venue.comments[0]._id);
             res.should.have.property('status', 403);
-            const v = await Venue.findOne({_id: aVenue._id});
-            v.comments.length.should.be.equal(1);
+            const v = await Venue.findOne({_id: aVenue._id}).populate({path: 'comments', model: 'Comment'});
+            v.comments.length.should.be.equal(3);
         })));
-    });*/
+    });
 });

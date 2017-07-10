@@ -27,7 +27,11 @@ const CommentSchema = new Schema({
     date: {
         type: Date,
         default: Date.now()
-    }
+    },
+    comments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'TextComment'
+    }]
 }, options);
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -45,11 +49,7 @@ const comment = mongoose.model('Comment', CommentSchema);
 const TextCommentSchema = comment.discriminator('TextComment',
     new mongoose.Schema({
         comment: {
-            type: Schema.Types.ObjectId, ref: 'TextComment'},
-        comments: [{
-            type: Schema.Types.ObjectId,
-            ref: 'TextComment'
-        }]
+            type: Schema.Types.ObjectId, ref: 'TextComment'}
     }));
 
 const ImageCommentSchema = comment.discriminator('ImageComment',

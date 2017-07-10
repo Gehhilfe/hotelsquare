@@ -236,7 +236,9 @@ function queryAllVenuesFromGoogle(location, keyword, next_page_token = '') {
  * @returns {undefined}
  */
 async function getComments(request, response, next){
-    const venue = await Venue.findOne({_id: request.params.id});
+    const venue = await Venue.findOne({_id: request.params.id}).populate({path: 'comments', model: 'Comment'});
+    await Venue.populate(venue, {path: 'comments.author', model: 'User'});
+    await Venue.populate(venue, {path: 'comments.comments', model: 'Comment'});
     response.json(venue.comments);
     return next();
 }
