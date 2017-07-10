@@ -17,8 +17,9 @@ public class User implements Serializable {
     private Date updatedAt;
 
     @SerializedName("friend_requests")
-    List<FriendRequest> friendRequests;
+    private List<FriendRequest> friendRequests;
     private String _id;
+    private Image avatar;
 
     public User() {
     }
@@ -62,19 +63,18 @@ public class User implements Serializable {
         return displayName;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public Date getUpdatedAt() {
         return updatedAt;
     }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public String getId() {
         return _id;
+    }
+
+    public List<FriendRequest> getFriendRequests() {
+        return friendRequests;
+    }
+
+    public Image getAvatar() {
+        return avatar;
     }
 }
