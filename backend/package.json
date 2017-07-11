@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint *.js ./app/**/*.js *.js ./test/*.js ./test/**/*.js ./lib/*.js ./lib/**/*.js",
     "test": "mocha test test/api test/middleware/filter --timeout 10000",
-    "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- test test/api test/middleware/filter --timeout 10000"
+    "coverage": "node node_modules/istanbul/lib/cli.js cover -x **/lib/** ./node_modules/mocha/bin/_mocha -- test test/api test/middleware/filter --timeout 10000"
   },
   "engines": {
     "node": ">= 5.12.0"
@@ -39,6 +39,7 @@
     "chai-http": "^3.0.0",
     "chai-things": "^0.2.0",
     "eslint": "^3.19.0",
+    "eslint-plugin-security": "^1.4.0",
     "istanbul": "^1.0.0-alpha.1",
     "js-image-generator": "^1.0.2",
     "mocha": "^3.3.0",

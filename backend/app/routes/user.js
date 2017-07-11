@@ -42,8 +42,8 @@ const handleValidation = (next, func) => {
  * @returns {undefined}
  */
 async function search(request, response, next) {
-    let query = User.find({name: new RegExp(request.body.name, 'i')});
-    if (request.body.gender)
+    let query = User.find({ name: new RegExp(request.body.name, 'i'), _id: {$ne: request.authentication._id}  });
+    if(request.body.gender)
         query = query.where('gender').equals(request.body.gender);
     let result = await query;
     result = result.map((user) => {
@@ -73,7 +73,7 @@ async function profile(request, response, next) {
         selfRequest = true;
     }
 
-    let user = await User.findOne({name: request.params.name}).populate('friend_requests.sender');
+    let user = await User.findOne({name: request.params.name});
     if (user === null)
         return next(new restify.errors.NotFoundError());
     if (!selfRequest) {
@@ -81,6 +81,21 @@ async function profile(request, response, next) {
         user = user.toJSONPublic();
     }
     response.send(user);
+    return next();
+}
+
+/**
+ * Retrieves user profile by id
+ *
+ * @function profile
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function profileByID(request, response, next) {
+    const user = await User.findOne({_id: request.params.id});
+    response.send(user.toJSONPublic());
     return next();
 }
 
@@ -280,6 +295,7 @@ module.exports = {
     uploadAvatar,
     deleteAvatar,
     profile,
+    profileByID,
     sendFriendRequest,
     confirmFriendRequest,
     updateUser,

@@ -1,4 +1,5 @@
 'use strict';
+const _ = require('lodash');
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
@@ -15,6 +16,7 @@ const minioClient = new minio.Client({
 });
 const sharp = require('sharp');
 const URLSafeBase64 = require('urlsafe-base64');
+
 const ExifImage = require('exif').ExifImage;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -116,6 +118,11 @@ class ImageClass {
         });
     }
 
+    assignTo(assigned_to) {
+        this.assigned.to = assigned_to;
+        this.assigned.kind = assigned_to.constructor.modelName;
+    }
+
     /**
      * Stores a image into cloud storage and creates a corresponding document
      *
@@ -129,8 +136,7 @@ class ImageClass {
         const img = new self();
         img.uploader = user;
         if (assigned_to) {
-            img.assigned.to = assigned_to;
-            img.assigned.kind = assigned_to.constructor.modelName;
+            img.assignTo(assigned_to);
         }
         // const exif = await this._getExifInformation(path);
 
@@ -165,7 +171,7 @@ class ImageClass {
                 this._uploadImage(large, baseFileName + '_' + 'large.jpeg')
             ]);
             // Images a stored
-            return img.save();
+            return await img.save();
         } catch (err) {
             // Error happened try to clean up storage
             await  Promise.all([
@@ -236,6 +242,42 @@ class ImageClass {
         return this._getUrl('large');
     }
 
+    /**
+     * Get object stat
+     * @param {Number} size 0 to 2 small to large
+     * @returns {Promise} stat
+     */
+    getStat(size) {
+        return new Promise((resolve, reject) => {
+            minioClient.statObject(config.minio.bucket, this.filenames()[size], (err, stat) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve(stat);
+            });
+        });
+    }
+
+    getObject(size) {
+        return new Promise((resolve, reject) => {
+            minioClient.getObject(config.minio.bucket, this.filenames()[size], (err, datastream) => {
+                if (err)
+                    reject(err);
+                else {
+                    let buffer = Buffer.alloc(0);
+                    datastream.on('data', (chunk) => {
+                        buffer = Buffer.concat([buffer, chunk]);
+                    });
+                    datastream.on('end', () => {
+                        resolve(buffer);
+                    });
+                    datastream.on('error', (e) => {
+                        reject(e);
+                    });
+                }
+            });
+        });
+    }
 }
 
 ImageSchema.loadClass(ImageClass);

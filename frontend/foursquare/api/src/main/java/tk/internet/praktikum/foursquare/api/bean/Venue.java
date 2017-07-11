@@ -16,8 +16,12 @@ public class Venue {
     private Location location;
     private int rating;
     private int utc_offset;
+    private int check_ins_count;
+    private List<CheckinInformation> top_check_ins;
+    private List<CheckinInformation> last_check_ins;
 
-    public Venue() {}
+    public Venue() {
+    }
 
     public int getRating() {
         return rating;
@@ -73,5 +77,17 @@ public class Venue {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public int getCheckInCount() {
+        return check_ins_count;
+    }
+
+    public List<CheckinInformation> getTopCheckins() {
+        return top_check_ins;
+    }
+
+    public List<CheckinInformation> getLastCheckins() {
+        return last_check_ins;
     }
 }

@@ -261,7 +261,7 @@ describe('user', function () {
 
         it('should contain friends as a number', () => {
             const json = aUser.toJSONPublic();
-            json.friends.should.be.a('number');
+            json.friends_count.should.be.a('number');
         });
 
         it('should not contain friend_requests', () => {

@@ -57,30 +57,10 @@ const VenueSchema = new Schema({
     website: String,
     rating_google: Number,
     comments: [{
-        author: {
+        kind: String,
+        item: {
             type: Schema.Types.ObjectId,
-            ref: 'User'
-        },
-        text: String,
-        likes: {
-            type: Number,
-            default: 0
-        },
-        dislikes: {
-            type: Number,
-            default: 0
-        },
-        date: {
-            type: Date,
-            default: Date.now()
-        },
-        isimage: {
-            type: Boolean,
-            default: false
-        },
-        imagename: {
-            type: String,
-            default: ''
+            refPath: 'comments.kind'
         }
     }]
 });
@@ -118,7 +98,7 @@ class VenueClass {
         // Search for checkin
         let index = -1;
         let checkin = _.find(this.check_ins, (v, i) =>{
-            if(v.user === user) {
+            if(v.user.equals(user._id)) {
                 index = i;
                 return true;
             } else
@@ -142,6 +122,12 @@ class VenueClass {
             this.check_ins.push(checkin);
         else
             this.check_ins[index] = checkin;
+
+        return {
+            user: user._id,
+            count: checkin.count,
+            last: checkin.last
+        };
     }
 
     async loadDetails() {
@@ -149,6 +135,17 @@ class VenueClass {
         this.opening_hours = details.result.opening_hours;
         this.utc_offest = details.result.utc_offset;
         this.details_loaded = true;
+    }
+
+    addComment(comment) {
+        if(!comment.assigned.to.equals(this._id))
+            return;
+        if(_.indexOf(this.comments, comment._id) === -1) {
+            this.comments.push({
+                item: comment,
+                kind: comment.constructor.modelName
+            });
+        }
     }
 
     toJSONSearchResult() {
@@ -167,7 +164,9 @@ class VenueClass {
             name: this.name,
             location: this.location,
             types: this.types,
-            check_ins: _.sortBy(this.check_ins, 'last'),
+            last_check_ins: _.take(_.sortBy(this.check_ins, 'last'), 5),
+            top_check_ins: _.take(_.sortBy(this.check_ins, 'count'), 5),
+            check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0),
             opening_hours: this.opening_hours
         };
     }

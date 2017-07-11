@@ -4,3 +4,7 @@ coverage
 *.log
 .gradle
 
+
+backend/yarn\.lock
+
+backend/package-lock\.json
