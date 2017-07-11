@@ -1,8 +1,104 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
+    android:layout_marginTop="40dp"
     tools:context="tk.internet.praktikum.foursquare.search.VenueInDetailFragment">
 
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="100">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="20"
+            android:background="@drawable/side_nav_bar"
+            android:gravity="bottom"
+
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/image_venue_one"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="33"
+                app:srcCompat="@mipmap/image_venue_temp" />
+      <ImageView
+                android:id="@+id/image_venue_two"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="33"
+                app:srcCompat="@mipmap/image_venue_temp" />
+            <ImageView
+                android:id="@+id/image_venue_three"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="33"
+                app:srcCompat="@mipmap/image_venue_temp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="20"
+            android:orientation="horizontal">
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/venues_mapView"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="50"
+            android:orientation="vertical">
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/venue_comment"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="80"
+                android:background="@drawable/edit_text_"
+                android:inputType="textPersonName"
+                android:text="Add venue comment" />
+
+            <ImageButton
+            android:id="@+id/imageComment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            app:srcCompat="@mipmap/image_comment" />
+            <ImageButton
+                android:id="@+id/sendComment"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="10"
+                app:srcCompat="@mipmap/send" />
+        </LinearLayout>
+
+
+    </LinearLayout>
 </LinearLayout>

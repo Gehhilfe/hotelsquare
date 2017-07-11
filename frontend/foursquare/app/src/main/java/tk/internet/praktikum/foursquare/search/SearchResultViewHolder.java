@@ -13,18 +13,23 @@ import tk.internet.praktikum.foursquare.api.bean.Venue;
  */
 
 public class SearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
     private View itemView;
     private TextView name;
     private TextView address;
     private TextView rating;
     private ImageView image;
-    public SearchResultViewHolder(View itemResult){
+    private SearchResultAdapterListener searchResultAdapterListener;
+
+    public SearchResultViewHolder(View itemResult,SearchResultAdapterListener searchResultAdapterListener){
         super(itemResult);
+        this.searchResultAdapterListener=searchResultAdapterListener;
         this.itemView=itemResult;
         name= (TextView) itemView.findViewById(R.id.item_name);
         address=(TextView)itemView.findViewById(R.id.item_address);
         rating=(TextView)itemView.findViewById(R.id.item_address);
         image=(ImageView) itemView.findViewById(R.id.item_image);
+        itemView.setOnClickListener(this);
     }
     public void render(Venue searchResult){
         this.name.setText(searchResult.getName());
@@ -35,8 +40,9 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
     }
     @Override
     public void onClick(View v) {
-        //TODO
-        // views each Venue in details
-
+        System.out.println(" clicked on venue item");
+        searchResultAdapterListener.clickOnVenue(String.valueOf(this.getLayoutPosition()));
     }
+
+
 }

@@ -39,10 +39,10 @@
                 android:layout_marginStart="15dp"
                 android:layout_toEndOf="@+id/imageViewLocation"
                 android:layout_weight="80"
+                android:background="@drawable/edit_text_"
                 android:enabled="true"
                 android:hint="Near me"
-                android:inputType="textPersonName"
-                tools:background="@drawable/edit_text_location_search" />
+                android:inputType="textPersonName" />
 
 
             <ToggleButton

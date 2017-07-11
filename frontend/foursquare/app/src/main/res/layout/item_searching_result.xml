@@ -18,7 +18,7 @@
             android:id="@+id/item_image"
             android:layout_width="50dip"
             android:layout_height="50dip"
-            android:src="@drawable/common_google_signin_btn_icon_dark_focused"/>
+            android:src="@mipmap/image_venue_temp"/>
 
     </LinearLayout>
 
