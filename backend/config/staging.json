@@ -1,7 +1,7 @@
 {
   "db": {
     "host": "mongo",
-    "name": "dev"
+    "name": "staging"
   },
   "jwt": {
     "secret": "secret",

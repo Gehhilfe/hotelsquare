@@ -1,10 +1,13 @@
 'use strict';
 
 const _ = require('lodash');
+const restify = require('restify');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const googleapilib = require('googleplaces');
 const config = require('config');
+
+const Image = require('./image');
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Schema
@@ -14,6 +17,7 @@ const VenueSchema = new Schema({
     name: String,
     place_id: String,
     reference: String,
+    photo_reference: String,
     types: [String],
     location: {
         'type': {type: String, default: 'Point'},
@@ -97,8 +101,8 @@ class VenueClass {
     checkIn(user) {
         // Search for checkin
         let index = -1;
-        let checkin = _.find(this.check_ins, (v, i) =>{
-            if(v.user.equals(user._id)) {
+        let checkin = _.find(this.check_ins, (v, i) => {
+            if (v.user.equals(user._id)) {
                 index = i;
                 return true;
             } else
@@ -106,7 +110,7 @@ class VenueClass {
         });
 
         // Create new checkin when non found
-        if(!checkin) {
+        if (!checkin) {
             checkin = {
                 user: user,
                 count: 0
@@ -118,7 +122,7 @@ class VenueClass {
         checkin.last = Date.now();
 
         // Update element in collection
-        if(index === -1)
+        if (index === -1)
             this.check_ins.push(checkin);
         else
             this.check_ins[index] = checkin;
@@ -130,17 +134,89 @@ class VenueClass {
         };
     }
 
+    _loadPhotoURLGoogle() {
+        const client = restify.createClient({
+            url: 'https://maps.googleapis.com'
+        });
+        return new Promise((resolve, reject) => {
+            client.get('/maps/api/place/photo?maxheight=1600&photoreference='
+                + this.photo_reference + '&key='
+                + config.googleapi.GOOGLE_PLACES_API_KEY, function (err, req) {
+                if(err)
+                    return reject(err);
+
+                req.on('result', function (err, res) {
+                    if(err)
+                        return reject(err);
+
+                    let body = '';
+                    let buffer = Buffer.alloc(0);
+                    resolve(res.headers.location);
+                    res.on('data', function (chunk) {
+                        buffer = Buffer.concat([buffer, chunk]);
+                        body += chunk;
+                    });
+
+                    res.on('end', function () {
+                        resolve(buffer);
+                    });
+
+                    res.on('error', (e) => {
+                        reject(e);
+                    });
+                });
+            });
+        });
+    }
+
+    async _loadPhotoGoogle() {
+        const url = await this._loadPhotoURLGoogle();
+        const client = restify.createClient({
+            url: url
+        });
+        return new Promise((resolve, reject) => {
+            client.get('', function (err, req) {
+                if(err)
+                    return reject(err);
+
+                req.on('result', function (err, res) {
+                    if(err)
+                        return reject(err);
+
+                    let buffer = Buffer.alloc(0);
+                    res.on('data', function (chunk) {
+                        buffer = Buffer.concat([buffer, chunk]);
+                    });
+
+                    res.on('end', function () {
+                        resolve(buffer);
+                    });
+
+                    res.on('error', (e) => {
+                        reject(e);
+                    });
+                });
+            });
+        });
+    }
+
     async loadDetails() {
         const details = await this._getPlaceDetails(this.place_id);
+        if(this.photo_reference !== '') {
+            const buffer = await this._loadPhotoGoogle();
+            const img = await Image.upload(buffer, null, this);
+            this.images.push(img);
+        }
+
         this.opening_hours = details.result.opening_hours;
         this.utc_offest = details.result.utc_offset;
         this.details_loaded = true;
     }
 
     addComment(comment) {
-        if(!comment.assigned.to.equals(this._id))
+        if (!comment.assigned.to.equals(this._id))
             return;
-        if(_.indexOf(this.comments, comment._id) === -1) {
+        if (_.indexOf(this.comments, comment._id) === -1) {
             this.comments.push({
                 item: comment,
                 kind: comment.constructor.modelName
@@ -149,21 +225,25 @@ class VenueClass {
     }
 
     toJSONSearchResult() {
+        const images = (this.images && this.images.length > 0)?[_.first(this.images)]:[];
         return {
             _id: this._id,
             name: this.name,
             location: this.location,
             types: this.types,
+            images: images,
             check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0)
         };
     }
 
     toJSONDetails() {
+        const images = (this.images && this.images.length > 0)?[_.first(this.images)]:[];
         return {
             _id: this._id,
             name: this.name,
             location: this.location,
             types: this.types,
+            images: images,
             last_check_ins: _.take(_.sortBy(this.check_ins, 'last'), 5),
             top_check_ins: _.take(_.sortBy(this.check_ins, 'count'), 5),
             check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0),
