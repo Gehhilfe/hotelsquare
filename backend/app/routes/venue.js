@@ -44,12 +44,15 @@ async function importGoogleResult(entry) {
     if (existing.length > 0)
         return;
 
+    const photo_reference = (entry.photos && entry.photos.length > 0)?entry.photos[0].photo_reference:'';
+
     return Venue.create({
         name: entry.name,
         place_id: entry.place_id,
         reference: entry.reference,
         types: entry.types,
         rating_google: entry.rating,
+        photo_reference: photo_reference,
         location: {
             type: 'Point',
             coordinates: [entry.geometry.location.lng, entry.geometry.location.lat]

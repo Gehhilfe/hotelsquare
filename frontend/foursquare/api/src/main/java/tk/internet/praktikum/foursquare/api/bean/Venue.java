@@ -2,7 +2,6 @@ package tk.internet.praktikum.foursquare.api.bean;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.io.InputStream;
 import java.util.List;
 
 public class Venue {
@@ -17,6 +16,7 @@ public class Venue {
     private int rating;
     private int utc_offset;
     private int check_ins_count;
+    private List<Image> images;
     private List<CheckinInformation> top_check_ins;
     private List<CheckinInformation> last_check_ins;
 
@@ -89,5 +89,9 @@ public class Venue {
 
     public List<CheckinInformation> getLastCheckins() {
         return last_check_ins;
+    }
+
+    public List<Image> getImages() {
+        return images;
     }
 }
