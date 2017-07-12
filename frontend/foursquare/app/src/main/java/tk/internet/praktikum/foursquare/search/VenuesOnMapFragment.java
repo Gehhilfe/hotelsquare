@@ -2,6 +2,9 @@ package tk.internet.praktikum.foursquare.search;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +27,7 @@ import tk.internet.praktikum.foursquare.api.bean.Venue;
 public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback {
     private View view;
     private GoogleMap map;
+    private RecyclerView recyclerView;
 
 
     public VenuesOnMapFragment() {
@@ -37,6 +41,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_venues_on_map, container, false);
+       recyclerView =(RecyclerView) view.findViewById(R.id.searching_results_on_map);
         SupportMapFragment mapFragment =((SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.venues_mapView));
         mapFragment.getMapAsync(this);
@@ -68,6 +73,17 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             ranking++;
         }
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(venues.get(0).getLocation().getLatitude(), venues.get(0).getLocation().getLongitude()),14));
+
+    }
+
+    /**
+     * update new venues list
+     * @param venues
+     */
+    protected   void updateRecyclerView(List<Venue> venues){
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
+        recyclerView.setAdapter(new SearchResultAdapter(this,venues));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),LinearLayoutManager.HORIZONTAL));
 
     }
 

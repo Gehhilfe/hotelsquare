@@ -188,8 +188,8 @@
                 android:drawableTop="@mipmap/suggestion_event"
                 android:paddingTop="20dp"
                 android:text="@string/suggestion_event"
-                android:textSize="10dp"
-                android:textColor="#fff" />
+                android:textColor="#fff"
+                android:textSize="10dp" />
         </LinearLayout>
     </LinearLayout>
 

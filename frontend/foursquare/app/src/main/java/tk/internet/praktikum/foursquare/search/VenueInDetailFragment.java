@@ -20,7 +20,6 @@ public class VenueInDetailFragment extends Fragment {
 
     public static VenueInDetailFragment newInstance(String param1, String param2) {
         VenueInDetailFragment fragment = new VenueInDetailFragment();
-
         return fragment;
     }
 

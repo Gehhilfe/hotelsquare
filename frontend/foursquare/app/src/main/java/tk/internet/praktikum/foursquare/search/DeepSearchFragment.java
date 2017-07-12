@@ -102,6 +102,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         inflater.inflate(R.menu.search_view, menu);
         final MenuItem item = menu.findItem(R.id.action_search);
         searchView = (android.support.v7.widget.SearchView) MenuItemCompat.getActionView(item);
+        searchView.onActionViewExpanded();
+        searchView.requestFocus();
+        searchView.clearFocus();
         //searchView.setOnClickListener(v -> deepSearch(searchView.getQuery().toString()));
         //searchView.setOnSearchClickListener(v -> deepSearch(searchView.getQuery().toString()));
         searchView.setOnQueryTextListener(this);
@@ -286,6 +289,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private void displayVenuesOnMap() {
         VenuesOnMapFragment venuesOnMapFragment = (VenuesOnMapFragment) venueStatePageAdapter.getItem(1);
         venuesOnMapFragment.updateVenuesMarker(venues);
+        venuesOnMapFragment.updateRecyclerView(venues);
         venuesViewPager.setCurrentItem(1);
     }
 

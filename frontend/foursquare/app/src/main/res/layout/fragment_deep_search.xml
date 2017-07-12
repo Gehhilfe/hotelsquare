@@ -20,7 +20,7 @@
             android:orientation="horizontal"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true"
-            android:weightSum="100">
+            >
 
 
             <ImageView
