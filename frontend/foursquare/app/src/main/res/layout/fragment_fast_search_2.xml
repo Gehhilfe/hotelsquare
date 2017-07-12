@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="100"
-    android:layout_marginTop="70dp"
+    android:layout_marginTop="20dp"
     tools:context="tk.internet.praktikum.foursquare.MainActivity">
 
     <LinearLayout
@@ -25,10 +25,9 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="@drawable/circle_button"
-                android:drawableTop="@mipmap/suggestion_cafe"
+                android:drawableTop="@android:drawable/ic_dialog_email"
                 android:paddingTop="20dp"
-                android:text="@string/suggestion_cafe"
-                android:textSize="10dp"
+                android:text="Contact"
                 android:textColor="#fff" />
         </LinearLayout>
 
@@ -44,10 +43,9 @@
 
                 android:layout_height="100dp"
                 android:background="@drawable/circle_button"
-                android:drawableTop="@mipmap/suggestion_restaurant"
+                android:drawableTop="@android:drawable/ic_dialog_map"
                 android:paddingTop="20dp"
-                android:text="@string/suggestion_restaurant"
-                android:textSize="10dp"
+                android:text="Map"
                 android:textColor="#fff" />
         </LinearLayout>
 
@@ -62,10 +60,9 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="@drawable/circle_button"
-                android:drawableTop="@mipmap/suggestion_beer"
+                android:drawableTop="@android:drawable/ic_dialog_info"
                 android:paddingTop="20dp"
-                android:text="@string/suggestion_beer"
-                android:textSize="10dp"
+                android:text="Info"
                 android:textColor="#fff" />
         </LinearLayout>
     </LinearLayout>
@@ -87,10 +84,9 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="@drawable/circle_button"
-                android:drawableTop="@mipmap/suggestion_breakfast"
+                android:drawableTop="@android:drawable/ic_dialog_email"
                 android:paddingTop="20dp"
-                android:text="@string/suggestion_breakfast"
-                android:textSize="10dp"
+                android:text="Contact"
                 android:textColor="#fff" />
         </LinearLayout>
 
@@ -106,10 +102,9 @@
 
                 android:layout_height="100dp"
                 android:background="@drawable/circle_button"
-                android:drawableTop="@mipmap/suggestion_cinema"
+                android:drawableTop="@android:drawable/ic_dialog_map"
                 android:paddingTop="20dp"
-                android:text="@string/suggestion_cinema"
-                android:textSize="10dp"
+                android:text="Map"
                 android:textColor="#fff" />
         </LinearLayout>
 
@@ -124,10 +119,9 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="@drawable/circle_button"
-                android:drawableTop="@mipmap/suggestion_bookstore"
+                android:drawableTop="@android:drawable/ic_dialog_info"
                 android:paddingTop="20dp"
-                android:textSize="10dp"
-                android:text="@string/suggestion_bookstore"
+                android:text="Info"
                 android:textColor="#fff" />
         </LinearLayout>
     </LinearLayout>
@@ -148,10 +142,9 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="@drawable/circle_button"
-                android:drawableTop="@mipmap/suggestion_gas_station"
+                android:drawableTop="@android:drawable/ic_dialog_email"
                 android:paddingTop="20dp"
-                android:text="@string/suggestion_gas_station"
-                android:textSize="10dp"
+                android:text="Contact"
                 android:textColor="#fff" />
         </LinearLayout>
 
@@ -167,10 +160,9 @@
 
                 android:layout_height="100dp"
                 android:background="@drawable/circle_button"
-                android:drawableTop="@mipmap/suggestion_hotel"
+                android:drawableTop="@android:drawable/ic_dialog_map"
                 android:paddingTop="20dp"
-                android:textSize="10dp"
-                android:text="@string/suggestion_hotel"
+                android:text="Map"
                 android:textColor="#fff" />
         </LinearLayout>
 
@@ -185,10 +177,9 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="@drawable/circle_button"
-                android:drawableTop="@mipmap/suggestion_event"
+                android:drawableTop="@android:drawable/ic_dialog_info"
                 android:paddingTop="20dp"
-                android:text="@string/suggestion_event"
-                android:textSize="10dp"
+                android:text="Info"
                 android:textColor="#fff" />
         </LinearLayout>
     </LinearLayout>

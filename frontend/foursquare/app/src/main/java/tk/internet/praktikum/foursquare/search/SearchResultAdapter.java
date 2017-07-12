@@ -18,10 +18,10 @@ import tk.internet.praktikum.foursquare.api.bean.Venue;
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHolder> implements SearchResultAdapterListener{
     List<Venue> searchResultViewHolderList;
-    Fragment parentFrament;
+    Fragment parentFragment;
 
-    public SearchResultAdapter(Fragment  parentFrament,List<Venue> searchResultViewHolderList) {
-        this.parentFrament=parentFrament;
+    public SearchResultAdapter(Fragment  parentFragment,List<Venue> searchResultViewHolderList) {
+        this.parentFragment=parentFragment;
         this.searchResultViewHolderList = searchResultViewHolderList;
     }
 
@@ -53,7 +53,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
 
 
    private void redirectToFragment(Fragment fragment){
-        FragmentTransaction fragmentTransaction = parentFrament.getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = parentFragment.getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
