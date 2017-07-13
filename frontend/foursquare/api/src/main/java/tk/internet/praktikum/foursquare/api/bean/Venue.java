@@ -13,6 +13,20 @@ public class Venue {
     private String reference;
     private String formatted_address;
     private boolean is_open;
+    private String phone_number;
+    private String website;
+    private String vicinity;
+    private List<String> types;
+    private Location location;
+    private int rating;
+    private int utc_offset;
+    private int check_ins_count;
+    private List<Image> images;
+    private List<CheckinInformation> top_check_ins;
+    private List<CheckinInformation> last_check_ins;
+
+    public Venue() {
+    }
 
     public String getFormattedAddress() {
         return formatted_address;
@@ -33,22 +47,7 @@ public class Venue {
     public String getVicinity() {
         return vicinity;
     }
-
-    private String phone_number;
-    private String website;
-    private String vicinity;
-    private List<String> types;
-    private Location location;
-    private int rating;
-    private int utc_offset;
-    private int check_ins_count;
-    private List<Image> images;
-    private List<CheckinInformation> top_check_ins;
-    private List<CheckinInformation> last_check_ins;
-
-    public Venue() {
-    }
-
+    
     public int getRating() {
         return rating;
     }
