@@ -14,6 +14,7 @@ public class User implements Serializable {
     private Gender gender;
     private String city;
     private int age;
+    private Location location;
 
     @SerializedName("update_at")
     private Date updatedAt;
@@ -94,5 +95,13 @@ public class User implements Serializable {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

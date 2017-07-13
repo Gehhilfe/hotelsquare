@@ -47,7 +47,7 @@ public class Venue {
     public String getVicinity() {
         return vicinity;
     }
-    
+
     public int getRating() {
         return rating;
     }

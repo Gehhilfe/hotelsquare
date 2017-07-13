@@ -199,7 +199,8 @@ class UserClass {
             friends_count: this.friends.length,
             avatar: this.avatar,
             city: this.city,
-            age: this.age
+            age: this.age,
+            location: this.location
         };
     }
 }
