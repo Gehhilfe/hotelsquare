@@ -13,22 +13,31 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
+import java.util.Map;
 
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
 //import tk.internet.praktikum.foursquare.api.bean.Location;
 
 
 public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback {
+
     private View view;
     private GoogleMap map;
     private RecyclerView recyclerView;
 
+    private Marker myPosition;
+
+    private Map <Marker, Venue> markerVenueMap;
+    // TODO private Map <Marker, Friend> markerFriendMap;
 
     public VenuesOnMapFragment() {
         // Required empty public constructor
@@ -53,26 +62,67 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // set Map
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if(markerVenueMap.containsKey(marker)){
+                    Venue v = markerVenueMap.get(marker);
+                    //TODO open new Fragment/Activity
+                    return true;
+                }
+                //else if(markerFriendMap.containsKey(marker)){
+                //Friend f = markerFriendMap.get(marker);
+                //TODO: open new Fragment/Activity
+                // return true;
+                //}
+            return false;
+            }
+
+        });
 
     }
 
 
     public void updateVenueLocation(Venue venue,int ranking){
         LatLng venueLocation = new LatLng(venue.getLocation().getLatitude(), venue.getLocation().getLongitude());
-        map.addMarker(new MarkerOptions()
-                    .position(venueLocation).title(String.valueOf(ranking)));
+
+        Marker tmp = map.addMarker(new MarkerOptions()
+                    .position(venueLocation)
+                    .title(venue.getName() + String.valueOf(ranking)));
+        markerVenueMap.put(tmp, venue);
 
     }
 
 
     public void updateVenuesMarker(List<Venue> venues){
         map.clear();
-        int ranking=1;
+        int ranking = 1;
         for(Venue venue:venues){
-            updateVenueLocation(venue,ranking);
+            updateVenueLocation(venue, ranking);
             ranking++;
         }
+
+        //Shouldn't we move the Camera to the User's Position?
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(venues.get(0).getLocation().getLatitude(), venues.get(0).getLocation().getLongitude()),14));
+
+    }
+
+    //public void updateFriendsLocation(Friend friend){
+    //LatLng friendLocation = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
+    // Marker tmp = map.addMarker(new MarkerOptions()
+    //        .position(friendLocation)
+    //       .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position))
+    // );
+    // markerFriendMap.put(tmp, friend);
+
+
+
+    public void setUser(){
+        //TODO get LocationData...
+        myPosition = map.addMarker(new MarkerOptions()
+        .position(new LatLng(0,0))
+        .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
 
     }
 
@@ -86,8 +136,5 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),LinearLayoutManager.HORIZONTAL));
 
     }
-
-
-
 
 }
