@@ -59,7 +59,9 @@ const UserSchema = new Schema({
     avatar: {
         type: Schema.Types.ObjectId,
         ref: 'Image'
-    }
+    },
+    age: Number,
+    city: String
 });
 
 UserSchema.index({location: '2dsphere'});
@@ -139,6 +141,12 @@ class UserClass {
 
         if (data.location && data.location.coordinates)
             self.location.coordinates = data.location.coordinates;
+
+        if(data.city)
+            self.city = data.city;
+
+        if(data.age)
+            self.age = data.age;
     }
 
     comparePassword(candidatePassword) {
@@ -189,7 +197,9 @@ class UserClass {
             name: this.name,
             displayName: this.displayName,
             friends_count: this.friends.length,
-            avatar: this.avatar
+            avatar: this.avatar,
+            city: this.city,
+            age: this.age
         };
     }
 }
