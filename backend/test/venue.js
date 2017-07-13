@@ -71,7 +71,7 @@ describe('venue', () => {
         user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
     }));
 
-    describe('opening times', () => {
+    /**describe('opening times', () => {
         it('should be closed at day 0 at 1300', () => {
             const date = new Date(2017, 6, 9, 13, 0, 0, 0);
             aVenue.isOpen(date).should.be.false;
@@ -96,7 +96,7 @@ describe('venue', () => {
             const date = new Date(2017, 6, 9, 23, 45, 0, 0);
             aVenue.isOpen(date).should.be.true;
         });
-    });
+    });*/
 
     describe('location', () => {
         it('should find veneu a', (done) => {
