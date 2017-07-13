@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SearchView;
 
 import tk.internet.praktikum.foursquare.R;
@@ -21,6 +22,7 @@ import tk.internet.praktikum.foursquare.R;
 
 public class FastSearchFragment extends Fragment {
     private  SearchView searchView;
+    private  String PREFIX_SUGGESTION="suggestion_";
     View view;
     public FastSearchFragment() {
         // Required empty public constructor
@@ -33,10 +35,14 @@ public class FastSearchFragment extends Fragment {
         view=  inflater.inflate(R.layout.fragment_fast_search, container, false);
         //searchView=(SearchView)view.findViewById(R.id.fast_search);
         setHasOptionsMenu(true);
-
+        for (int i=1;i<10;i++){
+            String buttonId=PREFIX_SUGGESTION+i;
+            Button button = (Button) view.findViewById(getResources().getIdentifier(buttonId,"id",getActivity().getPackageName().toString()));
+            button.setOnClickListener(v->deepSearch(button.getText().toString()));
+        }
         return view;
     }
-    private  void fastSearch(){
+    private  void deepSearch(String keyWord){
 
         //Intent intent = new Intent(getActivity().getApplicationContext(), DeepSearchFragment.class);
         //startActivityForResult(intent, 1);
@@ -44,6 +50,9 @@ public class FastSearchFragment extends Fragment {
         // Todo
         // also gets the suggested value from 9 categories
         Fragment fragment=new DeepSearchFragment();
+        Bundle bundle=new Bundle();
+        bundle.putString("keyword",keyWord);
+        fragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction= getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(null);
@@ -78,7 +87,7 @@ public class FastSearchFragment extends Fragment {
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {
                         // Do something when expanded
-                        fastSearch();
+                        deepSearch("");
                         return true; // Return true to expand action view
                     }
                 });

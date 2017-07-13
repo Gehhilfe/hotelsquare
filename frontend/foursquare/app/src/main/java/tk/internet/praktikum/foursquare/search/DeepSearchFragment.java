@@ -55,7 +55,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private boolean isMapView;
     private ViewPager venuesViewPager;
     private VenuesListFragment venuesListFragment = null;
-
+    private String keyword;
+    private int currentPage;
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -68,12 +69,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         venuesViewPager = (ViewPager) view.findViewById(R.id.venues_result);
         filterLocation = (EditText) view.findViewById(R.id.location);
 
-      /*  filterLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                filterLocation.setFocusable(true);
-            }
-        });*/
         filterRadius = (SeekBar) view.findViewById(R.id.seekBarRadius);
         filterRadius.setMax(50);
         seekBarView = (TextView) view.findViewById(R.id.seekBarView);
@@ -83,10 +78,12 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         mapViewButton.setChecked(true);
         filterLocation.onCommitCompletion(null);
         filterLocation.addTextChangedListener(createTextWatcherLocation());
+
         filterRadius.setOnSeekBarChangeListener(createOnSeekBarChangeListener());
         mapViewButton.setOnClickListener(toggleMapView());
         initVenueStatePageAdapter();
         setHasOptionsMenu(true);
+        keyword=getArguments().getString("keyword");
         return view;
     }
 
@@ -101,13 +98,13 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         inflater.inflate(R.menu.search_view, menu);
         final MenuItem item = menu.findItem(R.id.action_search);
+        MenuItemCompat.expandActionView(item);
         searchView = (android.support.v7.widget.SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(this);
         searchView.onActionViewExpanded();
         searchView.requestFocus();
         searchView.clearFocus();
-        //searchView.setOnClickListener(v -> deepSearch(searchView.getQuery().toString()));
-        //searchView.setOnSearchClickListener(v -> deepSearch(searchView.getQuery().toString()));
-        searchView.setOnQueryTextListener(this);
+        searchView.setQuery(keyword,true);
         MenuItemCompat.setOnActionExpandListener(item,
                 new MenuItemCompat.OnActionExpandListener() {
                     @Override
@@ -128,7 +125,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                 });
     }
 
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -148,8 +144,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
     private void deepSearch(String query) {
         Log.d(LOG, "I am here");
-        // System.out.println("I am here");
         // Searching for
+        currentPage=1;
         VenueSearchQuery venueSearchQuery;
         if (filterLocation.isClickable() && !filterLocation.getText().toString().equals("Near Me")) {
             venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString());
@@ -167,7 +163,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         // Add more optional filters later
 
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
-        venueService.queryVenue(venueSearchQuery).subscribeOn(Schedulers.newThread())
+        venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(venueSearchResult -> {
                             venueSearchResult.getResults()

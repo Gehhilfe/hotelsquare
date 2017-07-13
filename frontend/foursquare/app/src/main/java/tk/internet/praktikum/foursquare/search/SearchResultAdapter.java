@@ -47,7 +47,6 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
     public void clickOnVenue(String venueId) {
         VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();
         redirectToFragment(venueInDetailFragment);
-
     }
 
 
@@ -55,7 +54,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
    private void redirectToFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction = parentFragment.getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.addToBackStack(fragment.getTag());
         fragmentTransaction.commit();
 
     }
