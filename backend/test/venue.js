@@ -32,9 +32,31 @@ describe('venue', () => {
 
         aVenue = await Venue.create({
             name: 'aVenue',
+            utc_offset: 120,
             location: {
                 type: 'Point',
                 coordinates: [5, 5]
+            },
+            opening_hours: {
+                periods: [{
+                    close: {
+                        day: 0,
+                        time: '1204'
+                    },
+                    open: {
+                        day: 0,
+                        time: '0645'
+                    }
+                }, {
+                    close: {
+                        day: 1,
+                        time: '0204'
+                    },
+                    open: {
+                        day: 0,
+                        time: '2245'
+                    }
+                }]
             }
         });
 
@@ -48,6 +70,33 @@ describe('venue', () => {
 
         user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
     }));
+
+    describe('opening times', () => {
+        it('should be closed at day 0 at 1300', () => {
+            const date = new Date(2017, 6, 9, 13, 0, 0, 0);
+            aVenue.isOpen(date).should.be.false;
+        });
+        it('should be open at day 0 at 0815', () => {
+            const date = new Date(2017, 6, 9, 8, 15, 0, 0);
+            aVenue.isOpen(date).should.be.true;
+        });
+        it('should be open at day 1 at 0045', () => {
+            const date = new Date(2017, 6, 10, 0, 45, 0, 0);
+            aVenue.isOpen(date).should.be.true;
+        });
+        it('should be closed at day 0 at 0300', () => {
+            const date = new Date(2017, 6, 9, 3, 0, 0, 0);
+            aVenue.isOpen(date).should.be.false;
+        });
+        it('should be closed at day 1 at 1803', () => {
+            const date = new Date(2017, 6, 9, 18, 3, 0, 0);
+            aVenue.isOpen(date).should.be.false;
+        });
+        it('should be open at day 0 at 2345', () => {
+            const date = new Date(2017, 6, 9, 23, 45, 0, 0);
+            aVenue.isOpen(date).should.be.true;
+        });
+    });
 
     describe('location', () => {
         it('should find veneu a', (done) => {

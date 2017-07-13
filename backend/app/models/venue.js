@@ -59,6 +59,10 @@ const VenueSchema = new Schema({
     }],
     utc_offset: Number,
     website: String,
+    vicinity: String,
+    formattedAddress: String,
+    phone_number: Number,
+    icon_url: String,
     rating_google: Number,
     comments: [{
         kind: String,
@@ -90,6 +94,41 @@ class VenueClass {
                     resolve(details);
             });
         });
+    }
+
+    /**
+     * Return open venues
+     *
+     * @param {Date} datenow current date
+     * @returns {bool} flag if venue is open
+     */
+    isOpen(datenow){
+        const opening_periods = this.opening_hours.periods;
+        if(!datenow){
+            datenow = new Date();
+        }
+        const currentDayAtVenue = datenow.getUTCDay();
+        const currentTimeAtVenue = (datenow.getUTCHours() + Math.floor(this.utc_offset/60))*100 + datenow.getUTCMinutes() + this.utc_offset%60;
+        let isOpen = false;
+
+        for(let i = 0, len = opening_periods.length; i < len; i++){
+            const opentime = parseInt(opening_periods[i].open.time, 10);
+            if(currentDayAtVenue === opening_periods[i].open.day && currentTimeAtVenue > opentime){
+                if(opening_periods[i].close){
+                    if(currentDayAtVenue === opening_periods[i].close.day){
+                        const closetime = parseInt(opening_periods[i].close.time, 10);
+                        if(closetime > currentTimeAtVenue){
+                            isOpen = true;
+                        }
+                    } else {
+                        isOpen = true;
+                    }
+                } else {
+                    isOpen = true;
+                }
+            }
+        }
+        return isOpen;
     }
 
     /**
@@ -209,7 +248,12 @@ class VenueClass {
         }
 
         this.opening_hours = details.result.opening_hours;
-        this.utc_offest = details.result.utc_offset;
+        this.utc_offset = details.result.utc_offset;
+        this.website = details.result.website;
+        this.phone_number = details.result.phone_number;
+        this.icon_url = details.result.icon;
+        this.vicinity = details.result.vicinity;
+        this.formatted_address = details.result.formatted_address;
         this.details_loaded = true;
     }
 
@@ -232,7 +276,9 @@ class VenueClass {
             location: this.location,
             types: this.types,
             images: images,
-            check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0)
+            check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0),
+            is_open: this.isOpen(),
+            formatted_address: this.formatted_address
         };
     }
 
@@ -247,7 +293,13 @@ class VenueClass {
             last_check_ins: _.take(_.sortBy(this.check_ins, 'last'), 5),
             top_check_ins: _.take(_.sortBy(this.check_ins, 'count'), 5),
             check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0),
-            opening_hours: this.opening_hours
+            opening_hours: this.opening_hours,
+            is_open: this.isOpen(),
+            website: this.website,
+            phone_number: this.phone_number,
+            vicinity: this.vicinity,
+            formatted_address: this.formatted_address,
+            utc_offset: this.utc_offset
         };
     }
 }
