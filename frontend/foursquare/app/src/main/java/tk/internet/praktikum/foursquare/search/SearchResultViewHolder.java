@@ -5,7 +5,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
 /**
@@ -35,6 +38,8 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
         this.name.setText(searchResult.getName());
        //this.address.setText(searchResult.getPlace_id());
         this.address.setText(searchResult.getReference());
+        List<Image> images=searchResult.getImages();
+
        // this.rating.setText(searchResult.getRating());
         //this.image.setImageBitmap(Utils.decodeResponsedInputStreamImage(searchResult.getImage()));
     }

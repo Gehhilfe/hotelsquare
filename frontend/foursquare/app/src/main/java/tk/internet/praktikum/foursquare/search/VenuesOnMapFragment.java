@@ -18,11 +18,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
 //import tk.internet.praktikum.foursquare.api.bean.Location;
@@ -54,6 +54,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         SupportMapFragment mapFragment =((SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.venues_mapView));
         mapFragment.getMapAsync(this);
+        markerVenueMap=new HashMap<Marker,Venue>();
+
         return view;
     }
 
@@ -62,7 +64,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // set Map
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
-        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+      map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
 
             @Override
             public boolean onMarkerClick(Marker marker) {

@@ -78,7 +78,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         mapViewButton.setChecked(true);
         filterLocation.onCommitCompletion(null);
         filterLocation.addTextChangedListener(createTextWatcherLocation());
-
         filterRadius.setOnSeekBarChangeListener(createOnSeekBarChangeListener());
         mapViewButton.setOnClickListener(toggleMapView());
         initVenueStatePageAdapter();
@@ -204,7 +203,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                List<tk.internet.praktikum.foursquare.api.bean.Location> suggestionLocations= suggestionLocations(s.toString());
             }
 
             @Override
@@ -290,8 +289,10 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     }
 
 
-    public List<tk.internet.praktikum.foursquare.api.bean.Location> suggestionLocation(){
+    public List<tk.internet.praktikum.foursquare.api.bean.Location> suggestionLocations(String currentTextLocation){
         // TODO
+        // use google location services to obtain the appropriate location list upon tipped current location
+
         return null;
     }
 }
