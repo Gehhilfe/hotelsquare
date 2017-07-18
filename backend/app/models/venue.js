@@ -142,11 +142,11 @@ class VenueClass {
             client.get('/maps/api/place/photo?maxheight=1600&photoreference='
                 + this.photo_reference + '&key='
                 + config.googleapi.GOOGLE_PLACES_API_KEY, function (err, req) {
-                if(err)
+                if (err)
                     return reject(err);
 
                 req.on('result', function (err, res) {
-                    if(err)
+                    if (err)
                         return reject(err);
 
                     let body = '';
@@ -176,11 +176,11 @@ class VenueClass {
         });
         return new Promise((resolve, reject) => {
             client.get('', function (err, req) {
-                if(err)
+                if (err)
                     return reject(err);
 
                 req.on('result', function (err, res) {
-                    if(err)
+                    if (err)
                         return reject(err);
 
                     let buffer = Buffer.alloc(0);
@@ -202,7 +202,7 @@ class VenueClass {
 
     async loadDetails() {
         const details = await this._getPlaceDetails(this.place_id);
-        if(this.photo_reference !== '') {
+        if (this.photo_reference !== '') {
             const buffer = await this._loadPhotoGoogle();
             const img = await Image.upload(buffer, null, this);
             this.images.push(img);
@@ -225,7 +225,7 @@ class VenueClass {
     }
 
     toJSONSearchResult() {
-        const images = (this.images && this.images.length > 0)?[_.first(this.images)]:[];
+        const images = (this.images && this.images.length > 0) ? [{_id: _.first(this.images)}] : [];
         return {
             _id: this._id,
             name: this.name,
@@ -237,7 +237,9 @@ class VenueClass {
     }
 
     toJSONDetails() {
-        const images = (this.images && this.images.length > 0)?[_.first(this.images)]:[];
+        const images = (this.images && this.images.length > 0) ? _.map(this.images, (it) => {
+            return {_id: it};
+        }) : [];
         return {
             _id: this._id,
             name: this.name,
