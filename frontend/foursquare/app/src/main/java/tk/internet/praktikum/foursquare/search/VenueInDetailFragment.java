@@ -1,6 +1,5 @@
 package tk.internet.praktikum.foursquare.search;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -11,7 +10,6 @@ import android.widget.ImageView;
 
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
@@ -69,7 +67,7 @@ public class VenueInDetailFragment extends Fragment {
         Log.d(LOG,"##### Venue Id: "+venueId);
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
         venueService.getDetails(venueId)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(venue -> {
                             images = venue.getImages();
@@ -78,21 +76,20 @@ public class VenueInDetailFragment extends Fragment {
                                 Log.d(LOG,"++++ get images");
                                 Image image = images.get(0);
                                 ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
-
-                                Observable<Bitmap> bitmapObservable= imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM);
-                                Bitmap bitmap=imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM).toFuture().get();
-                                imageVenueOne.setImageBitmap(bitmap);
-                                imageVenueTwo.setImageBitmap(bitmap);
-                                imageVenueThree.setImageBitmap(bitmap);
-
+                                imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM)
+                                           .subscribeOn(Schedulers.io())
+                                           .observeOn(AndroidSchedulers.mainThread())
+                                           .subscribe(bitmap -> {
+                                               imageVenueOne.setImageBitmap(bitmap);
+                                               imageVenueTwo.setImageBitmap(bitmap);
+                                               imageVenueThree.setImageBitmap(bitmap);
+                                           });
                             }
-
-
                         },
                         throwable -> {
                             //TODO
                             //handle exception
-                           Log.d(LOG,"#### exception"+ throwable.getStackTrace());
+                           Log.d(LOG,"#### exception"+ throwable.getCause());
 
                         }
                 );
