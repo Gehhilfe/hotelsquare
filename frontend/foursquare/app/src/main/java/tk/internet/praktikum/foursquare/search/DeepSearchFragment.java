@@ -66,6 +66,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private String keyword;
     private int currentPage;
     private PlaceAdapter placeAdapter;
+
+    private String lastFilterLocation;
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -86,6 +88,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         isMapView = false;
         mapViewButton.setChecked(true);
         filterLocation.onCommitCompletion(null);
+
         filterLocation.addTextChangedListener(createTextWatcherLocation());
 
         filterLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -227,25 +230,35 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
             @Override
             public void afterTextChanged(Editable s) {
-                PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, GOOGLE_PLACE_URL);
-                placeService.getSuggestedPlaces( s.toString(),"geocode", getString(R.string.google_maps_key).trim())
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(placeAutoComplete -> {
-                                    Log.d(LOG,"predictions: "+placeAutoComplete.getPredictions());
-                                    placeAdapter = new PlaceAdapter(getContext(),placeAutoComplete.getPredictions());
-                                    filterLocation.setAdapter(placeAdapter);
-                                    //placeAdapter.setSuggestedPlaces(placeAutoComplete.getPredictions());
-                                    placeAdapter.notifyDataSetChanged();
+                String changedLocation = s.toString().trim();
+                Log.d(LOG,"last fitler location: "+lastFilterLocation);
+                Log.d(LOG,"changed location: "+changedLocation);
+                if (!changedLocation.equals(lastFilterLocation)) {
+                    lastFilterLocation = changedLocation;
+                    PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, GOOGLE_PLACE_URL);
+                    placeService.getSuggestedPlaces(changedLocation, "geocode", getString(R.string.google_maps_key).trim())
+                            .subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(placeAutoComplete -> {
+                                        Log.d(LOG,"status: "+placeAutoComplete.getStatus());
+                                        Log.d(LOG, "predictions: " + placeAutoComplete.getPredictions());
+                                        List<Prediction> predictions = placeAutoComplete.getPredictions();
+                                        if (placeAdapter==null || predictions.size()>0) {
+                                            Log.d(LOG, "#### created place adapter");
+                                            placeAdapter = new PlaceAdapter(getContext(), predictions);
+                                            filterLocation.setAdapter(placeAdapter);
+                                            placeAdapter.notifyDataSetChanged();
+                                        }
 
-                                },
-                                throwable -> {
-                                    Log.d(LOG,"exception");
+                                    },
+                                    throwable -> {
+                                        Log.d(LOG, "exception");
 
-                                });
+                                    });
+                }
             }
-        };
 
+        };
     }
 
     /**
@@ -320,14 +333,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         venuesViewPager.setCurrentItem(1);
     }
 
-
-    public List<tk.internet.praktikum.foursquare.api.bean.Location> suggestionLocations(String currentTextLocation) {
-        // TODO
-        // use google location services to obtain the appropriate location list upon tipped current location
-        //SupportPlaceAutocompleteFragment autocompleteFragment = (SupportPlaceAutocompleteFragment )getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-        //SautocompleteFragment.setOnPlaceSelectedListener(this);
-        return null;
-    }
 
     @Override
     public void onPlaceSelected(Place place) {

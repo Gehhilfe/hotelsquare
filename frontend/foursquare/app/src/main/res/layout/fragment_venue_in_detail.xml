@@ -1,6 +1,7 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
@@ -64,46 +65,45 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="57"
+            android:layout_weight="65"
             android:orientation="vertical">
 
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/venue_detail_image_commnent_button"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+
+                android:src="@mipmap/image_comment"
+                fab:fab_label="Pictures comment"
+                fab:fab_size="mini" />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/venue_detail_text_comment_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+
+                android:src="@mipmap/text_commemnt"
+                fab:fab_label="Text comment"
+                fab:fab_size="mini" />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/venue_detail_images"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+
+                android:src="@mipmap/venue_images"
+                fab:fab_label="Pictures"
+                fab:fab_size="mini" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="8"
-            android:layout_marginBottom="5dp"
 
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/venue_comment"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="80"
-                android:layout_marginLeft="3dp"
-                android:background="@drawable/edit_text_"
-                android:inputType="textPersonName"
-                android:text="Add venue comment" />
-
-            <Button
-                android:id="@+id/imageComment"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="10"
-                android:layout_marginLeft="3dp"
-                android:background="@mipmap/image_comment" />
-            <Button
-                android:id="@+id/sendComment"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="10"
-                android:layout_marginRight="3dp"
-                android:background="@mipmap/send" />
-        </LinearLayout>
 
 
     </LinearLayout>
-</LinearLayout>
+
+</RelativeLayout>
