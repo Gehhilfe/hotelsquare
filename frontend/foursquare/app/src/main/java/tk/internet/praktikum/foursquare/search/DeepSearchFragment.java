@@ -8,8 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -21,10 +20,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
 import java.util.List;
 
@@ -32,30 +36,38 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Prediction;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueSearchQuery;
+import tk.internet.praktikum.foursquare.api.service.PlaceService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.location.LocationReader;
 
 //import tk.internet.praktikum.foursquare.api.bean.Location;
 
 
-public class DeepSearchFragment extends Fragment implements android.support.v7.widget.SearchView.OnQueryTextListener {
+public class DeepSearchFragment extends Fragment implements android.support.v7.widget.SearchView.OnQueryTextListener, PlaceSelectionListener {
     private final String URL = "https://dev.ip.stimi.ovh/";
-    private final String LOG=DeepSearchFragment.class.getSimpleName();
+    private final String GOOGLE_PLACE_URL = "https://maps.googleapis.com";
+    private final String LOG = DeepSearchFragment.class.getSimpleName();
     private SearchView searchView;
-    private RecyclerView recyclerView;
-    private EditText filterLocation;
+    private VenueStatePageAdapter venueStatePageAdapter;
+    private AutoCompleteTextView filterLocation;
     private ToggleButton mapViewButton;
     private SeekBar filterRadius;
     private TextView seekBarView;
     private List<?> optionalFilters;
     private List<Venue> venues;
-    private SearchResultAdapter searchResultAdapter;
     private View view;
     private boolean isNearMe;
-    private  boolean isMapView;
+    private boolean isMapView;
+    private ViewPager venuesViewPager;
+    private VenuesListFragment venuesListFragment = null;
+    private String keyword;
+    private int currentPage;
+    private PlaceAdapter placeAdapter;
 
+    private String lastFilterLocation;
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -65,29 +77,43 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_deep_search, container, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.searching_results);
+        venuesViewPager = (ViewPager) view.findViewById(R.id.venues_result);
+        filterLocation = (AutoCompleteTextView) view.findViewById(R.id.location);
 
-        filterLocation = (EditText) view.findViewById(R.id.location);
-
-        filterLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                filterLocation.setFocusable(true);
-            }
-        });
         filterRadius = (SeekBar) view.findViewById(R.id.seekBarRadius);
         filterRadius.setMax(50);
-        seekBarView=(TextView)view.findViewById(R.id.seekBarView);
+        seekBarView = (TextView) view.findViewById(R.id.seekBarView);
 
-        mapViewButton=(ToggleButton)view.findViewById(R.id.is_map_view);
-        isMapView=false;
+        mapViewButton = (ToggleButton) view.findViewById(R.id.is_map_view);
+        isMapView = false;
         mapViewButton.setChecked(true);
         filterLocation.onCommitCompletion(null);
+
         filterLocation.addTextChangedListener(createTextWatcherLocation());
+        filterLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(LOG," ******* onItemclick ******");
+                Prediction place = (Prediction) parent.getItemAtPosition(position);
+                filterLocation.setText(place.getDescription());
+                filterLocation.setSelection(filterLocation.getText().length());
+                deepSearch(searchView.getQuery().toString());
+            }
+        });
+
+
         filterRadius.setOnSeekBarChangeListener(createOnSeekBarChangeListener());
         mapViewButton.setOnClickListener(toggleMapView());
+        initVenueStatePageAdapter();
         setHasOptionsMenu(true);
+        keyword = getArguments().getString("keyword");
         return view;
+    }
+
+    public void initVenueStatePageAdapter() {
+        venueStatePageAdapter = new VenueStatePageAdapter(getFragmentManager());
+        venueStatePageAdapter.initVenuesFragment();
+        venuesViewPager.setAdapter(venueStatePageAdapter);
     }
 
     @Override
@@ -95,10 +121,13 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         inflater.inflate(R.menu.search_view, menu);
         final MenuItem item = menu.findItem(R.id.action_search);
+        MenuItemCompat.expandActionView(item);
         searchView = (android.support.v7.widget.SearchView) MenuItemCompat.getActionView(item);
-        //searchView.setOnClickListener(v -> deepSearch(searchView.getQuery().toString()));
-        //searchView.setOnSearchClickListener(v -> deepSearch(searchView.getQuery().toString()));
         searchView.setOnQueryTextListener(this);
+        searchView.onActionViewExpanded();
+        searchView.requestFocus();
+        searchView.clearFocus();
+        searchView.setQuery(keyword, true);
         MenuItemCompat.setOnActionExpandListener(item,
                 new MenuItemCompat.OnActionExpandListener() {
                     @Override
@@ -119,11 +148,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                 });
     }
 
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        searchResultAdapter = new SearchResultAdapter(venues);
     }
 
     @Override
@@ -134,50 +161,48 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
     @Override
     public boolean onQueryTextChange(String newText) {
-
         deepSearch(newText);
         return true;
     }
 
     private void deepSearch(String query) {
-         Log.d(LOG,"I am here");
-       // System.out.println("I am here");
+        Log.d(LOG, "I am here");
         // Searching for
+        currentPage = 1;
         VenueSearchQuery venueSearchQuery;
         if (filterLocation.isClickable() && !filterLocation.getText().toString().equals("Near Me")) {
-            venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString());
+            venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString().trim());
         } else {
             // TODO
             // gets current location based on gps; "Near me"
-            Location currentLocation= LocationReader.getLocationReader(getContext()).getCurrentLocation(LocationManager.GPS_PROVIDER);
+            Location currentLocation = LocationReader.getLocationReader(getContext()).getCurrentLocation(LocationManager.GPS_PROVIDER);
             //Toast.makeText(getActivity().getApplicationContext(), currentLocation.toString(), Toast.LENGTH_LONG).show();
-            Log.d(LOG,"current location: long- "+currentLocation.getLongitude()+ "lat- "+currentLocation.getLatitude());
+            Log.d(LOG, "current location: long- " + currentLocation.getLongitude() + "lat- " + currentLocation.getLatitude());
             //venueSearchQuery = new VenueSearchQuery(query, dummyLocation().getLongitude(), dummyLocation().getLatitude());
             venueSearchQuery = new VenueSearchQuery(query, currentLocation.getLongitude(), currentLocation.getLatitude());
-
         }
         venueSearchQuery.setRadius(filterRadius.getProgress());
         // TODO
         // Add more optional filters later
 
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
-        venueService.queryVenue(venueSearchQuery).subscribeOn(Schedulers.newThread())
+        venueService.queryVenue(venueSearchQuery, currentPage).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(venueSearchResult -> {
                             venueSearchResult.getResults()
-                                    .forEach(e->
-                                    {
-                                        Log.d(LOG,e.getName());
-                                        Log.d(LOG,"long: "+e.getLocation().getLongitude()+ "lat: "+e.getLocation().getLatitude());
-
-                                    }
-                            );
+                                    .forEach(e ->
+                                            {
+                                                Log.d(LOG, e.getName());
+                                                Log.d(LOG, "long: " + e.getLocation().getLongitude() + "lat: " + e.getLocation().getLatitude());
+                                            }
+                                    );
                             venues = venueSearchResult.getResults();
-                            if(!isMapView)
-                                updateRecyclerView(venues);
+                            if (!isMapView)
+                                displayVenuesList();
                             else {
                                 //TODO
                                 //calls map services to display positions
+                                displayVenuesOnMap();
                             }
                         },
                         throwable -> {
@@ -190,9 +215,10 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
     /**
      * listens the changes of location
+     *
      * @return
      */
-    public TextWatcher createTextWatcherLocation(){
+    public TextWatcher createTextWatcherLocation() {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -202,25 +228,52 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                deepSearch(searchView.getQuery().toString().trim());
-            }
-        };
+                String changedLocation = s.toString().trim();
+                Log.d(LOG,"last fitler location: "+lastFilterLocation);
+                Log.d(LOG,"changed location: "+changedLocation);
+                if (!changedLocation.equals(lastFilterLocation)) {
+                    lastFilterLocation = changedLocation;
+                    PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, GOOGLE_PLACE_URL);
+                    placeService.getSuggestedPlaces(changedLocation, "geocode", getString(R.string.google_maps_key).trim())
+                            .subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(placeAutoComplete -> {
+                                        Log.d(LOG,"status: "+placeAutoComplete.getStatus());
+                                        Log.d(LOG, "predictions: " + placeAutoComplete.getPredictions());
+                                        List<Prediction> predictions = placeAutoComplete.getPredictions();
+                                        if (placeAdapter==null || predictions.size()>0) {
+                                            Log.d(LOG, "#### created place adapter");
+                                            placeAdapter = new PlaceAdapter(getContext(), predictions);
+                                            filterLocation.setAdapter(placeAdapter);
+                                            placeAdapter.notifyDataSetChanged();
+                                        }
 
+                                    },
+                                    throwable -> {
+                                        Log.d(LOG, "exception");
+
+                                    });
+                }
+            }
+
+        };
     }
 
     /**
      * listens the changes of seekbar
+     *
      * @return
      */
-    public SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener(){
+    public SeekBar.OnSeekBarChangeListener createOnSeekBarChangeListener() {
         return new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                 seekBarView.setText(String.valueOf(progress));
+                seekBarView.setText(String.valueOf(progress));
             }
 
             @Override
@@ -230,49 +283,69 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-               deepSearch(searchView.getQuery().toString().trim());
+                // deepSearch(searchView.getQuery().toString().trim());
             }
         };
     }
 
-    /**
-     * update new venues list
-     * @param venues
-     */
-    private  void updateRecyclerView(List<Venue> venues){
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(new SearchResultAdapter(venues));
-    }
 
     /**
      * dummy location for testing "near me"
+     *
      * @return
      */
     /*public Location dummyLocation() {
         // Luisen Darmstadt
         return new Location(8.6511929, 49.8728253);
     }*/
-     public View.OnClickListener toggleMapView(){
-         return new View.OnClickListener() {
-             @Override
-             public void onClick(View v) {
-               if(isMapView){
-                  //TODO
-                   // change toggle button to list view
-                   isMapView=false;
-                   updateRecyclerView(venues);
-               }
-               else {
-                   //TODO
-                   // change toggle button to map view
-                   isMapView=true;
+    public View.OnClickListener toggleMapView() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (venues != null && venues.size() > 0) {
+                    if (isMapView) {
+                        //TODO
+                        // change toggle button to list view
+                        isMapView = false;
+                        displayVenuesList();
+                    } else {
+                        //TODO
+                        // change toggle button to map view
+                        isMapView = true;
+                        displayVenuesOnMap();
 
-               }
-             }
-         };
+                    }
+                }
+            }
+        };
 
-     }
+    }
 
+    private void displayVenuesList() {
+        VenuesListFragment venuesListFragment = (VenuesListFragment) venueStatePageAdapter.getItem(0);
+        venuesListFragment.updateRecyclerView(venues);
+        venuesViewPager.setCurrentItem(0);
+
+
+    }
+
+    private void displayVenuesOnMap() {
+        VenuesOnMapFragment venuesOnMapFragment = (VenuesOnMapFragment) venueStatePageAdapter.getItem(1);
+        venuesOnMapFragment.updateVenuesMarker(venues);
+        venuesOnMapFragment.updateRecyclerView(venues);
+        venuesViewPager.setCurrentItem(1);
+    }
+
+
+    @Override
+    public void onPlaceSelected(Place place) {
+
+    }
+
+    @Override
+    public void onError(Status status) {
+
+    }
 
 
 }
