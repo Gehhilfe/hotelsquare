@@ -90,15 +90,18 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         filterLocation.onCommitCompletion(null);
 
         filterLocation.addTextChangedListener(createTextWatcherLocation());
-
         filterLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(LOG," ******* onItemclick ******");
                 Prediction place = (Prediction) parent.getItemAtPosition(position);
                 filterLocation.setText(place.getDescription());
+                filterLocation.setSelection(filterLocation.getText().length());
                 deepSearch(searchView.getQuery().toString());
             }
         });
+
+
         filterRadius.setOnSeekBarChangeListener(createOnSeekBarChangeListener());
         mapViewButton.setOnClickListener(toggleMapView());
         initVenueStatePageAdapter();
@@ -168,7 +171,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         currentPage = 1;
         VenueSearchQuery venueSearchQuery;
         if (filterLocation.isClickable() && !filterLocation.getText().toString().equals("Near Me")) {
-            venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString());
+            venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString().trim());
         } else {
             // TODO
             // gets current location based on gps; "Near me"

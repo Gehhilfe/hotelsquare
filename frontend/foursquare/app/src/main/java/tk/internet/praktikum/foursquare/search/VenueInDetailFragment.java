@@ -1,5 +1,6 @@
 package tk.internet.praktikum.foursquare.search;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
@@ -73,11 +75,15 @@ public class VenueInDetailFragment extends Fragment {
                             images = venue.getImages();
                             Log.d(LOG,"all images size: " + images.size());
                             if (images.size() > 0) {
+                                Log.d(LOG,"++++ get images");
                                 Image image = images.get(0);
                                 ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
-                                imageVenueOne.setImageBitmap(imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM).blockingFirst());
-                                imageVenueTwo.setImageBitmap(imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM).blockingFirst());
-                                imageVenueThree.setImageBitmap(imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM).blockingFirst());
+
+                                Observable<Bitmap> bitmapObservable= imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM);
+                                Bitmap bitmap=imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM).toFuture().get();
+                                imageVenueOne.setImageBitmap(bitmap);
+                                imageVenueTwo.setImageBitmap(bitmap);
+                                imageVenueThree.setImageBitmap(bitmap);
 
                             }
 
@@ -86,7 +92,7 @@ public class VenueInDetailFragment extends Fragment {
                         throwable -> {
                             //TODO
                             //handle exception
-                            Log.d(LOG,"#### exception"+ throwable.getStackTrace());
+                           // Log.d(LOG,"#### exception"+ throwable.getStackTrace());
 
                         }
                 );
