@@ -13,7 +13,7 @@ public class Venue {
     private String reference;
     private List<String> types;
     private Location location;
-   // private int rating;
+    private int rating;
     private int utc_offset;
     private int check_ins_count;
     private List<Image> images;
@@ -23,13 +23,13 @@ public class Venue {
     public Venue() {
     }
 
-  /*  public int getRating() {
+    public int getRating() {
         return rating;
     }
 
     public void setRating(int rating) {
         this.rating = rating;
-    }*/
+    }
 
     public String getName() {
         return name;

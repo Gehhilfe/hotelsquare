@@ -92,7 +92,7 @@ public class VenueInDetailFragment extends Fragment {
                         throwable -> {
                             //TODO
                             //handle exception
-                           // Log.d(LOG,"#### exception"+ throwable.getStackTrace());
+                           Log.d(LOG,"#### exception"+ throwable.getStackTrace());
 
                         }
                 );
