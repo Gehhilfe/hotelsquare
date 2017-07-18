@@ -7,6 +7,8 @@ const image = require('./app/routes/image');
 const venue = require('./app/routes/venue');
 const comment = require('./app/routes/comment');
 const chat = require('./app/routes/chat');
+const friend = require('./app/routes/friend');
+
 const chatsocket = require('./app/routes/chatsocket');
 const util = require('./lib/util');
 const mongoose = require('mongoose');
@@ -59,6 +61,8 @@ server.get('profile', auth, user.profile);
 server.post('profile/avatar', auth, user.uploadAvatar);
 server.del('profile/avatar', auth, user.deleteAvatar);
 
+server.get('profile/friends', auth, friend.getFriends);
+server.get('profile/friends/:page', auth, friend.getFriends);
 server.del('profile/friends/:name', auth, user.removeFriend);
 server.put('profile/friend_requests/:name', auth, user.confirmFriendRequest);
 

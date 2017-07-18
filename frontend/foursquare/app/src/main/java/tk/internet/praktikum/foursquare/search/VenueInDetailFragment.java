@@ -67,26 +67,29 @@ public class VenueInDetailFragment extends Fragment {
         Log.d(LOG,"##### Venue Id: "+venueId);
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
         venueService.getDetails(venueId)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(venue -> {
                             images = venue.getImages();
                             Log.d(LOG,"all images size: " + images.size());
                             if (images.size() > 0) {
+                                Log.d(LOG,"++++ get images");
                                 Image image = images.get(0);
                                 ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
-                                imageVenueOne.setImageBitmap(imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM).blockingFirst());
-                                imageVenueTwo.setImageBitmap(imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM).blockingFirst());
-                                imageVenueThree.setImageBitmap(imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM).blockingFirst());
-
+                                imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM)
+                                           .subscribeOn(Schedulers.io())
+                                           .observeOn(AndroidSchedulers.mainThread())
+                                           .subscribe(bitmap -> {
+                                               imageVenueOne.setImageBitmap(bitmap);
+                                               imageVenueTwo.setImageBitmap(bitmap);
+                                               imageVenueThree.setImageBitmap(bitmap);
+                                           });
                             }
-
-
                         },
                         throwable -> {
                             //TODO
                             //handle exception
-                            Log.d(LOG,"#### exception"+ throwable.getStackTrace());
+                           Log.d(LOG,"#### exception"+ throwable.getCause());
 
                         }
                 );

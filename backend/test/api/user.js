@@ -25,10 +25,20 @@ describe('User', () => {
     beforeEach((done) => {
         Util.connectDatabase(mongoose).then(function () {
             User.remove({}).then(() => {
-                User.create({name: 'peter111', email: 'peter123@cool.de', password: 'peter99', gender: 'm'}).then((user) => {
+                User.create({
+                    name: 'peter111',
+                    email: 'peter123@cool.de',
+                    password: 'peter99',
+                    gender: 'm'
+                }).then((user) => {
                     peter = user;
                     peterToken = jsonwt.sign(peter.toJSON(), config.jwt.secret, config.jwt.options);
-                    User.create({name: 'peter1112', email: 'peter1223@cool.de', password: 'peter99', gender: 'f'}).then((user) => {
+                    User.create({
+                        name: 'peter1112',
+                        email: 'peter1223@cool.de',
+                        password: 'peter99',
+                        gender: 'f'
+                    }).then((user) => {
                         peter2 = user;
                         peter2Token = jsonwt.sign(peter2.toJSON(), config.jwt.secret, config.jwt.options);
                         User.create({name: 'peter1113', email: 'peter12223@cool.de', password: 'peter99'}).then(() => {
@@ -43,7 +53,7 @@ describe('User', () => {
     describe('GET user', () => {
         it('should retrieve user information when name given', (done) => {
             request(server)
-                .get('/users/'+peter.name)
+                .get('/users/' + peter.name)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
@@ -55,7 +65,7 @@ describe('User', () => {
 
         it('should retrieve user information when id given', (done) => {
             request(server)
-                .get('/users/id/'+peter._id)
+                .get('/users/id/' + peter._id)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
@@ -106,14 +116,14 @@ describe('User', () => {
                     return done();
                 });
         });
-        
+
         it('should change the location', (done) => {
             const before_location = peter.location.coordinates;
-            
+
             request(server)
                 .put('/users')
                 .set('x-auth', peterToken)
-                .send({location:{ coordinates: [1.0, 1.0]}})
+                .send({location: {coordinates: [1.0, 1.0]}})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
@@ -299,6 +309,27 @@ describe('User', () => {
 
     });
 
+    describe('DELETE profile/friends/', () => {
+        beforeEach((done) => {
+            peter.addFriend(peter2);
+            peter2.addFriend(peter);
+            Promise.all([
+                peter.save(),
+                peter2.save()
+            ]).then(() => done());
+        });
+
+        it('should retrieve friends', (done) => {
+            request(server)
+                .get('/profile/friends')
+                .set('x-auth', peterToken)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    return done();
+                });
+        });
+    });
+
     describe('DELETE profile/friend/:name', () => {
         describe('when a friend', () => {
             beforeEach((done) => {
@@ -312,7 +343,7 @@ describe('User', () => {
 
             it('should be possible to remove a friend', (done) => {
                 request(server)
-                    .del('/profile/friends/'+peter2.name)
+                    .del('/profile/friends/' + peter2.name)
                     .set('x-auth', peterToken)
                     .end((err, res) => {
                         res.should.have.status(200);
@@ -331,7 +362,7 @@ describe('User', () => {
         describe('when not a friend', () => {
             it('should not be possible to remove a friend', (done) => {
                 request(server)
-                    .del('/profile/friends/'+peter2.name)
+                    .del('/profile/friends/' + peter2.name)
                     .set('x-auth', peterToken)
                     .end((err, res) => {
                         res.should.have.status(200);
@@ -351,7 +382,7 @@ describe('User', () => {
     describe('friend requests', () => {
         it('should be able to send a friend request', (done) => {
             request(server)
-                .post('/users/'+peter2.name+'/friend_requests')
+                .post('/users/' + peter2.name + '/friend_requests')
                 .set('x-auth', peterToken)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -364,7 +395,7 @@ describe('User', () => {
 
         it('should result in error if a non existing friend request is tried to accept', (done) => {
             request(server)
-                .put('/profile/friend_requests/'+peter.name)
+                .put('/profile/friend_requests/' + peter.name)
                 .set('x-auth', peterToken)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -383,7 +414,7 @@ describe('User', () => {
 
             it('should not add another request', (done) => {
                 request(server)
-                    .post('/users/'+peter2.name+'/friend_requests')
+                    .post('/users/' + peter2.name + '/friend_requests')
                     .set('x-auth', peterToken)
                     .end((err, res) => {
                         res.should.have.status(400);
@@ -396,7 +427,7 @@ describe('User', () => {
 
             it('should be able to accept', (done) => {
                 request(server)
-                    .put('/profile/friend_requests/'+peter.name)
+                    .put('/profile/friend_requests/' + peter.name)
                     .set('x-auth', peter2Token)
                     .send({accept: true})
                     .end((err, res) => {
@@ -416,7 +447,7 @@ describe('User', () => {
 
             it('should be able to decline', (done) => {
                 request(server)
-                    .put('/profile/friend_requests/'+peter.name)
+                    .put('/profile/friend_requests/' + peter.name)
                     .set('x-auth', peter2Token)
                     .send({accept: false})
                     .end((err, res) => {
@@ -447,7 +478,7 @@ describe('User', () => {
 
             it('should result in error', (done) => {
                 request(server)
-                    .post('/users/'+peter2.name+'/friend_requests')
+                    .post('/users/' + peter2.name + '/friend_requests')
                     .set('x-auth', peterToken)
                     .end((err, res) => {
                         res.should.have.status(400);
@@ -465,7 +496,7 @@ describe('User', () => {
             request(server)
                 .post('/searches/users')
                 .set('x-auth', peterToken)
-                .send({ name: 'pet'})
+                .send({name: 'pet'})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.all.not.contain.item.with.property('name', 'peter');
@@ -477,7 +508,7 @@ describe('User', () => {
             request(server)
                 .post('/searches/users')
                 .set('x-auth', peterToken)
-                .send({ name: 'pet'})
+                .send({name: 'pet'})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.length.should.equal(2);
@@ -489,7 +520,7 @@ describe('User', () => {
             request(server)
                 .post('/searches/users')
                 .set('x-auth', peterToken)
-                .send({ name: '12'})
+                .send({name: '12'})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.length.should.equal(1);
@@ -501,7 +532,7 @@ describe('User', () => {
             request(server)
                 .post('/searches/users')
                 .set('x-auth', peterToken)
-                .send({ name: 'p', gender: 'f'})
+                .send({name: 'p', gender: 'f'})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.length.should.equal(1);
@@ -513,7 +544,7 @@ describe('User', () => {
             request(server)
                 .post('/searches/users')
                 .set('x-auth', peterToken)
-                .send({ name: '2', gender: 'm'})
+                .send({name: '2', gender: 'm'})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.length.should.equal(0);
@@ -529,7 +560,7 @@ describe('User', () => {
                 request(server)
                     .post('/searches/users')
                     .set('x-auth', peterToken)
-                    .send({ name: 'pet'})
+                    .send({name: 'pet'})
                     .end((err, res) => {
                         results = res.body;
                         return done();
