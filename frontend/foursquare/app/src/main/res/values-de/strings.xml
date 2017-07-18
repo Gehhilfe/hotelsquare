@@ -29,11 +29,20 @@
     <string name="action_search">Suchen</string>
     <string name="profile_upload_avatar">Hochladen</string>
     <string name="title_activity_maps">Map</string>
-    <string name="suggestion_1">Caffe-Tee</string>
-    <string name="suggestion_2">Bier</string>
-    <string name="suggestion_3">Restaurant</string>
-    <string name="suggestion_4">Kino</string>
-
+    <string name="liked">Mag</string>
+    <string name="more">Weiter...</string>
+    <string name="open_now">Öffnen jetzt</string>
+    <string name="price">Kosten</string>
+    <string name="saved">Speichern</string>
+    <string name="suggestion_beer">Bier</string>
+    <string name="suggestion_breakfast">Frühstück</string>
+    <string name="suggestion_bookstore">Buchhandlung</string>
+    <string name="suggestion_cafe">Cafe</string>
+    <string name="suggestion_cinema">Kino</string>
+    <string name="suggestion_event">Event</string>
+    <string name="suggestion_gas_station">Tankstelle</string>
+    <string name="suggestion_hotel">Hotel</string>
+    <string name="suggestion_restaurant">Restaurant</string>
 
 
 </resources>

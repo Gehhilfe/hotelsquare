@@ -7,6 +7,7 @@
     android:layout_marginTop="35dp"
     android:orientation="vertical"
     tools:context="tk.internet.praktikum.foursquare.MainActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,7 +20,7 @@
             android:orientation="horizontal"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true"
-            android:weightSum="100">
+            >
 
 
             <ImageView
@@ -29,7 +30,8 @@
                 android:layout_weight="10"
                 app:srcCompat="@mipmap/ic_location" />
 
-            <EditText
+         <AutoCompleteTextView
+
                 android:id="@+id/location"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -38,11 +40,27 @@
                 android:layout_marginStart="15dp"
                 android:layout_toEndOf="@+id/imageViewLocation"
                 android:layout_weight="80"
+                android:background="@drawable/edit_text_"
                 android:enabled="true"
                 android:hint="Near me"
                 android:inputType="textPersonName"
-                tools:background="@drawable/edit_text_location_search" />
+                />
 
+          <!--  <fragment
+                android:id="@+id/place_autocomplete_fragment"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="15dp"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@+id/imageViewLocation"
+                android:layout_weight="80"
+                android:background="@drawable/edit_text_"
+                android:enabled="true"
+                android:hint="Near me"
+                android:inputType="textPersonName"
+                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                />-->
 
             <ToggleButton
                 android:id="@+id/is_map_view"
@@ -163,13 +181,14 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/searching_results"
+
+    <android.support.v4.view.ViewPager
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:id="@+id/venues_result">
+    </android.support.v4.view.ViewPager>
 
-    </android.support.v7.widget.RecyclerView>
 
 
 

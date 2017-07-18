@@ -46,6 +46,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Just to test
         //map.addMarker(new MarkerOptions().position(new LatLng(49.877050, 8.654878)).title("Office"));
        //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(49.877050, 8.654878), 17));
+
+
+        // Add a marker in Sydney, Australia, and move the camera.
+        LatLng sydney = new LatLng(-34, 151);
+        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     @Override

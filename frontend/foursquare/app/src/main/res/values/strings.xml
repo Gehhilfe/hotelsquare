@@ -29,12 +29,19 @@
     <string name="action_search">Search</string>
     <string name="profile_upload_avatar">Upload</string>
     <string name="title_activity_maps">Map</string>
-    <string name="suggestion_1">Cafe-Tea</string>
-    <string name="suggestion_2">Cafe-Tea</string>
     <string name="price">Price</string>
     <string name="liked">Liked</string>
     <string name="open_now">Open Now</string>
     <string name="saved">Saved</string>
     <string name="more">More...</string>
+    <string name="suggestion_cafe">Cafe</string>
+    <string name="suggestion_restaurant">Restaurant</string>
+    <string name="suggestion_beer">Beer</string>
+    <string name="suggestion_breakfast">Breakfast</string>
+    <string name="suggestion_cinema">Cinema</string>
+    <string name="suggestion_bookstore">Bookstore</string>
+    <string name="suggestion_hotel">Hotel</string>
+    <string name="suggestion_gas_station">Gas Station</string>
+    <string name="suggestion_event">Events</string>
 
 </resources>
