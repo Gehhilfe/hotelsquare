@@ -1,14 +1,12 @@
 package tk.internet.praktikum.foursquare.search;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
-
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
 /**
@@ -23,7 +21,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
     private TextView rating;
     private ImageView image;
     private SearchResultAdapterListener searchResultAdapterListener;
-
+    private Context context;
     public SearchResultViewHolder(View itemResult,SearchResultAdapterListener searchResultAdapterListener){
         super(itemResult);
         this.searchResultAdapterListener=searchResultAdapterListener;
@@ -38,8 +36,13 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
         this.name.setText(searchResult.getName());
        //this.address.setText(searchResult.getPlace_id());
         this.address.setText(searchResult.getReference());
-        List<Image> images=searchResult.getImages();
-
+       /* List<Image> images=searchResult.getImages();
+        //System.out.println("all images size: "+ images.size());
+        if(images.size()>0) {
+            Image image = images.get(0);
+            ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
+            this.image.setImageBitmap(imageCacheLoader.loadBitmap(image, ImageSize.SMALL).blockingFirst());
+        }*/
        // this.rating.setText(searchResult.getRating());
         //this.image.setImageBitmap(Utils.decodeResponsedInputStreamImage(searchResult.getImage()));
     }
@@ -49,5 +52,11 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
         searchResultAdapterListener.clickOnVenue(String.valueOf(this.getLayoutPosition()));
     }
 
+    public Context getContext() {
+        return context;
+    }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
 }

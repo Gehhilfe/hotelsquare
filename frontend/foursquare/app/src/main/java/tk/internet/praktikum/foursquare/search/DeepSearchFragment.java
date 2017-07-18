@@ -20,10 +20,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
 import java.util.List;
 
@@ -31,20 +36,23 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Prediction;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueSearchQuery;
+import tk.internet.praktikum.foursquare.api.service.PlaceService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.location.LocationReader;
 
 //import tk.internet.praktikum.foursquare.api.bean.Location;
 
 
-public class DeepSearchFragment extends Fragment implements android.support.v7.widget.SearchView.OnQueryTextListener {
+public class DeepSearchFragment extends Fragment implements android.support.v7.widget.SearchView.OnQueryTextListener, PlaceSelectionListener {
     private final String URL = "https://dev.ip.stimi.ovh/";
+    private final String GOOGLE_PLACE_URL = "https://maps.googleapis.com";
     private final String LOG = DeepSearchFragment.class.getSimpleName();
     private SearchView searchView;
     private VenueStatePageAdapter venueStatePageAdapter;
-    private EditText filterLocation;
+    private AutoCompleteTextView filterLocation;
     private ToggleButton mapViewButton;
     private SeekBar filterRadius;
     private TextView seekBarView;
@@ -57,6 +65,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private VenuesListFragment venuesListFragment = null;
     private String keyword;
     private int currentPage;
+    private PlaceAdapter placeAdapter;
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -67,7 +76,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_deep_search, container, false);
         venuesViewPager = (ViewPager) view.findViewById(R.id.venues_result);
-        filterLocation = (EditText) view.findViewById(R.id.location);
+        filterLocation = (AutoCompleteTextView) view.findViewById(R.id.location);
 
         filterRadius = (SeekBar) view.findViewById(R.id.seekBarRadius);
         filterRadius.setMax(50);
@@ -78,11 +87,20 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         mapViewButton.setChecked(true);
         filterLocation.onCommitCompletion(null);
         filterLocation.addTextChangedListener(createTextWatcherLocation());
+
+        filterLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Prediction place = (Prediction) parent.getItemAtPosition(position);
+                filterLocation.setText(place.getDescription());
+                deepSearch(searchView.getQuery().toString());
+            }
+        });
         filterRadius.setOnSeekBarChangeListener(createOnSeekBarChangeListener());
         mapViewButton.setOnClickListener(toggleMapView());
         initVenueStatePageAdapter();
         setHasOptionsMenu(true);
-        keyword=getArguments().getString("keyword");
+        keyword = getArguments().getString("keyword");
         return view;
     }
 
@@ -103,7 +121,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         searchView.onActionViewExpanded();
         searchView.requestFocus();
         searchView.clearFocus();
-        searchView.setQuery(keyword,true);
+        searchView.setQuery(keyword, true);
         MenuItemCompat.setOnActionExpandListener(item,
                 new MenuItemCompat.OnActionExpandListener() {
                     @Override
@@ -144,7 +162,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private void deepSearch(String query) {
         Log.d(LOG, "I am here");
         // Searching for
-        currentPage=1;
+        currentPage = 1;
         VenueSearchQuery venueSearchQuery;
         if (filterLocation.isClickable() && !filterLocation.getText().toString().equals("Near Me")) {
             venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString());
@@ -162,7 +180,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         // Add more optional filters later
 
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
-        venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.newThread())
+        venueService.queryVenue(venueSearchQuery, currentPage).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(venueSearchResult -> {
                             venueSearchResult.getResults()
@@ -203,14 +221,28 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                List<tk.internet.praktikum.foursquare.api.bean.Location> suggestionLocations= suggestionLocations(s.toString());
+
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                String location=filterLocation.getText().toString().trim();
-                if(!location.isEmpty() && location.length()>=3)
-                    deepSearch(searchView.getQuery().toString().trim());
+                PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, GOOGLE_PLACE_URL);
+                placeService.getSuggestedPlaces( s.toString(),"geocode", getString(R.string.google_maps_key).trim())
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(placeAutoComplete -> {
+                                    Log.d(LOG,"predictions: "+placeAutoComplete.getPredictions());
+                                    placeAdapter = new PlaceAdapter(getContext(),placeAutoComplete.getPredictions());
+                                    filterLocation.setAdapter(placeAdapter);
+                                    //placeAdapter.setSuggestedPlaces(placeAutoComplete.getPredictions());
+                                    placeAdapter.notifyDataSetChanged();
+
+                                },
+                                throwable -> {
+                                    Log.d(LOG,"exception");
+
+                                });
             }
         };
 
@@ -235,7 +267,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                deepSearch(searchView.getQuery().toString().trim());
+                // deepSearch(searchView.getQuery().toString().trim());
             }
         };
     }
@@ -289,10 +321,23 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     }
 
 
-    public List<tk.internet.praktikum.foursquare.api.bean.Location> suggestionLocations(String currentTextLocation){
+    public List<tk.internet.praktikum.foursquare.api.bean.Location> suggestionLocations(String currentTextLocation) {
         // TODO
         // use google location services to obtain the appropriate location list upon tipped current location
-
+        //SupportPlaceAutocompleteFragment autocompleteFragment = (SupportPlaceAutocompleteFragment )getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        //SautocompleteFragment.setOnPlaceSelectedListener(this);
         return null;
     }
+
+    @Override
+    public void onPlaceSelected(Place place) {
+
+    }
+
+    @Override
+    public void onError(Status status) {
+
+    }
+
+
 }

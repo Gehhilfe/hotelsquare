@@ -4,13 +4,13 @@ package tk.internet.praktikum.foursquare.api;
  * Created by gehhi on 09.07.2017.
  */
 
-enum ImageSize {
+public enum ImageSize {
     SMALL(0),
     MEDIUM(1),
     LARGE(2);
 
     private int value;
-    private ImageSize(int value) {
+    ImageSize(int value) {
         this.value = value;
     }
 

@@ -28,8 +28,9 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
     @Override
     public SearchResultViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.item_searching_result,parent,false);
-
-        return  new SearchResultViewHolder(view,this);
+        SearchResultViewHolder searchResultViewHolder=new SearchResultViewHolder(view,this);
+        searchResultViewHolder.setContext(parentFragment.getContext());
+        return  searchResultViewHolder;
     }
 
     @Override
@@ -46,6 +47,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
     @Override
     public void clickOnVenue(String venueId) {
         VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();
+        venueInDetailFragment.setVenueId(searchResultViewHolderList.get(Integer.valueOf(venueId)).getId());
         redirectToFragment(venueInDetailFragment);
     }
 
