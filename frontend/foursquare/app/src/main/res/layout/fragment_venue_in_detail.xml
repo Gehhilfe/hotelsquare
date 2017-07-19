@@ -49,14 +49,25 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="15"
+            android:layout_weight="20"
             android:orientation="horizontal">
 
-            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/venues_mapView"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
+            <include
+                layout="@layout/venue_detail_information"
+                android:layout_width="0dp"
+                android:layout_weight="50"
                 android:layout_height="match_parent" />
+            <fragment
+                android:id="@+id/venueDetails_mapView"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="0dp"
+                android:layout_weight="50"
+                android:layout_height="match_parent">
+
+            </fragment>
+
+
+
 
         </LinearLayout>
 
@@ -64,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="65"
+            android:layout_weight="60"
             android:orientation="vertical">
 
             <com.github.clans.fab.FloatingActionButton
@@ -96,6 +107,24 @@
 
                 android:src="@mipmap/venue_images"
                 fab:fab_label="Pictures"
+                fab:fab_size="mini" />
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/checkin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+
+                android:src="@mipmap/checkin"
+                fab:fab_label="Check In"
+                fab:fab_size="mini" />
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+
+                android:src="@mipmap/back"
+                fab:fab_label="Back"
                 fab:fab_size="mini" />
 
         </LinearLayout>

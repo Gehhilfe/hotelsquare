@@ -73,7 +73,7 @@ public class LoginFragment extends Fragment {
 
         /**
          * Use RxJava to handle a long running backend api call without blocking the application
-         * Would be more clean if we used java 1.8 target with Jack
+         * Would be more clean if we used java 1.8 target with Retrolambda
          */
         service.postSession(new LoginCredentials(email, password))
                 .subscribeOn(Schedulers.newThread())                // call is executed i a new thread

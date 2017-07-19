@@ -19,7 +19,34 @@ public class Venue {
     private List<Image> images;
     private List<CheckinInformation> top_check_ins;
     private List<CheckinInformation> last_check_ins;
+    private String website;
+    private boolean is_open;
 
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public boolean is_open() {
+        return is_open;
+    }
+
+    public void setIs_open(boolean is_open) {
+        this.is_open = is_open;
+    }
+
+    public String getVicinity() {
+        return vicinity;
+    }
+
+    public void setVicinity(String vicinity) {
+        this.vicinity = vicinity;
+    }
+
+    private String vicinity;
     public Venue() {
     }
 

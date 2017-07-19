@@ -2,6 +2,7 @@ package tk.internet.praktikum.foursquare.search;
 
 //import android.app.Fragment;
 
+import android.app.ProgressDialog;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -66,8 +67,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private String keyword;
     private int currentPage;
     private PlaceAdapter placeAdapter;
-
     private String lastFilterLocation;
+    private ProgressDialog progressDialog;
+
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -90,18 +92,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         filterLocation.onCommitCompletion(null);
 
         filterLocation.addTextChangedListener(createTextWatcherLocation());
-        filterLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(LOG," ******* onItemclick ******");
-                Prediction place = (Prediction) parent.getItemAtPosition(position);
-                filterLocation.setText(place.getDescription());
-                filterLocation.setSelection(filterLocation.getText().length());
-                deepSearch(searchView.getQuery().toString());
-            }
-        });
-
-
+        filterLocation.setOnItemClickListener(createOnItemClick());
         filterRadius.setOnSeekBarChangeListener(createOnSeekBarChangeListener());
         mapViewButton.setOnClickListener(toggleMapView());
         initVenueStatePageAdapter();
@@ -168,6 +159,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private void deepSearch(String query) {
         Log.d(LOG, "I am here");
         // Searching for
+
         currentPage = 1;
         VenueSearchQuery venueSearchQuery;
         if (filterLocation.isClickable() && !filterLocation.getText().toString().equals("Near Me")) {
@@ -204,10 +196,12 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                                 //calls map services to display positions
                                 displayVenuesOnMap();
                             }
+                         progressDialog.dismiss();
                         },
                         throwable -> {
                             //TODO
                             //handle exception
+                            progressDialog.dismiss();
 
                         }
                 );
@@ -345,6 +339,24 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     @Override
     public void onError(Status status) {
 
+    }
+
+    public AdapterView.OnItemClickListener createOnItemClick(){
+        return
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Log.d(LOG," ******* onItemclick ******");
+                        progressDialog= new ProgressDialog(getActivity(), 1);
+                        progressDialog.setIndeterminate(true);
+                        progressDialog.setMessage("Waiting for searching...");
+                        progressDialog.show();
+                        Prediction place = (Prediction) parent.getItemAtPosition(position);
+                        filterLocation.setText(place.getDescription());
+                        filterLocation.setSelection(filterLocation.getText().length());
+                        deepSearch(searchView.getQuery().toString());
+                    }
+                };
     }
 
 

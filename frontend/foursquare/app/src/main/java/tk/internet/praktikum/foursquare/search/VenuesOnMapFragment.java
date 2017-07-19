@@ -64,7 +64,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // set Map
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
-      map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
 
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -88,7 +88,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     public void updateVenueLocation(Venue venue,int ranking){
         LatLng venueLocation = new LatLng(venue.getLocation().getLatitude(), venue.getLocation().getLongitude());
-
         Marker tmp = map.addMarker(new MarkerOptions()
                     .position(venueLocation)
                     .title(venue.getName() + String.valueOf(ranking)));
