@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:id="@+id/venue_in_detail"
     android:layout_marginTop="40dp"
     tools:context="tk.internet.praktikum.foursquare.search.VenueInDetailFragment">
 
@@ -78,7 +78,7 @@
             android:layout_weight="60"
             android:orientation="vertical">
 
-            <com.github.clans.fab.FloatingActionButton
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/venue_detail_image_commnent_button"
                 android:layout_width="wrap_content"
 
@@ -89,7 +89,7 @@
                 fab:fab_label="Pictures comment"
                 fab:fab_size="mini" />
 
-            <com.github.clans.fab.FloatingActionButton
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/venue_detail_text_comment_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -99,7 +99,7 @@
                 fab:fab_label="Text comment"
                 fab:fab_size="mini" />
 
-            <com.github.clans.fab.FloatingActionButton
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/venue_detail_images"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
                 android:src="@mipmap/venue_images"
                 fab:fab_label="Pictures"
                 fab:fab_size="mini" />
-            <com.github.clans.fab.FloatingActionButton
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/checkin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
                 android:src="@mipmap/checkin"
                 fab:fab_label="Check In"
                 fab:fab_size="mini" />
-            <com.github.clans.fab.FloatingActionButton
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -196,12 +196,13 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                                 //calls map services to display positions
                                 displayVenuesOnMap();
                             }
-                         progressDialog.dismiss();
+                            progressDialog.dismiss();
+
                         },
                         throwable -> {
                             //TODO
                             //handle exception
-                            progressDialog.dismiss();
+
 
                         }
                 );
@@ -355,6 +356,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                         filterLocation.setText(place.getDescription());
                         filterLocation.setSelection(filterLocation.getText().length());
                         deepSearch(searchView.getQuery().toString());
+
                     }
                 };
     }
