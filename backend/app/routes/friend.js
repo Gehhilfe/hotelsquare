@@ -4,7 +4,13 @@ const _ = require('lodash');
 const restify = require('restify');
 const User = require('../models/user');
 
-
+/**
+ * Returns a bunch of 20 friends
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next
+ * @returns {undefined}
+ */
 async function getFriends(request, response, next) {
     let page = 0;
     if (request.params.page)
@@ -24,8 +30,34 @@ async function getFriends(request, response, next) {
         count: friends,
         friends: _.map(user.friends, (it) => it.toJSONPublic())
     });
+    return next();
+}
+
+/**
+ * returns all friends within 5km radius
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function}next next
+ * @returns {undefined}
+ */
+async function getNearByFriends(request, response, next) {
+    const radius = 5000;
+    const user = await User.findOne({
+        _id: request.authentication._id
+    });
+
+    const users = await User.find({
+        _id : { $in : user.friends },
+        incognito: false
+    }).where('location').near({
+        center: request.body,
+        maxDistance: radius
+    });
+    response.send(_.map(user, (it) => it.toJSONPublic()));
+    return next();
 }
 
 module.exports = {
-    getFriends
+    getFriends,
+    getNearByFriends
 };

@@ -1,5 +1,7 @@
 package tk.internet.praktikum.foursquare.api.service;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 import retrofit2.http.Body;
@@ -9,7 +11,9 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import tk.internet.praktikum.foursquare.api.bean.FriendListResponse;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequestResponse;
+import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 
 public interface ProfileService {
@@ -38,4 +42,21 @@ public interface ProfileService {
     @Multipart
     @POST("profile/avatar")
     Observable<User> uploadAvatar(@Part MultipartBody.Part image);
+
+    /**
+     * Retrvies friends list for user
+     * @param page number page starts with 0
+     * @return
+     */
+    @GET("profile/friends/{page}")
+    Observable<FriendListResponse> friends(@Path("page") int page);
+
+    /**
+     * Retrieves all friends near by
+     *
+     * @param location Location of the user
+     * @return List<User> list of nearby friends
+     */
+    @POST("searches/nearbyfriends")
+    Observable<List<User>> getNearByFriends(@Body Location location);
 }
