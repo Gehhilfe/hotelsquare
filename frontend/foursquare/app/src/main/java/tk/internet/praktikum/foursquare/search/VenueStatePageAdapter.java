@@ -36,4 +36,5 @@ public class VenueStatePageAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return venuesFragments.size();
     }
+
 }
