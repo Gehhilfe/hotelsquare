@@ -12,9 +12,7 @@ public class Venue {
     private String place_id;
     private String reference;
     private String formatted_address;
-    private boolean is_open;
     private String phone_number;
-    private String website;
     private String vicinity;
     private List<String> types;
     private Location location;
@@ -27,8 +25,8 @@ public class Venue {
     private String website;
     private boolean is_open;
 
-    public String getWebsite() {
-        return website;
+
+    public Venue() {
     }
 
     public void setWebsite(String website) {
@@ -43,17 +41,11 @@ public class Venue {
         this.is_open = is_open;
     }
 
-    public String getVicinity() {
-        return vicinity;
-    }
 
     public void setVicinity(String vicinity) {
         this.vicinity = vicinity;
     }
 
-    private String vicinity;
-    public Venue() {
-    }
 
     public String getFormattedAddress() {
         return formatted_address;
