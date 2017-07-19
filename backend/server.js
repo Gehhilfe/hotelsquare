@@ -106,6 +106,9 @@ server.post('searches/users', auth, user.search);
 server.post('searches/venues', venue.queryVenue);
 server.post('searches/venues/:page', venue.queryVenue);
 
+//Friends
+server.post('searches/nearbyfriends', auth, friend.getNearByFriends);
+
 // Delete downloads
 server.on('after', (request) => {
     if (request.files) {
