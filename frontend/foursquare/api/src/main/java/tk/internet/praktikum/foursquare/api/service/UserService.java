@@ -9,6 +9,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import tk.internet.praktikum.foursquare.api.bean.FriendListResponse;
+import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.UserSearchQuery;
 
@@ -66,12 +67,4 @@ public interface UserService {
      */
     @POST("searches/users")
     Observable<List<User>> search(@Body UserSearchQuery query);
-
-    /**
-     * Retrvies friends list for user
-     * @param page number page starts with 0
-     * @return
-     */
-    @GET("profile/friends/{page}")
-    Observable<FriendListResponse> friends(@Path("page") int page);
 }

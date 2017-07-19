@@ -15,6 +15,7 @@ public class User implements Serializable {
     private String city;
     private int age;
     private Location location;
+    private boolean incognito;
 
     @SerializedName("update_at")
     private Date updatedAt;
@@ -103,5 +104,13 @@ public class User implements Serializable {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public boolean isIncognito() {
+        return incognito;
+    }
+
+    public void setIncognito(boolean incognito) {
+        this.incognito = incognito;
     }
 }
