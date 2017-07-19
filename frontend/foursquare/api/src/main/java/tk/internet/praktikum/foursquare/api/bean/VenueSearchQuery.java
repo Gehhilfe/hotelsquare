@@ -7,6 +7,7 @@ public class VenueSearchQuery {
     private Location location;
     private String locationName;
     private Integer radius;
+    private boolean only_open = false;
 
     public VenueSearchQuery(String keyword, double longitude, double latitude) {
         this.keyword = keyword;
@@ -48,5 +49,9 @@ public class VenueSearchQuery {
 
     public void setLocationName(String locationName) {
         this.locationName = locationName;
+    }
+
+    public void setOnlyOpen(boolean only_open) {
+        this.only_open = only_open;
     }
 }

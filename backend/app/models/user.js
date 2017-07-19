@@ -59,7 +59,13 @@ const UserSchema = new Schema({
     avatar: {
         type: Schema.Types.ObjectId,
         ref: 'Image'
-    }
+    },
+    incognito: {
+        type: Boolean,
+        default: false
+    },
+    age: Number,
+    city: String
 });
 
 UserSchema.index({location: '2dsphere'});
@@ -139,6 +145,15 @@ class UserClass {
 
         if (data.location && data.location.coordinates)
             self.location.coordinates = data.location.coordinates;
+
+        if(data.city)
+            self.city = data.city;
+
+        if(data.age)
+            self.age = data.age;
+
+        if(data.incognito)
+            self.incognito = data.incognito;
     }
 
     comparePassword(candidatePassword) {
@@ -184,12 +199,16 @@ class UserClass {
     }
 
     toJSONPublic() {
+        const location = this.incognito ? null : this.location;
         return {
             _id: this._id,
             name: this.name,
             displayName: this.displayName,
             friends_count: this.friends.length,
-            avatar: this.avatar
+            avatar: this.avatar,
+            city: this.city,
+            age: this.age,
+            location: location
         };
     }
 }

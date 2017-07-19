@@ -11,6 +11,11 @@ public class Venue {
     private String name;
     private String place_id;
     private String reference;
+    private String formatted_address;
+    private boolean is_open;
+    private String phone_number;
+    private String website;
+    private String vicinity;
     private List<String> types;
     private Location location;
     private int rating;
@@ -48,6 +53,26 @@ public class Venue {
 
     private String vicinity;
     public Venue() {
+    }
+
+    public String getFormattedAddress() {
+        return formatted_address;
+    }
+
+    public boolean isOpen() {
+        return is_open;
+    }
+
+    public String getPhoneNumber() {
+        return phone_number;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public String getVicinity() {
+        return vicinity;
     }
 
     public int getRating() {
