@@ -55,6 +55,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 .findFragmentById(R.id.venues_mapView));
         mapFragment.getMapAsync(this);
         markerVenueMap=new HashMap<Marker,Venue>();
+        this.setRetainInstance(true);
 
         return view;
     }
