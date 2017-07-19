@@ -108,9 +108,14 @@ async function queryVenue(request, response, next) {
     let location = request.body.location;
     let locationName = request.body.locationName;
     let radius = request.body.radius;
+    let only_open = false;
     let page = 0;
     if (request.params.page)
         page = request.params.page;
+
+    if(request.body.only_open){
+        only_open = request.body.only_open;
+    }
 
     if (!radius) {
         radius = 5000;
@@ -135,12 +140,15 @@ async function queryVenue(request, response, next) {
             coordinates: [result[0].longitude, result[0].latitude]
         };
 
-        locationName = result[0].formattedAddress;
+        locationName = result[0].formatted_address;
     }
 
     // search in our database for query
     let venues = await searchVenuesInDB(location, keyword, radius, page, 10);
     venues = _.map(venues, (v) => v.toJSONSearchResult());
+    if(only_open){
+        venues = _.filter(venues, (v) => v.isOpen());
+    }
     response.send({
         location: location,
         locationName: locationName,

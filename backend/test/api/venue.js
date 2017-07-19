@@ -44,8 +44,11 @@ describe('venue', () => {
                 radius: 5000
             });
         aVenue = res.body.results[0];
+        await request(server)
+            .get('/venues/' + aVenue._id + '');
         user = await User.create({name: 'peter111', email: 'peter123@cool.de', password: 'peter99', gender: 'm'});
         const bVenue = await Venue.findOne({_id: aVenue._id});
+        bVenue.isOpen();
         token = jsonwt.sign(user.toJSON(), config.jwt.secret, config.jwt.options);
     }));
 

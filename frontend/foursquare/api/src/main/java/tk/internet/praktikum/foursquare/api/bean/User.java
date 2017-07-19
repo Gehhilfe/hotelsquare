@@ -12,6 +12,10 @@ public class User implements Serializable {
     private String email;
     private String password;
     private Gender gender;
+    private String city;
+    private int age;
+    private Location location;
+    private boolean incognito;
 
     @SerializedName("update_at")
     private Date updatedAt;
@@ -76,5 +80,37 @@ public class User implements Serializable {
 
     public Image getAvatar() {
         return avatar;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public boolean isIncognito() {
+        return incognito;
+    }
+
+    public void setIncognito(boolean incognito) {
+        this.incognito = incognito;
     }
 }
