@@ -5,10 +5,10 @@ const restify = require('restify');
 const User = require('../models/user');
 
 /**
- * returns a bunch of 20 friends
- * @param request request
- * @param response response
- * @param next next
+ * Returns a bunch of 20 friends
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next
  * @returns {undefined}
  */
 async function getFriends(request, response, next) {
@@ -35,18 +35,18 @@ async function getFriends(request, response, next) {
 
 /**
  * returns all friends within 5km radius
- * @param request request
- * @param response response
- * @param next next
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function}next next
  * @returns {undefined}
  */
 async function getNearByFriends(request, response, next) {
-    let radius = 5000;
-    let user = await User.findOne({
+    const radius = 5000;
+    const user = await User.findOne({
         _id: request.authentication._id
     });
 
-    let users = await User.find({
+    const users = await User.find({
         _id : { $in : user.friends },
         incognito: false
     }).where('location').near({

@@ -260,7 +260,7 @@ class VenueClass {
     addComment(comment) {
         if (!comment.assigned.to.equals(this._id))
             return;
-        if (comment.constructor.modelName === "ImageComment" ) {
+        if (comment.constructor.modelName === 'ImageComment' ) {
             this.images.push(comment.image);
         }
         if (_.indexOf(this.comments, comment._id) === -1) {

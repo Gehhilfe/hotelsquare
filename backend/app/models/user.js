@@ -61,7 +61,7 @@ const UserSchema = new Schema({
         ref: 'Image'
     },
     incognito: {
-        type: boolean,
+        type: Boolean,
         default: false
     },
     age: Number,
