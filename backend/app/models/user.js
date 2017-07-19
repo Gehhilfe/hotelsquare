@@ -60,6 +60,10 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Image'
     },
+    incognito: {
+        type: boolean,
+        default: false
+    },
     age: Number,
     city: String
 });
@@ -147,6 +151,9 @@ class UserClass {
 
         if(data.age)
             self.age = data.age;
+
+        if(data.incognito)
+            self.incognito = data.incognito;
     }
 
     comparePassword(candidatePassword) {
@@ -192,6 +199,7 @@ class UserClass {
     }
 
     toJSONPublic() {
+        const location = this.incognito ? null : this.location;
         return {
             _id: this._id,
             name: this.name,
@@ -200,7 +208,7 @@ class UserClass {
             avatar: this.avatar,
             city: this.city,
             age: this.age,
-            location: this.location
+            location: location
         };
     }
 }
