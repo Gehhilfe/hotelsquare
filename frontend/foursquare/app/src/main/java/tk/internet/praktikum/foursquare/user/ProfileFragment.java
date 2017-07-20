@@ -21,16 +21,19 @@ import java.io.IOException;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MultipartBody;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
+import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.UploadHelper;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
+import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 import static android.app.Activity.RESULT_OK;
-
-//import android.app.Fragment;
 
 public class ProfileFragment extends Fragment {
     private TextView name, email, password, city;
@@ -42,6 +45,7 @@ public class ProfileFragment extends Fragment {
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User currentUser;
     private Bitmap avatar;
+    private boolean newPicture, changedPassword;
 
     private final int REQUEST_CAMERA = 0;
     private final int REQUEST_GALLERY = 1;
@@ -89,9 +93,25 @@ public class ProfileFragment extends Fragment {
                                 name.setText(currentUser.getDisplayName());
                                 email.setText(currentUser.getEmail());
                                 city.setText(currentUser.getName());
+                                // TODO - Gender
+                                // TODO - Age
+
+                            if (currentUser.getAvatar() != null) {
+                                ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
+                                imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.LARGE)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(bitmap -> {
+                                            avatarPicture.setImageBitmap(bitmap);
+                                        },
+                                                throwable -> {
+                                                    Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                        );
+                            }
                             },
                             throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), "Error fetching user Informations.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                     );
         }catch (Exception e) {
@@ -100,6 +120,9 @@ public class ProfileFragment extends Fragment {
     }
 
     private void save() {
+        if (password.getText() != "")
+            changedPassword = true;
+
         name.setEnabled(false);
         email.setEnabled(false);
         password.setEnabled(false);
@@ -116,6 +139,44 @@ public class ProfileFragment extends Fragment {
         male.setEnabled(false);
         female.setEnabled(false);
         none.setEnabled(false);
+
+        currentUser.setName(name.getText().toString());
+        currentUser.setCity(city.getText().toString());
+        currentUser.setEmail(email.getText().toString());
+        // TODO - GENDER
+        // TODO - AGE
+
+        uploadChanges();
+    }
+
+    private void uploadChanges() {
+        ProfileService service = ServiceFactory
+                .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        if  (newPicture) {
+            try {
+                MultipartBody.Part img = UploadHelper.createMultipartBodySync(avatar, getContext(), true);
+                service.uploadAvatar(img)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(user -> {},
+                                throwable -> {
+                                    Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                        );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        UserService service2 = ServiceFactory
+                .createRetrofitService(UserService.class, URL, LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
+
+        service2.update(currentUser);
+
     }
 
     private void edit() {
@@ -135,6 +196,9 @@ public class ProfileFragment extends Fragment {
         male.setEnabled(true);
         female.setEnabled(true);
         none.setEnabled(true);
+
+        changedPassword = false;
+        newPicture = false;
     }
 
     private void uploadPicture() {
@@ -180,6 +244,7 @@ public class ProfileFragment extends Fragment {
                 if (resultCode == RESULT_OK) {
                     avatar = (Bitmap) data.getExtras().get("data");
                     avatarPicture.setImageBitmap(avatar);
+                    newPicture = true;
                 }
             break;
 
@@ -188,6 +253,7 @@ public class ProfileFragment extends Fragment {
                     try {
                         avatar = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
                         avatarPicture.setImageBitmap(avatar);
+                        newPicture = true;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
