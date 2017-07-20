@@ -140,6 +140,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                         //TODO
                         // displays the recommendation list
                         searchView.onActionViewExpanded();
+                        //searchView.setQuery(lastQuery,false);
                         searchView.setQueryHint(getResources().getString(R.string.searching_question));
                         return true; // Return true to expand action view
                     }
@@ -159,11 +160,20 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        deepSearch(newText);
+         deepSearch(newText);
         return true;
     }
 
     private void deepSearch(String query) {
+        Log.d(LOG,"#### lastQuery: "+lastQuery);
+        Log.d(LOG,"#### currentQuery: "+query);
+
+        if(query == null || query.trim().isEmpty()) {
+            query = lastQuery;
+            if(searchView!=null)
+                searchView.setQuery(lastQuery,true);
+
+        }
         if (query != null && !query.trim().isEmpty()) {
             Log.d(LOG, "*** deepSearch");
             // Searching for
@@ -366,14 +376,17 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Log.d(LOG," ******* onItemclick ******");
-                        progressDialog= new ProgressDialog(getActivity(), 1);
-                        progressDialog.setIndeterminate(true);
-                        progressDialog.setMessage("Waiting for searching...");
-                        progressDialog.show();
-                        Prediction place = (Prediction) parent.getItemAtPosition(position);
-                        filterLocation.setText(place.getDescription());
-                        filterLocation.setSelection(filterLocation.getText().length());
-                        deepSearch(searchView.getQuery().toString());
+                        String query=searchView.getQuery().toString();
+                        if(!query.isEmpty()) {
+                            progressDialog = new ProgressDialog(getActivity(), 1);
+                            progressDialog.setIndeterminate(true);
+                            progressDialog.setMessage("Waiting for searching...");
+                            progressDialog.show();
+                            Prediction place = (Prediction) parent.getItemAtPosition(position);
+                            filterLocation.setText(place.getDescription());
+                            filterLocation.setSelection(filterLocation.getText().length());
+                            deepSearch(query);
+                        }
 
                     }
                 };
