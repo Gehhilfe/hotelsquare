@@ -35,13 +35,16 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MultipartBody;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.UploadHelper;
 import tk.internet.praktikum.foursquare.api.bean.Comment;
 import tk.internet.praktikum.foursquare.api.bean.Image;
+import tk.internet.praktikum.foursquare.api.bean.ImageComment;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.bean.User;
@@ -158,6 +161,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                             renderVenueInformation(venue);
                             Location location = venue.getLocation();
                             updateVenueLocation(location);
+                            renderCommentVenue(venue);
                             images = venue.getImages();
                             Log.d(LOG, "all images size: " + images.size());
                             if (images.size() > 0) {
@@ -173,7 +177,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                                             imageVenueThree.setImageBitmap(bitmap);
                                         });
                             }
-                            renderCommentVenue(venue);
+
                             progressDialog.dismiss();
                         },
                         throwable -> {
@@ -220,7 +224,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     }
 
     public void renderCommentVenue(Venue venue) {
-        String venueId = venue.getId();
+        Log.d(LOG,"renderCommentVenue");
         CommentService commentService = ServiceFactory.createRetrofitService(CommentService.class, URL);
         commentService.getComments(venueId, currentPage)
                 .subscribeOn(Schedulers.io())
@@ -252,19 +256,22 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 if (!comment.isEmpty()) {
 
                     TextComment textComment = new TextComment(comment);
-                    SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getContext());
+                    SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
                     User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
                     textComment.setAuthor(user);
-                    String token=sharedPreferences.getString(Constants.TOKEN,"");
-                    VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL,token);
+                    Log.d(LOG, "author: " + user);
+                    String token = sharedPreferences.getString(Constants.TOKEN, "");
+                    Log.d(LOG, "token: " + token);
+                    VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL, token);
+                    Log.d(LOG, "#### running here");
                     venueService.addTextComment(textComment, venueId)
-                            .subscribeOn(Schedulers.newThread())
+                           .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(textComment1 -> {
                                         Log.d(LOG, "##### textcomment: " + textComment1.getId());
                                     },
                                     throwable -> {
-                                       Log.d(LOG, throwable.getCause().toString());
+                                        Log.d(LOG, throwable.getMessage());
                                     });
 
 
@@ -295,6 +302,24 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 // User clicked OK button
                 //Todo
                 // call venueServices
+                MultipartBody.Part image= UploadHelper.createMultipartBodySync(venueImageComment,getContext(),true);
+                SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
+                User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
+                ImageComment imageComment=new ImageComment();
+                imageComment.setAuthor(user);
+                Log.d(LOG, "author: " + user);
+                String token = sharedPreferences.getString(Constants.TOKEN, "");
+                Log.d(LOG, "token: " + token);
+                VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL, token);
+                venueService.uploadAvatar(image,venueId)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(imageComment1 -> {
+                                    Log.d(LOG, "##### imageComment: " + imageComment1.getId());
+                                },
+                                throwable -> {
+                                    Log.d(LOG, throwable.getMessage());
+                                });
 
             }
         });
