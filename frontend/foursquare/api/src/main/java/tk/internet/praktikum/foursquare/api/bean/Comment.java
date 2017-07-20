@@ -15,7 +15,7 @@ public abstract class Comment {
     private int dislikes_count;
     private Date date;
 
-   /* public Comment() {};*/
+    public Comment() {}
 
     public void setAuthor(User author) {
         this.author = author;

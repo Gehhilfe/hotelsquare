@@ -248,22 +248,23 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 // call venueServices
                 System.out.println("*** comment text");
                 EditText textCommentContent = (EditText) textCommentView.findViewById(R.id.venue_text_comment_content);
-                String commnent = textCommentContent.getText().toString().trim();
-                if (!commnent.isEmpty()) {
-                    VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
-                    TextComment textComment = new TextComment(commnent);
+                String comment = textCommentContent.getText().toString().trim();
+                if (!comment.isEmpty()) {
+
+                    TextComment textComment = new TextComment(comment);
                     SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getContext());
                     User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
                     textComment.setAuthor(user);
+                    String token=sharedPreferences.getString(Constants.TOKEN,"");
+                    VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL,token);
                     venueService.addTextComment(textComment, venueId)
-                            .subscribeOn(Schedulers.io())
+                            .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(textComment1 -> {
                                         Log.d(LOG, "##### textcomment: " + textComment1.getId());
-
                                     },
                                     throwable -> {
-                                        Log.d(LOG, throwable.getMessage());
+                                       Log.d(LOG, throwable.getCause().toString());
                                     });
 
 
