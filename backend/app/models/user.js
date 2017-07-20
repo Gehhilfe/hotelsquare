@@ -200,12 +200,13 @@ class UserClass {
 
     toJSONPublic() {
         const location = this.incognito ? null : this.location;
+        const avatar = this.avatar ? this.avatar.toJSON() : null;
         return {
             _id: this._id,
             name: this.name,
             displayName: this.displayName,
             friends_count: this.friends.length,
-            avatar: this.avatar,
+            avatar: avatar,
             city: this.city,
             age: this.age,
             location: location
