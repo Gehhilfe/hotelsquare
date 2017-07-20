@@ -272,29 +272,26 @@ class VenueClass {
     }
 
     toJSONSearchResult() {
-        const images = (this.images && this.images.length > 0) ? [{_id: _.first(this.images)}] : [];
         return {
             _id: this._id,
             name: this.name,
             location: this.location,
             types: this.types,
-            images: images,
+            images: this.images,
             check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0),
             is_open: this.isOpen(),
+            rating: this.rating_google,
             formatted_address: this.formatted_address
         };
     }
 
     toJSONDetails() {
-        const images = (this.images && this.images.length > 0) ? _.map(this.images, (it) => {
-            return {_id: it};
-        }) : [];
         return {
             _id: this._id,
             name: this.name,
             location: this.location,
             types: this.types,
-            images: images,
+            images: this.images,
             last_check_ins: _.take(_.sortBy(this.check_ins, 'last'), 5),
             top_check_ins: _.take(_.sortBy(this.check_ins, 'count'), 5),
             check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0),
@@ -303,6 +300,7 @@ class VenueClass {
             website: this.website,
             phone_number: this.phone_number,
             vicinity: this.vicinity,
+            rating: this.rating_google,
             formatted_address: this.formatted_address,
             utc_offset: this.utc_offset
         };

@@ -19,7 +19,7 @@ const User = require('../models/user');
  * @returns {undefined}
  */
 async function getVenue(request, response, next) {
-    const venue = await Venue.findOne({_id: request.params.id});
+    const venue = await Venue.findOne({_id: request.params.id}).populate('images');
 
     // check if details are loaded
     if (!venue.details_loaded) {
@@ -189,7 +189,7 @@ async function searchVenuesInDB(location, keyword = '', radius = 5000, page = 0,
             {name: new RegExp(keyword, 'i')},
             {types: new RegExp(keyword, 'i')}
         ]
-    }).limit(limit).skip(page * limit);
+    }).populate('images').limit(limit).skip(page * limit);
     return await query.where('location').near({
         center: location,
         maxDistance: radius
