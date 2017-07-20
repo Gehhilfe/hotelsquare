@@ -113,4 +113,12 @@ public class User implements Serializable {
     public void setIncognito(boolean incognito) {
         this.incognito = incognito;
     }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
 }
