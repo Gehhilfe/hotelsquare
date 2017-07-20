@@ -28,9 +28,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
+import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.location.MapsActivity;
 
 //import tk.internet.praktikum.foursquare.api.bean.Location;
@@ -41,6 +45,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private View view;
     private GoogleMap map;
     private RecyclerView recyclerView;
+    private String URL = "https://dev.ip.stimi.ovh/";;
+    private Venue tmp;
 
     private Marker myPosition;
 
@@ -86,10 +92,41 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             @Override
             public View getInfoContents(Marker marker) {
 
-                TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
-                tvTitle.setText(marker.getTitle());
-                TextView tvSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
-                tvSnippet.setText(marker.getSnippet());
+                // Get Info from Venue
+                if(markerVenueMap.containsKey(marker)){
+                    Log.d("KEYFOUND", "Marker was Found");
+
+                    tmp = markerVenueMap.get(marker);
+                    // Retrieve Data from specific Venue
+                    VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
+                    venueService.getDetails(tmp.getId()).subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe(venue -> {
+                            tmp = venue;
+                        Log.d("GOTDETAILS", "Details for: " + venue.getName());
+                        Log.d("GOTDETAILS", "Details are: " + venue.getFormattedAddress() + venue.getRating());
+                    }, throwable -> {
+                        //TODO: handle exception
+                    });
+
+
+                    // Set InfoWindow Text
+                    TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
+                    tvTitle.setText(tmp.getName());
+                    TextView tvAddress = ((TextView) myContentsView.findViewById(R.id.adress));
+                    tvAddress.setText(tmp.getFormattedAddress());
+                    TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
+                    tvRate.setText(tmp.getFormattedAddress());
+                }
+
+                //TODO: Get Info from Venue or Friend
+                //ImageView ivImage = ((ImageView) myContentsView.findViewById(R.id.img));
+                //Drawable picture =
+                //ivImage.setImageDrawable(drawable);
+                //ivImage.setImageRe
+                //TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
+                //tvTitle.setText(marker.getTitle());
+                //TextView tvSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
+                //tvSnippet.setText(marker.getSnippet());
 
                 return myContentsView;
             }
@@ -138,8 +175,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         LatLng venueLocation = new LatLng(venue.getLocation().getLatitude(), venue.getLocation().getLongitude());
         Marker tmp = map.addMarker(new MarkerOptions()
                     .position(venueLocation)
-                    .title(venue.getName() + String.valueOf(ranking))
-                    .snippet("TestSnippet"));
+                    .title(venue.getName() + String.valueOf(ranking)));
         markerVenueMap.put(tmp, venue);
 
     }
