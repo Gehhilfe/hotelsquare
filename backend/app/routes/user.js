@@ -42,7 +42,7 @@ const handleValidation = (next, func) => {
  * @returns {undefined}
  */
 async function search(request, response, next) {
-    let query = User.find({ name: new RegExp(request.body.name, 'i'), _id: {$ne: request.authentication._id}  });
+    let query = User.find({ name: new RegExp(request.body.name, 'i'), _id: {$ne: request.authentication._id}  }).populate('avatar');
     if(request.body.gender)
         query = query.where('gender').equals(request.body.gender);
     let result = await query;
@@ -73,7 +73,7 @@ async function profile(request, response, next) {
         selfRequest = true;
     }
 
-    let user = await User.findOne({name: request.params.name});
+    let user = await User.findOne({name: request.params.name}).populate('avatar').exec();
     if (user === null)
         return next(new restify.errors.NotFoundError());
     if (!selfRequest) {
@@ -94,7 +94,7 @@ async function profile(request, response, next) {
  * @returns {undefined}
  */
 async function profileByID(request, response, next) {
-    const user = await User.findOne({_id: request.params.id});
+    const user = await User.findOne({_id: request.params.id}).populate('avatar');
     response.send(user.toJSONPublic());
     return next();
 }
