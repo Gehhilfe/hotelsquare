@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -140,6 +141,21 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         }
 
         map.setInfoWindowAdapter(new MyInfoWindowAdapter(this.getActivity()));
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener(){
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                if(markerVenueMap.containsKey(marker)){
+                    VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();
+                    venueInDetailFragment.setVenueId(markerVenueMap.get(marker).getId());
+                    FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, venueInDetailFragment);
+                    fragmentTransaction.addToBackStack(venueInDetailFragment.getTag());
+                    fragmentTransaction.commit();
+                    //redirectToFragment(venueInDetailFragment);
+
+                }
+            }
+        });
 
         //TODO
         //map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
