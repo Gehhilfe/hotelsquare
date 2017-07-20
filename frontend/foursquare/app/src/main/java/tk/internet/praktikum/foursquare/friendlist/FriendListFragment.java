@@ -30,32 +30,6 @@ public class FriendListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-
-         /*final List<User>[] users = {new ArrayList<>()};
-        users.add(new User("Alex", ""));
-        users.add(new User("Bob", ""));
-        users.add(new User("Chris", ""));
-        users.add(new User("Dennis", ""));
-        users.add(new User("Erik", ""));
-        users.add(new User("Frank", ""));
-        users.add(new User("Guido", ""));
-        users.add(new User("Hans", ""));
-        users.add(new User("Ingo", ""));
-        users.add(new User("Jan", ""));
-        users.add(new User("Klaus", ""));
-        users.add(new User("Lennard", ""));
-        users.add(new User("Max", ""));
-        users.add(new User("Nik", ""));
-        users.add(new User("Otto", ""));
-        users.add(new User("Peter", ""));
-        users.add(new User("Quin", ""));
-        users.add(new User("Rolf", ""));
-        users.add(new User("Stefan", ""));
-        users.add(new User("Tom", ""));
-        users.add(new User("Uwe", ""));
-
-        */
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
@@ -80,7 +54,6 @@ public class FriendListFragment extends Fragment {
             e.printStackTrace();
         }
 
-        //recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), users[0]));
         return view;
     }
 }
