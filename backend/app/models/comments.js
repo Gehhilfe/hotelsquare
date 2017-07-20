@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-
+const restify = require('restify');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -155,6 +155,8 @@ class TextCommentClass {
     }
 
     toJSONDetails() {
+        if (this.author && this.populated('author') === undefined)
+            throw new restify.errors.InternalServerError('Author not populated!');
         return {
             _id: this._id,
             assigned: {
@@ -191,6 +193,8 @@ class ImageCommentClass {
     }
 
     toJSONDetails() {
+        if (this.author && this.populated('author') === undefined)
+            throw new restify.errors.InternalServerError('Author not populated!');
         return {
             _id: this._id,
             assigned: {
