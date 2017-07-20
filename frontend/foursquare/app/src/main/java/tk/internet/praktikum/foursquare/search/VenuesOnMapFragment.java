@@ -1,13 +1,20 @@
 package tk.internet.praktikum.foursquare.search;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,8 +29,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
+import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.location.MapsActivity;
 
 //import tk.internet.praktikum.foursquare.api.bean.Location;
 
@@ -33,6 +46,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private View view;
     private GoogleMap map;
     private RecyclerView recyclerView;
+    private String URL = "https://dev.ip.stimi.ovh/";;
+    private Venue tmp;
 
     private Marker myPosition;
 
@@ -65,24 +80,109 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // set Map
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
-        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+
+        class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+
+            private final View myContentsView;
+
+            MyInfoWindowAdapter(Context context) {
+                LayoutInflater inflater = LayoutInflater.from(context);
+                myContentsView = inflater.inflate(R.layout.info_window, null);
+            }
 
             @Override
-            public boolean onMarkerClick(Marker marker) {
+            public View getInfoContents(Marker marker) {
+
+                // Get Info from Venue
                 if(markerVenueMap.containsKey(marker)){
-                    Venue v = markerVenueMap.get(marker);
-                    //TODO open new Fragment/Activity
-                    return true;
+                    Log.d("KEYFOUND", "Marker was Found");
+
+                    tmp = markerVenueMap.get(marker);
+                    // Retrieve Data from specific Venue
+                    VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
+                    venueService.getDetails(tmp.getId()).subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe(venue -> {
+                            tmp = venue;
+                        Log.d("GOTDETAILS", "Details for: " + venue.getName());
+                        Log.d("GOTDETAILS", "Details are: " + venue.getFormattedAddress() + venue.getRating());
+                    }, throwable -> {
+                        //TODO: handle exception
+                    });
+
+
+                    // Set InfoWindow Text
+                    TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
+                    tvTitle.setText(tmp.getName());
+                    TextView tvAddress = ((TextView) myContentsView.findViewById(R.id.adress));
+                    tvAddress.setText(tmp.getFormattedAddress());
+                    TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
+                    tvRate.setText(tmp.getFormattedAddress());
                 }
+
+                //TODO: Get Info from Venue or Friend
+                //ImageView ivImage = ((ImageView) myContentsView.findViewById(R.id.img));
+                //Drawable picture =
+                //ivImage.setImageDrawable(drawable);
+                //ivImage.setImageRe
+                //TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
+                //tvTitle.setText(marker.getTitle());
+                //TextView tvSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
+                //tvSnippet.setText(marker.getSnippet());
+
+                return myContentsView;
+            }
+
+            @Override
+            public View getInfoWindow(Marker marker) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+        }
+
+        map.setInfoWindowAdapter(new MyInfoWindowAdapter(this.getActivity()));
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener(){
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                if(markerVenueMap.containsKey(marker)){
+                    VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();
+                    venueInDetailFragment.setVenueId(markerVenueMap.get(marker).getId());
+                    FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, venueInDetailFragment);
+                    fragmentTransaction.addToBackStack(venueInDetailFragment.getTag());
+                    fragmentTransaction.commit();
+                    //redirectToFragment(venueInDetailFragment);
+
+                }
+            }
+        });
+
+        //TODO
+        //map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+         //   @Override
+          //  public void onInfoWindowClick(Marker marker) {
+
+         //   }
+        //});
+
+        //map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+
+          //  @Override
+           // public boolean onMarkerClick(Marker marker) {
+           //     if(markerVenueMap.containsKey(marker)){
+            //        Venue v = markerVenueMap.get(marker);
+            //        //TODO open new Fragment/Activity
+            //        return true;
+              //  }
                 //else if(markerFriendMap.containsKey(marker)){
                 //Friend f = markerFriendMap.get(marker);
                 //TODO: open new Fragment/Activity
                 // return true;
                 //}
-            return false;
-            }
+           // return false;
+            //}
 
-        });
+       // });
 
     }
 
