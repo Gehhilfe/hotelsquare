@@ -21,6 +21,7 @@ import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.DummyProfile;
 import tk.internet.praktikum.foursquare.user.MeFragment;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 
 //import android.app.FragmentTransaction;
 
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_history) {
             // call history activity
-            Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
+            Intent intent = new Intent(getApplicationContext(), UserActivity.class);
             startActivityForResult(intent, 0);
         } else if (id == R.id.nav_me) {
             // call login activity if didn't login util now
