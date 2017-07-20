@@ -82,7 +82,12 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     @Override
     public void onBindViewHolder(FriendListViewHolder holder, int position) {
         User currentUser = friendList.get(position);
-        holder.avatar.setImageResource(dummyProfilePictures[position]);
+        if (currentUser.getAvatar() != null) {
+            // TODO - Bild vom image loader
+        } else {
+            holder.avatar.setImageResource(R.mipmap.user_avatar);
+        }
+
         holder.name.setText(currentUser.getName());
     }
 
