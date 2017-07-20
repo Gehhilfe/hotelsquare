@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction.replace(R.id.fragment_container, fragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
-
     }
     private  void setTitle(MenuItem item){
         item.setChecked(true);

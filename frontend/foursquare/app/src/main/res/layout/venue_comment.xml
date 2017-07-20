@@ -20,7 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="80"
-            android:id="@+id/venue_text_comment"
+            android:id="@+id/venue_text_comment_content"
             android:paddingLeft="16dp"
             android:textSize="16sp"
             android:textColor="@color/black"

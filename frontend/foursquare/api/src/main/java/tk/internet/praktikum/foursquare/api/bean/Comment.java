@@ -8,14 +8,18 @@ public abstract class Comment {
 
     @SerializedName("_id")
     private String id;
+
     private User author;
-    private String text;
+   /* private String text;*/
     private int likes_count;
     private int dislikes_count;
     private Date date;
 
-    public Comment() {};
+   /* public Comment() {};*/
 
+    public void setAuthor(User author) {
+        this.author = author;
+    }
     public User getAuthor() {
         return author;
     }

@@ -221,7 +221,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                             throwable -> {
                                 //TODO
                                 //handle exception
-
+                                Log.d(LOG, throwable.toString());
 
                             }
                     );

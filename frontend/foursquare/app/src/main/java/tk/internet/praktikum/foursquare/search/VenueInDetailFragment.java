@@ -4,20 +4,24 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -31,16 +35,24 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Comment;
 import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.Location;
+import tk.internet.praktikum.foursquare.api.bean.TextComment;
+import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
+import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 import static android.app.Activity.RESULT_OK;
+
+//import android.support.design.widget.FloatingActionButton;
 
 
 public class VenueInDetailFragment extends Fragment implements OnMapReadyCallback {
@@ -66,16 +78,19 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private ProgressDialog progressDialog;
     private FloatingActionButton venueTextCommentButton;
     private FloatingActionButton venueImageCommentButton;
-
+    private RecyclerView recyclerView;
     private AlertDialog venueTextCommentDialog;
     private AlertDialog venueImageCommentDialog;
 
     private Bitmap venueImageComment;
+    private int currentPage;
     private ImageView selectedImageView;
     private final int REQUEST_CAMERA = 0;
     private final int REQUEST_GALLERY = 1;
+
     public static VenueInDetailFragment newInstance(String param1, String param2) {
         VenueInDetailFragment fragment = new VenueInDetailFragment();
+
         return fragment;
     }
 
@@ -108,6 +123,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         venueImageCommentButton.setOnClickListener(v -> {
             showUpImageCommentDialog();
         });
+        recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
 
         progressDialog = new ProgressDialog(getActivity(), 1);
         progressDialog.setIndeterminate(true);
@@ -117,6 +133,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         SupportMapFragment mapFragment = ((SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.venueDetails_mapView));
         mapFragment.getMapAsync(this);
+        currentPage = 0;
         renderContent();
 
         return view;
@@ -156,6 +173,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                                             imageVenueThree.setImageBitmap(bitmap);
                                         });
                             }
+                            renderCommentVenue(venue);
                             progressDialog.dismiss();
                         },
                         throwable -> {
@@ -201,16 +219,55 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
             this.venueIsOpened.setText(getString(R.string.closed));
     }
 
+    public void renderCommentVenue(Venue venue) {
+        String venueId = venue.getId();
+        CommentService commentService = ServiceFactory.createRetrofitService(CommentService.class, URL);
+        commentService.getComments(venueId, currentPage)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(comments -> {
+                            updateRecyclerView(comments);
+                        },
+                        throwable -> {
+                            Log.d(LOG, throwable.getMessage());
+                        });
+
+    }
+
     private void showUpTextCommentDialog() {
         //Todo
         LayoutInflater inflater = getActivity().getLayoutInflater();
-
+        View textCommentView = inflater.inflate(R.layout.venue_comment, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
         builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
+
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked OK button
                 //Todo
                 // call venueServices
+                System.out.println("*** comment text");
+                EditText textCommentContent = (EditText) textCommentView.findViewById(R.id.venue_text_comment_content);
+                String commnent = textCommentContent.getText().toString().trim();
+                if (!commnent.isEmpty()) {
+                    VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
+                    TextComment textComment = new TextComment(commnent);
+                    SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getContext());
+                    User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
+                    textComment.setAuthor(user);
+                    venueService.addTextComment(textComment, venueId)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(textComment1 -> {
+                                        Log.d(LOG, "##### textcomment: " + textComment1.getId());
+
+                                    },
+                                    throwable -> {
+                                        Log.d(LOG, throwable.getMessage());
+                                    });
+
+
+                }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -221,7 +278,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         });
 
         venueTextCommentDialog = builder.create();
-        venueTextCommentDialog.setView(inflater.inflate(R.layout.venue_comment,null));
+        venueTextCommentDialog.setView(textCommentView);
         venueTextCommentDialog.show();
 
 
@@ -230,13 +287,14 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private void showUpImageCommentDialog() {
         //Todo
         LayoutInflater inflater = getActivity().getLayoutInflater();
-
+        View venueImageCommentView = inflater.inflate(R.layout.venue_image_comment, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked OK button
                 //Todo
                 // call venueServices
+
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -247,11 +305,13 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         });
 
         venueImageCommentDialog = builder.create();
-        View venueImageCommentView=inflater.inflate(R.layout.venue_image_comment,null);
+
         venueImageCommentDialog.setView(venueImageCommentView);
-        Button venuImageCommentButton= (Button) venueImageCommentView.findViewById(R.id.venue_image_comment_button);
-        selectedImageView=(ImageView)venueImageCommentView.findViewById(R.id.venue_image_comment);
-        venuImageCommentButton.setOnClickListener(v->{uploadPicture();});
+        Button venuImageCommentButton = (Button) venueImageCommentView.findViewById(R.id.venue_image_comment_button);
+        selectedImageView = (ImageView) venueImageCommentView.findViewById(R.id.venue_image_comment);
+        venuImageCommentButton.setOnClickListener(v -> {
+            uploadPicture();
+        });
         venueImageCommentDialog.show();
     }
 
@@ -313,6 +373,12 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 }
                 break;
         }
+    }
+
+    public void updateRecyclerView(List<Comment> comments) {
+        Log.d(LOG, "***size :" + comments.size());
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(new CommentVenueAdapter(comments, this));
     }
 
 

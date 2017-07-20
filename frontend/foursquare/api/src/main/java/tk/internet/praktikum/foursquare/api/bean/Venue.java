@@ -16,7 +16,7 @@ public class Venue {
     private String vicinity;
     private List<String> types;
     private Location location;
-    private int rating;
+    private float rating;
     private int utc_offset;
     private int check_ins_count;
     private List<Image> images;
@@ -67,11 +67,11 @@ public class Venue {
         return vicinity;
     }
 
-    public int getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
 
