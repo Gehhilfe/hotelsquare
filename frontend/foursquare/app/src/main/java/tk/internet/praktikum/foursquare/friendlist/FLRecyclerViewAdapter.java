@@ -89,7 +89,7 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     public void onBindViewHolder(FriendListViewHolder holder, int position) {
         User currentUser = friendList.get(position);
         if (currentUser.getAvatar() != null) {
-            ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
+           /* ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
             imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.LARGE)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -99,7 +99,7 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
                             throwable -> {
                                 Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
-                    );
+                    );*/
         } else {
             holder.avatar.setImageResource(R.mipmap.user_avatar);
         }
