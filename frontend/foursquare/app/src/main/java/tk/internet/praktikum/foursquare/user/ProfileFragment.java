@@ -21,19 +21,22 @@ import java.io.IOException;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MultipartBody;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
+import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.UploadHelper;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
+import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 import static android.app.Activity.RESULT_OK;
 
-//import android.app.Fragment;
-
 public class ProfileFragment extends Fragment {
-    private TextView name, email, password, city;
+    private TextView name, email, password, city, age;
     private Button upload, edit, save;
     private RadioButton male, female, none;
     private ImageView avatarPicture;
@@ -42,6 +45,7 @@ public class ProfileFragment extends Fragment {
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User currentUser;
     private Bitmap avatar;
+    private boolean newPicture, changedPassword;
 
     private final int REQUEST_CAMERA = 0;
     private final int REQUEST_GALLERY = 1;
@@ -54,6 +58,7 @@ public class ProfileFragment extends Fragment {
         email = (TextView) view.findViewById(R.id.profile_email);
         password = (TextView) view.findViewById(R.id.profile_password);
         city = (TextView) view.findViewById(R.id.profile_city);
+        age = (TextView) view.findViewById(R.id.profile_age);
 
         upload = (Button) view.findViewById(R.id.profile_avatar_upload_btn);
         edit = (Button) view.findViewById(R.id.profile_tmp_edit_btn);
@@ -88,10 +93,26 @@ public class ProfileFragment extends Fragment {
                                 currentUser = user;
                                 name.setText(currentUser.getDisplayName());
                                 email.setText(currentUser.getEmail());
-                                city.setText(currentUser.getName());
+                                city.setText(currentUser.getCity());
+                                age.setText(Integer.toString(currentUser.getAge()));
+                                // TODO - Gender
+
+                            if (currentUser.getAvatar() != null) {
+                                ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
+                                imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.LARGE)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(bitmap -> {
+                                            avatarPicture.setImageBitmap(bitmap);
+                                        },
+                                                throwable -> {
+                                                    Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                        );
+                            }
                             },
                             throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), "Error fetching user Informations.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                     );
         }catch (Exception e) {
@@ -104,11 +125,13 @@ public class ProfileFragment extends Fragment {
         email.setEnabled(false);
         password.setEnabled(false);
         city.setEnabled(false);
+        age.setEnabled(false);
 
         name.clearFocus();
         email.clearFocus();
         password.clearFocus();
         city.clearFocus();
+        age.clearFocus();
 
         upload.setEnabled(false);
         save.setEnabled(false);
@@ -116,6 +139,58 @@ public class ProfileFragment extends Fragment {
         male.setEnabled(false);
         female.setEnabled(false);
         none.setEnabled(false);
+
+        if (password.getText() != "")
+            currentUser.setPassword(password.getText().toString());
+
+        currentUser.setName(name.getText().toString());
+        currentUser.setCity(city.getText().toString());
+        currentUser.setEmail(email.getText().toString());
+        currentUser.setAge(Integer.parseInt(age.getText().toString()));
+        // TODO - GENDER
+
+        uploadChanges();
+    }
+
+    private void uploadChanges() {
+        ProfileService service = ServiceFactory
+                .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        if  (newPicture) {
+            try {
+                MultipartBody.Part img = UploadHelper.createMultipartBodySync(avatar, getContext(), true);
+                service.uploadAvatar(img)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(user -> {},
+                                throwable -> {
+                                    Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                        );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        UserService service2 = ServiceFactory
+                .createRetrofitService(UserService.class, URL, LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        try {
+            service2.update(currentUser)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                        currentUser = user;
+                            },
+                            throwable -> {
+                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void edit() {
@@ -123,11 +198,13 @@ public class ProfileFragment extends Fragment {
         email.setFocusable(true);
         password.setFocusable(true);
         city.setFocusable(true);
+        age.setFocusable(true);
 
         name.setEnabled(true);
         email.setEnabled(true);
         password.setEnabled(true);
         city.setEnabled(true);
+        age.setEnabled(true);
 
         upload.setEnabled(true);
         save.setEnabled(true);
@@ -135,6 +212,9 @@ public class ProfileFragment extends Fragment {
         male.setEnabled(true);
         female.setEnabled(true);
         none.setEnabled(true);
+
+        changedPassword = false;
+        newPicture = false;
     }
 
     private void uploadPicture() {
@@ -180,6 +260,7 @@ public class ProfileFragment extends Fragment {
                 if (resultCode == RESULT_OK) {
                     avatar = (Bitmap) data.getExtras().get("data");
                     avatarPicture.setImageBitmap(avatar);
+                    newPicture = true;
                 }
             break;
 
@@ -188,6 +269,7 @@ public class ProfileFragment extends Fragment {
                     try {
                         avatar = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
                         avatarPicture.setImageBitmap(avatar);
+                        newPicture = true;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

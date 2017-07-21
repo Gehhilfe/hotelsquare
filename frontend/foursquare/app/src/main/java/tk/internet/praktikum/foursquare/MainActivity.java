@@ -3,7 +3,9 @@ package tk.internet.praktikum.foursquare;
 //import android.app.Fragment;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -15,17 +17,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.IOException;
+
 import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.DummyProfile;
 import tk.internet.praktikum.foursquare.user.MeFragment;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 
 //import android.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private final int REQUEST_LOGIN = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,13 +105,13 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_history) {
             // call history activity
-            Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
+            Intent intent = new Intent(getApplicationContext(), UserActivity.class);
             startActivityForResult(intent, 0);
         } else if (id == R.id.nav_me) {
             // call login activity if didn't login util now
             if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivityForResult(intent, 0);
+                startActivityForResult(intent, REQUEST_LOGIN);
                /*try {
                     fragment = LoginGeneralFragment.class.newInstance();
                     redirectToFragment(fragment);
@@ -149,7 +155,6 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction.replace(R.id.fragment_container, fragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
-
     }
     private  void setTitle(MenuItem item){
         item.setChecked(true);
@@ -158,7 +163,22 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
-
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    try {
+                        Fragment fragment = MeFragment.class.newInstance();
+                        redirectToFragment(fragment);
+                    } catch (java.lang.InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+        }
+    }
 }

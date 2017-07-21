@@ -33,7 +33,7 @@ public class VenuesListFragment extends Fragment {
         // Inflate the layout for this fragment
         view= inflater.inflate(R.layout.fragment_venues_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.searching_results);
-
+        this.setRetainInstance(true);
         return view;
     }
     /**

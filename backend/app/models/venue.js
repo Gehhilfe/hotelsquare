@@ -69,7 +69,8 @@ const VenueSchema = new Schema({
         item: {
             type: Schema.Types.ObjectId,
             refPath: 'comments.kind'
-        }
+        },
+        created_at: Date
     }]
 });
 
@@ -266,8 +267,10 @@ class VenueClass {
         if (_.indexOf(this.comments, comment._id) === -1) {
             this.comments.push({
                 item: comment,
-                kind: comment.constructor.modelName
+                kind: comment.constructor.modelName,
+                created_at: Date.now()
             });
+            this.comments = _.reverse(_.sortBy(this.comments, 'created_at'));
         }
     }
 

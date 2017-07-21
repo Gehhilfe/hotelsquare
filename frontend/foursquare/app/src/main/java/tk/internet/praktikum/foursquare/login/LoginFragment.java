@@ -33,7 +33,7 @@ public class LoginFragment extends Fragment {
     private EditText userInput, passwordInput;
     private AppCompatButton loginBtn;
     private TextView registerLbl, passwordForgottenLbl;
-    private  LoginGeneralFragment loginGeneralFragment;
+    private LoginGeneralFragment loginGeneralFragment;
 
 
     @Override
@@ -73,7 +73,7 @@ public class LoginFragment extends Fragment {
 
         /**
          * Use RxJava to handle a long running backend api call without blocking the application
-         * Would be more clean if we used java 1.8 target with Jack
+         * Would be more clean if we used java 1.8 target with Retrolambda
          */
         service.postSession(new LoginCredentials(email, password))
                 .subscribeOn(Schedulers.newThread())                // call is executed i a new thread
@@ -84,7 +84,7 @@ public class LoginFragment extends Fragment {
                             successfulLogin();
                             progressDialog.dismiss();
                             //Toast.makeText(getActivity().getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG).show();
-                            LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveLoggedinInformation(tokenInformation,new User(email,email));
+                            LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveLoggedinInformation(tokenInformation, new User(email, email));
 
                         },
                         throwable -> {
@@ -102,22 +102,22 @@ public class LoginFragment extends Fragment {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
    /*   Intent intent = new Intent(getActivity().getApplicationContext(), UserActivity.class);
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, 1);*/
+        getActivity().setResult(-1, null);
         getActivity().finish();
-*/
-     try {
+
+        /*
+        try {
             Fragment fragment = MeFragment.class.newInstance();
             redirectToFragment(fragment);
-        }
-        catch (java.lang.InstantiationException e) {
+        } catch (java.lang.InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        }
-
-
+        }*/
     }
-    private void redirectToFragment(Fragment fragment){
+
+    private void redirectToFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.login_layout, fragment);
         fragmentTransaction.addToBackStack(null);
@@ -144,8 +144,8 @@ public class LoginFragment extends Fragment {
 
     // TODO - Restore Password
     private void restorePassword() {
-       ((LoginActivity) getActivity()).changeFragment(2);
-       // loginGeneralFragment.changeFragment(2);
+        ((LoginActivity) getActivity()).changeFragment(2);
+        // loginGeneralFragment.changeFragment(2);
     }
 
     public LoginGeneralFragment getLoginGeneralFragment() {

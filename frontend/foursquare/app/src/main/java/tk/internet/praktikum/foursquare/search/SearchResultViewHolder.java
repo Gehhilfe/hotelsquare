@@ -6,7 +6,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
+import tk.internet.praktikum.foursquare.api.ImageSize;
+import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
 /**
@@ -35,15 +42,20 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
     public void render(Venue searchResult){
         this.name.setText(searchResult.getName());
        //this.address.setText(searchResult.getPlace_id());
-        this.address.setText(searchResult.getReference());
-       /* List<Image> images=searchResult.getImages();
+        this.address.setText(searchResult.getFormattedAddress());
+        List<Image> images=searchResult.getImages();
         //System.out.println("all images size: "+ images.size());
         if(images.size()>0) {
             Image image = images.get(0);
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
-            this.image.setImageBitmap(imageCacheLoader.loadBitmap(image, ImageSize.SMALL).blockingFirst());
-        }*/
-       // this.rating.setText(searchResult.getRating());
+            imageCacheLoader.loadBitmap(image, ImageSize.SMALL)
+                .subscribeOn(Schedulers.io())
+                 .observeOn(AndroidSchedulers.mainThread())
+                  .subscribe(bitmap -> {
+                      this.image.setImageBitmap(bitmap);
+                  });
+        }
+        //this.rating.setText(searchResult.getRating());
         //this.image.setImageBitmap(Utils.decodeResponsedInputStreamImage(searchResult.getImage()));
     }
     @Override
