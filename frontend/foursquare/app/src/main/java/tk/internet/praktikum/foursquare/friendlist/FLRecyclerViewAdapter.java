@@ -12,7 +12,11 @@ import android.widget.Toast;
 import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
+import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.bean.User;
 
 public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAdapter.FriendListViewHolder> {
@@ -42,6 +46,7 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
         }
     }
 
+    private Context context;
     private LayoutInflater inflater;
     private List<User> friendList = Collections.emptyList();
     private int[] dummyProfilePictures = {
@@ -70,6 +75,7 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     public FLRecyclerViewAdapter(Context context, List<User> friendList) {
         inflater = LayoutInflater.from(context);
         this.friendList = friendList;
+        this.context = context;
     }
 
     @Override
@@ -82,7 +88,22 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     @Override
     public void onBindViewHolder(FriendListViewHolder holder, int position) {
         User currentUser = friendList.get(position);
-        holder.avatar.setImageResource(dummyProfilePictures[position]);
+        if (currentUser.getAvatar() != null) {
+           /* ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
+            imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.LARGE)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(bitmap -> {
+                                holder.avatar.setImageBitmap(bitmap);
+                            },
+                            throwable -> {
+                                Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );*/
+        } else {
+            holder.avatar.setImageResource(R.mipmap.user_avatar);
+        }
+
         holder.name.setText(currentUser.getName());
     }
 

@@ -1,0 +1,33 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/venue_text_comment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxHeight="30dp"
+            android:minHeight="20dp"
+            android:padding="5dp"
+            android:layout_gravity="center"
+            android:src="@mipmap/user_avatar"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="80"
+            android:id="@+id/venue_text_comment_content"
+            android:paddingLeft="16dp"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:inputType="textMultiLine"
+            android:hint="Add a comment here" />
+
+
+    </LinearLayout>
+
+</RelativeLayout>
