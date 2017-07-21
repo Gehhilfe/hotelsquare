@@ -35,7 +35,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
         this.itemView=itemResult;
         name= (TextView) itemView.findViewById(R.id.item_name);
         address=(TextView)itemView.findViewById(R.id.item_address);
-        rating=(TextView)itemView.findViewById(R.id.item_address);
+        rating=(TextView)itemView.findViewById(R.id.rating);
         image=(ImageView) itemView.findViewById(R.id.item_image);
         itemView.setOnClickListener(this);
     }
@@ -55,8 +55,8 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
                       this.image.setImageBitmap(bitmap);
                   });
         }
-        //this.rating.setText(searchResult.getRating());
-        //this.image.setImageBitmap(Utils.decodeResponsedInputStreamImage(searchResult.getImage()));
+        this.rating.setText(String.valueOf(searchResult.getRating()));
+
     }
     @Override
     public void onClick(View v) {

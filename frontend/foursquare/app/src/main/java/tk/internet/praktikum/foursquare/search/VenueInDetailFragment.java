@@ -49,7 +49,6 @@ import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
-import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -225,9 +224,10 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
 
     public void renderCommentVenue(Venue venue) {
         Log.d(LOG,"renderCommentVenue");
-        CommentService commentService = ServiceFactory.createRetrofitService(CommentService.class, URL);
-        commentService.getComments(venueId, currentPage)
-                .subscribeOn(Schedulers.io())
+        //CommentService commentService = ServiceFactory.createRetrofitService(CommentService.class, URL);
+        VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
+        venueService.getComments(venueId, currentPage)
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(comments -> {
                             updateRecyclerView(comments);
