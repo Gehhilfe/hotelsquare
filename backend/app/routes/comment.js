@@ -99,8 +99,8 @@ function getComments(model) {
                     path: 'image'
                 }
             })
-            .limit(10).skip(page.params.page);
-        response.send(_.map(o.comments, (e) => e.toJSONDetails()));
+            .slice('comments', [10 * page, 10]);
+        response.send(_.map(o.comments, (e) => e.item.toJSONDetails()));
         return next();
     };
 }

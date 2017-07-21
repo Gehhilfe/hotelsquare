@@ -64,8 +64,33 @@ describe('comment api query', () => {
             comments: []
         });
 
-        aComment = await TextComment.build(u, 'test', aVenue);
+        await TextComment.build(u, '0', aVenue);
+        await TextComment.build(u, '1', aVenue);
+        await TextComment.build(u, '2', aVenue);
+        await TextComment.build(u, '3', aVenue);
+        await TextComment.build(u, '4', aVenue);
+        await TextComment.build(u, '5', aVenue);
+        await TextComment.build(u, '6', aVenue);
+        await TextComment.build(u, '7', aVenue);
+        await TextComment.build(u, '8', aVenue);
+        await TextComment.build(u, '9', aVenue);
+        await TextComment.build(u, '10', aVenue);
+        await TextComment.build(u, '11', aVenue);
+        await TextComment.build(u, '12', aVenue);
+        await TextComment.build(u, '13', aVenue);
+        aComment = await TextComment.build(u, '14', aVenue);
+        await aVenue.save();
     }));
+
+    describe('GET comments of venue', () => {
+        it('should retrieve the last 10 comments', (mochaAsync(async () => {
+            const res = await request(server)
+                .get('/venues/' + aVenue._id + '/comments')
+                .send();
+            res.should.have.status(200);
+            res.body.length.should.be.equal(10);
+        })));
+    });
 
     describe('POST text comments to venue', () => {
         it('should add a comment to aVenue', (mochaAsync(async () => {
@@ -77,7 +102,7 @@ describe('comment api query', () => {
                 });
             res.should.have.status(200);
             const v = await Venue.findOne({_id: aVenue._id});
-            v.comments.length.should.be.equal(1);
+            v.comments.length.should.be.equal(aVenue.comments.length + 1);
             const c = await Comment.findOne({text: 'this is a comment'});
             c.kind.should.equal('TextComment');
         })));
@@ -126,7 +151,7 @@ describe('comment api query', () => {
                 .send();
             res.should.have.status(200);
             const v = await Venue.findOne({_id: aVenue._id});
-            v.comments.length.should.be.equal(1);
+            v.comments.length.should.be.equal(aVenue.comments.length + 1);
             const c = await Comment.findOne({_id: res.body._id});
             c.kind.should.equal('ImageComment');
         })));

@@ -38,7 +38,7 @@ const CommentSchema = new Schema(
             type: Number,
             default: 0
         },
-        date: {
+        created_at: {
             type: Date,
             default: Date.now()
         },
@@ -47,7 +47,8 @@ const CommentSchema = new Schema(
             item: {
                 type: Schema.Types.ObjectId,
                 refPath: 'comments.kind'
-            }
+            },
+            created_at: Date
         }]
     },
     options);
@@ -92,8 +93,10 @@ class CommentClass {
         if (_.indexOf(this.comments, o._id) === -1) {
             this.comments.push({
                 item: o,
-                kind: o.constructor.modelName
+                kind: o.constructor.modelName,
+                created_at: Date.now()
             });
+            this.comments = _.reverse(_.sortBy(this.comments, 'created_at'));
         }
     }
 
