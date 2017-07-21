@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -256,6 +257,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 if (!comment.isEmpty()) {
 
                     TextComment textComment = new TextComment(comment);
+                    textComment.setDate(new Date());
+
                     SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
                     User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
                     textComment.setAuthor(user);
@@ -307,6 +310,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
                 ImageComment imageComment=new ImageComment();
                 imageComment.setAuthor(user);
+                imageComment.setDate(new Date());
                 Log.d(LOG, "author: " + user);
                 String token = sharedPreferences.getString(Constants.TOKEN, "");
                 Log.d(LOG, "token: " + token);
