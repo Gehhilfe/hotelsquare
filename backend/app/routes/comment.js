@@ -53,8 +53,16 @@ async function dislike(request, response, next) {
  */
 function textComment(model) {
     return async (request, response, next) => {
-        const o = await model.findOne({_id: request.params.id});
-        let textComment = await TextComment.build(request.authentication, request.body.text, o);
+        const [o, author] = await Promise.all([
+            model.findOne({_id: request.params.id}),
+            User.findOne({_id: request.authentication._id})
+        ]);
+
+        if(!author || !o) {
+            return next(restify.errors.BadRequestError('Author or target model not found!'));
+        }
+
+        let textComment = await TextComment.build(author, request.body.text, o);
         textComment = await textComment.populate('author').execPopulate();
         await o.save();
         response.send(textComment.toJSONDetails());
@@ -69,8 +77,16 @@ function textComment(model) {
  */
 function imageComment(model) {
     return async (request, response, next) => {
-        const o = await model.findOne({_id: request.params.id});
-        let imageComment = await ImageComment.build(request.authentication, request.files.image.path, o);
+        const [o, author] = await Promise.all([
+            model.findOne({_id: request.params.id}),
+            User.findOne({_id: request.authentication._id})
+        ]);
+
+        if(!author || !o) {
+            return next(restify.errors.BadRequestError('Author or target model not found!'));
+        }
+
+        let imageComment = await ImageComment.build(author, request.files.image.path, o);
         imageComment = await imageComment.populate('author').execPopulate();
         await o.save();
         response.send(imageComment.toJSONDetails());

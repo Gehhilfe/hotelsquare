@@ -90,6 +90,23 @@ describe('comment api query', () => {
             res.should.have.status(200);
             res.body.length.should.be.equal(10);
         })));
+
+        it('should work after insert of comment', (mochaAsync(async () => {
+            aVenue.comments = [];
+            await aVenue.save();
+            const res = await request(server)
+                .post('/venues/' + aVenue._id + '/comments/text')
+                .set('x-auth', token)
+                .send({
+                    text: 'this is a comment'
+                });
+            res.should.have.status(200);
+            const res2 = await request(server)
+                .get('/venues/' + aVenue._id + '/comments')
+                .send();
+            res2.should.have.status(200);
+            res2.body.length.should.equal(1);
+        })));
     });
 
     describe('POST text comments to venue', () => {
