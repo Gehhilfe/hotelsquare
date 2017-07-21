@@ -1,6 +1,7 @@
 'use strict';
 
 const restify = require('restify');
+const restify_errors = require('restify-errors');
 const User = require('../models/user');
 const Image = require('../models/image');
 
@@ -75,7 +76,7 @@ async function profile(request, response, next) {
 
     let user = await User.findOne({name: request.params.name}).populate('avatar').exec();
     if (user === null)
-        return next(new restify.errors.NotFoundError());
+        return next(new restify_errors.NotFoundError());
     if (!selfRequest) {
         // Remove sensitive information
         user = user.toJSONPublic();

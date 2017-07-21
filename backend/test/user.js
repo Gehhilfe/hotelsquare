@@ -315,7 +315,7 @@ describe('user', function () {
         });
 
         it('should work with a json object as first parameter', () => {
-            return expect(User.login({name: 'Test', password: 'password'})).to.eventually.resolved;
+            return expect(User.login({name: 'Test', password: 'password'})).to.be.fulfilled;
         });
     });
 });
