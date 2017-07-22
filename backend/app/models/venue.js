@@ -33,14 +33,14 @@ const VenueSchema = new Schema({
     },
     opening_hours: {
         periods: [{
-            close: {
+            close: [{
                 day: Number,
                 time: String
-            },
-            open: {
+            }],
+            open: [{
                 day: Number,
                 time: String
-            }
+            }]
         }]
     },
     check_ins: [{
@@ -107,27 +107,60 @@ class VenueClass {
         if(!datenow){
             datenow = new Date();
         }
-        const currentDayAtVenue = datenow.getUTCDay();
-        const currentTimeAtVenue = (datenow.getUTCHours() + Math.floor(this.utc_offset/60))*100 + datenow.getUTCMinutes() + this.utc_offset%60;
+
+        //flag if venue is open
         let isOpen = false;
 
-        for(let i = 0, len = opening_periods.length; i < len; i++){
-            const opentime = parseInt(opening_periods[i].open.time, 10);
-            if(currentDayAtVenue === opening_periods[i].open.day && currentTimeAtVenue > opentime){
-                if(opening_periods[i].close){
-                    if(currentDayAtVenue === opening_periods[i].close.day){
-                        const closetime = parseInt(opening_periods[i].close.time, 10);
-                        if(closetime > currentTimeAtVenue){
-                            isOpen = true;
-                        }
-                    } else {
-                        isOpen = true;
-                    }
-                } else {
-                    isOpen = true;
-                }
+        //open and close to minutes from day 0 time 0000 -> periods in ints festlegen (independend of day) -> check if inside
+        //periods in minutes from day 0 time 0000 where it is open
+        const opentimes = [];
+        const closetimes = [];
+
+        for(let i = 0, len = opening_periods.length; i < len; i++) {
+            const day = opening_periods[i].open.length > 0 ? opening_periods[i].open[0].day : opening_periods[i].close[0].day;
+            const days_from_zero_in_minutes = day * 24 * 60;
+            for (let j = 0, len = opening_periods[i].open.length; j < len; j++) {
+                const opentime = parseInt(opening_periods[i].open[j].time, 10);
+                const opentime_in_minutes = Math.floor(opentime / 100) * 60 + opentime % 100;
+                const totaltime_since_day_zero_open = days_from_zero_in_minutes + opentime_in_minutes;
+                opentimes.push(totaltime_since_day_zero_open);
+            }
+            for (let j = 0, len = opening_periods[i].close.length; j < len; j++) {
+                const closetime = parseInt(opening_periods[i].close[j].time, 10);
+                const closetime_in_minutes = Math.floor(closetime / 100) * 60 + closetime % 100;
+                const totaltime_since_day_zero_close = days_from_zero_in_minutes + closetime_in_minutes;
+                closetimes.push(totaltime_since_day_zero_close);
             }
         }
+
+        //current time in minutes from day zero
+        const currentDayAtVenue = datenow.getUTCDay();
+        const currentTimeAtVenueInMinutes = currentDayAtVenue*24*60+this.utc_offset+datenow.getUTCHours()*60 + datenow.getUTCMinutes() + this.utc_offset%60;
+
+        //for current time find closest opening time prior to now
+        let last_open_time = opentimes[0];
+        let max_open_so_far;
+        let index = 0;
+        for(let i = 1, len = opentimes.length; i < len; i++) {
+            max_open_so_far = opentimes[i];
+            if(currentTimeAtVenueInMinutes < max_open_so_far) {
+                break;
+            }
+            index++;
+            last_open_time = max_open_so_far;
+        }
+
+        //find closest closing time to last_open_time
+        let closest_close;
+        if(closetimes.length > index) {
+            closest_close = closetimes[index];
+            if(currentTimeAtVenueInMinutes > last_open_time && currentTimeAtVenueInMinutes < closest_close){
+                isOpen = true;
+            }
+        } else {
+            isOpen = true;
+        }
+
         return isOpen;
     }
 
