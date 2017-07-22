@@ -29,7 +29,7 @@ chatsocket(io);
 
 util.connectDatabase(mongoose).then(util.initDatabase);
 
-server.use(restify.bodyParser({
+server.use(restify.plugins.bodyParser({
     maxBodySize: 1024 * 1024,
     mapParams: true,
     mapFiles: true,
@@ -95,7 +95,7 @@ server.post('comments/:id/comments/image', auth, comment.imageComment(Comment));
 // server.get('comments/:id', comment.getComment);
 
 // Images
-server.get('images/:id/:size/image.jpeg', image.getStat, restify.conditionalRequest(), image.getData);
+server.get('images/:id/:size/image.jpeg', image.getStat, restify.plugins.conditionalRequest(), image.getData);
 
 // Search
 
