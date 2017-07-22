@@ -23,9 +23,10 @@ const mochaAsync = (fn) => {
 };
 
 describe('image', () => {
-
+/*
     let image;
     let user, token;
+
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
 
@@ -38,11 +39,11 @@ describe('image', () => {
                 type: 'Point',
                 coordinates: [-74.0059, 40.7127]
             }
-        }) ;
+        });
 
         user = await User.create({name: 'peter111', email: 'peter123@cool.de', password: 'peter99', gender: 'm'});
         token = jsonwt.sign(user.toJSON(), config.jwt.secret, config.jwt.options);
-        /*const comment = await Comment.create({
+        const comment = await Comment.create({
             kind: 'ImageComment',
             author: user,
             text: 'this is a comment',
@@ -60,13 +61,13 @@ describe('image', () => {
             date: Date.now(),
             image: image
         });
-        if(comment && bcomment) {
+        if (comment && bcomment) {
             image.comments.push(comment);
             image.comments.push(bcomment);
             await image.save();
-        }*/
+        }
     }));
- /*
+
     it('should get all comments', (mochaAsync(async () => {
         const res = await request(server)
             .get('/images/' + image._id + '/comments');

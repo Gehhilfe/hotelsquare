@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "lint": "eslint *.js ./app/**/*.js *.js ./test/*.js ./test/**/*.js ./lib/*.js ./lib/**/*.js",
+    "lint": "eslint *.js ./app/**/*.js *.js ./test/*.js ./test/**/*.js ./lib/*.js ./lib/**/*.js --fix",
     "test": "mocha test test/api test/middleware/filter --timeout 30000",
     "coverage": "node node_modules/istanbul/lib/cli.js cover -x **/lib/** ./node_modules/mocha/bin/_mocha -- test test/api test/middleware/filter --timeout 10000"
   },
