@@ -23,8 +23,7 @@ function postSession(request, response, next) {
         response.json({token: token});
         return next();
     }, () => {
-        response.status(401);
-        response.json({error: 'Login credentials wrong!'});
+        response.json(401, {error: 'Login credentials wrong!'});
         return next();
     });
 }

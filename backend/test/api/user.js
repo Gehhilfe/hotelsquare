@@ -6,6 +6,7 @@ const chaiHttp = require('chai-http');
 const server = require('../../server');
 const Util = require('../../lib/util');
 const User = require('../../app/models/user');
+const Image = require('../../app/models/image');
 const jsonwt = require('jsonwebtoken');
 const expect = chai.expect;
 chai.should();
@@ -14,6 +15,15 @@ chai.use(require('chai-things'));
 
 const request = require('supertest');
 
+const mochaAsync = (fn) => {
+    return (done) => {
+        fn.call().then(done, (err) => {
+            return done(err);
+        });
+    };
+};
+
+
 describe('User', () => {
 
     let peter;
@@ -21,34 +31,33 @@ describe('User', () => {
     let peterToken;
     let peter2Token;
 
+    beforeEach(mochaAsync(async () => {
+        mongoose.Promise = global.Promise;
 
-    beforeEach((done) => {
-        Util.connectDatabase(mongoose).then(function () {
-            User.remove({}).then(() => {
-                User.create({
-                    name: 'peter111',
-                    email: 'peter123@cool.de',
-                    password: 'peter99',
-                    gender: 'm'
-                }).then((user) => {
-                    peter = user;
-                    peterToken = jsonwt.sign(peter.toJSON(), config.jwt.secret, config.jwt.options);
-                    User.create({
-                        name: 'peter1112',
-                        email: 'peter1223@cool.de',
-                        password: 'peter99',
-                        gender: 'f'
-                    }).then((user) => {
-                        peter2 = user;
-                        peter2Token = jsonwt.sign(peter2.toJSON(), config.jwt.secret, config.jwt.options);
-                        User.create({name: 'peter1113', email: 'peter12223@cool.de', password: 'peter99'}).then(() => {
-                            return done();
-                        });
-                    });
-                });
-            });
+        await Util.connectDatabase(mongoose);
+        await Image.remove({});
+        await User.remove({});
+
+        const avatar = await Image.create({});
+        peter = await User.create({
+            name: 'peter111',
+            email: 'peter123@cool.de',
+            password: 'peter99',
+            gender: 'm',
+            avatar: avatar
         });
-    });
+        peterToken = jsonwt.sign(peter.toJSON(), config.jwt.secret, config.jwt.options);
+
+        peter2 = await User.create({
+            name: 'peter1112',
+            email: 'peter1223@cool.de',
+            password: 'peter99',
+            gender: 'f'
+        });
+        peter2Token = jsonwt.sign(peter2.toJSON(), config.jwt.secret, config.jwt.options);
+
+        await User.create({name: 'peter1113', email: 'peter12223@cool.de', password: 'peter99'});
+    }));
 
     describe('GET user', () => {
         it('should retrieve user information when name given', (done) => {

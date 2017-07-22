@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.DynamicDrawableSpan;
@@ -43,27 +44,35 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        Drawable drawable = context.getResources().getDrawable(R.drawable.ic_menu_search, null);
+        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_menu_search);
         String title = "";
 
         switch (position) {
             case 6:
-                // home
-            break;
+                title = " \n" + " Home";
+                //drawable = context.getResources().getDrawable(R.mipmap.user_home, null);
+                drawable = ContextCompat.getDrawable(context, R.mipmap.user_home);
+                break;
             case 0: // profile
                 title = " \n" + " Profile";
-                drawable = context.getResources().getDrawable(R.mipmap.user_profile, null);
-                //drawable = context.getResources().getDrawable(R.drawable.ic_menu_search, null);
+                //drawable = context.getResources().getDrawable(R.mipmap.user_profile, null);
+                drawable = ContextCompat.getDrawable(context, R.mipmap.user_profile);
             break;
             case 2: // history
-
-            break;
+                title = " \n" + " History";
+                //drawable = context.getResources().getDrawable(R.mipmap.user_history, null);
+                drawable = ContextCompat.getDrawable(context, R.mipmap.user_history);
+                break;
             case 1: // friends
                 title = " \n" + " Friends";
-            break;
+                //drawable = context.getResources().getDrawable(R.mipmap.user_friends, null);
+                drawable = ContextCompat.getDrawable(context, R.mipmap.user_friends);
+                break;
             case 4: // inbox
-
-            break;
+                title = " \n" + " Inbox";
+                //drawable = context.getResources().getDrawable(R.mipmap.user_message, null);
+                drawable = ContextCompat.getDrawable(context, R.mipmap.user_message);
+                break;
             default:
             break;
         }

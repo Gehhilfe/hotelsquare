@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/venue_text_comment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxHeight="30dp"
+            android:minHeight="20dp"
+            android:padding="5dp"
+            android:layout_gravity="center"
+            android:src="@mipmap/user_avatar"/>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="90"
+            android:padding="5dp"
+            android:maxHeight="72dp"
+            android:maxWidth="72dp"
+            android:id="@+id/venue_image_comment"
+            android:paddingLeft="16dp"
+            />
+        <Button
+            android:id="@+id/venue_image_comment_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxHeight="30dp"
+            android:minHeight="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="10"
+            android:background="@mipmap/image_comment"
+            android:paddingTop="20dp"
+             />
+
+
+    </LinearLayout>
+
+</RelativeLayout>

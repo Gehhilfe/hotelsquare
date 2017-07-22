@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:id="@+id/venue_in_detail"
     android:layout_marginTop="40dp"
     tools:context="tk.internet.praktikum.foursquare.search.VenueInDetailFragment">
 
@@ -49,58 +49,91 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="15"
+            android:layout_weight="20"
             android:orientation="horizontal">
 
-            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/venues_mapView"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
+            <include
+                layout="@layout/venue_detail_information"
+                android:layout_width="0dp"
+                android:layout_weight="50"
                 android:layout_height="match_parent" />
+            <fragment
+                android:id="@+id/venueDetails_mapView"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="0dp"
+                android:layout_weight="50"
+                android:layout_height="match_parent">
+
+            </fragment>
 
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="65"
+            android:layout_weight="60"
             android:orientation="vertical">
 
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/venue_detail_image_commnent_button"
-                android:layout_width="wrap_content"
-
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/comments_venue"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:layout_marginTop="10dp">
 
-                android:src="@mipmap/image_comment"
-                fab:fab_label="Pictures comment"
-                fab:fab_size="mini" />
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/venue_detail_text_comment_button"
+            </android.support.v7.widget.RecyclerView>
+            <com.github.clans.fab.FloatingActionMenu
+                android:id="@+id/menu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="bottom|right">
 
-                android:src="@mipmap/text_commemnt"
-                fab:fab_label="Text comment"
-                fab:fab_size="mini" />
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/venue_detail_image_commnent_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
+                    android:src="@mipmap/image_comment"
+                    fab:fab_label="Image comment"
+                    fab:fab_size="mini" />
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/venue_detail_text_comment_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
+                    android:src="@mipmap/text_commemnt"
+                    fab:fab_label="Text comment"
+                    fab:fab_size="mini" />
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/venue_detail_images"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
+                    android:src="@mipmap/venue_images"
+                    fab:fab_label="Pictures"
+                    fab:fab_size="mini" />
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/checkin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
+                    android:src="@mipmap/checkin"
+                    fab:fab_label="Check in"
+                    fab:fab_size="mini" />
+         <!--       <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
 
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/venue_detail_images"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
+                    android:src="@mipmap/back"
+                    fab:fab_label="Back"
+                    fab:fab_size="mini" />-->
 
-                android:src="@mipmap/venue_images"
-                fab:fab_label="Pictures"
-                fab:fab_size="mini" />
-
-        </LinearLayout>
-
-
+            </com.github.clans.fab.FloatingActionMenu>
+        </RelativeLayout>
     </LinearLayout>
-
 </RelativeLayout>

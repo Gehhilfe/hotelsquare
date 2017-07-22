@@ -1,6 +1,7 @@
 'use strict';
 
 const restify = require('restify');
+const restify_errors = require('restify-errors');
 const User = require('../models/user');
 const Image = require('../models/image');
 
@@ -75,7 +76,7 @@ async function profile(request, response, next) {
 
     let user = await User.findOne({name: request.params.name}).populate('avatar').exec();
     if (user === null)
-        return next(new restify.errors.NotFoundError());
+        return next(new restify_errors.NotFoundError());
     if (!selfRequest) {
         // Remove sensitive information
         user = user.toJSONPublic();
@@ -110,9 +111,9 @@ async function profileByID(request, response, next) {
  */
 async function updateUser(request, response, next) {
     handleValidation(next, async () => {
-        const user = await User.findOne({_id: request.authentication._id});
+        let user = await User.findOne({_id: request.authentication._id}).populate('avatar');
         user.update(request.body);
-        await user.save();
+        user = await user.save();
 
         response.send(user);
         return next();
@@ -145,7 +146,7 @@ async function register(request, response, next) {
  * @returns {undefined}
  */
 async function deleteUser(request, response, next) {
-    const res = await User.findByIdAndRemove(request.authentication._id);
+    const res = await User.findByIdAndRemove(request.authentication._id).populate('avatar');
     response.json(res);
     return next();
 }

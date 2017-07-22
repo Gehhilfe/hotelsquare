@@ -1,6 +1,8 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const restify = require('restify');
+const restify_errors = require('restify-errors');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
 const SALT_WORK_FACTOR = 10;
@@ -191,16 +193,25 @@ class UserClass {
             depopulate: true
         });
         delete obj.password;
-        if (this.avatar)
+        if (this.avatar) {
+            if(this.populated('avatar') === undefined)
+                throw new restify_errors.InternalServerError('User avatar not populated!');
             obj.avatar = this.avatar.toJSON();
-        else
+        } else {
             delete obj.avatar;
+        }
         return obj;
     }
 
     toJSONPublic() {
         const location = this.incognito ? null : this.location;
-        const avatar = this.avatar ? this.avatar.toJSON() : null;
+        let avatar = null;
+        if(this.avatar) {
+            if(this.populated('avatar') === undefined)
+                throw new restify_errors.InternalServerError('User avatar not populated!');
+            avatar = this.avatar.toJSON();
+        }
+
         return {
             _id: this._id,
             name: this.name,

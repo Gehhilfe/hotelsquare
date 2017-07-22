@@ -2,6 +2,7 @@
 
 const _ = require('lodash');
 const restify = require('restify');
+const restify_errors = require('restify-errors');
 const Venue = require('../models/venue');
 const googleapilib = require('googleplaces');
 const NodeGeocoder = require('node-geocoder');
@@ -19,7 +20,7 @@ const User = require('../models/user');
  * @returns {undefined}
  */
 async function getVenue(request, response, next) {
-    const venue = await Venue.findOne({_id: request.params.id});
+    const venue = await Venue.findOne({_id: request.params.id}).populate('images');
 
     // check if details are loaded
     if (!venue.details_loaded) {
@@ -80,7 +81,7 @@ async function getLocationForName(locationName) {
         result = await geocoder.geocode(locationName);
 
         if (!result || result.length === 0) {
-            throw new restify.errors.BadRequestError({
+            throw new restify_errors.BadRequestError({
                 message: 'No valid location for location name found.'
             });
         }
@@ -125,7 +126,7 @@ async function queryVenue(request, response, next) {
     const keyword = request.body.keyword;
 
     if (keyword.length < 3) {
-        return next(new restify.errors.BadRequestError({
+        return next(new restify_errors.BadRequestError({
             field: 'keyword',
             message: 'The search keyword needs to be at least 3 characters'
         }));
@@ -189,7 +190,7 @@ async function searchVenuesInDB(location, keyword = '', radius = 5000, page = 0,
             {name: new RegExp(keyword, 'i')},
             {types: new RegExp(keyword, 'i')}
         ]
-    }).limit(limit).skip(page * limit);
+    }).populate('images').limit(limit).skip(page * limit);
     return await query.where('location').near({
         center: location,
         maxDistance: radius

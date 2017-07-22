@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const Venue = require('../../app/models/venue');
 const Comment = require('../../app/models/comments');
+const Image = require('../../app/models/image');
 const SearchRequest = require('../../app/models/searchrequest');
 const Util = require('../../lib/util');
 const chai = require('chai');
@@ -35,6 +36,7 @@ describe('venue', () => {
         await Venue.remove({});
         await User.remove({});
         await SearchRequest.remove({});
+        await Image.remove({});
 
         const res = await request(server)
             .post('/searches/venues')
@@ -48,7 +50,8 @@ describe('venue', () => {
             .get('/venues/' + aVenue._id + '');
         user = await User.create({name: 'peter111', email: 'peter123@cool.de', password: 'peter99', gender: 'm'});
         const bVenue = await Venue.findOne({_id: aVenue._id});
-        bVenue.isOpen();
+        bVenue.images.push(await Image.create({}));
+        await bVenue.save();
         token = jsonwt.sign(user.toJSON(), config.jwt.secret, config.jwt.options);
     }));
 
@@ -58,6 +61,8 @@ describe('venue', () => {
         res.should.have.status(200);
         res.body.should.have.property('name');
         res.body.should.have.property('location');
+        res.body.should.have.property('images');
+        res.body.images.length.should.not.be.equal(0);
     })));
 
     describe('checkin', () => {

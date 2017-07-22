@@ -2,8 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-
-    android:background="#33bbff"
     android:orientation="horizontal"
     android:layout_marginLeft="2dp"
     android:layout_marginRight="2dp"
@@ -19,46 +17,42 @@
         android:padding="3dip">
 
         <ImageView
-            android:id="@+id/item_image"
+            android:id="@+id/user_image"
             android:layout_width="50dip"
             android:layout_height="50dip"
-             />
+            android:src="@mipmap/user_avatar"
+            />
 
     </LinearLayout>
 
+
+    <ImageView
+        android:id="@+id/comment_image_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/thumbnail" />
     <TextView
-        android:id="@+id/item_name"
+        android:id="@+id/comment_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/thumbnail"
-        android:text="Alex Cafe Darmstadt"
+        android:text="A good place"
         android:textColor="#040404"
         android:textSize="15dip"
         android:textStyle="bold"
         android:typeface="sans" />
 
     <TextView
-        android:id="@+id/item_address"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/item_name"
-        android:layout_marginTop="1dip"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:text="Luisen Darmstadt"
-        android:textColor="#343434"
-        android:textSize="10dip" />
-
-
-    <TextView
-        android:id="@+id/rating"
+        android:id="@+id/comment_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/item_name"
+        android:layout_alignTop="@id/comment_content"
         android:layout_marginRight="5dip"
         android:gravity="right"
-        android:text="4"
+        android:text="20.07.2017"
         android:textColor="#343434"
         android:textSize="10dip"
         android:textStyle="bold" />

@@ -1,6 +1,6 @@
 'use strict';
 
-const restify = require('restify');
+const restify_errors = require('restify-errors');
 const util = require('util');
 
 /**
@@ -17,16 +17,15 @@ function ValidationError(errors) {
         });
     }
 
-    restify.RestError.call(this, {
+    restify_errors.RestError.call(this, {
         restCode: 'ValidationError',
         statusCode: 400,
-        message: message,
         constructorOpt: ValidationError
     });
     this.name = 'ValidationError';
     this.body.errors = message;
 }
 
-util.inherits(ValidationError, restify.RestError);
+util.inherits(ValidationError, restify_errors.RestError);
 
 module.exports = ValidationError;

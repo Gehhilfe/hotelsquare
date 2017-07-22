@@ -53,10 +53,19 @@ async function dislike(request, response, next) {
  */
 function textComment(model) {
     return async (request, response, next) => {
-        const o = await model.findOne({_id: request.params.id});
-        const textComment = await TextComment.build(request.authentication, request.body.text, o);
+        const [o, author] = await Promise.all([
+            model.findOne({_id: request.params.id}),
+            User.findOne({_id: request.authentication._id})
+        ]);
+
+        if(!author || !o) {
+            return next(restify.errors.BadRequestError('Author or target model not found!'));
+        }
+
+        let textComment = await TextComment.build(author, request.body.text, o);
+        textComment = await textComment.populate('author').execPopulate();
         await o.save();
-        response.send(textComment);
+        response.send(textComment.toJSONDetails());
         return next();
     };
 }
@@ -68,10 +77,19 @@ function textComment(model) {
  */
 function imageComment(model) {
     return async (request, response, next) => {
-        const o = await model.findOne({_id: request.params.id});
-        const imageComment = await ImageComment.build(request.authentication, request.files.image.path, o);
+        const [o, author] = await Promise.all([
+            model.findOne({_id: request.params.id}),
+            User.findOne({_id: request.authentication._id})
+        ]);
+
+        if(!author || !o) {
+            return next(restify.errors.BadRequestError('Author or target model not found!'));
+        }
+
+        let imageComment = await ImageComment.build(author, request.files.image.path, o);
+        imageComment = await imageComment.populate('author').execPopulate();
         await o.save();
-        response.send(imageComment);
+        response.send(imageComment.toJSONDetails());
         return next();
     };
 }
@@ -99,8 +117,8 @@ function getComments(model) {
                     path: 'image'
                 }
             })
-            .limit(10).skip(page.params.page);
-        response.send(_.map(o.comments, (e) => e.toJSONDetails()));
+            .slice('comments', [10 * page, 10]);
+        response.send(_.map(o.comments, (e) => e.item.toJSONDetails()));
         return next();
     };
 }
