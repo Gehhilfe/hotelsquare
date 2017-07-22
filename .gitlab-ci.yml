@@ -25,6 +25,7 @@ backend-test:
   stage: test
   coverage: '/^Statements[\s]*:[\s]*(\d+\.*\d*%)/'
   script:
+   - ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
    - cd backend
    - export NODE_ENV=test
    - npm install --silent

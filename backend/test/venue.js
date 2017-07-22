@@ -18,7 +18,7 @@ const mochaAsync = (fn) => {
 };
 
 describe('venue', () => {
-    let aVenue, bVenue;
+    let aVenue, bVenue, cVenue;
     let user;
 
     beforeEach(mochaAsync(async () => {
@@ -43,35 +43,129 @@ describe('venue', () => {
                         day: 0,
                         time: '1204'
                     },
-                    open: {
+                    open: [{
                         day: 0,
                         time: '0645'
-                    }
+                    }, {
+                        day: 0,
+                        time: '2245'
+                    }]
                 }, {
                     close: {
                         day: 1,
                         time: '0204'
                     },
-                    open: {
-                        day: 0,
-                        time: '2245'
-                    }
+                    open: {}
                 }]
             }
         });
 
         bVenue = await Venue.create({
             name: 'bVenue',
+            utc_offset: 120,
             location: {
                 type: 'Point',
                 coordinates: [-5, -5]
+            },
+            opening_hours: {
+                periods: [{
+                    open: {
+                        day: 0,
+                        time: '0000'
+                    }
+                }]
+            }
+        });
+
+        cVenue = await Venue.create({
+            name: 'cVenue',
+            utc_offset: 120,
+            location: {
+                type: 'Point',
+                coordinates: [-5, -5]
+            },
+            opening_hours: {
+                periods: [{
+                    open: {
+                        day: 0,
+                        time: '1800'
+                    }
+                }, {
+                    open: {
+                        day: 3,
+                        time: '1500'
+                    },
+                    close: [{
+                        day: 3,
+                        time: '1200'
+                    }, {
+                        day: 3,
+                        time: '1700'
+                    }
+                    ]
+                }]
             }
         });
 
         user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
     }));
 
-    /**describe('opening times', () => {
+    describe('opening times', () => {
+        //cVenue
+        it('should not be open at day 0 at 1300', () => {
+            const date = new Date(2017, 6, 9, 13, 0, 0, 0);
+            cVenue.isOpen(date).should.be.false;
+        });
+        it('should be open at day 0 at 1801', () => {
+            const date = new Date(2017, 6, 9, 18, 1, 0, 0);
+            cVenue.isOpen(date).should.be.true;
+        });
+        it('should be open at day 1 at 1101', () => {
+            const date = new Date(2017, 6, 10, 11, 1, 0, 0);
+            cVenue.isOpen(date).should.be.true;
+        });
+        it('should be open at day 3 at 0010', () => {
+            const date = new Date(2017, 6, 12, 0, 10, 0, 0);
+            cVenue.isOpen(date).should.be.true;
+        });
+        it('should not be open at day 3 at 1445', () => {
+            const date = new Date(2017, 6, 12, 14, 45, 0, 0);
+            cVenue.isOpen(date).should.be.false;
+        });
+        it('should be open at day 3 at 1505', () => {
+            const date = new Date(2017, 6, 12, 15, 5, 0, 0);
+            cVenue.isOpen(date).should.be.true;
+        });
+        it('should not be open at day 3 at 1705', () => {
+            const date = new Date(2017, 6, 12, 17, 5, 0, 0);
+            cVenue.isOpen(date).should.be.false;
+        });
+        it('should not be open at day 5 at 1801', () => {
+            const date = new Date(2017, 6, 14, 18, 1, 0, 0);
+            cVenue.isOpen(date).should.be.false;
+        });
+        //bVenue
+        it('should be open at day 0 at 1300', () => {
+            const date = new Date(2017, 6, 9, 13, 0, 0, 0);
+            bVenue.isOpen(date).should.be.true;
+        });
+        it('should be open at day 1 at 1300', () => {
+            const date = new Date(2017, 6, 10, 13, 0, 0, 0);
+            bVenue.isOpen(date).should.be.true;
+        });
+        it('should be open at day 3 at 0000', () => {
+            const date = new Date(2017, 6, 12, 0, 0, 0, 0);
+            bVenue.isOpen(date).should.be.true;
+        });
+        it('should be open at day 5 at 1211', () => {
+            const date = new Date(2017, 6, 14, 12, 11, 0, 0);
+            bVenue.isOpen(date).should.be.true;
+        });
+        it('should be open at day 6 at 2355', () => {
+            const date = new Date(2017, 6, 15, 23, 55, 0, 0);
+            bVenue.isOpen(date).should.be.true;
+        });
+        //aVenue
         it('should be closed at day 0 at 1300', () => {
             const date = new Date(2017, 6, 9, 13, 0, 0, 0);
             aVenue.isOpen(date).should.be.false;
@@ -96,7 +190,7 @@ describe('venue', () => {
             const date = new Date(2017, 6, 9, 23, 45, 0, 0);
             aVenue.isOpen(date).should.be.true;
         });
-    });*/
+    });
 
     describe('location', () => {
         it('should find veneu a', (done) => {
