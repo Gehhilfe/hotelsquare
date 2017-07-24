@@ -14,8 +14,16 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
-require('../../app/models/user');
-const User = mongoose.model('User');
+const User = require('../../app/models/user');
+const Image = require('../../app/models/image');
+
+const mochaAsync = (fn) => {
+    return (done) => {
+        fn.call().then(done, (err) => {
+            return done(err);
+        });
+    };
+};
 
 describe('Session', () => {
     beforeEach((done) => {
@@ -24,15 +32,47 @@ describe('Session', () => {
     });
 
     describe('/POST session', () => {
+
+        let validUser;
+
         beforeEach((done) => {
             User.remove({}).then(() => {
                 User.create({
                     name: 'test',
                     password: 'secret',
                     email: 'test@test.de'
-                }).then(() => {
+                }).then((u) => {
+                    validUser = u;
                     return done();
                 });
+            });
+        });
+
+        describe('when user has avatar', () => {
+            beforeEach(mochaAsync(async () => {
+                const img = new Image();
+                img.uploader = validUser;
+                await img.save();
+                validUser.avatar = img;
+                await validUser.save();
+            }));
+
+            it('should return a new jwt with correct login details', (done) => {
+                const loginDetails = {
+                    name: 'test',
+                    password: 'secret'
+                };
+                request(server)
+                    .post('/sessions')
+                    .send(loginDetails)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.should.be.a('object');
+                        jwt.verify(res.body.token, config.jwt.secret, config.jwt.options, (err, decoded) => {
+                            expect(decoded.name).to.be.equal(loginDetails.name);
+                        });
+                        return done();
+                    });
             });
         });
 

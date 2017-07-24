@@ -148,13 +148,13 @@ class UserClass {
         if (data.location && data.location.coordinates)
             self.location.coordinates = data.location.coordinates;
 
-        if(data.city)
+        if (data.city)
             self.city = data.city;
 
-        if(data.age)
+        if (data.age)
             self.age = data.age;
 
-        if(data.incognito)
+        if (data.incognito)
             self.incognito = data.incognito;
     }
 
@@ -194,7 +194,7 @@ class UserClass {
         });
         delete obj.password;
         if (this.avatar) {
-            if(this.populated('avatar') === undefined)
+            if (this.populated('avatar') === undefined)
                 throw new restify_errors.InternalServerError('User avatar not populated!');
             obj.avatar = this.avatar.toJSON();
         } else {
@@ -203,11 +203,19 @@ class UserClass {
         return obj;
     }
 
+    toJSONToken() {
+        return {
+            _id: this._id,
+            name: this.name,
+            displayName: this.displayName
+        };
+    }
+
     toJSONPublic() {
         const location = this.incognito ? null : this.location;
         let avatar = null;
-        if(this.avatar) {
-            if(this.populated('avatar') === undefined)
+        if (this.avatar) {
+            if (this.populated('avatar') === undefined)
                 throw new restify_errors.InternalServerError('User avatar not populated!');
             avatar = this.avatar.toJSON();
         }
@@ -220,6 +228,7 @@ class UserClass {
             avatar: avatar,
             city: this.city,
             age: this.age,
+            gender: this.gender,
             location: location
         };
     }
