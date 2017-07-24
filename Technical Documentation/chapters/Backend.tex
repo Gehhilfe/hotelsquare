@@ -1,3 +1,66 @@
 \section{Backend}
 \label{sec:backend}
-\todo[inline]{Backend technical documentation}
+The backend of the project shall provide the app with all necessary features like user management, venue data, image handling and a lot more. It was required to implement the backend by creating a \textit{NodeJS} server which is communicating with a \textit{NoSQL} database of choice. For the latter, as mentioned in sec.\ \ref{subsec:general_architecture}, a \textit{MongoDB} database was used im combination with \textit{mongoose} for easy \texttt{CRUD} access to it. 
+
+\subsection{Development Practice}
+\label{subsec:developmentpractice}
+\todo[inline]{docker container -> scaling, CD, CI, TDD, BDD, Gitlab, behavioural testing -> ggf. test als user story mit UML?, lint, code coverage}
+
+\subsection{Data Base}
+\label{subsec:database}
+
+\todo[inline]{erläutern beispiel new schema, klassen um schema -> single point of functionality (von routen in model -> ggf. beispiel wo in zwei route klassenfun aufgerufen wird), minio erwähnen und erklären für bilder }
+
+\subsection{Server}
+\label{subsec:server}
+For implementing the web server providing a \texttt{REST}ful API to the \textit{Android} app, \textit{NodeJS} was the required \textit{JavaScript} runtime environment. In sec.\ \ref{subsubsec:nodejs}, some general remarks about \textit{NodeJS} are mentioned. In the project, version 7.10 is used. From version 7.6 on, the \texttt{async - await} language construct was introduced to provide a much more readable callback approach than before. This helps for having compact, readable and maintainable software code. Besides many other language features, we made use of this new construct for the prior mentioned reasons. It should still be remarked that the functionality of the software does not improve by the newly possible syntax. In lst.\ (\ref{lst:callback}) and lst.\ (\ref{lst:async}), a short example of two \textit{NodeJS} statements (both logging 'Hello World' to the console) with the same functionality are shown. To illustrate the real benefit of this new syntax, a more complex example of uploading an avatar to the server is shown in lst.\ (\ref{lst:uploadavatar}). It can be clearly seen that this coding style reads very much like sequential code and it supports readability a lot.
+
+\begin{minipage}[b]{0.45\linewidth}
+	\centering
+	\label{lst:callback}
+\begin{lstlisting}[caption={Old version of 'Hello World' code using callbacks.}]
+sleep(100).
+then(() => {
+console.log('Hallo Welt!');
+}).
+catch(err => {
+// ...
+});
+\end{lstlisting}
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.45\linewidth}
+	\centering
+	\label{lst:async}
+\begin{lstlisting}[caption={New version of 'Hello World' code using callbacks within an \texttt{async} function.}]
+try {
+await sleep(100);
+console.log('Hallo Welt!');
+} catch (ex) {
+// ...
+}
+\end{lstlisting}
+\end{minipage}
+
+\begin{lstlisting}[caption={Example of more complex function uploading an avatar of a user to the database.}, label=lst:uploadavatar]
+async function uploadAvatar(request, response, next) {
+let user = await User.findOne({name: request.authentication.name});
+if(user.avatar) {
+await Image.destroy(user.avatar);
+}
+user.avatar = await Image.upload(request.files.image.path, user, user);
+user = await user.save();
+response.json(user);
+return next();
+}
+\end{lstlisting}
+
+\subsubsection{Server structure}
+\label{subsubsec:serverstructure}
+\todo[inline]{(alle) routen im server aufzeigen, über restify sprechen}
+
+\subsection{3rd Party Libraries}
+\label{subsec:3rdpartylibs}
+\todo[inline]{alle third libraries aufzählen sinn erläutern}
+
+
