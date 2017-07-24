@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.UploadHelper;
+import tk.internet.praktikum.foursquare.api.bean.Gender;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
@@ -95,7 +97,14 @@ public class ProfileFragment extends Fragment {
                                 email.setText(currentUser.getEmail());
                                 city.setText(currentUser.getCity());
                                 age.setText(Integer.toString(currentUser.getAge()));
-                                // TODO - Gender
+                                Gender gender = currentUser.getGender();
+                                if (gender == Gender.MALE)
+                                    male.setChecked(true);
+                                else if (gender == Gender.FEMALE)
+                                    female.setChecked(true);
+                                else
+                                    none.setChecked(true);
+
 
                             if (currentUser.getAvatar() != null) {
                                 ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
@@ -121,14 +130,18 @@ public class ProfileFragment extends Fragment {
     }
 
     private void save() {
+        /*
         name.setEnabled(false);
         email.setEnabled(false);
+        */
         password.setEnabled(false);
         city.setEnabled(false);
         age.setEnabled(false);
 
+        /*
         name.clearFocus();
         email.clearFocus();
+        */
         password.clearFocus();
         city.clearFocus();
         age.clearFocus();
@@ -143,11 +156,19 @@ public class ProfileFragment extends Fragment {
         if (password.getText() != "")
             currentUser.setPassword(password.getText().toString());
 
+        /*
         currentUser.setName(name.getText().toString());
-        currentUser.setCity(city.getText().toString());
         currentUser.setEmail(email.getText().toString());
+        */
+        currentUser.setCity(city.getText().toString());
         currentUser.setAge(Integer.parseInt(age.getText().toString()));
-        // TODO - GENDER
+
+        if (male.isChecked())
+            currentUser.setGender(Gender.MALE);
+        else if (female.isChecked())
+            currentUser.setGender(Gender.FEMALE);
+        else
+            currentUser.setGender(Gender.UNSPECIFIED);
 
         uploadChanges();
     }
@@ -163,7 +184,9 @@ public class ProfileFragment extends Fragment {
                 service.uploadAvatar(img)
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(user -> {},
+                        .subscribe(user -> {
+                            Log.d(LOG_TAG, "AVATAR ID" + user.getAvatar().getId());
+                                },
                                 throwable -> {
                                     Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
@@ -194,14 +217,18 @@ public class ProfileFragment extends Fragment {
     }
 
     private void edit() {
+        /*
         name.setFocusable(true);
         email.setFocusable(true);
+        */
         password.setFocusable(true);
         city.setFocusable(true);
         age.setFocusable(true);
 
+        /*
         name.setEnabled(true);
         email.setEnabled(true);
+        */
         password.setEnabled(true);
         city.setEnabled(true);
         age.setEnabled(true);
