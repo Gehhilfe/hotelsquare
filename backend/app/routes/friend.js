@@ -19,7 +19,10 @@ async function getFriends(request, response, next) {
     const friends = user.friends.length;
 
     user = await user.populate({
-        path: 'friends avatar',
+        path: 'friends',
+        populate: {
+            path: 'avatar'
+        },
         options: {
             limit: 20,
             sort: {updated_at: -1},
