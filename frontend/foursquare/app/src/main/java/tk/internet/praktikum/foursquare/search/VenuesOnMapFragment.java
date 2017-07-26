@@ -2,7 +2,9 @@ package tk.internet.praktikum.foursquare.search;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+//import android.location.Location;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
@@ -24,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +37,11 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
+import tk.internet.praktikum.foursquare.api.bean.Location;
+import tk.internet.praktikum.foursquare.api.service.ProfileService;
 
 public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -45,8 +51,10 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private String URL = "https://dev.ip.stimi.ovh/";;
     private Venue tmp;
     private Bitmap bmap;
+    private Location userLocation;
 
     private Marker myPosition;
+    private List<User> friends  = new ArrayList<User>();
 
     private Map <Marker, Venue> markerVenueMap;
     private Map <Marker, User> markerFriendMap;
@@ -73,6 +81,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         markerFriendMap = new HashMap<Marker, User>();
         venueBitmapMap = new HashMap<Venue, Bitmap>();
 
+        userLocation = new Location(49.876171, 8.656868);
         this.setRetainInstance(true);
 
         return view;
@@ -83,6 +92,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // set Map
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
+        //updateFriendsMarker();
 
         class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
@@ -264,15 +274,28 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     }
 
-    //public void updateFriendsLocation(Friend friend){
-    //LatLng friendLocation = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
-    // Marker tmp = map.addMarker(new MarkerOptions()
-    //        .position(friendLocation)
-    //       .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position))
-    // );
-    // markerFriendMap.put(tmp, friend);
+    public void updateFriendsLocation(User friend) {
+        LatLng friendLocation = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
+        Marker tmp = map.addMarker(new MarkerOptions()
+                .position(friendLocation)
+                .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position))
+        );
+        markerFriendMap.put(tmp, friend);
+    }
 
+    public void updateFriendsMarker(){
+        ProfileService profileService = ServiceFactory.createRetrofitService(ProfileService.class, URL);
+        profileService.getNearByFriends(userLocation).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(nearbyFriends -> {
+                    friends = nearbyFriends;
+                    Log.d("KEYFOUND", "Size of Nearby Friends " + friends.size());
+                });
 
+        for(User f : friends){
+            updateFriendsLocation(f);
+            Log.d("KEYFOUND", "SetMarker");
+        }
+    }
 
     public void setUser(){
         //TODO get LocationData...
