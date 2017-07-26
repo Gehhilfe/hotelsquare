@@ -116,6 +116,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     if (venueBitmapMap.containsKey(venue)) {
                         Log.d("KEYFOUND", "Image for Venue was found");
                         venueImage.setImageBitmap(venueBitmapMap.get(venue));
+                    } else {
+                        //TODO: Other Pic?
+                        venueImage.setImageResource(R.mipmap.ic_location_city_black_24dp);
                     }
 
 
