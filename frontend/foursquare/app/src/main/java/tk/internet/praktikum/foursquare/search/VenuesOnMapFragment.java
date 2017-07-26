@@ -72,7 +72,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         markerVenueMap = new HashMap<Marker, Venue>();
         markerFriendMap = new HashMap<Marker, User>();
         venueBitmapMap = new HashMap<Venue, Bitmap>();
-        loadImages();
 
         this.setRetainInstance(true);
 
@@ -166,6 +165,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         }
 
         map.setInfoWindowAdapter(new MyInfoWindowAdapter(this.getActivity()));
+
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener(){
             @Override
             public void onInfoWindowClick(Marker marker) {
@@ -211,16 +211,33 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     }
 
-    public void loadImages(){
-
-    }
-
     public void updateVenueLocation(Venue venue){
         LatLng venueLocation = new LatLng(venue.getLocation().getLatitude(), venue.getLocation().getLongitude());
+
+        //setup Marker
         Marker tmp = map.addMarker(new MarkerOptions()
                     .position(venueLocation)
                     .title(venue.getName()));
+
+        //set specific marker Icon
+        float rating = venue.getRating();
+        if(rating == 0){
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_grey_24dp));
+        } else if(rating > 0 && rating <= 1){
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_red_24dp));
+        } else if(rating > 1 && rating <= 2){
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_orange_24dp));
+        } else if(rating > 2 && rating <= 3) {
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_yellow_24dp));
+        } else if(rating > 3 && rating <= 4) {
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_lime_24dp));
+        }else if(rating > 4) {
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_green_24dp));
+        }
+
         markerVenueMap.put(tmp, venue);
+
+        // load Images for marker
         if(venue.getImages().size() > 0){
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
             imageCacheLoader.loadBitmap(venue.getImages().get(0), ImageSize.SMALL)
