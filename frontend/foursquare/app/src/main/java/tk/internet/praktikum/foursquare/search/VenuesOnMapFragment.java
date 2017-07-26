@@ -44,6 +44,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private RecyclerView recyclerView;
     private String URL = "https://dev.ip.stimi.ovh/";;
     private Venue tmp;
+    private Bitmap bmap;
 
     private Marker myPosition;
 
@@ -70,7 +71,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
         markerVenueMap = new HashMap<Marker, Venue>();
         markerFriendMap = new HashMap<Marker, User>();
-
+        venueBitmapMap = new HashMap<Venue, Bitmap>();
         loadImages();
 
         this.setRetainInstance(true);
@@ -101,18 +102,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
                     Venue venue = markerVenueMap.get(marker);
 
-                    if (venue.getImages().size() > 0) {
-                        ImageView venueImage = ((ImageView) myContentsView.findViewById(R.id.img));
-                        ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
-                        imageCacheLoader.loadBitmap(venue.getImages().get(0), ImageSize.SMALL)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(bitmap -> {
-                                    venueImage.setImageBitmap(bitmap);
-                                    Log.d("KEYFOUND", "Loaded Image for: " + venue.getName());
-                                });
-                    }
-
                     // Set InfoWindow Text
                     TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
                     tvTitle.setText(venue.getName());
@@ -123,8 +112,11 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     if (venue.isOpen()) {
                         tvOpen.setText(getString(R.string.open_now));
                     }
-
-
+                    ImageView venueImage = ((ImageView) myContentsView.findViewById(R.id.img));
+                    if (venueBitmapMap.containsKey(venue)) {
+                        Log.d("KEYFOUND", "Image for Venue was found");
+                        venueImage.setImageBitmap(venueBitmapMap.get(venue));
+                    }
 
 
                     // Retrieve Data from specific Venue
@@ -220,22 +212,31 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     }
 
-    public void updateVenueLocation(Venue venue,int ranking){
+    public void updateVenueLocation(Venue venue){
         LatLng venueLocation = new LatLng(venue.getLocation().getLatitude(), venue.getLocation().getLongitude());
         Marker tmp = map.addMarker(new MarkerOptions()
                     .position(venueLocation)
-                    .title(venue.getName() + String.valueOf(ranking)));
+                    .title(venue.getName()));
         markerVenueMap.put(tmp, venue);
+        if(venue.getImages().size() > 0){
+            ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+            imageCacheLoader.loadBitmap(venue.getImages().get(0), ImageSize.SMALL)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(bitmap -> {
+                    venueBitmapMap.put(venue, bitmap);
+                });
+        }
 
-    }
+
+
+}
 
 
     public void updateVenuesMarker(List<Venue> venues){
         map.clear();
-        int ranking = 1;
         for(Venue venue:venues){
-            updateVenueLocation(venue, ranking);
-            ranking++;
+            updateVenueLocation(venue);
         }
 
         //Shouldn't we move the Camera to the User's Position?
