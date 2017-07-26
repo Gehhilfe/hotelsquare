@@ -1,7 +1,7 @@
 package tk.internet.praktikum.foursquare.search;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,15 +30,12 @@ import java.util.Map;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
+import tk.internet.praktikum.foursquare.api.ImageSize;
+
+import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
-import tk.internet.praktikum.foursquare.api.service.VenueService;
-import tk.internet.praktikum.foursquare.location.MapsActivity;
-
-//import tk.internet.praktikum.foursquare.api.bean.Location;
-
 
 public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -52,7 +48,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private Marker myPosition;
 
     private Map <Marker, Venue> markerVenueMap;
-    // TODO private Map <Marker, Friend> markerFriendMap;
+    private Map <Marker, User> markerFriendMap;
+    private Map <Venue, Bitmap> venueBitmapMap;
 
     public VenuesOnMapFragment() {
         // Required empty public constructor
@@ -64,12 +61,18 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view=inflater.inflate(R.layout.fragment_venues_on_map, container, false);
-       recyclerView =(RecyclerView) view.findViewById(R.id.searching_results_on_map);
+        view = inflater.inflate(R.layout.fragment_venues_on_map, container, false);
+
+        recyclerView =(RecyclerView) view.findViewById(R.id.searching_results_on_map);
         SupportMapFragment mapFragment =((SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.venues_mapView));
         mapFragment.getMapAsync(this);
-        markerVenueMap=new HashMap<Marker,Venue>();
+
+        markerVenueMap = new HashMap<Marker, Venue>();
+        markerFriendMap = new HashMap<Marker, User>();
+
+        loadImages();
+
         this.setRetainInstance(true);
 
         return view;
@@ -89,46 +92,73 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 LayoutInflater inflater = LayoutInflater.from(context);
                 myContentsView = inflater.inflate(R.layout.info_window, null);
             }
-
             @Override
             public View getInfoContents(Marker marker) {
 
                 // Get Info from Venue
-                if(markerVenueMap.containsKey(marker)){
-                    Log.d("KEYFOUND", "Marker was Found");
+                if (markerVenueMap.containsKey(marker)) {
+                    Log.d("KEYFOUND", "Marker was Venue");
 
-                    tmp = markerVenueMap.get(marker);
-                    // Retrieve Data from specific Venue
-                    VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
-                    venueService.getDetails(tmp.getId()).subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread()).subscribe(venue -> {
-                            tmp = venue;
-                        Log.d("GOTDETAILS", "Details for: " + venue.getName());
-                        Log.d("GOTDETAILS", "Details are: " + venue.getFormattedAddress() + venue.getRating());
-                    }, throwable -> {
-                        //TODO: handle exception
-                    });
+                    Venue venue = markerVenueMap.get(marker);
 
+                    if (venue.getImages().size() > 0) {
+                        ImageView venueImage = ((ImageView) myContentsView.findViewById(R.id.img));
+                        ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+                        imageCacheLoader.loadBitmap(venue.getImages().get(0), ImageSize.SMALL)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(bitmap -> {
+                                    venueImage.setImageBitmap(bitmap);
+                                    Log.d("KEYFOUND", "Loaded Image for: " + venue.getName());
+                                });
+                    }
 
                     // Set InfoWindow Text
                     TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
-                    tvTitle.setText(tmp.getName());
-                    TextView tvAddress = ((TextView) myContentsView.findViewById(R.id.adress));
-                    tvAddress.setText(tmp.getFormattedAddress());
+                    tvTitle.setText(venue.getName());
                     TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
-                    tvRate.setText(tmp.getFormattedAddress());
+                    Log.d("KEYFOUND", "Rate is: " + venue.getRating());
+                    tvRate.setText(Float.toString(venue.getRating()));
+                    TextView tvOpen = ((TextView) myContentsView.findViewById(R.id.isopen));
+                    if (venue.isOpen()) {
+                        tvOpen.setText(getString(R.string.open_now));
+                    }
+
+
+
+
+                    // Retrieve Data from specific Venue
+                    //VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
+                    //venueService.getDetails(tmp.getId()).subscribeOn(Schedulers.newThread())
+                    //        .observeOn(AndroidSchedulers.mainThread()).subscribe(venue -> {
+                    //        tmp = venue;
+                    //    Log.d("GOTDETAILS", "Details for: " + venue.getName());
+                    //    Log.d("GOTDETAILS", "Details are: " + venue.getTypes() + venue.getRating());
+                    //}, throwable -> {
+                    //    //TODO: handle exception
+                    //});
+
+
+                    // Set InfoWindow Text
+                    //TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
+                    //tvTitle.setText(tmp.getName());
+                    //TextView tvAddress = ((TextView) myContentsView.findViewById(R.id.adress));
+                    //tvAddress.setText(tmp.getFormattedAddress());
+                    //TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
+                    //tvRate.setText(tmp.getFormattedAddress());
+
+                    //TODO: Get Info from Venue or Friend
+                    //ImageView ivImage = ((ImageView) myContentsView.findViewById(R.id.img));
+                    //Drawable picture =
+                    //ivImage.setImageDrawable(drawable);
+                    //ivImage.setImageRe
+                    //TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
+                    //tvTitle.setText(marker.getTitle());
+                    //TextView tvSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
+                    //tvSnippet.setText(marker.getSnippet());
+
+
                 }
-
-                //TODO: Get Info from Venue or Friend
-                //ImageView ivImage = ((ImageView) myContentsView.findViewById(R.id.img));
-                //Drawable picture =
-                //ivImage.setImageDrawable(drawable);
-                //ivImage.setImageRe
-                //TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
-                //tvTitle.setText(marker.getTitle());
-                //TextView tvSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
-                //tvSnippet.setText(marker.getSnippet());
-
                 return myContentsView;
             }
 
@@ -186,6 +216,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     }
 
+    public void loadImages(){
+
+    }
 
     public void updateVenueLocation(Venue venue,int ranking){
         LatLng venueLocation = new LatLng(venue.getLocation().getLatitude(), venue.getLocation().getLongitude());
