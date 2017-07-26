@@ -14,12 +14,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.github.clans.fab.FloatingActionButton;
 import java.io.IOException;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MultipartBody;
@@ -42,6 +40,7 @@ public class ProfileFragment extends Fragment {
     private Button upload, edit, save;
     private RadioButton male, female, none;
     private ImageView avatarPicture;
+    private FloatingActionButton uploadAvatarBtn, editProfileButton, saveChangesButton;
 
     private static final String LOG_TAG = ProfileFragment.class.getSimpleName();
     private final String URL = "https://dev.ip.stimi.ovh/";
@@ -71,6 +70,14 @@ public class ProfileFragment extends Fragment {
         none = (RadioButton) view.findViewById(R.id.radioButton3);
 
         avatarPicture = (ImageView) view.findViewById(R.id.profile_avatar);
+
+        saveChangesButton = (FloatingActionButton) view.findViewById(R.id.profile_save);
+        uploadAvatarBtn = (FloatingActionButton) view.findViewById(R.id.profile_upload_avatar_button);
+        editProfileButton = (FloatingActionButton) view.findViewById(R.id.profile_edit_button);
+
+        saveChangesButton.setOnClickListener(v -> save());
+        uploadAvatarBtn.setOnClickListener(v -> uploadPicture());
+        editProfileButton.setOnClickListener(v -> edit());
 
         upload.setOnClickListener(v -> uploadPicture());
         edit.setOnClickListener(v -> edit());

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -169,8 +170,37 @@
                 android:enabled="false"
                 android:text="Anonymous" />
         </RadioGroup>
-
     </RelativeLayout>
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/profile_floating_action_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        fab:menu_fab_size="mini"
+        android:layout_gravity="bottom|right">
 
-
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/profile_upload_avatar_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            fab:fab_label="Upload Avatar"
+            fab:fab_size="mini" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/profile_edit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:src="@mipmap/text_commemnt"
+            fab:fab_label="Edit Profile"
+            fab:fab_size="mini" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/profile_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            fab:fab_label="Save changes"
+            fab:fab_size="mini" />
+    </com.github.clans.fab.FloatingActionMenu>
 </LinearLayout>
