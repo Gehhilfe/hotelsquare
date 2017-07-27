@@ -3,6 +3,7 @@ package tk.internet.praktikum.foursquare.search;
 import android.content.Context;
 import android.graphics.Bitmap;
 //import android.location.Location;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
@@ -33,6 +34,7 @@ import java.util.Map;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
@@ -42,6 +44,7 @@ import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -92,6 +95,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // set Map
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
+        setUser();
+        //TODO:
         //updateFriendsMarker();
 
         class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
@@ -130,36 +135,10 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                         venueImage.setImageResource(R.mipmap.ic_location_city_black_24dp);
                     }
 
+                } else if(markerFriendMap.containsKey(marker)){
+                    Log.d("KEYFOUND", "Marker was Friend");
 
-                    // Retrieve Data from specific Venue
-                    //VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
-                    //venueService.getDetails(tmp.getId()).subscribeOn(Schedulers.newThread())
-                    //        .observeOn(AndroidSchedulers.mainThread()).subscribe(venue -> {
-                    //        tmp = venue;
-                    //    Log.d("GOTDETAILS", "Details for: " + venue.getName());
-                    //    Log.d("GOTDETAILS", "Details are: " + venue.getTypes() + venue.getRating());
-                    //}, throwable -> {
-                    //    //TODO: handle exception
-                    //});
-
-
-                    // Set InfoWindow Text
-                    //TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
-                    //tvTitle.setText(tmp.getName());
-                    //TextView tvAddress = ((TextView) myContentsView.findViewById(R.id.adress));
-                    //tvAddress.setText(tmp.getFormattedAddress());
-                    //TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
-                    //tvRate.setText(tmp.getFormattedAddress());
-
-                    //TODO: Get Info from Venue or Friend
-                    //ImageView ivImage = ((ImageView) myContentsView.findViewById(R.id.img));
-                    //Drawable picture =
-                    //ivImage.setImageDrawable(drawable);
-                    //ivImage.setImageRe
-                    //TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
-                    //tvTitle.setText(marker.getTitle());
-                    //TextView tvSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
-                    //tvSnippet.setText(marker.getSnippet());
+                    User friend = markerFriendMap.get(marker);
 
 
                 }
@@ -188,36 +167,11 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     fragmentTransaction.commit();
                     //redirectToFragment(venueInDetailFragment);
 
+                } else if(markerFriendMap.containsKey(marker)){
+                    //TODO: "Call FriendFragment"
                 }
             }
         });
-
-        //TODO
-        //map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-         //   @Override
-          //  public void onInfoWindowClick(Marker marker) {
-
-         //   }
-        //});
-
-        //map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
-
-          //  @Override
-           // public boolean onMarkerClick(Marker marker) {
-           //     if(markerVenueMap.containsKey(marker)){
-            //        Venue v = markerVenueMap.get(marker);
-            //        //TODO open new Fragment/Activity
-            //        return true;
-              //  }
-                //else if(markerFriendMap.containsKey(marker)){
-                //Friend f = markerFriendMap.get(marker);
-                //TODO: open new Fragment/Activity
-                // return true;
-                //}
-           // return false;
-            //}
-
-       // });
 
     }
 
@@ -268,7 +222,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         for(Venue venue:venues){
             updateVenueLocation(venue);
         }
-
+        setUser();
         //Shouldn't we move the Camera to the User's Position?
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(venues.get(0).getLocation().getLatitude(), venues.get(0).getLocation().getLongitude()),14));
 
@@ -284,13 +238,24 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     }
 
     public void updateFriendsMarker(){
-        ProfileService profileService = ServiceFactory.createRetrofitService(ProfileService.class, URL);
-        profileService.getNearByFriends(userLocation).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(nearbyFriends -> {
-                    friends = nearbyFriends;
-                    Log.d("KEYFOUND", "Size of Nearby Friends " + friends.size());
-                });
 
+        try {
+
+            //TODO: Doesn't work? Timeout
+            ProfileService profileService = ServiceFactory
+                    .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                            getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
+            //ProfileService profileService = ServiceFactory.createRetrofitService(ProfileService.class, URL);
+
+            profileService.getNearByFriends(userLocation).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(nearbyFriends -> {
+                        friends = nearbyFriends;
+                        Log.d("KEYFOUND", "Size of Nearby Friends " + friends.size());
+                    });
+        } catch(Exception e){
+            e.printStackTrace();
+        }
         for(User f : friends){
             updateFriendsLocation(f);
             Log.d("KEYFOUND", "SetMarker");
@@ -300,7 +265,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     public void setUser(){
         //TODO get LocationData...
         myPosition = map.addMarker(new MarkerOptions()
-        .position(new LatLng(0,0))
+        .position(new LatLng(userLocation.getLongitude(),userLocation.getLatitude()))
         .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
 
     }
