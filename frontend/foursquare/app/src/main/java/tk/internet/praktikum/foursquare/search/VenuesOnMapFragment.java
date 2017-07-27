@@ -234,6 +234,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             updateVenueLocation(venue);
         }
         setUser();
+        updateFriendsMarker();
         //Shouldn't we move the Camera to the User's Position?
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(venues.get(0).getLocation().getLatitude(), venues.get(0).getLocation().getLongitude()),14));
 
@@ -250,8 +251,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     public void updateFriendsMarker(){
 
-        try {
-
             //TODO: Doesn't work? Timeout
             ProfileService profileService = ServiceFactory
                     .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -264,9 +263,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                         friends = nearbyFriends;
                         Log.d("KEYFOUND", "Size of Nearby Friends " + friends.size());
                     });
-        } catch(Exception e){
-            e.printStackTrace();
-        }
         for(User f : friends){
             updateFriendsLocation(f);
             Log.d("KEYFOUND", "SetMarker");
