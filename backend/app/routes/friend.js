@@ -55,8 +55,8 @@ async function getNearByFriends(request, response, next) {
     }).where('location').near({
         center: request.body,
         maxDistance: radius
-    });
-    response.send(_.map(user, (it) => it.toJSONPublic()));
+    }).populate('avatar');
+    response.send(_.map(users, (it) => it.toJSONPublic()));
     return next();
 }
 

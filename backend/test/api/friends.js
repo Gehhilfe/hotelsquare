@@ -73,4 +73,18 @@ describe('Friends', () => {
         res.body.friends.should.be.a('array');
         res.body.friends.length.should.be.equal(1);
     })));
+
+    it('search nearybyfriends', (mochaAsync(async () => {
+        const res = await request(server)
+            .post('/searches/nearbyfriends')
+            .set('x-auth', peterToken)
+            .send({
+                type: 'Point',
+                coordinates: [0, 0]
+            });
+
+        res.should.have.status(200);
+        res.body.should.be.a('array');
+        res.body.length.should.be.equal(1);
+    })));
 });
