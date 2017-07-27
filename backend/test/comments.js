@@ -39,7 +39,8 @@ describe('comments', () => {
         await Promise.all([
             Comment.remove({}),
             User.remove({}),
-            Venue.remove({})
+            Venue.remove({}),
+            Image.remove({})
         ]);
 
         aVenue = await Venue.create({
@@ -51,6 +52,9 @@ describe('comments', () => {
         });
 
         user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
+        const img = await Image.create({});
+        user.avatar = img;
+        user = await user.save();
         comment = await Comment.create({});
         textComment = await TextComment.build(user, 'Test', comment);
     }));
@@ -203,17 +207,28 @@ describe('comments', () => {
             await TextComment.build(user, 'Test', textComment);
             await textComment.save();
             const comment = await Comment.findOne({_id: textComment._id})
-                .populate('author')
                 .populate({
-                    path: 'comments.item',
+                    path: 'author',
                     populate: {
-                        path: 'author'
+                        path: 'avatar'
                     }
                 })
                 .populate({
                     path: 'comments.item',
                     populate: {
-                        path: 'image'
+                        path: 'author',
+                        populate: {
+                            path: 'avatar'
+                        }
+                    }
+                })
+                .populate({
+                    path: 'comments.item',
+                    populate: {
+                        path: 'image author',
+                        populate: {
+                            path: 'avatar'
+                        }
                     }
                 });
             json = await comment.toJSONDetails();
