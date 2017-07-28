@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -10,7 +10,11 @@
     android:paddingTop="15dp"
     android:focusable="true"
     android:focusableInTouchMode="true">
-
+    <LinearLayout
+        android:id="@+id/profile_linear_layout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -171,16 +175,17 @@
                 android:text="Anonymous" />
         </RadioGroup>
     </RelativeLayout>
+    </LinearLayout>
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/profile_floating_action_menu"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        fab:menu_fab_size="mini"
-        android:layout_gravity="bottom|right">
+        android:layout_gravity="bottom|right"
+        app:menu_fab_size="mini">
 
-        <com.github.clans.fab.FloatingActionButton
+    <com.github.clans.fab.FloatingActionButton
             android:id="@+id/profile_upload_avatar_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -203,4 +208,4 @@
             fab:fab_label="Save changes"
             fab:fab_size="mini" />
     </com.github.clans.fab.FloatingActionMenu>
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>
