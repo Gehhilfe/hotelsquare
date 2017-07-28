@@ -45,6 +45,8 @@ import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.MeFragment;
+import tk.internet.praktikum.foursquare.user.ProfileFragment;
 
 public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -95,7 +97,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // set Map
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
-        setUser();
+        //setUser();
         //TODO:
         //updateFriendsMarker();
 
@@ -141,6 +143,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     User friend = markerFriendMap.get(marker);
 
 
+                } else {
+                    Log.d("KEYFOUND", "Marker was User");
+
                 }
                 return myContentsView;
             }
@@ -169,6 +174,12 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
                 } else if(markerFriendMap.containsKey(marker)){
                     //TODO: "Call FriendFragment"
+                } else {
+                    MeFragment meFragment = new MeFragment();
+                    FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, meFragment);
+                    fragmentTransaction.addToBackStack(meFragment.getTag());
+                    fragmentTransaction.commit();
                 }
             }
         });
@@ -223,6 +234,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             updateVenueLocation(venue);
         }
         setUser();
+        updateFriendsMarker();
         //Shouldn't we move the Camera to the User's Position?
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(venues.get(0).getLocation().getLatitude(), venues.get(0).getLocation().getLongitude()),14));
 
@@ -239,8 +251,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     public void updateFriendsMarker(){
 
-        try {
-
             //TODO: Doesn't work? Timeout
             ProfileService profileService = ServiceFactory
                     .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -253,9 +263,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                         friends = nearbyFriends;
                         Log.d("KEYFOUND", "Size of Nearby Friends " + friends.size());
                     });
-        } catch(Exception e){
-            e.printStackTrace();
-        }
         for(User f : friends){
             updateFriendsLocation(f);
             Log.d("KEYFOUND", "SetMarker");

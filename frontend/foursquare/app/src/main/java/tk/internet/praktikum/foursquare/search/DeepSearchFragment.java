@@ -178,7 +178,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             Log.d(LOG, "*** deepSearch");
             // Searching for
             lastQuery = query;
-            currentPage = 1;
+            currentPage = 0;
             VenueSearchQuery venueSearchQuery;
             if (filterLocation.isClickable() && !filterLocation.getText().toString().equals("Near Me")) {
                 venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString().trim());
