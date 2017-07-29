@@ -1,7 +1,11 @@
 'use strict';
 
+const config = require('config');
 const restify = require('restify');
 const restify_errors = require('restify-errors');
+
+const nodemailer = require('nodemailer');
+
 const User = require('../models/user');
 const Image = require('../models/image');
 
@@ -133,6 +137,29 @@ async function register(request, response, next) {
     handleValidation(next, async () => {
         const user = await User.create(request.params);
         response.json(user);
+
+        if(config.email) {
+            const transporter = nodemailer.createTransport({
+                host: config.email.server,
+                port: 587,
+                secure: false,
+                requireTLS: true,
+                auth: {
+                    user: config.email.mail,
+                    password: config.email.password
+                }
+            });
+
+            const mailOptions = {
+                from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
+                to: user.email,
+                subject: 'Welcome to HOTELSQUARE',
+                text: 'Hello '+user.displayName+', have fun using HOTELSQUARE!'
+            };
+
+            await transporter.sendMail(mailOptions);
+        }
+
         return next();
     });
 }

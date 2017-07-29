@@ -23,6 +23,7 @@
     "mongodb": "^2.2.27",
     "mongoose": "~4.10",
     "node-geocoder": "^3.18.0",
+    "nodemailer": "^4.0.1",
     "restify": "^4.0.0",
     "restify-bunyan-logger": "^2.0.7",
     "restify-errors": "^4.3.0",
