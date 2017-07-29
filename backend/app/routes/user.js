@@ -136,7 +136,6 @@ async function updateUser(request, response, next) {
 async function register(request, response, next) {
     handleValidation(next, async () => {
         const user = await User.create(request.params);
-        response.json(user);
 
         if(config.email) {
             const transporter = nodemailer.createTransport({
@@ -146,7 +145,7 @@ async function register(request, response, next) {
                 requireTLS: true,
                 auth: {
                     user: config.email.mail,
-                    password: config.email.password
+                    pass: config.email.password
                 }
             });
 
@@ -159,7 +158,7 @@ async function register(request, response, next) {
 
             await transporter.sendMail(mailOptions);
         }
-
+        response.json(user);
         return next();
     });
 }
