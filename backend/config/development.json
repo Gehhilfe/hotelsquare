@@ -3,11 +3,6 @@
     "host": "localhost",
     "name": "dev"
   },
-  "email": {
-    "server": "stimi.ovh",
-    "mail": "hotelsquare@stimi.ovh",
-    "password": "hZrxg9GCFGgrYZGr"
-  },
   "jwt": {
     "secret": "secret",
     "options": {
