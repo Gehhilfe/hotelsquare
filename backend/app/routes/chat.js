@@ -1,4 +1,7 @@
 'use strict';
+const _ = require('lodash');
+const errors = require('restify-errors');
+const User = require('../models/user');
 const Chat = require('../models/chat');
 const Message = require('../models/message');
 
@@ -10,53 +13,37 @@ const Message = require('../models/message');
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function newChat(request, response, next) {
+async function newChat(request, response, next) {
     if (!request.body.recipients) {
-        response.send(422, {error: 'You must at least have one recipient for the message.'});
-        return next();
+        return next(new errors.BadRequestError('You must at least have one recipient for the message.'));
     }
 
     if (request.body.message === '') {
-        response.send(422, {error: 'You must not send empty messages.'});
-        return next();
+        return next(new errors.BadRequestError('You must not send empty messages.'));
     }
 
-    //request.params.recipients.forEach((userid) => {
-    //    User.count({ _id: userid }, (err, count) => {
-    //        if(count < 1){
-    //            response.send(422, { error: 'recipient not known' });
-    //            return next();
-    //        }
-    //    })
-    //})
 
-    const chat = new Chat({
-        participants: [request.authentication._id, request.body.recipients]
+    const recipients = _.map(await User.find({
+        _id: { $in: request.body.recipients }
+    }), (it) => it._id);
+
+    if(recipients.length !== request.body.recipients.length) {
+        return next(new errors.BadRequestError('Unknown recipient.'));
+    }
+
+    const chat = await Chat.create({
+        participants: [request.authentication._id, recipients]
     });
 
-    chat.save((err, chat) => {
-        if (err) {
-            response.send({error: err});
-            return next();
-        }
+    const msg = await Message.create({
+        chatId: chat._id,
+        message: request.body.message,
+        sender: request.authentication._id
+    });
 
-        const msg = new Message({
-            chatId: chat._id,
-            message: request.body.message,
-            sender: request.authentication._id
-        });
-
-        msg.save((err) => {
-            if (err) {
-                response.send({error: err});
-                return next();
-            }
-
-            return response.send(200, {
-                message: 'New Chat',
-                chatId: chat._id
-            });
-        });
+    return response.send(200, {
+        message: msg,
+        chatId: chat._id
     });
 }
 
