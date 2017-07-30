@@ -100,8 +100,6 @@ describe('Chat', () => {
                 .send(chatdata)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.have.property('message', 'New Chat');
-                    res.body.should.have.property('chatId');
                     return done();
                 });
         });
@@ -115,7 +113,7 @@ describe('Chat', () => {
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
-                    res.should.have.status(422);
+                    res.should.have.status(400);
                     return done();
                 });
         });
@@ -130,7 +128,7 @@ describe('Chat', () => {
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
-                    res.should.have.status(422);
+                    res.should.have.status(400);
                     return done();
                 });
         });
