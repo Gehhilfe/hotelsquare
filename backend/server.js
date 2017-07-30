@@ -53,8 +53,7 @@ function handlePromiseReject(func) {
         try {
             func(req, res, next);
         }catch(err) {
-            res.send(new errors.InternalServerError(err));
-            return next();
+            return next(new errors.InternalServerError(err));
         }
     };
 }
