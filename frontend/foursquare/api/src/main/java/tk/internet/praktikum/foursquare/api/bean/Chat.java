@@ -4,9 +4,9 @@ import java.util.List;
 
 public class Chat {
 
-    String chatId;
-
-    List<User> participants;
+    private String chatId;
+    private List<User> participants;
+    private List<ChatMessage> messages;
 
     public Chat(String chatId, List<User> participants)
     {
@@ -32,5 +32,9 @@ public class Chat {
     List<User> getParticipants()
     {
         return participants;
+    }
+
+    public List<ChatMessage> getMessages() {
+        return messages;
     }
 }

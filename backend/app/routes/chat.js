@@ -24,14 +24,14 @@ async function newChat(request, response, next) {
 
 
     const recipients = _.map(await User.find({
-        _id: { $in: request.body.recipients }
+        _id: {$in: request.body.recipients}
     }), (it) => it._id);
 
-    if(recipients.length !== request.body.recipients.length) {
+    if (recipients.length !== request.body.recipients.length) {
         return next(new errors.BadRequestError('Unknown recipient.'));
     }
 
-    const chat = await Chat.create({
+    let chat = await Chat.create({
         participants: [request.authentication._id, recipients]
     });
 
@@ -41,10 +41,10 @@ async function newChat(request, response, next) {
         sender: request.authentication._id
     });
 
-    return response.send(200, {
-        message: msg,
-        chatId: chat._id
-    });
+    chat.addMessage(msg);
+    chat = await chat.save();
+
+    return response.send(chat);
 }
 
 /**
@@ -55,24 +55,34 @@ async function newChat(request, response, next) {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function replyMessage(request, response, next) {
-    const reply = new Message({
-        chatId: request.params.chatId,
+async function replyMessage(request, response, next) {
+    const chat = await Chat.findOne({
+        _id: request.params.chatId
+    });
+
+    if (_.find(chat.participants, request.authentication._id))
+        return next(new errors.BadRequestError('You are not are participant of this chat.'));
+
+    let reply = await Message.create({
+        chatId: chat._id,
         message: request.body.message,
         sender: request.authentication._id,
         date: Date.now()
     });
 
-    reply.save((err) => {
-        if (err) {
-            response.send({error: err});
-            return next();
-        }
+    chat.addMessage(reply);
 
-        return response.send(200, {
-            message: 'replied to message'
-        });
+    await chat.save();
+
+    reply = reply.populate({
+        path: 'sender',
+        populate: {
+            path: 'avatar'
+        }
     });
+
+    response.send(reply);
+    return next();
 }
 
 /**
@@ -83,42 +93,25 @@ function replyMessage(request, response, next) {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function getConversations(request, response, next) {
-    Chat.find({
+async function getConversations(request, response, next) {
+    // Get chats for user
+    const chat = await Chat.find({
         participants: request.authentication._id
-    })
-        .select('_id')
-        .exec((err, chats) => {
-            if (err) {
-                response.send({error: err});
-                return next(err);
+    }).populate({
+        path: 'messages',
+        populate: {
+            path: 'sender',
+            populate: {
+                path: 'avatar'
             }
-
-            const allChats = [];
-            chats.forEach((chat) => {
-
-                Message.find({
-                    chatId: chat._id
-                })
-                    .sort('-date')
-                    .limit(1)
-                    .populate({
-                        path: 'sender',
-                        select: 'displayName'
-                    })
-                    .exec((err, message) => {
-
-                        if (err) {
-                            response.send({error: err});
-                            return next(err);
-                        }
-                        allChats.push(message);
-                        if (allChats.length === chats.length) {
-                            return response.send(200, {chats: allChats});
-                        }
-                    });
-            });
-        });
+        },
+        options: {
+            limit: 1,
+            sort: {date: -1}
+        }
+    });
+    response.send(chat);
+    return next();
 }
 
 /**
@@ -129,26 +122,29 @@ function getConversations(request, response, next) {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-function getConversation(request, response, next) {
-    Message.find({
-        chatId: request.params.chatId
-    })
-        .select('date message sender')
-        .sort('-date')
-        .populate({
+async function getConversation(request, response, next) {
+
+    // Get chats for user
+    const chat = await Chat.findOne({
+        _id: request.params.chatId,
+        participants: request.authentication._id
+    }).populate({
+        path: 'messages',
+        populate: {
             path: 'sender',
-            select: 'displayName'
-        })
-        .exec((err, messages) => {
-            if (err) {
-                response.send({error: err});
-                return next();
+            populate: {
+                path: 'avatar'
             }
-            if (!messages.length) {
-                return response.send(404, {message: 'no chat found'});
-            }
-            return response.send(200, messages);
-        });
+        },
+        options: {
+            limit: 20,
+            sort: {date: -1}
+        }
+    });
+    if(!chat)
+        return next(new errors.BadRequestError('Chat not found.'));
+    response.send(chat);
+    return next();
 }
 
 module.exports = {
