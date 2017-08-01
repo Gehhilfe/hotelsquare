@@ -81,7 +81,7 @@ describe('Chat', () => {
                     res.body.messages.should.be.a('array');
                     res.body.participants.should.be.a('array');
                     res.body.participants[0].should.be.a('object');
-                    res.body.participants[0].avatar.should.be.a('object')
+                    res.body.participants[0].avatar.should.be.a('object');
                     res.body.messages[0].should.be.a('object');
                     res.body.messages.length.should.be.eql(1);
                     res.body.messages[0].message.should.be.equal('first chat');
@@ -179,6 +179,9 @@ describe('Chat', () => {
                 .send(chatdata)
                 .end((err, res) => {
                     res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.sender.should.be.a('object');
+                    res.body.sender.avatar.should.be.a('object');
                     return done();
                 });
         });
