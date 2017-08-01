@@ -8,6 +8,7 @@ const Util = require('../../lib/util');
 const Chat = require('../../app/models/chat');
 const Message = require('../../app/models/message');
 const User = require('../../app/models/user');
+const Image = require('../../app/models/image');
 const jsonwt = require('jsonwebtoken');
 chai.should();
 chai.use(chaiHttp);
@@ -39,7 +40,9 @@ describe('Chat', () => {
         await Util.connectDatabase(mongoose);
         await Promise.all([
             User.remove({}),
-            Chat.remove({})
+            Chat.remove({}),
+            Image.remove({}),
+            Message.remove({})
         ]);
 
         const users = await Promise.all([
@@ -49,6 +52,8 @@ describe('Chat', () => {
         ]);
 
         u = users[0];
+        u.avatar = await Image.create({});
+        u = await u.save();
         token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
         other = users[0];
         third = users[0];
@@ -73,6 +78,11 @@ describe('Chat', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
+                    res.body.messages.should.be.a('array');
+                    res.body.participants.should.be.a('array');
+                    res.body.participants[0].should.be.a('object');
+                    res.body.participants[0].avatar.should.be.a('object')
+                    res.body.messages[0].should.be.a('object');
                     res.body.messages.length.should.be.eql(1);
                     res.body.messages[0].message.should.be.equal('first chat');
                     return done();
@@ -105,6 +115,9 @@ describe('Chat', () => {
                 .send(chatdata)
                 .end((err, res) => {
                     res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.messages.should.be.a('array');
+                    res.body.messages[0].should.be.a('object');
                     return done();
                 });
         });

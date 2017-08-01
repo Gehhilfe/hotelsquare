@@ -43,7 +43,23 @@ async function newChat(request, response, next) {
 
     chat.addMessage(msg);
     chat = await chat.save();
-
+    chat = await chat.populate({
+        path: 'messages',
+        populate: {
+            path: 'sender',
+            populate: {
+                path: 'avatar'
+            }
+        },
+        options: {
+            limit: 1
+        }
+    }).populate({
+        path: 'participants',
+        populate: {
+            path: 'avatar'
+        }
+    }).execPopulate();
     return response.send(chat);
 }
 
@@ -109,6 +125,11 @@ async function getConversations(request, response, next) {
             limit: 1,
             sort: {date: -1}
         }
+    }).populate({
+        path: 'participants',
+        populate: {
+            path: 'avatar'
+        }
     });
     response.send(chat);
     return next();
@@ -140,8 +161,13 @@ async function getConversation(request, response, next) {
             limit: 20,
             sort: {date: -1}
         }
+    }).populate({
+        path: 'participants',
+        populate: {
+            path: 'avatar'
+        }
     });
-    if(!chat)
+    if (!chat)
         return next(new errors.BadRequestError('Chat not found.'));
     response.send(chat);
     return next();
