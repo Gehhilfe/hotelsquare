@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Chat {
 
+    @@SerializedName("_id")
     private String chatId;
     private List<User> participants;
     private List<ChatMessage> messages;
