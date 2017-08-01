@@ -175,7 +175,9 @@ exports.connectDatabase = function (mongoose) {
     if (mongoose.connection.db) {
         return Promise.resolve(mongoose);
     } else {
-        return mongoose.connect(databaseURI());
+        return mongoose.connect(databaseURI(), {
+            useMongoClient: true
+        });
     }
 };
 exports.bootstrap = bootstrap;

@@ -55,8 +55,14 @@ describe('Chat', () => {
 
         chat = await Chat.create({participants: [u, other]});
         otherchat = await Chat.create({participants: [u, other, third]});
-        await Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id});
-        await Message.create({sender: other, message: 'second chat', date: Date.now(), chatId: otherchat._id});
+        const msgA = await Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id});
+        chat.addMessage(msgA);
+        const msgB = await Message.create({sender: other, message: 'second chat', date: Date.now(), chatId: otherchat._id});
+        otherchat.addMessage(msgB);
+        await Promise.all([
+            chat.save(),
+            otherchat.save()
+        ]);
     }));
 
     describe('GET chat', () => {
@@ -66,10 +72,9 @@ describe('Chat', () => {
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.be.a('array');
-                    res.body.length.should.be.eql(1);
-                    res.body[0].sender.displayName.should.be.equal('peter');
-                    res.body[0].message.should.be.equal('first chat');
+                    res.body.should.be.a('object');
+                    res.body.messages.length.should.be.eql(1);
+                    res.body.messages[0].message.should.be.equal('first chat');
                     return done();
                 });
         });
@@ -79,7 +84,7 @@ describe('Chat', () => {
                 .get('/chats/' + mongoose.Types.ObjectId())
                 .set('x-auth', token)
                 .end((err, res) => {
-                    res.should.have.status(404);
+                    res.should.have.status(400);
                     return done();
                 });
         });
@@ -100,8 +105,6 @@ describe('Chat', () => {
                 .send(chatdata)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.have.property('message', 'New Chat');
-                    res.body.should.have.property('chatId');
                     return done();
                 });
         });
@@ -115,7 +118,7 @@ describe('Chat', () => {
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
-                    res.should.have.status(422);
+                    res.should.have.status(400);
                     return done();
                 });
         });
@@ -130,7 +133,7 @@ describe('Chat', () => {
                 .set('x-auth', token)
                 .send(chatdata)
                 .end((err, res) => {
-                    res.should.have.status(422);
+                    res.should.have.status(400);
                     return done();
                 });
         });
@@ -144,8 +147,8 @@ describe('Chat', () => {
                 .set('x-auth', token)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.chats[0].length.should.be.eql(1);
-                    res.body.chats.length.should.be.eql(2);
+                    res.body.length.should.be.eql(2);
+                    res.body[0].messages.length.should.be.eql(1);
                     return done();
                 });
         });
@@ -163,7 +166,6 @@ describe('Chat', () => {
                 .send(chatdata)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.have.property('message', 'replied to message');
                     return done();
                 });
         });

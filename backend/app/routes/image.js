@@ -3,6 +3,7 @@
 const _ = require('lodash');
 
 const restify = require('restify');
+const restify_errors = require('restify-errors');
 const Image = require('../models/image');
 
 /**
@@ -18,7 +19,7 @@ async function getStat(request, response, next) {
     const size = request.params.size;
 
     if (!_.inRange(size, 3))
-        throw new restify.errors.BadRequestError({
+        throw new restify_errors.BadRequestError({
             field: 'size',
             message: 'Size needs to be 0<=size<=2.'
         });
@@ -44,7 +45,7 @@ async function getData(request, response, next) {
     const size = request.params.size;
 
     if (!_.inRange(size, 3))
-        throw new restify.errors.BadRequestError({
+        throw new restify_errors.BadRequestError({
             field: 'size',
             message: 'Size needs to be 0<=size<=2.'
         });

@@ -3,6 +3,11 @@
     "host": "mongo",
     "name": "staging"
   },
+  "email": {
+    "server": "teamstimi.de",
+    "mail": "hotelsquare@stimi.ovh",
+    "password": "hZrxg9GCFGgrYZGr"
+  },
   "jwt": {
     "secret": "secret",
     "options": {

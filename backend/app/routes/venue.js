@@ -2,6 +2,7 @@
 
 const _ = require('lodash');
 const restify = require('restify');
+const restify_errors = require('restify-errors');
 const Venue = require('../models/venue');
 const googleapilib = require('googleplaces');
 const NodeGeocoder = require('node-geocoder');
@@ -80,7 +81,7 @@ async function getLocationForName(locationName) {
         result = await geocoder.geocode(locationName);
 
         if (!result || result.length === 0) {
-            throw new restify.errors.BadRequestError({
+            throw new restify_errors.BadRequestError({
                 message: 'No valid location for location name found.'
             });
         }
@@ -125,7 +126,7 @@ async function queryVenue(request, response, next) {
     const keyword = request.body.keyword;
 
     if (keyword.length < 3) {
-        return next(new restify.errors.BadRequestError({
+        return next(new restify_errors.BadRequestError({
             field: 'keyword',
             message: 'The search keyword needs to be at least 3 characters'
         }));

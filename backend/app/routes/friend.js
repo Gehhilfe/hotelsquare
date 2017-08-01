@@ -19,7 +19,10 @@ async function getFriends(request, response, next) {
     const friends = user.friends.length;
 
     user = await user.populate({
-        path: 'friends avatar',
+        path: 'friends',
+        populate: {
+            path: 'avatar'
+        },
         options: {
             limit: 20,
             sort: {updated_at: -1},
@@ -52,8 +55,8 @@ async function getNearByFriends(request, response, next) {
     }).where('location').near({
         center: request.body,
         maxDistance: radius
-    });
-    response.send(_.map(user, (it) => it.toJSONPublic()));
+    }).populate('avatar');
+    response.send(_.map(users, (it) => it.toJSONPublic()));
     return next();
 }
 

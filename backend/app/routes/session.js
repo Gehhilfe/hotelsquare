@@ -19,12 +19,11 @@ const User = mongoose.model('User');
  */
 function postSession(request, response, next) {
     User.login(request.params).then((u) => {
-        const token = jwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
+        const token = jwt.sign(u.toJSONToken(), config.jwt.secret, config.jwt.options);
         response.json({token: token});
         return next();
     }, () => {
-        response.status(401);
-        response.json({error: 'Login credentials wrong!'});
+        response.json(401, {error: 'Login credentials wrong!'});
         return next();
     });
 }

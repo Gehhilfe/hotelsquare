@@ -1,6 +1,9 @@
 FROM node:7.10.0
 ENV NODE_ENV staging
 
+# Set timezone
+RUN ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app

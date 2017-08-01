@@ -31,13 +31,14 @@ describe('venue', () => {
     let user, token;
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
-
         await Util.connectDatabase(mongoose);
-        await Venue.remove({});
-        await User.remove({});
-        await SearchRequest.remove({});
-        await Image.remove({});
-
+        await Promise.all([
+            Venue.remove({}),
+            User.remove({}),
+            SearchRequest.remove({}),
+            Image.remove({}),
+            Comment.Comment.remove({})
+        ]);
         const res = await request(server)
             .post('/searches/venues')
             .send({
@@ -49,6 +50,9 @@ describe('venue', () => {
         await request(server)
             .get('/venues/' + aVenue._id + '');
         user = await User.create({name: 'peter111', email: 'peter123@cool.de', password: 'peter99', gender: 'm'});
+        const img = await Image.create({});
+        user.avatar = img;
+        user = await user.save();
         const bVenue = await Venue.findOne({_id: aVenue._id});
         bVenue.images.push(await Image.create({}));
         await bVenue.save();
@@ -77,6 +81,18 @@ describe('venue', () => {
                 .set('x-auth', token);
             res.body.should.have.property('count', 2);
         })));
+    });
+
+    describe('comments', () => {
+        it('should add a text comment', mochaAsync(async () => {
+            const res = await request(server)
+                .post('/venues/' + aVenue._id + '/comments/text')
+                .set('x-auth', token)
+                .send({
+                    text: 'Test comment'
+                });
+            res.should.have.status(200);
+        }));
     });
 });
 

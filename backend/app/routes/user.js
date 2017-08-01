@@ -1,6 +1,11 @@
 'use strict';
 
+const config = require('config');
 const restify = require('restify');
+const restify_errors = require('restify-errors');
+
+const nodemailer = require('nodemailer');
+
 const User = require('../models/user');
 const Image = require('../models/image');
 
@@ -75,7 +80,7 @@ async function profile(request, response, next) {
 
     let user = await User.findOne({name: request.params.name}).populate('avatar').exec();
     if (user === null)
-        return next(new restify.errors.NotFoundError());
+        return next(new restify_errors.NotFoundError());
     if (!selfRequest) {
         // Remove sensitive information
         user = user.toJSONPublic();
@@ -131,6 +136,28 @@ async function updateUser(request, response, next) {
 async function register(request, response, next) {
     handleValidation(next, async () => {
         const user = await User.create(request.params);
+
+        if(config.email) {
+            const transporter = nodemailer.createTransport({
+                host: config.email.server,
+                port: 587,
+                secure: false,
+                requireTLS: true,
+                auth: {
+                    user: config.email.mail,
+                    pass: config.email.password
+                }
+            });
+
+            const mailOptions = {
+                from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
+                to: user.email,
+                subject: 'Welcome to HOTELSQUARE',
+                text: 'Hello '+user.displayName+', have fun using HOTELSQUARE!'
+            };
+
+            await transporter.sendMail(mailOptions);
+        }
         response.json(user);
         return next();
     });
