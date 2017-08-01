@@ -12,6 +12,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
+import tk.internet.praktikum.foursquare.api.bean.ChatMessage;
 import tk.internet.praktikum.foursquare.api.bean.Message;
 import tk.internet.praktikum.foursquare.api.bean.RecipientMessage;
 
@@ -24,7 +25,7 @@ public interface ChatService {
      * @return chatId and status message ("New Chat")
      */
     @POST("chats")
-    Observable<Object> newChat(@Body RecipientMessage message);
+    Observable<Chat> newChat(@Body RecipientMessage message);
 
     /**
      * Replies to an old message
@@ -33,7 +34,7 @@ public interface ChatService {
      * @return status message ("replied to message")
      */
     @POST("chats/{chatId}/messages")
-    Observable<Object> replyMessage(@Path("chatId") String chatId, @Body Message message);
+    Observable<ChatMessage> replyMessage(@Path("chatId") String chatId, @Body Message message);
 
     /**
      * Retrieves chat of currently authenticated user with id chatId

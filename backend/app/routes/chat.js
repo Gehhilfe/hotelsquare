@@ -31,7 +31,7 @@ async function newChat(request, response, next) {
         return next(new errors.BadRequestError('Unknown recipient.'));
     }
 
-    const chat = await Chat.create({
+    let chat = await Chat.create({
         participants: [request.authentication._id, recipients]
     });
 
@@ -41,10 +41,10 @@ async function newChat(request, response, next) {
         sender: request.authentication._id
     });
 
-    return response.send(200, {
-        message: msg,
-        chatId: chat._id
-    });
+    chat.addMessage(msg);
+    chat = await chat.save();
+
+    return response.send(chat);
 }
 
 /**
@@ -63,7 +63,7 @@ async function replyMessage(request, response, next) {
     if (_.find(chat.participants, request.authentication._id))
         return next(new errors.BadRequestError('You are not are participant of this chat.'));
 
-    const reply = await Message.create({
+    let reply = await Message.create({
         chatId: chat._id,
         message: request.body.message,
         sender: request.authentication._id,
@@ -73,6 +73,13 @@ async function replyMessage(request, response, next) {
     chat.addMessage(reply);
 
     await chat.save();
+
+    reply = reply.populate({
+        path: 'sender',
+        populate: {
+            path: 'avatar'
+        }
+    });
 
     response.send(reply);
     return next();
