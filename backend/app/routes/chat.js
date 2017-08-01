@@ -90,12 +90,12 @@ async function replyMessage(request, response, next) {
 
     await chat.save();
 
-    reply = reply.populate({
+    reply = await reply.populate({
         path: 'sender',
         populate: {
             path: 'avatar'
         }
-    });
+    }).execPopulate();
 
     response.send(reply);
     return next();
