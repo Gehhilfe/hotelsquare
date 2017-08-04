@@ -64,6 +64,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private Map <Marker, Venue> markerVenueMap;
     private Map <Marker, User> markerFriendMap;
     private Map <Venue, Bitmap> venueBitmapMap;
+    private Map <User, Bitmap> friendBitmapMap;
 
     public VenuesOnMapFragment() {
         // Required empty public constructor
@@ -85,6 +86,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         markerVenueMap = new HashMap<Marker, Venue>();
         markerFriendMap = new HashMap<Marker, User>();
         venueBitmapMap = new HashMap<Venue, Bitmap>();
+        friendBitmapMap = new HashMap<User, Bitmap>();
 
         userLocation = new Location(8.656868, 49.876171);
         this.setRetainInstance(true);
@@ -142,6 +144,12 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
                     User friend = markerFriendMap.get(marker);
 
+                    // Set InfoWindow Text
+                    TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
+                    tvTitle.setText(friend.getDisplayName());
+
+                    ImageView venueImage = ((ImageView) myContentsView.findViewById(R.id.img));
+                    venueImage.setImageBitmap(friendBitmapMap.get(friend));
 
                 } else {
                     Log.d("KEYFOUND", "Marker was User");
@@ -247,6 +255,18 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position))
         );
         markerFriendMap.put(tmp, friend);
+
+        // load Images for marker
+        Log.d("KEYFOUND", "Is not null: " + friendBitmapMap.size() + " " + friend + " " + friendBitmapMap.containsKey(friend));
+        if(friend.getAvatar() != null){
+        ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+            imageCacheLoader.loadBitmap(friend.getAvatar(), ImageSize.SMALL)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(bitmap -> {
+                        friendBitmapMap.put(friend, bitmap);
+                    });
+         }
     }
 
     public void updateFriendsMarker(){
@@ -258,16 +278,17 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
             //ProfileService profileService = ServiceFactory.createRetrofitService(ProfileService.class, URL);
 
-            profileService.getNearByFriends(userLocation).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            profileService.getNearByFriends(userLocation)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(nearbyFriends -> {
                         friends = nearbyFriends;
                         Log.d("KEYFOUND", "Size of Nearby Friends " + friends.size());
 
                         for(User f : friends){
                             updateFriendsLocation(f);
-                            Log.d("KEYFOUND", "SetMarker");
+                            Log.d("KEYFOUND", "SetMarker: " + f);
                         }
-
 
                     });
 
