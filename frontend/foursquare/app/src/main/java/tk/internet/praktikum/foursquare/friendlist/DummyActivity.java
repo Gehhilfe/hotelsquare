@@ -35,20 +35,20 @@ public class DummyActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dummy_activity);
-        
+
         startId = (TextView) findViewById(R.id.start_id);
         loadId = (TextView) findViewById(R.id.load_id);
 
         startBtn = (Button) findViewById(R.id.start_chat);
         loadBtn = (Button) findViewById(R.id.load_chat);
-        
+
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startChat();
             }
         });
-        
+
         loadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
