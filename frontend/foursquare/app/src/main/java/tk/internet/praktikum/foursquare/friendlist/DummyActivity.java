@@ -63,7 +63,7 @@ public class DummyActivity extends AppCompatActivity {
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
         List<String> recipitants = new ArrayList<>();
-        recipitants.add("597e2a61d0f960001443dbc8");
+        recipitants.add("5980da1eaead6e0015b903be");
         RecipientMessage rm = new RecipientMessage(recipitants, "Test Chat mit Janus");
 
         try {
