@@ -86,7 +86,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         markerFriendMap = new HashMap<Marker, User>();
         venueBitmapMap = new HashMap<Venue, Bitmap>();
 
-        userLocation = new Location(49.876171, 8.656868);
+        userLocation = new Location(8.656868, 49.876171);
         this.setRetainInstance(true);
 
         return view;
@@ -262,17 +262,21 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     .subscribe(nearbyFriends -> {
                         friends = nearbyFriends;
                         Log.d("KEYFOUND", "Size of Nearby Friends " + friends.size());
+
+                        for(User f : friends){
+                            updateFriendsLocation(f);
+                            Log.d("KEYFOUND", "SetMarker");
+                        }
+
+
                     });
-        for(User f : friends){
-            updateFriendsLocation(f);
-            Log.d("KEYFOUND", "SetMarker");
-        }
+
     }
 
     public void setUser(){
         //TODO get LocationData...
         myPosition = map.addMarker(new MarkerOptions()
-        .position(new LatLng(userLocation.getLongitude(),userLocation.getLatitude()))
+        .position(new LatLng(userLocation.getLatitude(),userLocation.getLongitude()))
         .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
 
     }
