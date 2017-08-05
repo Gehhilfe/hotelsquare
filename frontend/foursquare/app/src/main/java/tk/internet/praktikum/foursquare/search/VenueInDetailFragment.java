@@ -86,11 +86,16 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private AlertDialog venueImageCommentDialog;
 
     private Bitmap venueImageComment;
+    private LinearLayoutManager linearLayoutManager;
+    private int visibleItemCount;
+    private int itemCount;
+    private int lastVisibleItemPosition;
     private int currentPage;
     private ImageView selectedImageView;
     private final int REQUEST_CAMERA = 0;
     private final int REQUEST_GALLERY = 1;
-
+    private Venue currentVenue;
+    private CommentVenueAdapter commentVenueAdapter;
     public static VenueInDetailFragment newInstance(String param1, String param2) {
         VenueInDetailFragment fragment = new VenueInDetailFragment();
 
@@ -127,7 +132,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
             showUpImageCommentDialog();
         });
         recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
-
+        linearLayoutManager=new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
         progressDialog = new ProgressDialog(getActivity(), 1);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Waiting for seeing venue details...");
@@ -138,7 +144,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
         currentPage = 0;
         renderContent();
-
+        recyclerViewOnScrollListener();
         return view;
     }
 
@@ -158,6 +164,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(venue -> {
+                            currentVenue=venue;
                             renderVenueInformation(venue);
                             Location location = venue.getLocation();
                             updateVenueLocation(location);
@@ -240,16 +247,13 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     }
 
     private void showUpTextCommentDialog() {
-        //Todo
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View textCommentView = inflater.inflate(R.layout.venue_comment, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
-
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked OK button
-                //Todo
                 // call venueServices
                 System.out.println("*** comment text");
                 EditText textCommentContent = (EditText) textCommentView.findViewById(R.id.venue_text_comment_content);
@@ -272,6 +276,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(textComment1 -> {
                                         Log.d(LOG, "##### textcomment: " + textComment1.getId());
+                                        addComment(textComment1);
                                     },
                                     throwable -> {
                                         Log.d(LOG, throwable.getMessage());
@@ -320,6 +325,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(imageComment1 -> {
                                     Log.d(LOG, "##### imageComment: " + imageComment1.getId());
+                                    addComment(imageComment1);
                                 },
                                 throwable -> {
                                     Log.d(LOG, throwable.getMessage());
@@ -407,9 +413,47 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
 
     public void updateRecyclerView(List<Comment> comments) {
         Log.d(LOG, "***size :" + comments.size());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new CommentVenueAdapter(comments, this));
+        if(currentPage==0) {
+            commentVenueAdapter = new CommentVenueAdapter(comments, this);
+            recyclerView.setAdapter(commentVenueAdapter);
+        }
+        else{
+            commentVenueAdapter.addMoreCommentVenues(comments);
+        }
+
     }
+
+    public void addComment(Comment comment){
+        commentVenueAdapter.addCommentVenue(comment);
+    }
+
+    public void recyclerViewOnScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                visibleItemCount = linearLayoutManager.getChildCount();
+                itemCount = linearLayoutManager.getItemCount();
+                lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
+                if((lastVisibleItemPosition+visibleItemCount)>=itemCount){
+                    Log.d(LOG,"lastVisibleItemPosition "+lastVisibleItemPosition);
+                    Log.d(LOG,"visibleItemCount "+visibleItemCount);
+                    Log.d(LOG,"itemCount "+itemCount);
+                    currentPage+=1;
+                    renderCommentVenue(currentVenue);
+                }
+
+
+            }
+        });
+    }
+
 
 
 }

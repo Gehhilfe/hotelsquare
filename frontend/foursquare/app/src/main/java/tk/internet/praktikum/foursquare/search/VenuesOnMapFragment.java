@@ -2,10 +2,7 @@ package tk.internet.praktikum.foursquare.search;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-//import android.location.Location;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
@@ -38,22 +35,22 @@ import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
-
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
-import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.MeFragment;
-import tk.internet.praktikum.foursquare.user.ProfileFragment;
+
+//import android.location.Location;
 
 public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback {
 
     private View view;
     private GoogleMap map;
     private RecyclerView recyclerView;
-    private String URL = "https://dev.ip.stimi.ovh/";;
+    private String URL = "https://dev.ip.stimi.ovh/";
     private Venue tmp;
     private Bitmap bmap;
     private Location userLocation;
@@ -78,7 +75,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_venues_on_map, container, false);
 
-        recyclerView =(RecyclerView) view.findViewById(R.id.searching_results_on_map);
+        //recyclerView =(RecyclerView) view.findViewById(R.id.searching_results_on_map);
         SupportMapFragment mapFragment =((SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.venues_mapView));
         mapFragment.getMapAsync(this);

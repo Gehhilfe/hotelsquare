@@ -196,7 +196,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             // Add more optional filters later
 
             VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
-            venueService.queryVenue(venueSearchQuery, currentPage).subscribeOn(Schedulers.newThread())
+            venueService.queryVenue(venueSearchQuery).subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(venueSearchResult -> {
                                 venueSearchResult.getResults()
@@ -355,7 +355,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             initVenueStatePageAdapter();
         }
         venuesOnMapFragment.updateVenuesMarker(venues);
-        venuesOnMapFragment.updateRecyclerView(venues);
+        //venuesOnMapFragment.updateRecyclerView(venues);
         venuesViewPager.setCurrentItem(1);
     }
 
