@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const config = require('config');
 const User = require('./../app/models/user');
+const Chat = require('./../app/models/chat');
+const Message = require('./../app/models/message');
 const bunyan = require('bunyan');
 const restifyBunyanLogger = require('restify-bunyan-logger');
 const restify = require('restify');
@@ -47,6 +49,23 @@ function bootstrapFriends(data) {
 }
 
 /**
+ * Creates predefined chat instances including messages
+ * @param {Object} data bootstrap information
+ * @returns {Promise.<void>} Promise of all chats created
+ */
+async function bootstrapChat(data) {
+    await Promise.all(_.each(data, async (it) => {
+        const participants = await User.find({'displayName': { $in: it.participants }});
+        const chat = await Chat.create({
+            participants: participants
+        });
+        const msgs = await Promise.all(_.map(it.messages, (it) => Message.create({sender: _.find(participants, ['displayName', it.from]), message: it.message, chatId: chat})));
+        _.each(msgs, (it) => chat.addMessage(it));
+        await chat.save();
+    }));
+}
+
+/**
  * Boostrap friend requests for user model
  * @param {Array} data Friend request entry.from to entry.to
  * @returns {Promise}  Promise of all connection are created
@@ -76,12 +95,15 @@ async function initDatabase() {
         const Message = require('./../app/models/message');
         const SearchRequest = require('./../app/models/searchrequest');
         const GeocodeResult = require('./../app/models/geocoderesult');
+        const Chat = require('./../app/models/chat');
 
         await Promise.all([
             Venue.remove({}),
             Message.remove({}),
             SearchRequest.remove({}),
-            GeocodeResult.remove({})
+            GeocodeResult.remove({}),
+            Chat.remove({}),
+            Message.remove({})
         ]);
 
         if (config.bootstrap) {
@@ -94,6 +116,9 @@ async function initDatabase() {
             }
             if (config.bootstrap.UserFriendRequest) {
                 await bootstrapFriendRequets(config.bootstrap.UserFriendRequest);
+            }
+            if(config.bootstrap.Chat) {
+                await bootstrapChat(config.bootstrap.Chat);
             }
         }
     }
