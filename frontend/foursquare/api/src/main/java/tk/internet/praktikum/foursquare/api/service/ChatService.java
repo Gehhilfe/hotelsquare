@@ -48,6 +48,15 @@ public interface ChatService {
     /**
      * Retrieves chat of currently authenticated user with id chatId
      *
+     * @param chatId id of chat
+     * @return chat history of passed ID
+     */
+    @GET("chats/{chatId}/{page}")
+    Observable<Chat> getConversation(@Path("chatId") String chatId, @Path("page") int page);
+
+    /**
+     * Retrieves chat of currently authenticated user with id chatId
+     *
      * @return all chats with the last message as teaser (you can get more if you want... ;)) for the authenticated user
      */
     @GET("chats")
