@@ -17,7 +17,7 @@
         android:layout_marginRight="5dip"
         android:padding="3dip">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/item_image"
             android:layout_width="50dip"
             android:layout_height="50dip"

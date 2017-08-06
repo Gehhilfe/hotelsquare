@@ -88,6 +88,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         seekBarView = (TextView) view.findViewById(R.id.seekBarView);
 
         mapViewButton = (ToggleButton) view.findViewById(R.id.is_map_view);
+        mapViewButton.setText(null);
+        mapViewButton.setTextOff(null);
+        mapViewButton.setTextOn(null);
         isMapView = false;
         mapViewButton.setChecked(true);
         filterLocation.onCommitCompletion(null);
@@ -207,11 +210,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                                                 }
                                         );
                                 venues = venueSearchResult.getResults();
-                                Log.d(LOG,"isMapView: "+isMapView);
-                                if (!isMapView)
+                                if (mapViewButton.isChecked())
                                     displayVenuesList();
                                 else {
-                                    //TODO
                                     //calls map services to display positions
                                     displayVenuesOnMap();
                                 }
@@ -219,7 +220,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
                             },
                             throwable -> {
-                                //TODO
                                 //handle exception
                                 Log.d(LOG, throwable.toString());
 
@@ -317,15 +317,14 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             @Override
             public void onClick(View v) {
                 if (venues != null && venues.size() > 0) {
-                    if (isMapView) {
-                        //TODO
+                    if (mapViewButton.isChecked()) {
                         // change toggle button to list view
-                        isMapView = false;
+                       // isMapView = false;
                         displayVenuesList();
                     } else {
                         //TODO
                         // change toggle button to map view
-                        isMapView = true;
+                       // isMapView = true;
                         displayVenuesOnMap();
 
                     }

@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -179,6 +180,11 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(bitmap -> {
+                                            imageVenueOne.setMaxHeight(imageVenueOne.getWidth());
+                                            imageVenueTwo.setMaxHeight(imageVenueTwo.getWidth());
+                                            imageVenueThree.setMaxHeight(imageVenueThree.getWidth());
+                                            Log.d(LOG,"imageView Width: "+imageVenueOne.getWidth());
+                                            Log.d(LOG,"bitmap width: "+bitmap.getWidth());
                                             imageVenueOne.setImageBitmap(bitmap);
                                             imageVenueTwo.setImageBitmap(bitmap);
                                             imageVenueThree.setImageBitmap(bitmap);
@@ -416,6 +422,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         if(currentPage==0) {
             commentVenueAdapter = new CommentVenueAdapter(comments, this);
             recyclerView.setAdapter(commentVenueAdapter);
+            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+
         }
         else{
             commentVenueAdapter.addMoreCommentVenues(comments);
