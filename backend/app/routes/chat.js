@@ -145,6 +145,10 @@ async function getConversations(request, response, next) {
  */
 async function getConversation(request, response, next) {
 
+    let page = 0;
+    if(request.params.page)
+        page = request.params.page;
+
     // Get chats for user
     const chat = await Chat.findOne({
         _id: request.params.chatId,
@@ -159,7 +163,8 @@ async function getConversation(request, response, next) {
         },
         options: {
             limit: 20,
-            sort: {date: -1}
+            sort: {date: -1},
+            skip: page * 20
         }
     }).populate({
         path: 'participants',

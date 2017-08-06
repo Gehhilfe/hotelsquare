@@ -83,6 +83,7 @@ server.put('profile/friend_requests/:name', auth, handlePromiseReject(user.confi
 
 // Chat
 server.get('chats/:chatId', auth, handlePromiseReject(chat.getConversation));
+server.get('chats/:chatId/:page', auth, handlePromiseReject(chat.getConversation));
 server.post('chats', auth, handlePromiseReject(chat.newChat));
 server.post('chats/:chatId/messages', auth, handlePromiseReject(chat.replyMessage));
 server.get('chats', auth, handlePromiseReject(chat.getConversations));
