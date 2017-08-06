@@ -82,6 +82,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private ProgressDialog progressDialog;
     private FloatingActionButton venueTextCommentButton;
     private FloatingActionButton venueImageCommentButton;
+    private FloatingActionButton venueCheckInButton;
     private RecyclerView recyclerView;
     private AlertDialog venueTextCommentDialog;
     private AlertDialog venueImageCommentDialog;
@@ -93,6 +94,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private int lastVisibleItemPosition;
     private int currentPage;
     private ImageView selectedImageView;
+    private TextView venueRating;
+    private TextView venueCheckIn;
     private final int REQUEST_CAMERA = 0;
     private final int REQUEST_GALLERY = 1;
     private Venue currentVenue;
@@ -123,6 +126,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         venueIsOpened = (TextView) view.findViewById(R.id.venue_is_opened);
         venueWebsite = (TextView) view.findViewById(R.id.venue_website);
         venueWebsiteLabel = (TextView) view.findViewById(R.id.venue_website_label);
+        venueRating=(TextView) view.findViewById(R.id.venue_rating);
+        venueCheckIn=(TextView) view.findViewById(R.id.venue_checkinCount);
 
         venueTextCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_text_comment_button);
         venueTextCommentButton.setOnClickListener(v -> {
@@ -132,6 +137,9 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         venueImageCommentButton.setOnClickListener(v -> {
             showUpImageCommentDialog();
         });
+        venueCheckInButton=(FloatingActionButton)view.findViewById(R.id.venue_checkin);
+        venueCheckInButton.setOnClickListener(v->venueCheckIn());
+
         recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
         linearLayoutManager=new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -148,6 +156,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         recyclerViewOnScrollListener();
         return view;
     }
+
+
 
     public String getVenueId() {
         return venueId;
@@ -234,6 +244,9 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
             this.venueIsOpened.setText(getString(R.string.isOpened));
         else
             this.venueIsOpened.setText(getString(R.string.closed));
+
+        this.venueRating.setText(String.valueOf(venue.getRating()));
+        this.venueCheckIn.setText(String.valueOf(venue.getCheckInCount()));
     }
 
     public void renderCommentVenue(Venue venue) {
@@ -357,6 +370,23 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         venueImageCommentDialog.show();
     }
 
+
+    private void venueCheckIn() {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
+        String token = sharedPreferences.getString(Constants.TOKEN, "");
+        Log.d(LOG, "token: " + token);
+        VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL, token);
+        venueService.checkin(venueId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(checkInInformation -> {
+                           Log.d(LOG,"checkIn Count: "+checkInInformation.getCount());
+                            venueCheckIn.setText(String.valueOf(checkInInformation.getCount()));
+                        },
+                        throwable -> {
+
+                        });
+    }
 
     private void uploadPicture() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

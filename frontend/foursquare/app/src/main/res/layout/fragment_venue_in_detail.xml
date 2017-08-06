@@ -103,6 +103,7 @@
                             android:layout_centerHorizontal="true"
                             android:layout_centerVertical="true"
                             android:layout_centerInParent="true"
+                            android:layout_marginLeft="5dp"
                             >
                             <ImageView
                                 android:layout_width="wrap_content"
@@ -114,8 +115,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:color="@color/transparent"
+                                android:paddingLeft="5dp"
                                 app:layout_collapseMode="parallax"
-                                android:text="Rating "/>
+                                />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="0dp"
@@ -133,6 +135,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:layout_collapseMode="parallax"
+                                android:paddingLeft="5dp"
                                 android:color="@color/transparent"
                                 android:text="Like"/>
                         </LinearLayout>
@@ -142,18 +145,20 @@
                             android:layout_weight="33"
                             android:layout_centerHorizontal="true"
                             android:layout_centerVertical="true"
-                            android:layout_centerInParent="true">
+                            android:layout_centerInParent="true"
+                            android:layout_marginRight="5dp">
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:srcCompat="@mipmap/venue_checkin"/>
                             <TextView
-                                android:id="@+id/venue_dislike"
+                                android:id="@+id/venue_checkinCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:layout_collapseMode="parallax"
                                 android:color="@color/transparent"
-                                android:text="Check in"/>
+                                android:paddingLeft="5dp"
+                                />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -232,7 +237,7 @@
                     fab:fab_size="mini" />
 
                 <com.github.clans.fab.FloatingActionButton
-                    android:id="@+id/checkin"
+                    android:id="@+id/venue_checkin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|right"
