@@ -1,12 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
+const config = require('config');
 const restify = require('restify');
 const restify_errors = require('restify-errors');
 const Venue = require('../models/venue');
 const googleapilib = require('googleplaces');
 const NodeGeocoder = require('node-geocoder');
-const config = require('config');
 const SearchRequest = require('../models/searchrequest');
 const GeocodeResult = require('../models/geocoderesult');
 const User = require('../models/user');
@@ -135,7 +135,7 @@ async function queryVenue(request, response, next) {
     let keywords = _.split(keyword, ' ');
 
     keywords = _.map(keywords, (it) => {
-        let n = _.find(config.keywords);
+        let n = _.find(config.keywords, it);
         if(!n)
             n = it;
         return n;
