@@ -45,7 +45,7 @@ async function importGoogleResult(entry) {
     if (existing.length > 0)
         return;
 
-    const photo_reference = (entry.photos && entry.photos.length > 0)?entry.photos[0].photo_reference:'';
+    const photo_reference = (entry.photos && entry.photos.length > 0) ? entry.photos[0].photo_reference : '';
 
     return Venue.create({
         name: entry.name,
@@ -114,7 +114,7 @@ async function queryVenue(request, response, next) {
     if (request.params.page)
         page = request.params.page;
 
-    if(request.body.only_open){
+    if (request.body.only_open) {
         only_open = request.body.only_open;
     }
 
@@ -134,12 +134,7 @@ async function queryVenue(request, response, next) {
 
     let keywords = _.split(keyword, ' ');
 
-    keywords = _.map(keywords, (it) => {
-        let n = _.find(config.keywords, it.toLowerCase());
-        if(!n)
-            n = it;
-        return n;
-    });
+    keywords = _.map(keywords, (it) => _.get(config.keywords, it.toLowerCase(), it.toLowerCase()));
 
     keyword = _.join(keywords, ' ');
 
@@ -158,7 +153,7 @@ async function queryVenue(request, response, next) {
     // search in our database for query
     let venues = await searchVenuesInDB(location, keyword, radius, page, 10);
     venues = _.map(venues, (v) => v.toJSONSearchResult());
-    if(only_open){
+    if (only_open) {
         venues = _.filter(venues, (v) => v.isOpen());
     }
     response.send({
@@ -258,7 +253,7 @@ function queryAllVenuesFromGoogle(location, keyword, next_page_token = '') {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function getComments(request, response, next){
+async function getComments(request, response, next) {
     const venue = await Venue.findOne({_id: request.params.id}).populate({path: 'comments', model: 'Comment'});
     await Venue.populate(venue, {path: 'comments.author', model: 'User'});
     await Venue.populate(venue, {path: 'comments.comments', model: 'Comment'});
