@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
     android:paddingTop="15dp"
     android:focusable="true"
     android:focusableInTouchMode="true">
-
+    <LinearLayout
+        android:id="@+id/profile_linear_layout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -169,8 +174,38 @@
                 android:enabled="false"
                 android:text="Anonymous" />
         </RadioGroup>
-
     </RelativeLayout>
+    </LinearLayout>
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/profile_floating_action_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|right"
+        app:menu_fab_size="mini">
 
-
-</LinearLayout>
+    <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/profile_upload_avatar_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            fab:fab_label="Upload Avatar"
+            fab:fab_size="mini" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/profile_edit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:src="@mipmap/text_commemnt"
+            fab:fab_label="Edit Profile"
+            fab:fab_size="mini" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/profile_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            fab:fab_label="Save changes"
+            fab:fab_size="mini" />
+    </com.github.clans.fab.FloatingActionMenu>
+</android.support.design.widget.CoordinatorLayout>

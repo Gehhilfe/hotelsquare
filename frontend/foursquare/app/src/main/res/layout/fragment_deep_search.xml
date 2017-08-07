@@ -70,7 +70,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_weight="10"
                 android:visibility="visible"
-                android:background="@mipmap/ic_list_view" />
+                android:background="@drawable/toogle_map_view_button" />
 
 
         </LinearLayout>

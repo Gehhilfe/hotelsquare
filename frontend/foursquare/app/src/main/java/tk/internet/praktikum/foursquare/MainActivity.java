@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity
 
     }else if (id == R.id.nav_manage) {
             // call history activity
-            Intent intent = new Intent(getApplicationContext(), DummyProfile.class);
+            Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
             startActivityForResult(intent, 0);
         }
 

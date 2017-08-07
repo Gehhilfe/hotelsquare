@@ -71,6 +71,10 @@ public class Venue {
         return rating;
     }
 
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
     public String getName() {
         return name;
     }

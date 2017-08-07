@@ -13,8 +13,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
-            android:adjustViewBounds="true"
-            android:src="@drawable/friend_position"/>
+            android:adjustViewBounds="true"/>
 
         <TextView
             android:id="@+id/title"
@@ -31,7 +30,7 @@
             android:textSize="10dp"/>
 
         <TextView
-            android:id="@+id/adress"
+            android:id="@+id/isopen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="10dp"/>

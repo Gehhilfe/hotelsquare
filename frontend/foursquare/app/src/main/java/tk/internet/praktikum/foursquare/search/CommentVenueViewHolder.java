@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -54,27 +55,33 @@ public class CommentVenueViewHolder extends RecyclerView.ViewHolder implements V
             ImageComment imageComment=(ImageComment)comment;
             comment_content.setVisibility(View.INVISIBLE);
             Image image=imageComment.getImage();
-            imageCacheLoader.loadBitmap(image, ImageSize.SMALL)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(bitmap -> {
-                        comment_image_content.setImageBitmap(bitmap);
+            if(image!=null) {
+                imageCacheLoader.loadBitmap(image, ImageSize.SMALL)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(bitmap -> {
+                            comment_image_content.setImageBitmap(bitmap);
 
-                    });
+                        });
+            }
         }
 
         Image avatar=comment.getAuthor().getAvatar();
+        if(avatar!=null) {
+            imageCacheLoader.loadBitmap(avatar, ImageSize.SMALL)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(bitmap -> {
+                        user_avatar.setImageBitmap(bitmap);
 
-        imageCacheLoader.loadBitmap(avatar, ImageSize.SMALL)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(bitmap -> {
-                    user_avatar.setImageBitmap(bitmap);
-
-                });
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-        String dateToString = formatter.format(comment.getDate());
-        comment_date.setText(dateToString);
+                    });
+        }
+        Date date= comment.getDate();
+        if (date!=null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+            String dateToString = formatter.format(comment.getDate());
+            comment_date.setText(dateToString);
+        }
 
 
     }

@@ -20,6 +20,27 @@ public abstract class Comment {
     public void setAuthor(User author) {
         this.author = author;
     }
+
+    public int getLikes_count() {
+        return likes_count;
+    }
+
+    public void setLikes_count(int likes_count) {
+        this.likes_count = likes_count;
+    }
+
+    public int getDislikes_count() {
+        return dislikes_count;
+    }
+
+    public void setDislikes_count(int dislikes_count) {
+        this.dislikes_count = dislikes_count;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     public User getAuthor() {
         return author;
     }
