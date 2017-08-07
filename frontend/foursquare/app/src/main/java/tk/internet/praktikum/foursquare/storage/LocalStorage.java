@@ -92,7 +92,7 @@ public class LocalStorage {
      */
     public void savedUserInformation(User user){
         SharedPreferences.Editor editor=getEditor();
-        editor.putString(Constants.NAME,user.getDisplayName());
+        editor.putString(Constants.NAME,user.getName());
         editor.putString(Constants.EMAIL,user.getEmail());
         editor.commit();
     }
