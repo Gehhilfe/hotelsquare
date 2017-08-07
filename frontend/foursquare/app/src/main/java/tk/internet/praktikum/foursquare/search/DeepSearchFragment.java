@@ -70,6 +70,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private String lastFilterLocation;
     private ProgressDialog progressDialog;
     private String lastQuery;
+    private boolean isChangedSearchText = false;
 
     public DeepSearchFragment() {
         // Required empty public constructor
@@ -102,8 +103,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         initVenueStatePageAdapter();
         setHasOptionsMenu(true);
         keyword = getArguments().getString("keyword");
+        if (keyword != null && !keyword.trim().isEmpty() && !isChangedSearchText)
+            lastQuery = keyword;
         this.setRetainInstance(true);
-        //deepSearch(lastQuery);
         return view;
     }
 
@@ -127,7 +129,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         searchView.onActionViewExpanded();
         searchView.requestFocus();
         searchView.clearFocus();
-        searchView.setQuery(keyword, true);
+        searchView.setQuery(lastQuery, true);
 
         MenuItemCompat.setOnActionExpandListener(item,
                 new MenuItemCompat.OnActionExpandListener() {
@@ -157,31 +159,35 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        Log.d(LOG, "Action: onQueryTextSubmit");
         deepSearch(query);
         return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-         deepSearch(newText);
+        //deepSearch(newText);
         return true;
     }
 
     private void deepSearch(String query) {
-        Log.d(LOG,"#### lastQuery: "+lastQuery);
-        Log.d(LOG,"#### currentQuery: "+query);
+        Log.d(LOG, "**** seachView: " + searchView);
+        Log.d(LOG, "#### lastQuery: " + lastQuery);
+        Log.d(LOG, "#### currentQuery: " + query);
 
-        if(query == null || query.trim().isEmpty()) {
+        if (query == null || query.trim().isEmpty()) {
             query = lastQuery;
-            if(searchView!=null)
-                searchView.setQuery(lastQuery,true);
+            if (searchView != null)
+                searchView.setQuery(lastQuery, true);
 
         }
         if (query != null && !query.trim().isEmpty()) {
             Log.d(LOG, "*** deepSearch");
             // Searching for
+            isChangedSearchText = true;
             lastQuery = query;
             currentPage = 0;
+            searchView.setQuery(query, false);
             VenueSearchQuery venueSearchQuery;
             if (filterLocation.isClickable() && !filterLocation.getText().toString().equals("Near Me")) {
                 venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString().trim());
@@ -227,6 +233,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                     );
         }
     }
+
     /**
      * listens the changes of location
      *
@@ -248,8 +255,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             @Override
             public void afterTextChanged(Editable s) {
                 String changedLocation = s.toString().trim();
-                Log.d(LOG,"last fitler location: "+lastFilterLocation);
-                Log.d(LOG,"changed location: "+changedLocation);
+                Log.d(LOG, "last fitler location: " + lastFilterLocation);
+                Log.d(LOG, "changed location: " + changedLocation);
                 if (!changedLocation.equals(lastFilterLocation)) {
                     lastFilterLocation = changedLocation;
                     PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, GOOGLE_PLACE_URL);
@@ -257,10 +264,10 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(placeAutoComplete -> {
-                                        Log.d(LOG,"status: "+placeAutoComplete.getStatus());
+                                        Log.d(LOG, "status: " + placeAutoComplete.getStatus());
                                         Log.d(LOG, "predictions: " + placeAutoComplete.getPredictions());
                                         List<Prediction> predictions = placeAutoComplete.getPredictions();
-                                        if (placeAdapter==null || predictions.size()>0) {
+                                        if (placeAdapter == null || predictions.size() > 0) {
                                             Log.d(LOG, "#### created place adapter");
                                             placeAdapter = new PlaceAdapter(getContext(), predictions);
                                             filterLocation.setAdapter(placeAdapter);
@@ -319,12 +326,12 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                 if (venues != null && venues.size() > 0) {
                     if (mapViewButton.isChecked()) {
                         // change toggle button to list view
-                       // isMapView = false;
+                        // isMapView = false;
                         displayVenuesList();
                     } else {
                         //TODO
                         // change toggle button to map view
-                       // isMapView = true;
+                        // isMapView = true;
                         displayVenuesOnMap();
 
                     }
@@ -335,24 +342,28 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     }
 
     private void displayVenuesList() {
-        Log.d(LOG,"1.*** displayVenuesList");
+        Log.d(LOG, "1.*** displayVenuesList");
         VenuesListFragment venuesListFragment = (VenuesListFragment) venueStatePageAdapter.getItem(0);
         // handle back from venue in detail
-        if(venuesListFragment.getView()==null) {
+        if (venuesListFragment.getView() == null) {
             initVenueStatePageAdapter();
+            venuesListFragment = (VenuesListFragment) venueStatePageAdapter.getItem(0);
         }
+
         venuesListFragment.updateRecyclerView(venues);
         venuesViewPager.setCurrentItem(0);
 
     }
 
     private void displayVenuesOnMap() {
-        Log.d(LOG,"2.*** displayVenuesOnMap");
+        Log.d(LOG, "2.*** displayVenuesOnMap");
         VenuesOnMapFragment venuesOnMapFragment = (VenuesOnMapFragment) venueStatePageAdapter.getItem(1);
         // handle back from venue in detail
-        if(venuesOnMapFragment.getView()==null){
+        if (venuesOnMapFragment.getView() == null) {
             initVenueStatePageAdapter();
+            venuesOnMapFragment = (VenuesOnMapFragment) venueStatePageAdapter.getItem(1);
         }
+
         venuesOnMapFragment.updateVenuesMarker(venues);
         //venuesOnMapFragment.updateRecyclerView(venues);
         venuesViewPager.setCurrentItem(1);
@@ -369,14 +380,14 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
     }
 
-    public AdapterView.OnItemClickListener createOnItemClick(){
+    public AdapterView.OnItemClickListener createOnItemClick() {
         return
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Log.d(LOG," ******* onItemclick ******");
-                        String query=searchView.getQuery().toString();
-                        if(!query.isEmpty()) {
+                        Log.d(LOG, " ******* onItemclick ******");
+                        String query = searchView.getQuery().toString();
+                        if (!query.isEmpty()) {
                             progressDialog = new ProgressDialog(getActivity(), 1);
                             progressDialog.setIndeterminate(true);
                             progressDialog.setMessage("Waiting for searching...");
@@ -390,8 +401,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                     }
                 };
     }
-
-
 
 
 }
