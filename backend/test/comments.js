@@ -50,10 +50,8 @@ describe('comments', () => {
                 coordinates: [5, 5]
             }
         });
-
-        user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
-        const img = await Image.create({});
-        user.avatar = img;
+        const avatar = await Image.create({});
+        user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99', avatar: avatar});
         user = await user.save();
         comment = await Comment.create({});
         textComment = await TextComment.build(user, 'Test', comment);

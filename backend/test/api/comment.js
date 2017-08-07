@@ -49,9 +49,11 @@ describe('comment api query', () => {
         await Util.connectDatabase(mongoose);
         await Venue.remove({});
         await User.remove({});
+        await Image.remove({});
         await Comments.Comment.remove({});
+        const avatar = await Image.create({});
 
-        u = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99'});
+        u = await User.create({name: 'peter333', email: 'peter1@cool.de', password: 'peter99', avatar: avatar});
         token = jsonwt.sign(u.toJSON(), config.jwt.secret, config.jwt.options);
 
         aVenue = await Venue.create({

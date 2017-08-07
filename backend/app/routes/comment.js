@@ -58,7 +58,7 @@ function textComment(model) {
             User.findOne({_id: request.authentication._id}).populate('avatar')
         ]);
 
-        if(!author || !o) {
+        if (!author || !o) {
             return next(restify.errors.BadRequestError('Author or target model not found!'));
         }
 
@@ -81,7 +81,7 @@ function imageComment(model) {
             User.findOne({_id: request.authentication._id}).populate('avatar')
         ]);
 
-        if(!author || !o) {
+        if (!author || !o) {
             return next(restify.errors.BadRequestError('Author or target model not found!'));
         }
 
@@ -106,7 +106,10 @@ function getComments(model) {
             .populate({
                 path: 'comments.item',
                 populate: {
-                    path: 'author'
+                    path: 'author',
+                    populate: {
+                        path: 'avatar'
+                    }
                 }
             })
             .populate({
