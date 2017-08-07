@@ -123,7 +123,7 @@ async function queryVenue(request, response, next) {
     } else {
         radius = Math.min(5000, Math.max(1000, radius));
     }
-    const keyword = request.body.keyword;
+    let keyword = request.body.keyword;
 
     if (keyword.length < 3) {
         return next(new restify_errors.BadRequestError({
@@ -131,6 +131,17 @@ async function queryVenue(request, response, next) {
             message: 'The search keyword needs to be at least 3 characters'
         }));
     }
+
+    let keywords = _.split(keyword, ' ');
+
+    keywords = _.map(keywords, (it) => {
+        let n = _.find(config.keywords);
+        if(!n)
+            n = it;
+        return n;
+    });
+
+    keyword = _.join(keywords, ' ');
 
     if (locationName) {
         // Resolve name into location
