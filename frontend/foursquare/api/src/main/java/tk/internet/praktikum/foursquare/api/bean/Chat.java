@@ -17,22 +17,22 @@ public class Chat {
         this.participants = participants;
     }
 
-    void setChatId(String chatId)
+    public void setChatId(String chatId)
     {
         this.chatId = chatId;
     }
 
-    void setParticipants(List<User> participants)
+    public void setParticipants(List<User> participants)
     {
         this.participants = participants;
     }
 
-    String getChatId()
+    public String getChatId()
     {
         return chatId;
     }
 
-    List<User> getParticipants()
+    public List<User> getParticipants()
     {
         return participants;
     }
