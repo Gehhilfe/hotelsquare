@@ -1,6 +1,6 @@
 {
   "db": {
-    "host": "docker",
+    "host": "localhost",
     "name": "dev"
   },
   "jwt": {

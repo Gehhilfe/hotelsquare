@@ -605,4 +605,21 @@ describe('User', () => {
             });
         });
     });
+
+    describe('search near by friends', () => {
+        it('should find a friend', mochaAsync(async() => {
+            const res = await request(server)
+                .post('/searches/nearbyfriends')
+                .set('x-auth', peterToken)
+                .send(peter.location.toJSON());
+            res.should.have.status(200);
+        }));
+
+        it('should find a friend around me', mochaAsync(async() => {
+            const res = await request(server)
+                .post('/searches/nearbyfriends')
+                .set('x-auth', peterToken);
+            res.should.have.status(200);
+        }));
+    });
 });

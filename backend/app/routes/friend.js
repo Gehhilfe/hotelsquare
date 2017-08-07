@@ -49,11 +49,13 @@ async function getNearByFriends(request, response, next) {
         _id: request.authentication._id
     });
 
+    const location = (request.body)?request.body:user.location;
+
     const users = await User.find({
         _id : { $in : user.friends },
         incognito: false
     }).where('location').near({
-        center: request.body,
+        center: location,
         maxDistance: radius
     }).populate('avatar');
     response.send(_.map(users, (it) => it.toJSONPublic()));
