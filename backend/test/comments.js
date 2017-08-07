@@ -38,6 +38,8 @@ describe('comments', () => {
         await Util.connectDatabase(mongoose);
         await Promise.all([
             Comment.remove({}),
+            TextComment.remove({}),
+            ImageComment.remove({}),
             User.remove({}),
             Venue.remove({}),
             Image.remove({})
@@ -51,8 +53,7 @@ describe('comments', () => {
             }
         });
         const avatar = await Image.create({});
-        user = await User.create({name: 'peter', email: 'peter1@cool.de', password: 'peter99', avatar: avatar});
-        user = await user.save();
+        user = await User.create({name: 'pete213r', email: 'pete213r1@cool.de', password: 'peter99', avatar: avatar});
         comment = await Comment.create({});
         textComment = await TextComment.build(user, 'Test', comment);
     }));

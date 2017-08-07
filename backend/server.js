@@ -50,11 +50,9 @@ const bunyanLogger = util.initLogger(server);
  */
 function handlePromiseReject(func) {
     return (req, res, next) => {
-        try {
-            func(req, res, next);
-        }catch(err) {
+        Promise.resolve(func(req, res, next)).catch((err) => {
             return next(new errors.InternalServerError(err));
-        }
+        });
     };
 }
 
