@@ -135,7 +135,7 @@ async function queryVenue(request, response, next) {
     let keywords = _.split(keyword, ' ');
 
     keywords = _.map(keywords, (it) => {
-        let n = _.find(config.keywords, it);
+        let n = _.find(config.keywords, it.toLowerCase());
         if(!n)
             n = it;
         return n;

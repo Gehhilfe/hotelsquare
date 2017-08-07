@@ -2,8 +2,21 @@
   "keywords": [
     ["bier", "bar"],
     ["wein", "bar"],
-    ["essen", "food"],
+    ["essen", "restaurant"],
+    ["burger", "restaurant"],
+    ["apotheke", "pharmacy"],
     ["arzt", "doctor"],
+    ["zahnarzt", "dentist"],
+    ["disco", "night_club"],
+    ["club", "night_club"],
+    ["tanzen", "night_club"],
+    ["tankstelle", "gas_station"],
+    ["krankenhaus", "hospital"],
+    ["versicherung", "insurance_agency"],
+    ["flughafen", "airport"],
+    ["kunst", "art_gallery"],
+    ["anwalt", "lawyer"],
+    ["bibliothek", "library"],
     ["kino", "cinema"]
   ]
 }
