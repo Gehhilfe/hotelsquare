@@ -20,6 +20,8 @@ public class CommentVenueAdapter extends RecyclerView.Adapter<CommentVenueViewHo
     List<Comment> commentVenueList;
     Fragment parentFragment;
 
+
+
     public CommentVenueAdapter(List<Comment> commentVenueList, Fragment parentFragment) {
         this.commentVenueList = commentVenueList;
         this.parentFragment = parentFragment;
@@ -41,5 +43,22 @@ public class CommentVenueAdapter extends RecyclerView.Adapter<CommentVenueViewHo
     @Override
     public int getItemCount() {
         return commentVenueList.size();
+    }
+
+    public List<Comment> getCommentVenueList() {
+        return commentVenueList;
+    }
+
+    public void setCommentVenueList(List<Comment> commentVenueList) {
+        this.commentVenueList = commentVenueList;
+    }
+
+    public  void addMoreCommentVenues(List<Comment> comments){
+        this.commentVenueList.addAll(comments);
+        this.notifyDataSetChanged();
+    }
+    public void addCommentVenue(Comment comment){
+        this.commentVenueList.add(0,comment);
+        this.notifyDataSetChanged();
     }
 }

@@ -48,12 +48,12 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
         String title = "";
 
         switch (position) {
-            case 6:
+            case 0:
                 title = " \n" + " Home";
                 //drawable = context.getResources().getDrawable(R.mipmap.user_home, null);
                 drawable = ContextCompat.getDrawable(context, R.mipmap.user_home);
                 break;
-            case 0: // profile
+            case 1: // profile
                 title = " \n" + " Profile";
                 //drawable = context.getResources().getDrawable(R.mipmap.user_profile, null);
                 drawable = ContextCompat.getDrawable(context, R.mipmap.user_profile);
@@ -63,7 +63,7 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
                 //drawable = context.getResources().getDrawable(R.mipmap.user_history, null);
                 drawable = ContextCompat.getDrawable(context, R.mipmap.user_history);
                 break;
-            case 1: // friends
+            case 3: // friends
                 title = " \n" + " Friends";
                 //drawable = context.getResources().getDrawable(R.mipmap.user_friends, null);
                 drawable = ContextCompat.getDrawable(context, R.mipmap.user_friends);

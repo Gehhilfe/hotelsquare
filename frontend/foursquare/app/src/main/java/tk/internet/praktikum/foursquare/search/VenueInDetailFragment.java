@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,6 +32,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -49,7 +51,6 @@ import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
-import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -81,16 +82,24 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private ProgressDialog progressDialog;
     private FloatingActionButton venueTextCommentButton;
     private FloatingActionButton venueImageCommentButton;
+    private FloatingActionButton venueCheckInButton;
     private RecyclerView recyclerView;
     private AlertDialog venueTextCommentDialog;
     private AlertDialog venueImageCommentDialog;
 
     private Bitmap venueImageComment;
+    private LinearLayoutManager linearLayoutManager;
+    private int visibleItemCount;
+    private int itemCount;
+    private int lastVisibleItemPosition;
     private int currentPage;
     private ImageView selectedImageView;
+    private TextView venueRating;
+    private TextView venueCheckIn;
     private final int REQUEST_CAMERA = 0;
     private final int REQUEST_GALLERY = 1;
-
+    private Venue currentVenue;
+    private CommentVenueAdapter commentVenueAdapter;
     public static VenueInDetailFragment newInstance(String param1, String param2) {
         VenueInDetailFragment fragment = new VenueInDetailFragment();
 
@@ -117,6 +126,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         venueIsOpened = (TextView) view.findViewById(R.id.venue_is_opened);
         venueWebsite = (TextView) view.findViewById(R.id.venue_website);
         venueWebsiteLabel = (TextView) view.findViewById(R.id.venue_website_label);
+        venueRating=(TextView) view.findViewById(R.id.venue_rating);
+        venueCheckIn=(TextView) view.findViewById(R.id.venue_checkinCount);
 
         venueTextCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_text_comment_button);
         venueTextCommentButton.setOnClickListener(v -> {
@@ -126,8 +137,12 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         venueImageCommentButton.setOnClickListener(v -> {
             showUpImageCommentDialog();
         });
-        recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
+        venueCheckInButton=(FloatingActionButton)view.findViewById(R.id.venue_checkin);
+        venueCheckInButton.setOnClickListener(v->venueCheckIn());
 
+        recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
+        linearLayoutManager=new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
         progressDialog = new ProgressDialog(getActivity(), 1);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Waiting for seeing venue details...");
@@ -138,9 +153,11 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
         currentPage = 0;
         renderContent();
-
+        recyclerViewOnScrollListener();
         return view;
     }
+
+
 
     public String getVenueId() {
         return venueId;
@@ -158,6 +175,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(venue -> {
+                            currentVenue=venue;
                             renderVenueInformation(venue);
                             Location location = venue.getLocation();
                             updateVenueLocation(location);
@@ -172,6 +190,11 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(bitmap -> {
+                                            imageVenueOne.setMaxHeight(imageVenueOne.getWidth());
+                                            imageVenueTwo.setMaxHeight(imageVenueTwo.getWidth());
+                                            imageVenueThree.setMaxHeight(imageVenueThree.getWidth());
+                                            Log.d(LOG,"imageView Width: "+imageVenueOne.getWidth());
+                                            Log.d(LOG,"bitmap width: "+bitmap.getWidth());
                                             imageVenueOne.setImageBitmap(bitmap);
                                             imageVenueTwo.setImageBitmap(bitmap);
                                             imageVenueThree.setImageBitmap(bitmap);
@@ -221,13 +244,17 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
             this.venueIsOpened.setText(getString(R.string.isOpened));
         else
             this.venueIsOpened.setText(getString(R.string.closed));
+
+        this.venueRating.setText(String.valueOf(venue.getRating()));
+        this.venueCheckIn.setText(String.valueOf(venue.getCheckInCount()));
     }
 
     public void renderCommentVenue(Venue venue) {
         Log.d(LOG,"renderCommentVenue");
-        CommentService commentService = ServiceFactory.createRetrofitService(CommentService.class, URL);
-        commentService.getComments(venueId, currentPage)
-                .subscribeOn(Schedulers.io())
+        //CommentService commentService = ServiceFactory.createRetrofitService(CommentService.class, URL);
+        VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
+        venueService.getComments(venueId, currentPage)
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(comments -> {
                             updateRecyclerView(comments);
@@ -239,16 +266,13 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     }
 
     private void showUpTextCommentDialog() {
-        //Todo
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View textCommentView = inflater.inflate(R.layout.venue_comment, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
-
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked OK button
-                //Todo
                 // call venueServices
                 System.out.println("*** comment text");
                 EditText textCommentContent = (EditText) textCommentView.findViewById(R.id.venue_text_comment_content);
@@ -256,6 +280,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 if (!comment.isEmpty()) {
 
                     TextComment textComment = new TextComment(comment);
+                    textComment.setDate(new Date());
+
                     SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
                     User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
                     textComment.setAuthor(user);
@@ -269,6 +295,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(textComment1 -> {
                                         Log.d(LOG, "##### textcomment: " + textComment1.getId());
+                                        addComment(textComment1);
                                     },
                                     throwable -> {
                                         Log.d(LOG, throwable.getMessage());
@@ -307,6 +334,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
                 ImageComment imageComment=new ImageComment();
                 imageComment.setAuthor(user);
+                imageComment.setDate(new Date());
                 Log.d(LOG, "author: " + user);
                 String token = sharedPreferences.getString(Constants.TOKEN, "");
                 Log.d(LOG, "token: " + token);
@@ -316,6 +344,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(imageComment1 -> {
                                     Log.d(LOG, "##### imageComment: " + imageComment1.getId());
+                                    addComment(imageComment1);
                                 },
                                 throwable -> {
                                     Log.d(LOG, throwable.getMessage());
@@ -341,6 +370,23 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         venueImageCommentDialog.show();
     }
 
+
+    private void venueCheckIn() {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
+        String token = sharedPreferences.getString(Constants.TOKEN, "");
+        Log.d(LOG, "token: " + token);
+        VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL, token);
+        venueService.checkin(venueId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(checkInInformation -> {
+                           Log.d(LOG,"checkIn Count: "+checkInInformation.getCount());
+                            venueCheckIn.setText(String.valueOf(checkInInformation.getCount()));
+                        },
+                        throwable -> {
+
+                        });
+    }
 
     private void uploadPicture() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -403,9 +449,49 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
 
     public void updateRecyclerView(List<Comment> comments) {
         Log.d(LOG, "***size :" + comments.size());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new CommentVenueAdapter(comments, this));
+        if(currentPage==0) {
+            commentVenueAdapter = new CommentVenueAdapter(comments, this);
+            recyclerView.setAdapter(commentVenueAdapter);
+            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+
+        }
+        else{
+            commentVenueAdapter.addMoreCommentVenues(comments);
+        }
+
     }
+
+    public void addComment(Comment comment){
+        commentVenueAdapter.addCommentVenue(comment);
+    }
+
+    public void recyclerViewOnScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                visibleItemCount = linearLayoutManager.getChildCount();
+                itemCount = linearLayoutManager.getItemCount();
+                lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
+                if((lastVisibleItemPosition+visibleItemCount)>=itemCount){
+                    Log.d(LOG,"lastVisibleItemPosition "+lastVisibleItemPosition);
+                    Log.d(LOG,"visibleItemCount "+visibleItemCount);
+                    Log.d(LOG,"itemCount "+itemCount);
+                    currentPage+=1;
+                    renderCommentVenue(currentVenue);
+                }
+
+
+            }
+        });
+    }
+
 
 
 }

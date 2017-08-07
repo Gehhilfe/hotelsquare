@@ -1,5 +1,7 @@
 package tk.internet.praktikum.foursquare.api.bean;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class Chat {
