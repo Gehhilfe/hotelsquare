@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -370,17 +368,17 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     }
 
-    /**
+ /*   *//**
      * update new venues list
      *
      * @param venues
-     */
+     *//*
     protected void updateRecyclerView(List<Venue> venues) {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         recyclerView.setAdapter(new SearchResultAdapter(this, venues));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.HORIZONTAL));
 
-    }
+    }*/
 
 
     protected  Location calculateClusteringCenterLocation(List<Venue> venues){
