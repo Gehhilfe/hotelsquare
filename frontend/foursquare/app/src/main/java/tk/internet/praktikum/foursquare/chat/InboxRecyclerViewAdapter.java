@@ -1,6 +1,7 @@
 package tk.internet.praktikum.foursquare.chat;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,11 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         public void onClick(View v) {
             if (v.getId() == R.id.inbox_msg) {
                 Toast.makeText(v.getContext(), "To Chat " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+                ChatFragment fragment = new ChatFragment();
+                Bundle args = new Bundle();
+                args.putString("chatId", chatList.get(getAdapterPosition()).getChatId());
+                args.putString("currentUserName", currentUserName);
+                fragment.setArguments(args);
             } else {
                 Toast.makeText(v.getContext(), "Profile " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
             }
@@ -54,11 +60,13 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
     private Context context;
     private LayoutInflater inflater;
     private List<Chat> chatList = Collections.emptyList();
+    private String currentUserName;
 
     public InboxRecylcerViewAdapter(Context context, List<Chat> inbox) {
         inflater = LayoutInflater.from(context);
         this.chatList = inbox;
         this.context = context;
+        currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
     }
 
     @Override
@@ -75,7 +83,7 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         User chatPartner = new User();
 
         for (User user : currentChat.getParticipants()) {
-            if (Objects.equals(user.getName(), LocalStorage.getSharedPreferences(context).getString(Constants.NAME, ""))) {
+            if (Objects.equals(user.getName(), currentUserName)) {
                 currentUser = user;
             } else {
                 chatPartner = user;
