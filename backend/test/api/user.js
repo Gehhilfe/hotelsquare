@@ -607,7 +607,7 @@ describe('User', () => {
     });
 
     describe('search near by friends', () => {
-        it('should find a friend', mochaAsync(async() => {
+        it('should find a friend', mochaAsync(async () => {
             const res = await request(server)
                 .post('/searches/nearbyfriends')
                 .set('x-auth', peterToken)
@@ -615,11 +615,23 @@ describe('User', () => {
             res.should.have.status(200);
         }));
 
-        it('should find a friend around me', mochaAsync(async() => {
+        it('should find a friend around me', mochaAsync(async () => {
             const res = await request(server)
                 .post('/searches/nearbyfriends')
                 .set('x-auth', peterToken);
             res.should.have.status(200);
+        }));
+    });
+
+    describe('password reset', () => {
+        it('should reset the password to random string', mochaAsync(async () => {
+            const hashBefore = peter.password;
+            const res = await request(server)
+                .post('/users/passwordreset')
+                .send({name: peter.name, email: peter.email});
+            res.should.have.status(200);
+            const u = await User.findOne({_id: peter._id});
+            hashBefore.should.not.equal(u.password);
         }));
     });
 });

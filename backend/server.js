@@ -64,6 +64,8 @@ server.get('users', auth, handlePromiseReject(user.profile));
 server.get('users/:name', handlePromiseReject(user.profile));
 server.get('users/id/:id', handlePromiseReject(user.profileByID));
 
+server.post('users/passwordreset', handlePromiseReject(user.resetPassword));
+
 server.post('users', handlePromiseReject(user.register));
 server.post('users/:name/friend_requests', auth, handlePromiseReject(user.sendFriendRequest));
 server.put('users', auth, handlePromiseReject(user.updateUser));

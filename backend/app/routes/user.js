@@ -3,7 +3,7 @@
 const config = require('config');
 const restify = require('restify');
 const restify_errors = require('restify-errors');
-
+const password_generate = require('generate-password');
 const nodemailer = require('nodemailer');
 
 const User = require('../models/user');
@@ -161,6 +161,52 @@ async function register(request, response, next) {
         response.json(user);
         return next();
     });
+}
+
+/**
+ * Resets user password and sends it him per mail
+ *
+ * @function register
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function resetPassword(request, response, next) {
+    if(!request.body.name && !request.body.email) {
+        return next(new restify_errors.BadRequestError());
+    }
+    const user = await User.findOne({$or: [{name: request.body.name}, {displayName: request.body.name}], email: request.body.email});
+    const password = password_generate.generate({
+        length: 10,
+        numbers: true
+    });
+    user.password = password;
+    await user.save();
+    if(config.email) {
+        const transporter = nodemailer.createTransport({
+            host: config.email.server,
+            port: 587,
+            secure: false,
+            requireTLS: true,
+            auth: {
+                user: config.email.mail,
+                pass: config.email.password
+            }
+        });
+
+        const mailOptions = {
+            from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
+            to: user.email,
+            subject: 'HOTELSQUARE Passwordreset',
+            text: 'Hello '+user.displayName+', your password has been changed to "'+password+'" without quotes. Change your password immediately!'
+        };
+
+        await transporter.sendMail(mailOptions);
+    }
+
+    response.send(200, 'Password reseted');
+    return next();
 }
 
 /**
@@ -327,5 +373,6 @@ module.exports = {
     confirmFriendRequest,
     updateUser,
     removeFriend,
-    search
+    search,
+    resetPassword
 };
