@@ -144,7 +144,7 @@ class ImageClass {
         const buffers = await Promise.all([
             sharp(path)
                 .resize(200, 200)
-                .max()
+                .crop()
                 .toFormat('jpeg')
                 .toBuffer(),
             sharp(path)
