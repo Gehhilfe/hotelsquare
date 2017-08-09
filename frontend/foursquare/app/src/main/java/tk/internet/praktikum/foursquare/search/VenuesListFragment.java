@@ -3,7 +3,6 @@ package tk.internet.praktikum.foursquare.search;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,15 +20,32 @@ import tk.internet.praktikum.foursquare.api.bean.Venue;
 public class VenuesListFragment extends Fragment {
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
-    private CardView cardView;
+    private SearchResultAdapter searchResultAdapter;
     private int currentPage;
     private int visibleItemCount;
     private int itemCount;
     private int lastVisibleItemPosition;
+    private int firstVisibleItem;
+    private int currentVisibleItem;
+    private int maxLastVisibleItemPosition=0;
     private boolean scrolledVenue;
+    private DeepSearchFragment parent;
+    private boolean endOfList;
     View view;
 
+    public DeepSearchFragment getParent() {
+        return parent;
+    }
+
+    public void setParent(DeepSearchFragment parent) {
+        this.parent = parent;
+    }
+
+
+
+
     public VenuesListFragment() {
+
         // Required empty public constructor
     }
 
@@ -49,8 +65,17 @@ public class VenuesListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         linearLayoutManager = new LinearLayoutManager(getActivity());
+        firstVisibleItem=linearLayoutManager.findFirstVisibleItemPosition();
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerViewOnScrollListener();
+    }
+
+    public SearchResultAdapter getSearchResultAdapter() {
+        return searchResultAdapter;
+    }
+
+    public void setSearchResultAdapter(SearchResultAdapter searchResultAdapter) {
+        this.searchResultAdapter = searchResultAdapter;
     }
 
     /**
@@ -59,9 +84,24 @@ public class VenuesListFragment extends Fragment {
      * @param venues
      */
     protected void updateRecyclerView(List<Venue> venues) {
+        if(parent.getCurrentPage()==0){
+            searchResultAdapter=new SearchResultAdapter(this, venues);
+            recyclerView.setAdapter(searchResultAdapter);
+            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        }
+        else{
 
-        recyclerView.setAdapter(new SearchResultAdapter(this, venues));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+           searchResultAdapter.addMoreVenues(venues);
+        }
+
+        for(Venue venue:venues){
+            System.out.println(venue.getName());
+        }
+        System.out.println("**** all venues:");
+        for(Venue venue:searchResultAdapter.getSearchResultViewHolderList()){
+            System.out.println(venue.getName());
+        }
+
 
     }
 
@@ -80,15 +120,30 @@ public class VenuesListFragment extends Fragment {
                 visibleItemCount = linearLayoutManager.getChildCount();
                 itemCount = linearLayoutManager.getItemCount();
                 lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
-                if((lastVisibleItemPosition+visibleItemCount)>=itemCount){
-                    System.out.println("lastVisibleItemPosition "+lastVisibleItemPosition);
-                    System.out.println("visibleItemCount "+visibleItemCount);
-
+                currentVisibleItem=linearLayoutManager.findFirstVisibleItemPosition();
+                System.out.println("dy: "+dy);
+                System.out.println("lastVisibleItemPosition "+lastVisibleItemPosition);
+                System.out.println("visibleItemCount "+visibleItemCount);
+                System.out.println("itemCount: "+itemCount);
+                if(dy>0&&(lastVisibleItemPosition+visibleItemCount)>=itemCount &&lastVisibleItemPosition%10==9 && !parent.isReachedMaxVenues() ){
+                    parent.setSubmitNewQuery(false);
+                    System.out.println("**** get next page");
+                    System.out.println("parentFragment: "+parent);
+                    currentPage=parent.getCurrentPage()+1;
+                    parent.setCurrentPage(currentPage);
+                    System.out.println("current Page: "+parent.getCurrentPage());
+                    maxLastVisibleItemPosition=Math.max(maxLastVisibleItemPosition,lastVisibleItemPosition);
+                    parent.deepSearch();
                 }
+                firstVisibleItem=currentVisibleItem;
                 // Toast.makeText(getContext(), linearLayoutManager.getChildCount(),Toast.LENGTH_LONG).show();
 
             }
         });
+    }
+
+    public void detectScrollDown(){
+
     }
 
     public int getCurrentPage() {

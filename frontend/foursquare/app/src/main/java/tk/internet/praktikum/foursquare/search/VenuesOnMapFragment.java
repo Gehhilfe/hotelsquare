@@ -62,6 +62,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private Map<Marker, User> markerFriendMap;
     private Map<Venue, Bitmap> venueBitmapMap;
     private Map<User, Bitmap> friendBitmapMap;
+    private List<Venue> allVenues;
 
     public VenuesOnMapFragment() {
         // Required empty public constructor
@@ -317,4 +318,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     }
 
+
+    protected  Location calculateClusteringCenterLocation(List<Venue> venues){
+        //Todo
+        return null;
+    }
 }

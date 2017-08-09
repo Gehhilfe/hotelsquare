@@ -31,6 +31,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -71,6 +72,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private ProgressDialog progressDialog;
     private String lastQuery;
     private boolean isChangedSearchText = false;
+    private boolean submitNewQuery;
+    private boolean reachedMaxVenues;
 
     public DeepSearchFragment() {
         // Required empty public constructor
@@ -106,6 +109,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         if (keyword != null && !keyword.trim().isEmpty() && !isChangedSearchText)
             lastQuery = keyword;
         this.setRetainInstance(true);
+        currentPage = 0;
         return view;
     }
 
@@ -160,7 +164,11 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.d(LOG, "Action: onQueryTextSubmit");
-        deepSearch(query);
+        venues=new ArrayList<Venue>();
+        submitNewQuery=true;
+        currentPage=0;
+        reachedMaxVenues=false;
+        deepSearch();
         return true;
     }
 
@@ -170,10 +178,19 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         return true;
     }
 
-    private void deepSearch(String query) {
+    public boolean isReachedMaxVenues() {
+        return reachedMaxVenues;
+    }
+
+    public void setReachedMaxVenues(boolean reachedMaxVenues) {
+        this.reachedMaxVenues = reachedMaxVenues;
+    }
+
+    protected void deepSearch() {
         Log.d(LOG, "**** seachView: " + searchView);
         Log.d(LOG, "#### lastQuery: " + lastQuery);
-        Log.d(LOG, "#### currentQuery: " + query);
+
+        String query=searchView.getQuery().toString();
 
         if (query == null || query.trim().isEmpty()) {
             query = lastQuery;
@@ -186,8 +203,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             // Searching for
             isChangedSearchText = true;
             lastQuery = query;
-            currentPage = 0;
             searchView.setQuery(query, false);
+            Log.d(LOG, "#### currentQuery: " + query);
+            Log.d(LOG,"++++ currentPageQuery: "+currentPage);
             VenueSearchQuery venueSearchQuery;
             if (filterLocation.isClickable() && !filterLocation.getText().toString().equals("Near Me")) {
                 venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString().trim());
@@ -205,7 +223,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             // Add more optional filters later
 
             VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
-            venueService.queryVenue(venueSearchQuery).subscribeOn(Schedulers.newThread())
+            venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(venueSearchResult -> {
                                 venueSearchResult.getResults()
@@ -216,12 +234,21 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                                                 }
                                         );
                                 venues = venueSearchResult.getResults();
-                                if (mapViewButton.isChecked())
-                                    displayVenuesList();
-                                else {
-                                    //calls map services to display positions
-                                    displayVenuesOnMap();
-                                }
+                               if(venues.size()>0) {
+                                   if (mapViewButton.isChecked())
+                                       displayVenuesList();
+                                   else {
+                                       //calls map services to display positions
+                                       displayVenuesOnMap();
+                                   }
+                               }
+                               else{
+
+                                   if(this.getCurrentPage()>0) {
+                                       this.setCurrentPage(getCurrentPage() - 1);
+                                       reachedMaxVenues=true;
+                                   }
+                               }
                                 progressDialog.dismiss();
 
                             },
@@ -342,17 +369,29 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     }
 
     private void displayVenuesList() {
-        Log.d(LOG, "1.*** displayVenuesList");
-        VenuesListFragment venuesListFragment = (VenuesListFragment) venueStatePageAdapter.getItem(0);
-        // handle back from venue in detail
-        if (venuesListFragment.getView() == null) {
-            initVenueStatePageAdapter();
-            venuesListFragment = (VenuesListFragment) venueStatePageAdapter.getItem(0);
-        }
+            Log.d(LOG, "1.*** displayVenuesList");
+            VenuesListFragment venuesListFragment = (VenuesListFragment) venueStatePageAdapter.getItem(0);
+            // handle back from venue in detail
+            if (venuesListFragment.getView() == null) {
+                initVenueStatePageAdapter();
+                venuesListFragment = (VenuesListFragment) venueStatePageAdapter.getItem(0);
+            }
+      /*  if(submitNewQuery){
+            venuesListFragment.getSearchResultAdapter().setSearchResultViewHolderList(new ArrayList<Venue>());
+        }*/
+            venuesListFragment.setParent(this);
 
-        venuesListFragment.updateRecyclerView(venues);
-        venuesViewPager.setCurrentItem(0);
+            venuesListFragment.updateRecyclerView(venues);
+            venuesViewPager.setCurrentItem(0);
 
+    }
+
+    public boolean isSubmitNewQuery() {
+        return submitNewQuery;
+    }
+
+    public void setSubmitNewQuery(boolean submitNewQuery) {
+        this.submitNewQuery = submitNewQuery;
     }
 
     private void displayVenuesOnMap() {
@@ -370,7 +409,16 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     }
 
 
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+    }
+
     @Override
+
     public void onPlaceSelected(Place place) {
 
     }
@@ -388,6 +436,10 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                         Log.d(LOG, " ******* onItemclick ******");
                         String query = searchView.getQuery().toString();
                         if (!query.isEmpty()) {
+                            venues=new ArrayList<Venue>();
+                           // submitNewQuery=true;
+                            currentPage=0;
+                            reachedMaxVenues=false;
                             progressDialog = new ProgressDialog(getActivity(), 1);
                             progressDialog.setIndeterminate(true);
                             progressDialog.setMessage("Waiting for searching...");
@@ -395,7 +447,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                             Prediction place = (Prediction) parent.getItemAtPosition(position);
                             filterLocation.setText(place.getDescription());
                             filterLocation.setSelection(filterLocation.getText().length());
-                            deepSearch(query);
+                            deepSearch();
                         }
 
                     }
