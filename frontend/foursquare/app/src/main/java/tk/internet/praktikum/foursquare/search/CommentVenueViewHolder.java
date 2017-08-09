@@ -19,6 +19,8 @@ import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.ImageComment;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 
+import static android.view.View.GONE;
+
 /**
  * Created by truongtud on 20.07.2017.
  */
@@ -49,6 +51,7 @@ public class CommentVenueViewHolder extends RecyclerView.ViewHolder implements V
             TextComment textComment= (TextComment) comment;
             comment_image_content.setVisibility(View.INVISIBLE);
             comment_content.setText(textComment.getText());
+            comment_content.setVisibility(View.VISIBLE);
 
         }
         else{
@@ -61,9 +64,13 @@ public class CommentVenueViewHolder extends RecyclerView.ViewHolder implements V
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(bitmap -> {
                             comment_image_content.setImageBitmap(bitmap);
-
+                            comment_image_content.setVisibility(View.VISIBLE);
                         });
             }
+            else
+                comment_image_content.setVisibility(GONE);
+
+
         }
 
         Image avatar=comment.getAuthor().getAvatar();
@@ -73,14 +80,17 @@ public class CommentVenueViewHolder extends RecyclerView.ViewHolder implements V
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(bitmap -> {
                         user_avatar.setImageBitmap(bitmap);
-
+                        user_avatar.setVisibility(View.VISIBLE);
                     });
         }
+        else
+            user_avatar.setVisibility(GONE);
         Date date= comment.getDate();
         if (date!=null) {
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
             String dateToString = formatter.format(comment.getDate());
             comment_date.setText(dateToString);
+            comment_date.setVisibility(View.VISIBLE);
         }
 
 

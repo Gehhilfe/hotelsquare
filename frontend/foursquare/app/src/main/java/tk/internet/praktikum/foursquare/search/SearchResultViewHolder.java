@@ -44,7 +44,6 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
        //this.address.setText(searchResult.getPlace_id());
         this.address.setText(searchResult.getFormattedAddress());
         List<Image> images=searchResult.getImages();
-        //System.out.println("all images size: "+ images.size());
         if(images.size()>0) {
             Image image = images.get(0);
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
@@ -56,8 +55,9 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
                       this.image.setVisibility(View.VISIBLE);
                   });
         }
-        else
+        else {
             this.image.setVisibility(View.GONE);
+        }
         this.rating.setText(String.valueOf(searchResult.getRating()));
 
     }

@@ -14,8 +14,7 @@
             android:maxHeight="30dp"
             android:minHeight="20dp"
             android:padding="5dp"
-            android:layout_gravity="center"
-            android:src="@mipmap/user_avatar"/>
+            android:layout_gravity="center"/>
         <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"

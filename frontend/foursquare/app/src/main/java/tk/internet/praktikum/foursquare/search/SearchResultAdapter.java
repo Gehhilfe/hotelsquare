@@ -37,7 +37,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
 
     @Override
     public void onBindViewHolder(SearchResultViewHolder holder, int position) {
-        Venue venue=searchResultViewHolderList.get(position);
+          //Venue venue=searchResultViewHolderList.get(position);
          //System.out.println("render venue position: "+position+ "name: "+venue.getName());
          holder.render(searchResultViewHolderList.get(position));
 
@@ -52,6 +52,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
     public void clickOnVenue(String venueId) {
         VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();
         venueInDetailFragment.setVenueId(searchResultViewHolderList.get(Integer.valueOf(venueId)).getId());
+        venueInDetailFragment.setParent(parentFragment);
         redirectToFragment(venueInDetailFragment);
     }
     public  void addMoreVenues(List<Venue> venues){

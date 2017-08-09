@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -83,6 +84,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private FloatingActionButton venueTextCommentButton;
     private FloatingActionButton venueImageCommentButton;
     private FloatingActionButton venueCheckInButton;
+    private FloatingActionButton venueImagesButton;
     private RecyclerView recyclerView;
     private AlertDialog venueTextCommentDialog;
     private AlertDialog venueImageCommentDialog;
@@ -100,6 +102,9 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private final int REQUEST_GALLERY = 1;
     private Venue currentVenue;
     private CommentVenueAdapter commentVenueAdapter;
+
+
+    private Fragment parent;
     public static VenueInDetailFragment newInstance(String param1, String param2) {
         VenueInDetailFragment fragment = new VenueInDetailFragment();
 
@@ -110,53 +115,58 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         // Required empty public constructor
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_venue_in_detail, container, false);
-        // layoutInflater=inflater;
-        //this.container=container;
-        imageVenueOne = (ImageView) view.findViewById(R.id.image_venue_one);
-        imageVenueTwo = (ImageView) view.findViewById(R.id.image_venue_two);
-        imageVenueThree = (ImageView) view.findViewById(R.id.image_venue_three);
+        if(view==null) {
+            // Inflate the layout for this fragment
+            view = inflater.inflate(R.layout.fragment_venue_in_detail, container, false);
+            // layoutInflater=inflater;
+            //this.container=container;
+            imageVenueOne = (ImageView) view.findViewById(R.id.image_venue_one);
+            imageVenueTwo = (ImageView) view.findViewById(R.id.image_venue_two);
+            imageVenueThree = (ImageView) view.findViewById(R.id.image_venue_three);
 
-        venueName = (TextView) view.findViewById(R.id.venue_name);
-        venueAddress = (TextView) view.findViewById(R.id.venue_address);
-        venueIsOpened = (TextView) view.findViewById(R.id.venue_is_opened);
-        venueWebsite = (TextView) view.findViewById(R.id.venue_website);
-        venueWebsiteLabel = (TextView) view.findViewById(R.id.venue_website_label);
-        venueRating=(TextView) view.findViewById(R.id.venue_rating);
-        venueCheckIn=(TextView) view.findViewById(R.id.venue_checkinCount);
+            venueName = (TextView) view.findViewById(R.id.venue_name);
+            venueAddress = (TextView) view.findViewById(R.id.venue_address);
+            venueIsOpened = (TextView) view.findViewById(R.id.venue_is_opened);
+            venueWebsite = (TextView) view.findViewById(R.id.venue_website);
+            venueWebsiteLabel = (TextView) view.findViewById(R.id.venue_website_label);
+            venueRating = (TextView) view.findViewById(R.id.venue_rating);
+            venueCheckIn = (TextView) view.findViewById(R.id.venue_checkinCount);
 
-        venueTextCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_text_comment_button);
-        venueTextCommentButton.setOnClickListener(v -> {
-            showUpTextCommentDialog();
-        });
-        venueImageCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_image_commnent_button);
-        venueImageCommentButton.setOnClickListener(v -> {
-            showUpImageCommentDialog();
-        });
-        venueCheckInButton=(FloatingActionButton)view.findViewById(R.id.venue_checkin);
-        venueCheckInButton.setOnClickListener(v->venueCheckIn());
+            venueTextCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_text_comment_button);
+            venueTextCommentButton.setOnClickListener(v -> {
+                showUpTextCommentDialog();
+            });
+            venueImageCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_image_commnent_button);
+            venueImageCommentButton.setOnClickListener(v -> {
+                showUpImageCommentDialog();
+            });
+            venueCheckInButton = (FloatingActionButton) view.findViewById(R.id.venue_checkin);
+            venueCheckInButton.setOnClickListener(v -> venueCheckIn());
+            venueImagesButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_images);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
-        linearLayoutManager=new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        progressDialog = new ProgressDialog(getActivity(), 1);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Waiting for seeing venue details...");
-        progressDialog.show();
+            venueImagesButton.setOnClickListener(v -> venueImages());
 
-        SupportMapFragment mapFragment = ((SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.venueDetails_mapView));
-        mapFragment.getMapAsync(this);
-        currentPage = 0;
-        renderContent();
-        recyclerViewOnScrollListener();
+            recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
+            linearLayoutManager = new LinearLayoutManager(getContext());
+            recyclerView.setLayoutManager(linearLayoutManager);
+            progressDialog = new ProgressDialog(getActivity(), 1);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage("Waiting for seeing venue details...");
+            progressDialog.show();
+
+            SupportMapFragment mapFragment = ((SupportMapFragment) getChildFragmentManager()
+                    .findFragmentById(R.id.venueDetails_mapView));
+            mapFragment.getMapAsync(this);
+            currentPage = 0;
+            renderContent();
+            recyclerViewOnScrollListener();
+        }
         return view;
     }
-
 
 
     public String getVenueId() {
@@ -492,6 +502,30 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         });
     }
 
+    private void venueImages() {
+        System.out.println("I am here");
+          VenueImagesFragment venueImagesFragment=new VenueImagesFragment();
+          venueImagesFragment.setParent(this.getParent());
+          venueImagesFragment.setImages(images);
+          redirectToFragment(venueImagesFragment);
+
+    }
+
+    private void redirectToFragment(Fragment fragment){
+        FragmentTransaction fragmentTransaction = this.getParent().getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
+    }
+
+    public Fragment getParent() {
+        return parent;
+    }
+
+    public void setParent(Fragment parent) {
+        this.parent = parent;
+    }
 
 
 }
