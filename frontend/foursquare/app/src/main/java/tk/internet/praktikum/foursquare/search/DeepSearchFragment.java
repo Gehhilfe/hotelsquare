@@ -278,8 +278,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                 Log.d(LOG, "changed location: " + changedLocation);
                 if (!changedLocation.equals(lastFilterLocation)) {
                     lastFilterLocation = changedLocation;
-                    PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, GOOGLE_PLACE_URL);
-                    placeService.getSuggestedPlaces(changedLocation, "geocode", getString(R.string.google_maps_key).trim())
+                    PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, URL);
+                    placeService.getSuggestedPlaces(changedLocation)
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(placeAutoComplete -> {

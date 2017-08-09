@@ -1,7 +1,9 @@
 package tk.internet.praktikum.foursquare.api.service;
 
 import io.reactivex.Observable;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 import tk.internet.praktikum.foursquare.api.bean.PlaceAutoComplete;
 
@@ -11,6 +13,6 @@ import tk.internet.praktikum.foursquare.api.bean.PlaceAutoComplete;
 
 public interface PlaceService {
 
-    @GET("/maps/api/place/autocomplete/json")
-    Observable<PlaceAutoComplete> getSuggestedPlaces(@Query("input")String typedPlace,@Query("types") String types,  @Query("key") String api_key);
+    @POST("/autocomplete")
+    Observable<PlaceAutoComplete> getSuggestedPlaces(@Body String typedPlace);
 }
