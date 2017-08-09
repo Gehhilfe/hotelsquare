@@ -18,8 +18,8 @@ import android.view.ViewGroup;
 import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.chat.ChatFragment;
+import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
-import tk.internet.praktikum.foursquare.history.HistoryFragment;
 import tk.internet.praktikum.foursquare.history.dummy.DummyHistoryFragment;
 import tk.internet.praktikum.foursquare.home.HomeFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
@@ -96,7 +96,7 @@ public class MeFragment extends Fragment {
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
         userStatePagerAdapter.addFragment(new DummyHistoryFragment(), "History");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
-        userStatePagerAdapter.addFragment(new ChatFragment(), "Chat");
+        userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);
     }
 

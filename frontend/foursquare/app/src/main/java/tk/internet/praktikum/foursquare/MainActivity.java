@@ -3,9 +3,8 @@ package tk.internet.praktikum.foursquare;
 //import android.app.Fragment;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -14,16 +13,28 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import java.io.IOException;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.Constants;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Location;
+import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
+import tk.internet.praktikum.foursquare.location.LocationService;
+import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.DummyProfile;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.foursquare.user.UserActivity;
 
@@ -32,6 +43,13 @@ import tk.internet.praktikum.foursquare.user.UserActivity;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
+
+
+    private Location userLocation = new Location(0,0);
+    private Handler handler = new Handler();
+    private final String URL = "https://dev.ip.stimi.ovh/";
+    private User locationUser = new User();
+    private int PARAM_INTERVAL = 60000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,4 +199,77 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("LOCATION", "StartService");
+        startService(new Intent(this, LocationService.class)); // start tracking service
+
+        // off-topic -> ignore this
+        if(!(EventBus.getDefault().isRegistered(this))){
+            EventBus.getDefault().register(this);
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(this, LocationService.class)); // stop tracking service
+        Log.d("LOCATION", "StopService");
+        // off-topic -> ignore this
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
+
+    /**
+     * Listen for new database entries from background service
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(LocationTracker.LocationEvent event) {
+        Log.d("SUBSRIBE", "This is: "  + event.location);
+        // Update User Location on Map
+       userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
+        // Update User Location on Server
+        if ((LocalStorage.
+                getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""))  != "") {
+            sendUserLocation(userLocation);
+        }
+    }
+
+    private void sendUserLocation(Location userLocation) {
+        locationUser.setLocation(userLocation);
+        handler.postDelayed(sendLocation, PARAM_INTERVAL);
+
+    }
+
+    public Location getUserLocation(){
+        return userLocation;
+    }
+
+    private Runnable sendLocation = new Runnable() {
+        @Override
+        public void run() {
+            UserService service = ServiceFactory
+                    .createRetrofitService(UserService.class, URL, LocalStorage.
+                            getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+            service.update(locationUser)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                                locationUser = user;
+                        Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+            handler.postDelayed(this,PARAM_INTERVAL);
+        }
+
+    };
+
+
 }

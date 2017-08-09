@@ -47,5 +47,6 @@
     <string name="closed">Closed</string>
     <string name="websiteLabel">Website: </string>
     <string name="startLabel">Search</string>
+    <string name="restore_name">Name</string>
 
 </resources>
