@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
 
+
+    private Location userLocation = new Location(0,0);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -220,6 +223,12 @@ public class MainActivity extends AppCompatActivity
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LocationTracker.LocationEvent event) {
         Log.d("SUBSRIBE", "This is: "  + event.location);
+        // Update User Location on Map
+       userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
+        // Update User Location in ListSearch
+    }
 
+    public Location getUserLocation(){
+        return userLocation;
     }
 }
