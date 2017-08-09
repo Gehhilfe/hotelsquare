@@ -173,6 +173,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
+                Log.d("KEYFOUND", "Token is: " + (LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")));
                 if (markerVenueMap.containsKey(marker)) {
                     VenueInDetailFragment venueInDetailFragment = new VenueInDetailFragment();
                     venueInDetailFragment.setVenueId(markerVenueMap.get(marker).getId());
@@ -184,7 +186,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
                 } else if (markerFriendMap.containsKey(marker)) {
                     //TODO: "Call FriendFragment"
-                } else {
+                } else if ((LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""))  != "") {
                     MeFragment meFragment = new MeFragment();
                     FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.fragment_container, meFragment);
