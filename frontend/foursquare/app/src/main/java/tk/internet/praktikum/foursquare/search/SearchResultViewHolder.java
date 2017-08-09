@@ -53,8 +53,11 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
                  .observeOn(AndroidSchedulers.mainThread())
                   .subscribe(bitmap -> {
                       this.image.setImageBitmap(bitmap);
+                      this.image.setVisibility(View.VISIBLE);
                   });
         }
+        else
+            this.image.setVisibility(View.GONE);
         this.rating.setText(String.valueOf(searchResult.getRating()));
 
     }

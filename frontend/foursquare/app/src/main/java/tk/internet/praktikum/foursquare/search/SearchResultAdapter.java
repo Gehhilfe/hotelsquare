@@ -37,6 +37,8 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
 
     @Override
     public void onBindViewHolder(SearchResultViewHolder holder, int position) {
+        Venue venue=searchResultViewHolderList.get(position);
+         //System.out.println("render venue position: "+position+ "name: "+venue.getName());
          holder.render(searchResultViewHolderList.get(position));
 
     }
