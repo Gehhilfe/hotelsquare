@@ -102,7 +102,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private final int REQUEST_GALLERY = 1;
     private Venue currentVenue;
     private CommentVenueAdapter commentVenueAdapter;
-
+    private Image userAvatar=null;
 
     private Fragment parent;
     public static VenueInDetailFragment newInstance(String param1, String param2) {
@@ -278,6 +278,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private void showUpTextCommentDialog() {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View textCommentView = inflater.inflate(R.layout.venue_comment, null);
+        //ImageView user_avatar=(ImageView) textCommentView.findViewById(R.id.user_avatar_text_comment);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
@@ -294,6 +295,20 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
 
                     SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
                     User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
+                    ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+                    /*getUserAvatar(user.getName());
+                    if(userAvatar!=null) {
+                        imageCacheLoader.loadBitmap(userAvatar, ImageSize.SMALL)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(bitmap -> {
+                                    user_avatar.setImageBitmap(bitmap);
+                                    user_avatar.setVisibility(View.VISIBLE);
+                                });
+                    }
+                    else
+                        user_avatar.setVisibility(GONE);*/
+
                     textComment.setAuthor(user);
                     Log.d(LOG, "author: " + user);
                     String token = sharedPreferences.getString(Constants.TOKEN, "");
@@ -333,6 +348,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         //Todo
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View venueImageCommentView = inflater.inflate(R.layout.venue_image_comment, null);
+       // ImageView user_avatar=(ImageView) venueImageCommentView.findViewById(R.id.user_avatar_image_comment);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -342,6 +359,19 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 MultipartBody.Part image= UploadHelper.createMultipartBodySync(venueImageComment,getContext(),true);
                 SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
                 User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
+                ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+               /* getUserAvatar(user.getName());
+                if(userAvatar!=null) {
+                    imageCacheLoader.loadBitmap(userAvatar, ImageSize.SMALL)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(bitmap -> {
+                                user_avatar.setImageBitmap(bitmap);
+                                user_avatar.setVisibility(View.VISIBLE);
+                            });
+                }
+                else
+                    user_avatar.setVisibility(GONE);*/
                 ImageComment imageComment=new ImageComment();
                 imageComment.setAuthor(user);
                 imageComment.setDate(new Date());
@@ -526,6 +556,21 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     public void setParent(Fragment parent) {
         this.parent = parent;
     }
+
+   /* public void getUserAvatar(String userName){
+        if(userAvatar==null) {
+            UserService userService = ServiceFactory.createRetrofitService(UserService.class, URL);
+            userService.detailsByName(userName)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                                userAvatar = user.getAvatar();
+                            },
+                            throwable -> {
+                                Log.d(LOG, throwable.getMessage());
+                            });
+        }
+    }*/
 
 
 }

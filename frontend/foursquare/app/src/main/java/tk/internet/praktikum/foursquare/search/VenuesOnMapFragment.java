@@ -70,6 +70,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private Map<User, Bitmap> friendBitmapMap;
     private List<Venue> allVenues;
     private MainActivity ma;
+    private Fragment parent;
 
     public VenuesOnMapFragment() {
         // Required empty public constructor
@@ -103,7 +104,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         if(!(EventBus.getDefault().isRegistered(this))){
             EventBus.getDefault().register(this);
         }
-
+        parent=this;
         return view;
     }
 
@@ -197,6 +198,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")));
                 if (markerVenueMap.containsKey(marker)) {
                     VenueInDetailFragment venueInDetailFragment = new VenueInDetailFragment();
+                    venueInDetailFragment.setParent(parent);
                     venueInDetailFragment.setVenueId(markerVenueMap.get(marker).getId());
                     FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.fragment_container, venueInDetailFragment);
