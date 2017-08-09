@@ -10,6 +10,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import tk.internet.praktikum.foursquare.api.bean.FriendListResponse;
 import tk.internet.praktikum.foursquare.api.bean.Location;
+import tk.internet.praktikum.foursquare.api.bean.PasswordResetInformation;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.UserSearchQuery;
 
@@ -67,4 +68,12 @@ public interface UserService {
      */
     @POST("searches/users")
     Observable<List<User>> search(@Body UserSearchQuery query);
+
+    /**
+     * Reset password if name and email is correct
+     * @param information Name and email
+     * @return
+     */
+    @POST("users/passwordreset")
+    Observable<String> passwordReset(@Body PasswordResetInformation information);
 }
