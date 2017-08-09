@@ -20,7 +20,8 @@ const User = require('../models/user');
  * @returns {undefined}
  */
 async function getVenue(request, response, next) {
-    const venue = await Venue.findOne({_id: request.params.id}).populate('images');
+    const venue = await Venue.findOne({_id: request.params.id})
+        .populate('images');
 
     // check if details are loaded
     if (!venue.details_loaded) {
