@@ -186,10 +186,10 @@ class ImageCommentClass {
         const self = this;
         const icmt = new self();
         icmt.author = user;
+        icmt.image = await Image.upload(path, user);
         if (assigned_to) {
             icmt.assignTo(assigned_to);
         }
-        icmt.image = await Image.upload(path, user);
         await icmt.save();
         icmt.image.assignTo(icmt);
         await icmt.image.save();
