@@ -135,7 +135,7 @@ public class VenuesListFragment extends Fragment {
                     maxLastVisibleItemPosition=Math.max(maxLastVisibleItemPosition,lastVisibleItemPosition);
                     parent.deepSearch();
                 }
-                firstVisibleItem=currentVisibleItem;
+
                 // Toast.makeText(getContext(), linearLayoutManager.getChildCount(),Toast.LENGTH_LONG).show();
 
             }

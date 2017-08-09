@@ -103,7 +103,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private Venue currentVenue;
     private CommentVenueAdapter commentVenueAdapter;
     private Image userAvatar=null;
-
+    private boolean reachedMaxVenues;
     private Fragment parent;
     public static VenueInDetailFragment newInstance(String param1, String param2) {
         VenueInDetailFragment fragment = new VenueInDetailFragment();
@@ -162,8 +162,10 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                     .findFragmentById(R.id.venueDetails_mapView));
             mapFragment.getMapAsync(this);
             currentPage = 0;
+            reachedMaxVenues=false;
             renderContent();
             recyclerViewOnScrollListener();
+
         }
         return view;
     }
@@ -489,14 +491,19 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
 
     public void updateRecyclerView(List<Comment> comments) {
         Log.d(LOG, "***size :" + comments.size());
-        if(currentPage==0) {
-            commentVenueAdapter = new CommentVenueAdapter(comments, this);
-            recyclerView.setAdapter(commentVenueAdapter);
-            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        if(comments.size()>0) {
+            if (currentPage == 0) {
+                commentVenueAdapter = new CommentVenueAdapter(comments, this);
+                recyclerView.setAdapter(commentVenueAdapter);
+                recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+            } else {
+                commentVenueAdapter.addMoreCommentVenues(comments);
+            }
         }
         else{
-            commentVenueAdapter.addMoreCommentVenues(comments);
+            reachedMaxVenues=true;
+            currentPage=currentPage-1;
         }
 
     }
@@ -519,11 +526,13 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 visibleItemCount = linearLayoutManager.getChildCount();
                 itemCount = linearLayoutManager.getItemCount();
                 lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
-                if((lastVisibleItemPosition+visibleItemCount)>=itemCount){
-                    Log.d(LOG,"lastVisibleItemPosition "+lastVisibleItemPosition);
-                    Log.d(LOG,"visibleItemCount "+visibleItemCount);
-                    Log.d(LOG,"itemCount "+itemCount);
+                Log.d(LOG,"currentPage: "+currentPage);
+                Log.d(LOG,"lastVisibleItemPosition "+lastVisibleItemPosition);
+                Log.d(LOG,"visibleItemCount "+visibleItemCount);
+                Log.d(LOG,"itemCount "+itemCount);
+                if(dy>0&&(lastVisibleItemPosition+visibleItemCount)>=itemCount&&lastVisibleItemPosition%10==9&&!reachedMaxVenues){
                     currentPage+=1;
+
                     renderCommentVenue(currentVenue);
                 }
 

@@ -49,14 +49,14 @@ public class CommentVenueViewHolder extends RecyclerView.ViewHolder implements V
         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.context);
         if(comment instanceof TextComment){
             TextComment textComment= (TextComment) comment;
-            comment_image_content.setVisibility(View.INVISIBLE);
+            comment_image_content.setVisibility(View.GONE);
             comment_content.setText(textComment.getText());
             comment_content.setVisibility(View.VISIBLE);
 
         }
         else{
             ImageComment imageComment=(ImageComment)comment;
-            comment_content.setVisibility(View.INVISIBLE);
+            comment_content.setVisibility(View.GONE);
             Image image=imageComment.getImage();
             if(image!=null) {
                 imageCacheLoader.loadBitmap(image, ImageSize.SMALL)
@@ -92,6 +92,7 @@ public class CommentVenueViewHolder extends RecyclerView.ViewHolder implements V
             comment_date.setText(dateToString);
             comment_date.setVisibility(View.VISIBLE);
         }
+        commentItemView.setVisibility(View.VISIBLE);
 
 
     }
