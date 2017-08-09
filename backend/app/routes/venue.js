@@ -1,12 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
+const config = require('config');
 const restify = require('restify');
 const restify_errors = require('restify-errors');
 const Venue = require('../models/venue');
 const googleapilib = require('googleplaces');
 const NodeGeocoder = require('node-geocoder');
-const config = require('config');
 const SearchRequest = require('../models/searchrequest');
 const GeocodeResult = require('../models/geocoderesult');
 const User = require('../models/user');
@@ -45,7 +45,7 @@ async function importGoogleResult(entry) {
     if (existing.length > 0)
         return;
 
-    const photo_reference = (entry.photos && entry.photos.length > 0)?entry.photos[0].photo_reference:'';
+    const photo_reference = (entry.photos && entry.photos.length > 0) ? entry.photos[0].photo_reference : '';
 
     return Venue.create({
         name: entry.name,
@@ -114,7 +114,7 @@ async function queryVenue(request, response, next) {
     if (request.params.page)
         page = request.params.page;
 
-    if(request.body.only_open){
+    if (request.body.only_open) {
         only_open = request.body.only_open;
     }
 
@@ -123,7 +123,7 @@ async function queryVenue(request, response, next) {
     } else {
         radius = Math.min(5000, Math.max(1000, radius));
     }
-    const keyword = request.body.keyword;
+    let keyword = request.body.keyword;
 
     if (keyword.length < 3) {
         return next(new restify_errors.BadRequestError({
@@ -131,6 +131,12 @@ async function queryVenue(request, response, next) {
             message: 'The search keyword needs to be at least 3 characters'
         }));
     }
+
+    let keywords = _.split(keyword, ' ');
+
+    keywords = _.map(keywords, (it) => _.get(config.keywords, it.toLowerCase(), it.toLowerCase()));
+
+    keyword = _.join(keywords, ' ');
 
     if (locationName) {
         // Resolve name into location
@@ -147,7 +153,7 @@ async function queryVenue(request, response, next) {
     // search in our database for query
     let venues = await searchVenuesInDB(location, keyword, radius, page, 10);
     venues = _.map(venues, (v) => v.toJSONSearchResult());
-    if(only_open){
+    if (only_open) {
         venues = _.filter(venues, (v) => v.isOpen());
     }
     response.send({
@@ -247,7 +253,7 @@ function queryAllVenuesFromGoogle(location, keyword, next_page_token = '') {
  * @param {Function} next next handler
  * @returns {undefined}
  */
-async function getComments(request, response, next){
+async function getComments(request, response, next) {
     const venue = await Venue.findOne({_id: request.params.id}).populate({path: 'comments', model: 'Comment'});
     await Venue.populate(venue, {path: 'comments.author', model: 'User'});
     await Venue.populate(venue, {path: 'comments.comments', model: 'Comment'});

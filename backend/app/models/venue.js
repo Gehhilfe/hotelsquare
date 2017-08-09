@@ -104,6 +104,8 @@ class VenueClass {
      * @returns {bool} flag if venue is open
      */
     isOpen(datenow){
+        if(!this.opening_hours || !this.opening_hours.periods)
+            return null;
         const opening_periods = this.opening_hours.periods;
         if(!datenow){
             datenow = new Date();
@@ -322,6 +324,7 @@ class VenueClass {
     }
 
     toJSONDetails() {
+
         return {
             _id: this._id,
             name: this.name,
