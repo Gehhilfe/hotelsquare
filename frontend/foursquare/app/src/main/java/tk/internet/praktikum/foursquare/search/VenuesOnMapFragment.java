@@ -24,6 +24,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +36,7 @@ import java.util.Map;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
+import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
@@ -40,6 +45,7 @@ import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
+import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 
@@ -63,6 +69,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private Map<Venue, Bitmap> venueBitmapMap;
     private Map<User, Bitmap> friendBitmapMap;
     private List<Venue> allVenues;
+    private MainActivity ma;
 
     public VenuesOnMapFragment() {
         // Required empty public constructor
@@ -85,22 +92,35 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         venueBitmapMap = new HashMap<Venue, Bitmap>();
         friendBitmapMap = new HashMap<User, Bitmap>();
 
-        userLocation = new Location(8.656868, 49.876171);
+        MainActivity ma = (MainActivity) getActivity();
+        Log.d("KEYFOUND", "MA is " + ma);
+        userLocation = new Location(0,0);
+        userLocation = ma.getUserLocation();
+        Log.d("KEYFOUND", "UserLocation: " + userLocation.getLatitude() + " _ " + userLocation.getLongitude());
         this.setRetainInstance(true);
+
+        // off-topic -> ignore this
+        if(!(EventBus.getDefault().isRegistered(this))){
+            EventBus.getDefault().register(this);
+        }
+
         return view;
     }
 
     @Override
     public void onDestroy() {
+        // off-topic -> ignore this
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // set Map
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
-        //setUser();
+        setUser();
         //TODO:
         //updateFriendsMarker();
 
@@ -302,7 +322,11 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     }
 
     public void setUser() {
-        //TODO get LocationData...
+        MainActivity ma = (MainActivity) getActivity();
+        Log.d("KEYFOUND", "MA is " + ma);
+        userLocation = new Location(0,0);
+        userLocation = ma.getUserLocation();
+        Log.d("KEYFOUND", "UserLocation is: " + userLocation.getLatitude() + " _ " + userLocation.getLongitude());
         myPosition = map.addMarker(new MarkerOptions()
                 .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
                 .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
@@ -326,4 +350,16 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         //Todo
         return null;
     }
+
+    /**
+     * Listen for new database entries from background service
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(LocationTracker.LocationEvent event) {
+        Log.d("SUBSRIBEINMAP", "This is: "  + event.location);
+        // Update User Location on Map
+        // Update User Location in ListSearch
+    }
+
 }

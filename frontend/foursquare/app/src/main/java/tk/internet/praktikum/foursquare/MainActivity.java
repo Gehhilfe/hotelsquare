@@ -14,12 +14,21 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 
+import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
+import tk.internet.praktikum.foursquare.location.LocationService;
+import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
@@ -32,6 +41,9 @@ import tk.internet.praktikum.foursquare.user.UserActivity;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
+
+
+    private Location userLocation = new Location(0,0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,5 +192,43 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("LOCATION", "StartService");
+        startService(new Intent(this, LocationService.class)); // start tracking service
+
+        // off-topic -> ignore this
+        if(!(EventBus.getDefault().isRegistered(this))){
+            EventBus.getDefault().register(this);
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(this, LocationService.class)); // stop tracking service
+        Log.d("LOCATION", "StopService");
+        // off-topic -> ignore this
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
+
+    /**
+     * Listen for new database entries from background service
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(LocationTracker.LocationEvent event) {
+        Log.d("SUBSRIBE", "This is: "  + event.location);
+        // Update User Location on Map
+       userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
+        // Update User Location in ListSearch
+    }
+
+    public Location getUserLocation(){
+        return userLocation;
     }
 }
