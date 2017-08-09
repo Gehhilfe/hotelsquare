@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
+import tk.internet.praktikum.foursquare.api.bean.ChatMessage;
 import tk.internet.praktikum.foursquare.api.bean.Message;
 import tk.internet.praktikum.foursquare.api.bean.User;
 
@@ -25,15 +26,13 @@ public class ChatListViewAdapter extends BaseAdapter {
 
     private String LOG_TAG = ChatListViewAdapter.class.getSimpleName();
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("HH:mm");
-    private ArrayList<Message> messages;
-    private ArrayList<Chat> chatList;
+    private ArrayList<ChatMessage> messages;
     private Context context;
     private User currentUser;
 
-    public ChatListViewAdapter(ArrayList<Message> messages, ArrayList<Chat> chatList, User currentUser, Context context) {
+    public ChatListViewAdapter(ArrayList<ChatMessage> messages, User currentUser, Context context) {
         this.messages = messages;
         this.context = context;
-        this.chatList = chatList;
         this.currentUser = currentUser;
     }
 
@@ -58,7 +57,7 @@ public class ChatListViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = null;
-        Message message = messages.get(position);
+        ChatMessage message = messages.get(position);
         ViewHolder holder1;
         ViewHolder holder2;
 

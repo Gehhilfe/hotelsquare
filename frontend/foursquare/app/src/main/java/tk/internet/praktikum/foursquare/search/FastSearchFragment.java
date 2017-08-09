@@ -1,7 +1,5 @@
 package tk.internet.praktikum.foursquare.search;
 
-//import android.app.Fragment;
-//import android.app.FragmentTransaction;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -44,10 +42,7 @@ public class FastSearchFragment extends Fragment {
     }
     private  void deepSearch(String keyWord){
 
-        //Intent intent = new Intent(getActivity().getApplicationContext(), DeepSearchFragment.class);
-        //startActivityForResult(intent, 1);
 
-        // Todo
         // also gets the suggested value from 9 categories
         Fragment fragment=new DeepSearchFragment();
         Bundle bundle=new Bundle();

@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -83,6 +84,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private FloatingActionButton venueTextCommentButton;
     private FloatingActionButton venueImageCommentButton;
     private FloatingActionButton venueCheckInButton;
+    private FloatingActionButton venueImagesButton;
     private RecyclerView recyclerView;
     private AlertDialog venueTextCommentDialog;
     private AlertDialog venueImageCommentDialog;
@@ -100,6 +102,9 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private final int REQUEST_GALLERY = 1;
     private Venue currentVenue;
     private CommentVenueAdapter commentVenueAdapter;
+    private Image userAvatar=null;
+    private boolean reachedMaxVenues;
+    private Fragment parent;
     public static VenueInDetailFragment newInstance(String param1, String param2) {
         VenueInDetailFragment fragment = new VenueInDetailFragment();
 
@@ -110,53 +115,60 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         // Required empty public constructor
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_venue_in_detail, container, false);
-        // layoutInflater=inflater;
-        //this.container=container;
-        imageVenueOne = (ImageView) view.findViewById(R.id.image_venue_one);
-        imageVenueTwo = (ImageView) view.findViewById(R.id.image_venue_two);
-        imageVenueThree = (ImageView) view.findViewById(R.id.image_venue_three);
+        if(view==null) {
+            // Inflate the layout for this fragment
+            view = inflater.inflate(R.layout.fragment_venue_in_detail, container, false);
+            // layoutInflater=inflater;
+            //this.container=container;
+            imageVenueOne = (ImageView) view.findViewById(R.id.image_venue_one);
+            imageVenueTwo = (ImageView) view.findViewById(R.id.image_venue_two);
+            imageVenueThree = (ImageView) view.findViewById(R.id.image_venue_three);
 
-        venueName = (TextView) view.findViewById(R.id.venue_name);
-        venueAddress = (TextView) view.findViewById(R.id.venue_address);
-        venueIsOpened = (TextView) view.findViewById(R.id.venue_is_opened);
-        venueWebsite = (TextView) view.findViewById(R.id.venue_website);
-        venueWebsiteLabel = (TextView) view.findViewById(R.id.venue_website_label);
-        venueRating=(TextView) view.findViewById(R.id.venue_rating);
-        venueCheckIn=(TextView) view.findViewById(R.id.venue_checkinCount);
+            venueName = (TextView) view.findViewById(R.id.venue_name);
+            venueAddress = (TextView) view.findViewById(R.id.venue_address);
+            venueIsOpened = (TextView) view.findViewById(R.id.venue_is_opened);
+            venueWebsite = (TextView) view.findViewById(R.id.venue_website);
+            venueWebsiteLabel = (TextView) view.findViewById(R.id.venue_website_label);
+            venueRating = (TextView) view.findViewById(R.id.venue_rating);
+            venueCheckIn = (TextView) view.findViewById(R.id.venue_checkinCount);
 
-        venueTextCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_text_comment_button);
-        venueTextCommentButton.setOnClickListener(v -> {
-            showUpTextCommentDialog();
-        });
-        venueImageCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_image_commnent_button);
-        venueImageCommentButton.setOnClickListener(v -> {
-            showUpImageCommentDialog();
-        });
-        venueCheckInButton=(FloatingActionButton)view.findViewById(R.id.venue_checkin);
-        venueCheckInButton.setOnClickListener(v->venueCheckIn());
+            venueTextCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_text_comment_button);
+            venueTextCommentButton.setOnClickListener(v -> {
+                showUpTextCommentDialog();
+            });
+            venueImageCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_image_commnent_button);
+            venueImageCommentButton.setOnClickListener(v -> {
+                showUpImageCommentDialog();
+            });
+            venueCheckInButton = (FloatingActionButton) view.findViewById(R.id.venue_checkin);
+            venueCheckInButton.setOnClickListener(v -> venueCheckIn());
+            venueImagesButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_images);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
-        linearLayoutManager=new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        progressDialog = new ProgressDialog(getActivity(), 1);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Waiting for seeing venue details...");
-        progressDialog.show();
+            venueImagesButton.setOnClickListener(v -> venueImages());
 
-        SupportMapFragment mapFragment = ((SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.venueDetails_mapView));
-        mapFragment.getMapAsync(this);
-        currentPage = 0;
-        renderContent();
-        recyclerViewOnScrollListener();
+            recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
+            linearLayoutManager = new LinearLayoutManager(getContext());
+            recyclerView.setLayoutManager(linearLayoutManager);
+            progressDialog = new ProgressDialog(getActivity(), 1);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage("Waiting for seeing venue details...");
+            progressDialog.show();
+
+            SupportMapFragment mapFragment = ((SupportMapFragment) getChildFragmentManager()
+                    .findFragmentById(R.id.venueDetails_mapView));
+            mapFragment.getMapAsync(this);
+            currentPage = 0;
+            reachedMaxVenues=false;
+            renderContent();
+            recyclerViewOnScrollListener();
+
+        }
         return view;
     }
-
 
 
     public String getVenueId() {
@@ -268,6 +280,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private void showUpTextCommentDialog() {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View textCommentView = inflater.inflate(R.layout.venue_comment, null);
+        //ImageView user_avatar=(ImageView) textCommentView.findViewById(R.id.user_avatar_text_comment);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
@@ -284,6 +297,20 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
 
                     SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
                     User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
+                    ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+                    /*getUserAvatar(user.getName());
+                    if(userAvatar!=null) {
+                        imageCacheLoader.loadBitmap(userAvatar, ImageSize.SMALL)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(bitmap -> {
+                                    user_avatar.setImageBitmap(bitmap);
+                                    user_avatar.setVisibility(View.VISIBLE);
+                                });
+                    }
+                    else
+                        user_avatar.setVisibility(GONE);*/
+
                     textComment.setAuthor(user);
                     Log.d(LOG, "author: " + user);
                     String token = sharedPreferences.getString(Constants.TOKEN, "");
@@ -323,6 +350,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         //Todo
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View venueImageCommentView = inflater.inflate(R.layout.venue_image_comment, null);
+       // ImageView user_avatar=(ImageView) venueImageCommentView.findViewById(R.id.user_avatar_image_comment);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -332,6 +361,19 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 MultipartBody.Part image= UploadHelper.createMultipartBodySync(venueImageComment,getContext(),true);
                 SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getActivity().getApplicationContext());
                 User user = new User(sharedPreferences.getString(Constants.NAME, ""), sharedPreferences.getString(Constants.EMAIL, ""));
+                ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+               /* getUserAvatar(user.getName());
+                if(userAvatar!=null) {
+                    imageCacheLoader.loadBitmap(userAvatar, ImageSize.SMALL)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(bitmap -> {
+                                user_avatar.setImageBitmap(bitmap);
+                                user_avatar.setVisibility(View.VISIBLE);
+                            });
+                }
+                else
+                    user_avatar.setVisibility(GONE);*/
                 ImageComment imageComment=new ImageComment();
                 imageComment.setAuthor(user);
                 imageComment.setDate(new Date());
@@ -449,14 +491,19 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
 
     public void updateRecyclerView(List<Comment> comments) {
         Log.d(LOG, "***size :" + comments.size());
-        if(currentPage==0) {
-            commentVenueAdapter = new CommentVenueAdapter(comments, this);
-            recyclerView.setAdapter(commentVenueAdapter);
-            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        if(comments.size()>0) {
+            if (currentPage == 0) {
+                commentVenueAdapter = new CommentVenueAdapter(comments, this);
+                recyclerView.setAdapter(commentVenueAdapter);
+                recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+            } else {
+                commentVenueAdapter.addMoreCommentVenues(comments);
+            }
         }
         else{
-            commentVenueAdapter.addMoreCommentVenues(comments);
+            reachedMaxVenues=true;
+            currentPage=currentPage-1;
         }
 
     }
@@ -479,11 +526,13 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                 visibleItemCount = linearLayoutManager.getChildCount();
                 itemCount = linearLayoutManager.getItemCount();
                 lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
-                if((lastVisibleItemPosition+visibleItemCount)>=itemCount){
-                    Log.d(LOG,"lastVisibleItemPosition "+lastVisibleItemPosition);
-                    Log.d(LOG,"visibleItemCount "+visibleItemCount);
-                    Log.d(LOG,"itemCount "+itemCount);
+                Log.d(LOG,"currentPage: "+currentPage);
+                Log.d(LOG,"lastVisibleItemPosition "+lastVisibleItemPosition);
+                Log.d(LOG,"visibleItemCount "+visibleItemCount);
+                Log.d(LOG,"itemCount "+itemCount);
+                if(dy>0&&(lastVisibleItemPosition+visibleItemCount)>=itemCount&&lastVisibleItemPosition%10==9&&!reachedMaxVenues){
                     currentPage+=1;
+
                     renderCommentVenue(currentVenue);
                 }
 
@@ -492,6 +541,45 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         });
     }
 
+    private void venueImages() {
+        System.out.println("I am here");
+          VenueImagesFragment venueImagesFragment=new VenueImagesFragment();
+          venueImagesFragment.setParent(this.getParent());
+          venueImagesFragment.setImages(images);
+          redirectToFragment(venueImagesFragment);
+
+    }
+
+    private void redirectToFragment(Fragment fragment){
+        FragmentTransaction fragmentTransaction = this.getParent().getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
+    }
+
+    public Fragment getParent() {
+        return parent;
+    }
+
+    public void setParent(Fragment parent) {
+        this.parent = parent;
+    }
+
+   /* public void getUserAvatar(String userName){
+        if(userAvatar==null) {
+            UserService userService = ServiceFactory.createRetrofitService(UserService.class, URL);
+            userService.detailsByName(userName)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                                userAvatar = user.getAvatar();
+                            },
+                            throwable -> {
+                                Log.d(LOG, throwable.getMessage());
+                            });
+        }
+    }*/
 
 
 }

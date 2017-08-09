@@ -9,6 +9,7 @@ const venue = require('./app/routes/venue');
 const comment = require('./app/routes/comment');
 const chat = require('./app/routes/chat');
 const friend = require('./app/routes/friend');
+const autocompletion = require('./app/routes/autocompletion');
 
 const chatsocket = require('./app/routes/chatsocket');
 const util = require('./lib/util');
@@ -122,8 +123,11 @@ server.post('searches/users', auth, handlePromiseReject(user.search));
 server.post('searches/venues', handlePromiseReject(venue.queryVenue));
 server.post('searches/venues/:page', handlePromiseReject(venue.queryVenue));
 
-//Friends
+// Friends
 server.post('searches/nearbyfriends', auth, handlePromiseReject(friend.getNearByFriends));
+
+// Autocompletion of Places
+server.post('autocomplete', handlePromiseReject(autocompletion.complete));
 
 // Delete downloads
 server.on('after', (request) => {

@@ -17,6 +17,8 @@ import tk.internet.praktikum.foursquare.api.bean.Venue;
  */
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHolder> implements SearchResultAdapterListener{
+
+
     List<Venue> searchResultViewHolderList;
     Fragment parentFragment;
 
@@ -35,6 +37,8 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
 
     @Override
     public void onBindViewHolder(SearchResultViewHolder holder, int position) {
+          //Venue venue=searchResultViewHolderList.get(position);
+         //System.out.println("render venue position: "+position+ "name: "+venue.getName());
          holder.render(searchResultViewHolderList.get(position));
 
     }
@@ -48,7 +52,12 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
     public void clickOnVenue(String venueId) {
         VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();
         venueInDetailFragment.setVenueId(searchResultViewHolderList.get(Integer.valueOf(venueId)).getId());
+        venueInDetailFragment.setParent(parentFragment);
         redirectToFragment(venueInDetailFragment);
+    }
+    public  void addMoreVenues(List<Venue> venues){
+        this.searchResultViewHolderList.addAll(venues);
+        this.notifyDataSetChanged();
     }
 
 
@@ -59,6 +68,13 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
         fragmentTransaction.addToBackStack(fragment.getTag());
         fragmentTransaction.commit();
 
+    }
+    public List<Venue> getSearchResultViewHolderList() {
+        return searchResultViewHolderList;
+    }
+
+    public void setSearchResultViewHolderList(List<Venue> searchResultViewHolderList) {
+        this.searchResultViewHolderList = searchResultViewHolderList;
     }
 
 }

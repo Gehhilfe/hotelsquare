@@ -1,7 +1,5 @@
 package tk.internet.praktikum.foursquare.login;
 
-/*import android.app.Fragment;*/
-
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,7 +18,7 @@ public class RestorePasswordFragment extends Fragment {
 
     private static final String LOG_TAG = RestorePasswordFragment.class.getSimpleName();
 
-    private EditText email;
+    private EditText email, name;
     private AppCompatButton resetPwBtn;
     private  LoginGeneralFragment loginGeneralFragment;
 
@@ -28,6 +26,7 @@ public class RestorePasswordFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_restore_password, container, false);
 
+        name = (EditText) view.findViewById(R.id.reset_name);
         email = (EditText) view.findViewById(R.id.reset_email);
         resetPwBtn = (AppCompatButton) view.findViewById(R.id.reset_password_btn);
 
