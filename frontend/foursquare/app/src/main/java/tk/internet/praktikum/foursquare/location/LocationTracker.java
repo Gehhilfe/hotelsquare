@@ -17,29 +17,12 @@ import com.google.android.gms.location.LocationServices;
 
 import org.greenrobot.eventbus.EventBus;
 
-/**
- * tracks the Location
- */
 
 public class LocationTracker implements
         LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    // TAG
-    private final static String TAG = LocationTracker.class.getSimpleName();
-
-    // INTERVALS TODO: SET
-    private static final long INTERVAL = 10 * 45;
-    private static final long FASTEST_INTERVAL = 10 * 30;
-
-    //Variables
-    private Context context;
-    private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
-    private Location mCurrentLocation;
-
-    // LocationEvent class
     public static class LocationEvent {
         public Location location;
 
@@ -48,12 +31,20 @@ public class LocationTracker implements
         }
     }
 
+    private final static String TAG = LocationTracker.class.getSimpleName();
+    private static final long INTERVAL = 1000 * 15;
+    private static final long FASTEST_INTERVAL = 1000 * 10;
+    private Context context;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    private Location mCurrentLocation;
+
     public LocationTracker(Context context) {
         this.context = context;
+
         init();
     }
 
-    // Setup ApiClient
     private void init() {
         if (!isGooglePlayServicesAvailable(context)) return;
 
@@ -64,19 +55,17 @@ public class LocationTracker implements
                 .build();
     }
 
-    // Start and Connect
     public void start() {
         if (mGoogleApiClient != null) {
             mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(INTERVAL);
             mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
+            mLocationRequest.setSmallestDisplacement(5);
             mGoogleApiClient.connect();
         }
     }
 
-    // Stop and Disconnect
     public void stop() {
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
@@ -87,7 +76,6 @@ public class LocationTracker implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        // check Permissions
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.e(TAG, "Location tracking::Permission is missing");
@@ -95,37 +83,36 @@ public class LocationTracker implements
             return;
         }
 
-        // Start Location tracking
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         Log.d(TAG, "Location::start");
     }
 
-    // On ChangeListener
     @Override
     public void onLocationChanged(Location location) {
-        // set new Location
         mCurrentLocation = location;
+        Log.d("KEYFOUND", "Location("+location.getLatitude()+","+location.getLongitude()+")");
         Log.d(TAG, "Location("+location.getLatitude()+","+location.getLongitude()+")");
-        // Post to Bus
+
+        // notify UI
         EventBus.getDefault().post(new LocationEvent(mCurrentLocation));
     }
 
-    // Nothing to Do
     @Override
     public void onConnectionSuspended(int i) {
 
     }
 
-    // On Connection Failed
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d(TAG, "Connection failed: " + connectionResult.toString());
     }
 
-    // Check if Available
     public static boolean isGooglePlayServicesAvailable(Context context) {
-        // deprecated, but no way to fix due to version issues?
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
-        return ConnectionResult.SUCCESS == resultCode;
+        if (ConnectionResult.SUCCESS == resultCode) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

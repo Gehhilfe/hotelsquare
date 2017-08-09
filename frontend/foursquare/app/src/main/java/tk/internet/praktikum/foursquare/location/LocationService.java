@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import tk.internet.praktikum.foursquare.MainActivity;
+
 /**
  * Location Service which handle the LocationTracker
  */
@@ -26,22 +28,13 @@ public class LocationService extends Service{
         locationTracker = new LocationTracker(this);
         locationTracker.start();
 
-
-        // Shouldn't be necessary
-
-        //NotificationCompat.Builder mBuilder =
-         //       new NotificationCompat.Builder(this).setContentTitle("Aktiviere Tacking");
-
-        //Intent resultIntent = new Intent(this, MapsActivity.class);
-        //TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        //Intent resultIntent = new Intent(this, MainActivity.class);
+        //android.support.v4.app.TaskStackBuilder stackBuilder = android.support.v4.app.TaskStackBuilder.create(this);
         //stackBuilder.addParentStack(MainActivity.class);
-       // stackBuilder.addNextIntent(resultIntent);
+        //stackBuilder.addNextIntent(resultIntent);
 
-       // PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-       // mBuilder.setContentIntent(resultPendingIntent);
-
-       // startForeground(SERVICE_NOTIFICATION_ID, mBuilder.build());
-    return START_STICKY;
+        //PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        return START_STICKY;
     }
 
 
