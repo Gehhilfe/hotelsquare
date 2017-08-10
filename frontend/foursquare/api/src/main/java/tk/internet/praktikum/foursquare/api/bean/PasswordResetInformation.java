@@ -8,8 +8,9 @@ public class PasswordResetInformation {
     private String name;
     private String email;
 
-    PasswordResetInformation() {}
-    PasswordResetInformation(String name, String email) {
+    public PasswordResetInformation() {}
+
+    public PasswordResetInformation(String name, String email) {
         this.name = name;
         this.email = email;
     }
