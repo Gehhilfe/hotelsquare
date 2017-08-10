@@ -2,6 +2,7 @@ package tk.internet.praktikum.foursquare.search;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import static android.view.View.GONE;
  */
 
 public class CommentVenueViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private final String  LOG=CommentVenueViewHolder.class.getName();
     private View commentItemView;
     private TextView comment_content;
 
@@ -56,6 +58,7 @@ public class CommentVenueViewHolder extends RecyclerView.ViewHolder implements V
         }
         else{
             ImageComment imageComment=(ImageComment)comment;
+            Log.d(LOG, "imageComment: "+imageComment.getImage());
             comment_content.setVisibility(View.GONE);
             Image image=imageComment.getImage();
             if(image!=null) {
@@ -63,6 +66,7 @@ public class CommentVenueViewHolder extends RecyclerView.ViewHolder implements V
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(bitmap -> {
+                            Log.d(LOG,"*** bitmap: "+bitmap);
                             comment_image_content.setImageBitmap(bitmap);
                             comment_image_content.setVisibility(View.VISIBLE);
                         });
