@@ -7,6 +7,7 @@ import java.util.Date;
  */
 public class ChatMessage {
 
+    private String _id;
     private User sender;
     private String message;
     private Date date;
@@ -21,5 +22,9 @@ public class ChatMessage {
 
     public Date getDate() {
         return date;
+    }
+
+    public String getId() {
+        return _id;
     }
 }
