@@ -32,8 +32,8 @@ public class LocationTracker implements
     }
 
     private final static String TAG = LocationTracker.class.getSimpleName();
-    private static final long INTERVAL = 1000 * 10;
-    private static final long FASTEST_INTERVAL = 1000 * 10;
+    private static final long INTERVAL = 1000;
+    private static final long FASTEST_INTERVAL = 1000;
     private Context context;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -60,7 +60,8 @@ public class LocationTracker implements
             mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(INTERVAL);
             mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+            //mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             mGoogleApiClient.connect();
         }
     }

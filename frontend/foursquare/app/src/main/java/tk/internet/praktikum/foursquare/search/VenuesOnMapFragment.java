@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
@@ -151,7 +152,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     if (venue.isOpen()) {
                         tvOpen.setText(getString(R.string.open_now));
                     }
-                    ImageView venueImage = ((ImageView) myContentsView.findViewById(R.id.img));
+                    CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
                     if (venueBitmapMap.containsKey(venue)) {
                         Log.d("KEYFOUND", "Image for Venue was found");
                         venueImage.setImageBitmap(venueBitmapMap.get(venue));
@@ -169,7 +170,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
                     tvTitle.setText(friend.getDisplayName());
 
-                    ImageView venueImage = ((ImageView) myContentsView.findViewById(R.id.img));
+                    CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
                     venueImage.setImageBitmap(friendBitmapMap.get(friend));
 
                 } else {
