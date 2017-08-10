@@ -127,8 +127,8 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
             // layoutInflater=inflater;
             //this.container=container;
             imageVenueOne = (ImageView) view.findViewById(R.id.image_venue_one);
-            imageVenueTwo = (ImageView) view.findViewById(R.id.image_venue_two);
-            imageVenueThree = (ImageView) view.findViewById(R.id.image_venue_three);
+           // imageVenueTwo = (ImageView) view.findViewById(R.id.image_venue_two);
+           // imageVenueThree = (ImageView) view.findViewById(R.id.image_venue_three);
 
             venueName = (TextView) view.findViewById(R.id.venue_name);
             venueAddress = (TextView) view.findViewById(R.id.venue_address);
@@ -209,15 +209,21 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(bitmap -> {
+
                                             imageVenueOne.setMaxHeight(imageVenueOne.getWidth());
-                                            imageVenueTwo.setMaxHeight(imageVenueTwo.getWidth());
-                                            imageVenueThree.setMaxHeight(imageVenueThree.getWidth());
+                                            //imageVenueTwo.setMaxHeight(imageVenueTwo.getWidth());
+                                            //imageVenueThree.setMaxHeight(imageVenueThree.getWidth());
                                             Log.d(LOG,"imageView Width: "+imageVenueOne.getWidth());
                                             Log.d(LOG,"bitmap width: "+bitmap.getWidth());
                                             imageVenueOne.setImageBitmap(bitmap);
-                                            imageVenueTwo.setImageBitmap(bitmap);
-                                            imageVenueThree.setImageBitmap(bitmap);
+                                            //imageVenueTwo.setImageBitmap(bitmap);
+                                            //imageVenueThree.setImageBitmap(bitmap);
                                         });
+                            }
+                            else{
+                               /* Bitmap bitmap=Utils.decodeResourceImage(Resources.getSystem(),R.drawable.side_nav_bar,imageVenueOne.getWidth(),imageVenueOne.getHeight());
+                                Log.d(LOG,"bitmap Resource: "+bitmap);
+                                imageVenueOne.setImageBitmap(bitmap);*/
                             }
 
                             progressDialog.dismiss();
