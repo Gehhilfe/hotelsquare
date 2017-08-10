@@ -9,16 +9,26 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
+import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.ChatMessage;
 import tk.internet.praktikum.foursquare.api.bean.Message;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class ChatListViewAdapter extends BaseAdapter {
 
     private class ViewHolder {
+        public TextView messageView;
+        public TextView time;
+        //public TextView user;
+    }
+
+    private class ViewHolder2 {
         public TextView messageView;
         public TextView time;
         public TextView user;
@@ -26,14 +36,17 @@ public class ChatListViewAdapter extends BaseAdapter {
 
     private String LOG_TAG = ChatListViewAdapter.class.getSimpleName();
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("HH:mm");
-    private ArrayList<ChatMessage> messages;
+    private List<ChatMessage> messages;
     private Context context;
     private User currentUser;
 
-    public ChatListViewAdapter(ArrayList<ChatMessage> messages, User currentUser, Context context) {
+    public ChatListViewAdapter(List<ChatMessage> messages, List<User> participants, Context context) {
         this.messages = messages;
         this.context = context;
-        this.currentUser = currentUser;
+
+        for (User user : participants)
+            if (Objects.equals(user.getName(), LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "")))
+                currentUser = user;
     }
 
     public ChatListViewAdapter() {
@@ -59,11 +72,12 @@ public class ChatListViewAdapter extends BaseAdapter {
         View view = null;
         ChatMessage message = messages.get(position);
         ViewHolder holder1;
-        ViewHolder holder2;
+        ViewHolder2 holder2;
 
         // MSG = SENT => Participant = current
-        if (true) {
-            if (convertView == null) {
+
+        if (Objects.equals(message.getSender().getId(), currentUser.getId())) {
+           // if (convertView == null) {
                 view = LayoutInflater.from(context).inflate(R.layout.chat_send_msg, null, false);
                 holder1 = new ViewHolder();
 
@@ -71,36 +85,36 @@ public class ChatListViewAdapter extends BaseAdapter {
                 holder1.messageView = (TextView) view.findViewById(R.id.message_text);
                 holder1.time = (TextView) view.findViewById(R.id.time_text);
 
-                view.setTag(holder1);
-            } else {
-                view = convertView;
-                holder1 = (ViewHolder) view.getTag();
-            }
+           //     view.setTag(holder1);
+           // } else {
+           //     view = convertView;
+           //     holder1 = (ViewHolder) view.getTag();
+           // }
 
-            //holder1.messageView.setText(message.getMessage()); // TODO ADD SEND MSG
-            holder1.time.setText(SIMPLE_DATE_FORMAT.format("Sent time")); // TODO - ADD TIME
+            holder1.messageView.setText(message.getMessage());
+            holder1.time.setText(SIMPLE_DATE_FORMAT.format(message.getDate()));
 
             // MSG = REC => PART != current
-        } else if (true) {
+        } else if (!Objects.equals(message.getSender().getId(), currentUser.getId())) {
 
-            if (convertView == null) {
+            //if (convertView == null) {
                 view = LayoutInflater.from(context).inflate(R.layout.chat_received_msg, null, false);
 
-                holder2 = new ViewHolder();
+                holder2 = new ViewHolder2();
 
 
                 holder2.messageView = (TextView) view.findViewById(R.id.message_text);
                 holder2.time = (TextView) view.findViewById(R.id.time_text);
                 holder2.user = (TextView) view.findViewById(R.id.chat_user);
-                view.setTag(holder2);
-            } else {
-                view = convertView;
-                holder2 = (ViewHolder) view.getTag();
-            }
+             //   view.setTag(holder2);
+           // } else {
+            //    view = convertView;
+           //     holder2 = (ViewHolder2) view.getTag();
+           // }
 
-            holder2.user.setText("USER"); // TODO - ADD OTHER USERNAME
-            //holder2.messageView.setText(message.getMessage()); // TODO ADD RECEIVED MSG
-            holder2.time.setText(SIMPLE_DATE_FORMAT.format("SENT TIME")); // TODO - ADD TIME
+            holder2.user.setText(message.getSender().getDisplayName());
+            holder2.messageView.setText(message.getMessage());
+            holder2.time.setText(SIMPLE_DATE_FORMAT.format(message.getDate()));
         }
         return view;
     }
