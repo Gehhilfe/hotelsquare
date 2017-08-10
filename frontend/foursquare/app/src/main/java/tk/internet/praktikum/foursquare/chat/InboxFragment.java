@@ -39,13 +39,14 @@ public class InboxFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.inbox_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+
         try {
             service.getConversations()
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             inboxResponse -> {
-                                recyclerView.setAdapter(new InboxRecylcerViewAdapter(getContext(), inboxResponse));
+                                recyclerView.setAdapter(new InboxRecylcerViewAdapter(getContext(), inboxResponse, this, getActivity()));
                             },
                             throwable -> {
                                 Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
