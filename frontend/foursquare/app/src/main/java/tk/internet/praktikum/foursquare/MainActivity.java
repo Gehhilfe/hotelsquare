@@ -67,9 +67,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         FastSearchFragment searchFragment = new FastSearchFragment();
-        //getFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
-
+        redirectToFragment(searchFragment);
     }
 
     @Override
