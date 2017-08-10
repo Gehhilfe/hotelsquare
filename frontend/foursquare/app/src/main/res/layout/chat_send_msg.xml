@@ -7,7 +7,7 @@
     android:paddingTop="5dp">
 
     <!-- Maybe chat layout -->
-    <RelativeLayout
+    <tk.internet.praktikum.foursquare.chat.ChatLayout
         android:layout_marginLeft="20dp"
         android:layout_width="wrap_content"
         android:id="@+id/bubble"
@@ -50,5 +50,5 @@
             android:layout_toLeftOf="@id/time_text"
             android:autoLink="web"
             android:text="Test Message send." />
-    </RelativeLayout>
+    </tk.internet.praktikum.foursquare.chat.ChatLayout>
 </RelativeLayout>

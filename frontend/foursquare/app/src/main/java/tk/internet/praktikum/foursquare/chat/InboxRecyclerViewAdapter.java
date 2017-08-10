@@ -1,7 +1,10 @@
 package tk.internet.praktikum.foursquare.chat;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +20,15 @@ import java.util.Objects;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
+import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 
 class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAdapter.InboxViewHolder> {
 
@@ -50,6 +56,16 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
                 args.putString("chatId", chatList.get(getAdapterPosition()).getChatId());
                 args.putString("currentUserName", currentUserName);
                 fragment.setArguments(args);
+                /*
+                FragmentTransaction transaction = inboxFragment.getFragmentManager().beginTransaction();
+                transaction.replace(R.id.inbox_layout, fragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+                */
+                Intent intent = new Intent(context, DummyChatActivity.class);
+                intent.putExtra("chatId", chatList.get(getAdapterPosition()).getChatId());
+                intent.putExtra("currentUserName", currentUserName);
+                activity.startActivityForResult(intent, 0);
             } else {
                 Toast.makeText(v.getContext(), "Profile " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
             }
@@ -61,12 +77,25 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
     private LayoutInflater inflater;
     private List<Chat> chatList = Collections.emptyList();
     private String currentUserName;
+    private InboxFragment inboxFragment;
+    private Activity activity;
 
-    public InboxRecylcerViewAdapter(Context context, List<Chat> inbox) {
+
+    public InboxRecylcerViewAdapter(Context context, List<Chat> inbox, InboxFragment inboxFragment) {
         inflater = LayoutInflater.from(context);
         this.chatList = inbox;
         this.context = context;
         currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
+        this.inboxFragment = inboxFragment;
+    }
+
+    public InboxRecylcerViewAdapter(Context context, List<Chat> inbox, InboxFragment inboxFragment, Activity activity) {
+        inflater = LayoutInflater.from(context);
+        this.chatList = inbox;
+        this.context = context;
+        currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
+        this.inboxFragment = inboxFragment;
+        this.activity = activity;
     }
 
     @Override
