@@ -31,6 +31,8 @@ chatsocket(io);
 
 util.connectDatabase(mongoose).then(util.initDatabase);
 
+server.use(restify.queryParser());
+
 server.use(restify.plugins.bodyParser({
     maxBodySize: 1024 * 1024,
     mapParams: true,

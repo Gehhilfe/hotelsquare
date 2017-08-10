@@ -33,6 +33,7 @@ describe('Chat', () => {
     let token;
     let chat;
     let otherchat;
+    let msgA;
 
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
@@ -60,8 +61,10 @@ describe('Chat', () => {
 
         chat = await Chat.create({participants: [u, other]});
         otherchat = await Chat.create({participants: [u, other, third]});
-        const msgA = await Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id});
+        msgA = await Message.create({sender: u, message: 'first chat', date: Date.now(), chatId: chat._id});
+        const newerMessage = await Message.create({sender: u, message: 'new message', date: Date.now(), chatId: chat._id});
         chat.addMessage(msgA);
+        chat.addMessage(newerMessage);
         const msgB = await Message.create({sender: other, message: 'second chat', date: Date.now(), chatId: otherchat._id});
         otherchat.addMessage(msgB);
         await Promise.all([
@@ -75,6 +78,44 @@ describe('Chat', () => {
             request(server)
                 .get('/chats/' + chat._id)
                 .set('x-auth', token)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.messages.should.be.a('array');
+                    res.body.participants.should.be.a('array');
+                    res.body.participants[0].should.be.a('object');
+                    res.body.participants[0].avatar.should.be.a('object');
+                    res.body.messages[0].should.be.a('object');
+                    res.body.messages.length.should.be.eql(2);
+                    res.body.messages[0].message.should.be.equal('first chat');
+                    return done();
+                });
+        });
+
+        it('should retrieve the respective chat history of the passed id also when query parameter is empty', (done) => {
+            request(server)
+                .get('/chats/' + chat._id)
+                .set('x-auth', token)
+                .query({ lastMessage: '' })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.messages.should.be.a('array');
+                    res.body.participants.should.be.a('array');
+                    res.body.participants[0].should.be.a('object');
+                    res.body.participants[0].avatar.should.be.a('object');
+                    res.body.messages[0].should.be.a('object');
+                    res.body.messages.length.should.be.eql(2);
+                    res.body.messages[0].message.should.be.equal('new message');
+                    return done();
+                });
+        });
+
+        it('should retrive only message newer than the provided id', (done) => {
+            request(server)
+                .get('/chats/' + chat._id)
+                .set('x-auth', token)
+                .query({ lastMessage: msgA._id.toString() })
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');

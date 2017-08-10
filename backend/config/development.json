@@ -1,6 +1,6 @@
 {
   "db": {
-    "host": "localhost",
+    "host": "docker",
     "name": "dev"
   },
   "jwt": {
@@ -8,60 +8,6 @@
     "options": {
       "algorithm": "HS256"
     }
-  },
-  "bootstrap": {
-    "User": [
-      {"name": "Admin", "email": "admin@test.de", "password": "123456", "location": { "type": "Point", "coordinates": [8.654596, 49.874840]}},
-      {"name": "Peter", "email": "peter@wunderlich.de", "password": "peterw", "location": { "type": "Point", "coordinates": [8.657327, 49.873550]}},
-      {"name": "Janus", "email": "janus@wunderlich.de", "password": "janusw", "location": { "type": "Point", "coordinates": [8.656656, 49.874297]}},
-      {"name": "Birte", "email": "birte@wunderlich.de", "password": "birtew", "location": { "type": "Point", "coordinates": [8.657606, 49.875791]}},
-      {"name": "Rosamunde", "email": "rosamunde@wunderlich.de", "password": "rosamunde", "location": { "type": "Point", "coordinates": [8.659435, 49.874142]}},
-      {"name": "Waldi", "email": "waldi@wunderlich.de", "password": "waldiw", "location": { "type": "Point", "coordinates": [8.653373, 49.876641]}}
-    ],
-    "UserFriend": [
-      {"a": "Admin", "b": "Peter"},
-      {"a": "Admin", "b": "Janus"},
-      {"a": "Admin", "b": "Birte"},
-      {"a": "Admin", "b": "Rosamunde"},
-      {"a": "Janus", "b": "Rosamunde"},
-      {"a": "Rosamunde", "b": "Waldi"}
-    ],
-    "UserFriendRequest": [
-      {"from": "Waldi", "to": "Admin"}
-    ],
-    "Chat": [
-      {
-        "participants": ["Admin", "Peter"],
-        "messages": [
-          {"from": "Admin", "message": "1 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "2 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "3 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "4 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "5 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "6 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "7 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "8 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "9 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "10 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "11 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "12 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "13 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "14 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "15 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "16 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "17 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "18 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "19 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "20 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "21 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "22 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "23 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Admin", "message": "24 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "25 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."},
-          {"from": "Peter", "message": "26 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient."}
-        ]
-      }
-    ]
   },
   "minio": {
     "key": "stimi-storage",

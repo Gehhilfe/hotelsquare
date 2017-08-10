@@ -1,6 +1,7 @@
 'use strict';
 const _ = require('lodash');
 const errors = require('restify-errors');
+const mongoose = require('mongoose');
 const User = require('../models/user');
 const Chat = require('../models/chat');
 const Message = require('../models/message');
@@ -149,12 +150,20 @@ async function getConversation(request, response, next) {
     if(request.params.page)
         page = request.params.page;
 
+    let filter = null;
+    if(request.params.lastMessage) {
+        filter = {
+            _id: {$gt: new mongoose.Types.ObjectId(request.params.lastMessage)}
+        };
+    }
+
     // Get chats for user
     const chat = await Chat.findOne({
         _id: request.params.chatId,
         participants: request.authentication._id
     }).populate({
         path: 'messages',
+        match: filter,
         populate: {
             path: 'sender',
             populate: {
