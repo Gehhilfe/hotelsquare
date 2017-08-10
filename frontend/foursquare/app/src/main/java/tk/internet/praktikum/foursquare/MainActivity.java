@@ -3,9 +3,8 @@ package tk.internet.praktikum.foursquare;
 //import android.app.Fragment;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -23,16 +22,19 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.IOException;
-
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.Constants;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Location;
+import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.DummyProfile;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.foursquare.user.UserActivity;
 
@@ -44,6 +46,10 @@ public class MainActivity extends AppCompatActivity
 
 
     private Location userLocation = new Location(0,0);
+    private Handler handler = new Handler();
+    private final String URL = "https://dev.ip.stimi.ovh/";
+    private User locationUser = new User();
+    private int PARAM_INTERVAL = 60000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +67,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         FastSearchFragment searchFragment = new FastSearchFragment();
-        //getFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, searchFragment).commit();
-
+        redirectToFragment(searchFragment);
     }
 
     @Override
@@ -225,10 +229,45 @@ public class MainActivity extends AppCompatActivity
         Log.d("SUBSRIBE", "This is: "  + event.location);
         // Update User Location on Map
        userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
-        // Update User Location in ListSearch
+        // Update User Location on Server
+        if ((LocalStorage.
+                getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""))  != "") {
+            sendUserLocation(userLocation);
+        }
+    }
+
+    private void sendUserLocation(Location userLocation) {
+        locationUser.setLocation(userLocation);
+        handler.postDelayed(sendLocation, PARAM_INTERVAL);
+
     }
 
     public Location getUserLocation(){
         return userLocation;
     }
+
+    private Runnable sendLocation = new Runnable() {
+        @Override
+        public void run() {
+            UserService service = ServiceFactory
+                    .createRetrofitService(UserService.class, URL, LocalStorage.
+                            getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+            service.update(locationUser)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                                locationUser = user;
+                        Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+            handler.postDelayed(this,PARAM_INTERVAL);
+        }
+
+    };
+
+
 }

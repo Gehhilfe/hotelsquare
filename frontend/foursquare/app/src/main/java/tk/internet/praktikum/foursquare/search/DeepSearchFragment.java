@@ -3,8 +3,6 @@ package tk.internet.praktikum.foursquare.search;
 //import android.app.Fragment;
 
 import android.app.ProgressDialog;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -36,14 +34,15 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.Prediction;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueSearchQuery;
 import tk.internet.praktikum.foursquare.api.service.PlaceService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
-import tk.internet.praktikum.foursquare.location.LocationReader;
 
 //import tk.internet.praktikum.foursquare.api.bean.Location;
 
@@ -207,12 +206,11 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             Log.d(LOG, "#### currentQuery: " + query);
             Log.d(LOG,"++++ currentPageQuery: "+currentPage);
             VenueSearchQuery venueSearchQuery;
-            if (filterLocation.isClickable() && !filterLocation.getText().toString().equals("Near Me")) {
+            if ( filterLocation!=null && !filterLocation.getText().toString().isEmpty()&& !filterLocation.getText().toString().equals("Near Me")) {
                 venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString().trim());
             } else {
-                // TODO
                 // gets current location based on gps; "Near me"
-                Location currentLocation = LocationReader.getLocationReader(getContext()).getCurrentLocation(LocationManager.GPS_PROVIDER);
+                Location currentLocation=((MainActivity)getActivity()).getUserLocation();
                 //Toast.makeText(getActivity().getApplicationContext(), currentLocation.toString(), Toast.LENGTH_LONG).show();
                 Log.d(LOG, "current location: long- " + currentLocation.getLongitude() + "lat- " + currentLocation.getLatitude());
                 //venueSearchQuery = new VenueSearchQuery(query, dummyLocation().getLongitude(), dummyLocation().getLatitude());
@@ -226,6 +224,14 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(venueSearchResult -> {
+                                venueSearchResult.getResults()
+                                        .forEach(e ->
+                                                {
+                                                    Log.d(LOG, e.getName());
+                                                    Log.d(LOG, "long: " + e.getLocation().getLongitude() + "lat: " + e.getLocation().getLatitude());
+                                                }
+                                        );
+
                                 venueSearchResult.getResults();
                                 venues = venueSearchResult.getResults();
                                if(venues.size()>0) {
@@ -280,8 +286,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                 Log.d(LOG, "changed location: " + changedLocation);
                 if (!changedLocation.equals(lastFilterLocation)) {
                     lastFilterLocation = changedLocation;
-                    PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, GOOGLE_PLACE_URL);
-                    placeService.getSuggestedPlaces(changedLocation, "geocode", getString(R.string.google_maps_key).trim())
+                    PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, URL);
+                    placeService.getSuggestedPlaces(changedLocation)
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(placeAutoComplete -> {

@@ -37,7 +37,7 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:weightSum="100">
-                <LinearLayout
+         <!--       <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="45"
@@ -66,8 +66,27 @@
                         android:layout_height="match_parent"
                         android:layout_weight="33"
                         app:layout_collapseMode="parallax" />
-                </LinearLayout>
-
+                </LinearLayout>-->
+                    <GridLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="45"
+                        android:gravity="bottom"
+                        android:background="@drawable/side_nav_bar"
+                        android:orientation="horizontal"
+                        app:layout_collapseMode="parallax"
+                        android:columnCount="1"
+                        android:rowCount="1">
+                        <ImageView
+                            android:id="@+id/image_venue_one"
+                            android:layout_column="0"
+                            android:layout_row="0"
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:layout_gravity="fill_horizontal"
+                            android:scaleType="centerCrop"
+                            app:layout_collapseMode="parallax"/>
+                    </GridLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -202,7 +221,7 @@
 
             </com.github.clans.fab.FloatingActionMenu>-->
             <com.github.clans.fab.FloatingActionMenu
-                android:id="@+id/menu"
+                android:id="@+id/floating_menu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"

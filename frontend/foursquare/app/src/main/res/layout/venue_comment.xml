@@ -8,20 +8,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <ImageView
+     <!--   <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxHeight="30dp"
             android:minHeight="20dp"
             android:padding="5dp"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"/>-->
+     <!--   <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_avatar_text_comment"
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            />-->
         <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="80"
             android:id="@+id/venue_text_comment_content"
-            android:paddingLeft="16dp"
-            android:textSize="16sp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:textSize="12sp"
             android:textColor="@color/black"
             android:inputType="textMultiLine"
             android:hint="Add a comment here" />

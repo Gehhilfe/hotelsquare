@@ -6,9 +6,10 @@
     <ImageView
         android:id="@+id/venue_image_item"
         android:adjustViewBounds="true"
-        android:layout_height="200dp"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
         android:scaleType="centerCrop"
         android:layout_margin="2dp"
-        android:layout_width="match_parent"/>
+        />
 
 </LinearLayout>
