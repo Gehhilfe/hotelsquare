@@ -2,20 +2,5 @@
   "db": {
     "host": "mongo",
     "name": "test"
-  },
-  "jwt": {
-    "secret": "secret",
-    "options": {
-      "algorithm": "HS256"
-    }
-  },
-  "minio": {
-    "key": "stimi-storage",
-    "secret": "6!u40ws?}QwjhpFw",
-    "bucket": "test"
-  },
-  "googleapi": {
-    "GOOGLE_PLACES_API_KEY": "AIzaSyCK1nUagKpUd3I5i415iNaiXz5Cl2l9QM8",
-    "GOOGLE_PLACES_OUTPUT_FORMAT": "json"
   }
 }

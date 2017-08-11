@@ -18,5 +18,24 @@
     "anwalt": "lawyer",
     "bibliothek": "library",
     "kino": "cinema"
+  },
+  "jwt": {
+    "secret": "secret",
+    "options": {
+      "algorithm": "HS256"
+    }
+  },
+  "facebook": {
+    "app_id": "260324484463075",
+    "key": ""
+  },
+  "googleapi": {
+    "GOOGLE_PLACES_API_KEY": "AIzaSyCK1nUagKpUd3I5i415iNaiXz5Cl2l9QM8",
+    "GOOGLE_PLACES_OUTPUT_FORMAT": "json"
+  },
+  "minio": {
+    "key": "stimi-storage",
+    "secret": "6!u40ws?}QwjhpFw",
+    "bucket": "test"
   }
 }

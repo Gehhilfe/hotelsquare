@@ -12,7 +12,12 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.PasswordResetInformation;
+import tk.internet.praktikum.foursquare.api.service.UserService;
 
 public class RestorePasswordFragment extends Fragment {
 
@@ -49,10 +54,12 @@ public class RestorePasswordFragment extends Fragment {
         progressDialog.show();
 
 
-        new android.os.Handler().postDelayed(() -> {
-            successfulReset();
-            progressDialog.dismiss();
-        }, 3000);
+        UserService service = ServiceFactory.createRetrofitService(UserService.class, "https://dev.ip.stimi.ovh/");
+
+        service.passwordReset(new PasswordResetInformation(name.getText().toString(), email.getText().toString()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((a) -> successfulReset(), (a) -> failedReset());
 
     }
 
