@@ -40,7 +40,8 @@ describe('Session', () => {
                 User.create({
                     name: 'test',
                     password: 'secret',
-                    email: 'test@test.de'
+                    email: 'test@test.de',
+                    active: true
                 }).then((u) => {
                     validUser = u;
                     return done();
