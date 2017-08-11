@@ -11,6 +11,7 @@ const Image = require('../models/image');
 
 const ValidationError = require('../errors/ValidationError');
 
+var {FB, FacebookApiException} = require('fb');
 
 const handleValidation = (next, func) => {
     func().catch((error) => {
@@ -362,6 +363,53 @@ async function confirmFriendRequest(request, response, next) {
     }
 }
 
+/**
+ * Register user with information provided from facebook api
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function facebookRegister(request, response, next) {
+    FB.setAccessToken(request.params.token);
+    FB.api('me', {fields: ['id', 'name', 'email', 'cover']}, async (res) => {
+        const password = password_generate.generate({
+            length: 10,
+            numbers: true
+        });
+        const user = new User({
+            name: res.name,
+            email: res.email,
+            password: password
+        });
+        if(config.email) {
+            const transporter = nodemailer.createTransport({
+                host: config.email.server,
+                port: 587,
+                secure: false,
+                requireTLS: true,
+                auth: {
+                    user: config.email.mail,
+                    pass: config.email.password
+                }
+            });
+
+            const mailOptions = {
+                from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
+                to: user.email,
+                subject: 'HOTELSQUARE Passwordreset',
+                text: 'Hello '+user.displayName+', your password has been changed to "'+password+'" without quotes. Change your password immediately!'
+            };
+
+            await transporter.sendMail(mailOptions);
+        }
+
+        response.send(await user.save());
+        return next();
+    });
+}
+
 module.exports = {
     register,
     deleteUser,
@@ -374,5 +422,6 @@ module.exports = {
     updateUser,
     removeFriend,
     search,
-    resetPassword
+    resetPassword,
+    facebookRegister
 };

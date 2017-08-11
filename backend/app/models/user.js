@@ -17,7 +17,7 @@ const UserSchema = new Schema({
         required: [true, 'Please fill a name'],
         minlength: [4, 'Name needs to have at least 5 characters'],
         unique: true,
-        match: [/^[a-zA-Z][a-zA-Z0-9-_]*$/, 'Only a-z,A-Z,0-9,-,_ characters are allowed as name']
+        match: [/^[a-zA-Z][a-zA-Z0-9-_ ]*$/, 'Only a-z,A-Z,0-9,-,_ characters are allowed as name']
     },
     displayName: String,
     email: {
