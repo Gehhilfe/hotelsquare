@@ -136,7 +136,7 @@ async function updateUser(request, response, next) {
  */
 async function register(request, response, next) {
     handleValidation(next, async () => {
-        const user = await User.create(request.params);
+        const user = await User.register(request.body.name, request.body.email, request.body.password);
 
         if(config.email) {
             const transporter = nodemailer.createTransport({
@@ -154,7 +154,7 @@ async function register(request, response, next) {
                 from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
                 to: user.email,
                 subject: 'Welcome to HOTELSQUARE',
-                text: 'Hello '+user.displayName+', have fun using HOTELSQUARE!'
+                text: 'Hello ${user.displayName}, have fun using HOTELSQUARE! But before you start please confirm your email address by clicking on this link http://dev.ip.stimi.ovh/emailConfirmation/${user.activation_key}'
             };
 
             await transporter.sendMail(mailOptions);
@@ -378,11 +378,7 @@ async function facebookRegister(request, response, next) {
             length: 10,
             numbers: true
         });
-        const user = new User({
-            name: res.name,
-            email: res.email,
-            password: password
-        });
+        const user = await User.register(res.name, res.email, password);
         if(config.email) {
             const transporter = nodemailer.createTransport({
                 host: config.email.server,
@@ -410,6 +406,32 @@ async function facebookRegister(request, response, next) {
     });
 }
 
+/**
+ * Handle email confirmation
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function confirmEmail(request, response, next) {
+    if(!request.params.id || !request.params.key) {
+        return next(new restify_errors.BadRequestError('Missing id or key'));
+    }
+
+    const user = await User.findOne({_id: request.params.id, activation_key: request.params.key});
+    if(!user) {
+        return next(new restify_errors.BadRequestError('Wrong id or key'));
+    }
+
+    user.active = true;
+    user.activation_key = '';
+    await user.save();
+
+    response.send('Hello ${user.displayName} your email is succesfuly confirmed. Have fun using HOTEL-Square');
+    return next();
+}
+
 module.exports = {
     register,
     deleteUser,
@@ -423,5 +445,6 @@ module.exports = {
     removeFriend,
     search,
     resetPassword,
-    facebookRegister
+    facebookRegister,
+    confirmEmail
 };

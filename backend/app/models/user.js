@@ -5,6 +5,7 @@ const restify = require('restify');
 const restify_errors = require('restify-errors');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
+const password_generate = require('generate-password');
 const SALT_WORK_FACTOR = 10;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -66,6 +67,11 @@ const UserSchema = new Schema({
         type: Boolean,
         default: false
     },
+    active: {
+        type: Boolean,
+        default: false
+    },
+    activation_key: String,
     age: Number,
     city: String
 });
@@ -109,7 +115,7 @@ class UserClass {
             name = name.name;
         }
         return new Promise(function (resolve, reject) {
-            self.findOne({$or: [{displayName: name}, {email: name}, {name: name}]}).then(function (res) {
+            self.findOne({$or: [{displayName: name}, {email: name}, {name: name}], active: true}).then(function (res) {
                 const foundUser = res;
                 if (res === null)
                     return reject();
@@ -121,6 +127,21 @@ class UserClass {
                 }, reject);
             }, reject);
         });
+    }
+
+    static async register(name, email, password) {
+        const self = this;
+        const user = await self.create({
+            name: name,
+            email: email,
+            password: password,
+            activation_key: password_generate.generate({
+                length: 64,
+                numbers: true,
+                excludeSimilarCharacters: true
+            })
+        });
+        return user;
     }
 
     /**

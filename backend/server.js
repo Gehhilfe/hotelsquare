@@ -133,6 +133,9 @@ server.post('searches/nearbyfriends', auth, handlePromiseReject(friend.getNearBy
 // Autocompletion of Places
 server.post('autocomplete', handlePromiseReject(autocompletion.complete));
 
+// Email confirmationb
+server.get('emailConfirmation', handlePromiseReject(user.confirmEmail));
+
 // Delete downloads
 server.on('after', (request) => {
     if (request.files) {
