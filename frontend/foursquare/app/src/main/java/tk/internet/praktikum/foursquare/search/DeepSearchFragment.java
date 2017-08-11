@@ -224,7 +224,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(venueSearchResult -> {
-                                venueSearchResult.getResults();
+
                                 venues = venueSearchResult.getResults();
                                if(venues.size()>0) {
                                    if (mapViewButton.isChecked())

@@ -48,5 +48,8 @@
     <string name="websiteLabel">Website: </string>
     <string name="startLabel">Search</string>
     <string name="restore_name">Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="sendComment">Send</string>
+    <string name="loginToContinue">Continue</string>
 
 </resources>

@@ -26,6 +26,6 @@
      add your KEY to use googlemaps
     -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
-           AIzaSyA5UGvQh2M3VHy_AUpnr3bsYDWix2cHglw
+           AIzaSyBF_TBSA4WyFLN14Hpm_cWrM9FmAZV2QC4
     </string>
 </resources>
