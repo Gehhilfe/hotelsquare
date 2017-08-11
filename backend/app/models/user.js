@@ -137,7 +137,7 @@ class UserClass {
             password: password,
             activation_key: password_generate.generate({
                 length: 64,
-                numbers: true,
+                numbers: false,
                 excludeSimilarCharacters: true
             })
         });
