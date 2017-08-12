@@ -110,6 +110,7 @@ async function queryVenue(request, response, next) {
     let location = request.body.location;
     let locationName = request.body.locationName;
     let radius = request.body.radius;
+    let price = 0;
     let only_open = false;
     let page = 0;
     if (request.params.page)
@@ -119,10 +120,14 @@ async function queryVenue(request, response, next) {
         only_open = request.body.only_open;
     }
 
+    if (request.body.price) {
+        price = request.body.price;
+    }
+
     if (!radius) {
-        radius = 5000;
+        radius = 25000;
     } else {
-        radius = Math.min(5000, Math.max(1000, radius));
+        radius = Math.min(25000, Math.max(1000, radius));
     }
     let keyword = request.body.keyword;
 
@@ -152,7 +157,7 @@ async function queryVenue(request, response, next) {
     }
 
     // search in our database for query
-    let venues = await searchVenuesInDB(location, keyword, radius, page, 10);
+    let venues = await searchVenuesInDB(location, keyword, radius, price, page, 10);
     venues = _.map(venues, (v) => v.toJSONSearchResult());
     if (only_open) {
         venues = _.filter(venues, (v) => v.isOpen());
@@ -175,11 +180,12 @@ async function queryVenue(request, response, next) {
  * @param {Number[]} location center point
  * @param {string} keyword keyword
  * @param {Number} radius search radius
+ * @param {Number} price minimum price level 0=all 5=highest
  * @param {Number} page result page
  * @param {Number} limit  number of results on page
  * @returns {Promise.<*>} result
  */
-async function searchVenuesInDB(location, keyword = '', radius = 5000, page = 0, limit = 20) {
+async function searchVenuesInDB(location, keyword = '', radius = 5000, price = 0, page = 0, limit = 20) {
     const closestSearch = await SearchRequest.findClosestLocation(location, keyword, 5000);
 
     if (closestSearch.length === 0) {
@@ -196,7 +202,10 @@ async function searchVenuesInDB(location, keyword = '', radius = 5000, page = 0,
         $or: [
             {name: new RegExp(keyword, 'i')},
             {types: new RegExp(keyword, 'i')}
-        ]
+        ],
+        price: {
+            $gte: price
+        }
     }).populate('images').limit(limit).skip(page * limit);
     return await query.where('location').near({
         center: location,
