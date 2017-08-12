@@ -2,6 +2,7 @@ package tk.internet.praktikum.foursquare;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -14,8 +15,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,12 +33,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.CommentAdapter;
+import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
+import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -56,6 +64,8 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
 
     private NestedScrollView scrollView;
 
+    private Button callBtn, wwwBtn, checkinBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,10 +73,16 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Intent intent = getIntent();
         String venueId = intent.getStringExtra("VENUE_ID");
 
         headerImage = (ImageView) findViewById(R.id.header_image);
+
+        callBtn = (Button) findViewById(R.id.call);
+        wwwBtn = (Button) findViewById(R.id.www);
+        checkinBtn = (Button) findViewById(R.id.checkin);
 
         scrollView = (NestedScrollView) findViewById(R.id.scrollView);
 
@@ -124,6 +140,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                     updateVicinty(venue);
                     updateVenueLocation(venue.getLocation());
                     updatePrice(venue);
+                    updateButtons(venue);
                     if (venue.getImages().size() > 0) {
                         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
 
@@ -161,6 +178,33 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                 }, err -> {
                     Log.d(NewVenueDetail.class.getName(), err.toString());
                 });
+    }
+
+    private void updateButtons(Venue venue) {
+        if(venue.getWebsite() != null && !venue.getWebsite().isEmpty())
+            wwwBtn.setVisibility(View.VISIBLE);
+        else
+            wwwBtn.setVisibility(View.INVISIBLE);
+
+        if(venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty())
+            callBtn.setVisibility(View.VISIBLE);
+        else
+            callBtn.setVisibility(View.INVISIBLE);
+
+        checkinBtn.setOnClickListener((view) -> {
+            LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
+            SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
+            if(ls.isLoggedIn()) {
+                VenueService vs = ServiceFactory.createRetrofitService(VenueService.class, URL, sp.getString(Constants.TOKEN, ""));
+                vs.checkin(venue.getId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe((res) -> Toast.makeText(getApplicationContext(), "Checked in", Toast.LENGTH_SHORT).show(),
+                                (err) -> {});
+            }else {
+                Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updatePrice(Venue venue) {
@@ -242,5 +286,16 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                 .position(venueLocation))
                 .setIcon(BitmapDescriptorFactory.fromBitmap(imageBitmap));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(venueLocation, 14));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

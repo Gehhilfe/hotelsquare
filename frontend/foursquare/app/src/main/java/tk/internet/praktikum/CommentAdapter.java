@@ -1,6 +1,8 @@
 package tk.internet.praktikum;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -25,7 +28,9 @@ import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.ImageComment;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
+import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 /**
  * Created by gehhi on 12.08.2017.
@@ -95,6 +100,28 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(bitmap -> holder.avatar.setImageBitmap(bitmap));
         }
+
+        holder.upvote.setOnClickListener((event) -> {
+            LocalStorage ls = LocalStorage.getLocalStorageInstance(context);
+            SharedPreferences sp = LocalStorage.getSharedPreferences(context);
+            if(ls.isLoggedIn()) {
+                CommentService service = ServiceFactory.createRetrofitService(CommentService.class, NewVenueDetail.URL, sp.getString(Constants.TOKEN, ""));
+                service.like(comment.getId());
+            }else {
+                Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        holder.downvote.setOnClickListener((event) -> {
+            LocalStorage ls = LocalStorage.getLocalStorageInstance(context);
+            SharedPreferences sp = LocalStorage.getSharedPreferences(context);
+            if(ls.isLoggedIn()) {
+                CommentService service = ServiceFactory.createRetrofitService(CommentService.class, NewVenueDetail.URL, sp.getString(Constants.TOKEN, ""));
+                service.dislike(comment.getId());
+            }else {
+                Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

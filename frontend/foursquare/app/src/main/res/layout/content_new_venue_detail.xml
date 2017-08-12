@@ -132,6 +132,16 @@
 
                     <Button
                         style="@style/Widget.AppCompat.Button.Borderless"
+                        android:id="@+id/www"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/actions_padding"
+                        android:text="WWW"
+                        android:textAppearance="@style/TextAction" />
+
+                    <Button
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:id="@+id/call"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
@@ -140,6 +150,7 @@
 
                     <Button
                         style="@style/Widget.AppCompat.Button.Borderless"
+                        android:id="@+id/checkin"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
