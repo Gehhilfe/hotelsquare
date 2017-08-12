@@ -123,7 +123,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                              Bundle savedInstanceState) {
         if(view==null) {
             // Inflate the layout for this fragment
-            view = inflater.inflate(R.layout.fragment_venue_in_detail, container, false);
+            view = inflater.inflate(R.layout.fragment_venue_detail_new, container, false);
             // layoutInflater=inflater;
             //this.container=container;
             imageVenueOne = (ImageView) view.findViewById(R.id.image_venue_one);

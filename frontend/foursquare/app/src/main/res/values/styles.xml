@@ -13,9 +13,18 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <style name="Dark.Overlay" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <!--<item name="android:background">?attr/colorPrimary</item>-->
+    </style>
+
+    <style name="Dark.Overlay.LightPopup" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:background">@color/black</item>
+    </style>
 
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
@@ -39,7 +48,6 @@
         <item name="android:textColorPrimary">@color/iron</item>
         <item name="android:background">@color/primary</item>
     </style>
-
 
 
     <style name="User.Tabs" parent="Widget.Design.TabLayout">
