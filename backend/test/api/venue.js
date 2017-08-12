@@ -26,7 +26,7 @@ const mochaAsync = (fn) => {
 
 describe('venue', () => {
 
-    let aVenue;
+    let aVenue, cVenue;
     let bVenue;
     let user, token;
     beforeEach(mochaAsync(async () => {
@@ -39,7 +39,7 @@ describe('venue', () => {
             Image.remove({}),
             Comment.Comment.remove({})
         ]);
-        const res = await request(server)
+        let res = await request(server)
             .post('/searches/venues')
             .send({
                 locationName: 'Hügelstraße, Darmstadt',
