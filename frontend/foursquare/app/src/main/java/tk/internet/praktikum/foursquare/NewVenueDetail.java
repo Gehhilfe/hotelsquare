@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,15 +32,20 @@ import tk.internet.praktikum.foursquare.api.service.VenueService;
 
 public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallback {
 
-    private final String URL = "https://dev.ip.stimi.ovh/";
-    private final String LOG = NewVenueDetail.class.getSimpleName();
+    public static final String URL = "https://dev.ip.stimi.ovh/";
+    public final String LOG = NewVenueDetail.class.getSimpleName();
 
     private ImageView headerImage;
-    private Toolbar headerTitle;
     private ProgressDialog progressDialog;
     private GoogleMap map;
     private Toolbar toolbar;
     private TextView infoVicinity;
+    private ImageView image_1;
+    private ImageView image_2;
+    private ImageView image_3;
+
+    private ImageView[] money;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +58,19 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
 
 
         headerImage = (ImageView) findViewById(R.id.header_image);
-        headerTitle = (Toolbar) findViewById(R.id.toolbar);
+
+        image_1 = (ImageView) findViewById(R.id.image_1);
+        image_2 = (ImageView) findViewById(R.id.image_2);
+        image_3 = (ImageView) findViewById(R.id.image_3);
+
+
+        money = new ImageView[]{
+                (ImageView) findViewById(R.id.money_1),
+                (ImageView) findViewById(R.id.money_2),
+                (ImageView) findViewById(R.id.money_3),
+                (ImageView) findViewById(R.id.money_4),
+                (ImageView) findViewById(R.id.money_5)
+        };
 
         infoVicinity = (TextView) findViewById(R.id.text_vicinty);
 
@@ -73,16 +91,95 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                     toolbar.setTitle(venue.getName());
                     updateVicinty(venue);
                     updateVenueLocation(venue.getLocation());
+                    updatePrice(venue);
                     if (venue.getImages().size() > 0) {
                         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
+
                         imageCacheLoader.loadBitmap(venue.getImages().get(0), ImageSize.MEDIUM)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(bitmap -> {
                                     headerImage.setImageBitmap(bitmap);
                                 });
+
+                        if (venue.getImages().size() > 1)
+                            imageCacheLoader.loadBitmap(venue.getImages().get(1), ImageSize.SMALL)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(bitmap -> {
+                                        image_1.setImageBitmap(bitmap);
+                                    });
+
+                        if (venue.getImages().size() > 2)
+                            imageCacheLoader.loadBitmap(venue.getImages().get(2), ImageSize.SMALL)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(bitmap -> {
+                                        image_2.setImageBitmap(bitmap);
+                                    });
+
+                        if (venue.getImages().size() > 3)
+                            imageCacheLoader.loadBitmap(venue.getImages().get(3), ImageSize.SMALL)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(bitmap -> {
+                                        image_3.setImageBitmap(bitmap);
+                                    });
                     }
                 });
+    }
+
+    private void updatePrice(Venue venue) {
+        switch (venue.getPrice()) {
+            default:
+            case 0:
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                break;
+
+            case 1:
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                break;
+
+            case 2:
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                break;
+
+            case 3:
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                break;
+
+            case 4:
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                break;
+
+            case 5:
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                break;
+        }
     }
 
     private void updateVicinty(Venue venue) {
