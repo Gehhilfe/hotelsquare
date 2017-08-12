@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SearchEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,6 +29,8 @@ import android.widget.ToggleButton;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,6 +112,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             lastQuery = keyword;
         this.setRetainInstance(true);
         currentPage = 0;
+
+        EventBus.getDefault().post(new SearchEvent(true));
+
         return view;
     }
 
@@ -446,5 +452,18 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                 };
     }
 
+
+    public void onStop(){
+        EventBus.getDefault().post(new SearchEvent(false));
+        super.onStop();
+    }
+
+    public static class SearchEvent {
+        public boolean isSearch;
+
+        public SearchEvent(boolean b) {
+            this.isSearch = b;
+        }
+    }
 
 }
