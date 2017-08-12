@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity
                             getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
             service.update(locationUser)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                                 locationUser = user;

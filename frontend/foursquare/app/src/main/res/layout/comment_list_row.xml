@@ -1,29 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
     android:focusable="true"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
-    android:clickable="true"
-    android:background="?android:attr/selectableItemBackground"
-    android:orientation="vertical">
+    android:paddingTop="10dp">
 
-    <TextView
-        android:id="@+id/name"
-        android:textColor="@color/colorAccent"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        android:layout_alignParentTop="true"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/avatar"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@mipmap/user_avatar" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:text="Username"
+            android:textColor="@color/colorAccent"
+            android:layout_gravity="center_vertical"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@android:color/darker_gray"/>
 
     <TextView
         android:id="@+id/text"
-        android:layout_below="@id/title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Content" />
 
-</RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@android:color/darker_gray"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />
+
+        <ImageButton
+            android:id="@+id/upvote"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:adjustViewBounds="false"
+            android:cropToPadding="false"
+            android:scaleType="center"
+            android:src="@drawable/upvote" />
+
+        <TextView
+            android:id="@+id/votes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="666" />
+
+        <ImageButton
+            android:id="@+id/downvote"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_below="@id/upvote"
+            android:src="@drawable/downvote" />
+
+    </LinearLayout>
+
+</LinearLayout>

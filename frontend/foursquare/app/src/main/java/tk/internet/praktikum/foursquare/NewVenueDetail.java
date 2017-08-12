@@ -8,6 +8,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.ImageView;
@@ -23,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.CommentAdapter;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
@@ -46,6 +52,9 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
 
     private ImageView[] money;
 
+    private RecyclerView commentRecyclerView;
+    private CommentAdapter commentAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,13 +65,21 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         Intent intent = getIntent();
         String venueId = intent.getStringExtra("VENUE_ID");
 
-
         headerImage = (ImageView) findViewById(R.id.header_image);
 
         image_1 = (ImageView) findViewById(R.id.image_1);
         image_2 = (ImageView) findViewById(R.id.image_2);
         image_3 = (ImageView) findViewById(R.id.image_3);
 
+        commentRecyclerView = (RecyclerView) findViewById(R.id.comment_recycler_view);
+
+        commentRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
+
+        commentAdapter = new CommentAdapter(venueId, getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager = new CustomGridLayoutMaganager(getApplicationContext());
+        commentRecyclerView.setLayoutManager(mLayoutManager);
+        commentRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        commentRecyclerView.setAdapter(commentAdapter);
 
         money = new ImageView[]{
                 (ImageView) findViewById(R.id.money_1),
@@ -126,6 +143,8 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                                         image_3.setImageBitmap(bitmap);
                                     });
                     }
+                }, err -> {
+                    Log.d(NewVenueDetail.class.getName(), err.toString());
                 });
     }
 

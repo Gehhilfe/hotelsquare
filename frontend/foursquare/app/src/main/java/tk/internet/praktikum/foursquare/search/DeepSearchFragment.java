@@ -227,7 +227,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             // Add more optional filters later
 
             VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
-            venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.newThread())
+            venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(venueSearchResult -> {
 
@@ -286,7 +286,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                     lastFilterLocation = changedLocation;
                     PlaceService placeService = ServiceFactory.createRetrofitService(PlaceService.class, URL);
                     placeService.getSuggestedPlaces(changedLocation)
-                            .subscribeOn(Schedulers.newThread())
+                            .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(placeAutoComplete -> {
                                         Log.d(LOG, "status: " + placeAutoComplete.getStatus());

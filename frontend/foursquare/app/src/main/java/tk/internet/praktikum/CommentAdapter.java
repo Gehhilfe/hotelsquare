@@ -1,9 +1,12 @@
 package tk.internet.praktikum;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -13,8 +16,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.NewVenueDetail;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
+import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Comment;
+import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
@@ -25,13 +31,16 @@ import tk.internet.praktikum.foursquare.api.service.VenueService;
 
 public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapter<CommentAdapter.MyViewHolder> {
     VenueService service;
-    Venue venue;
+    String venueId;
     List<Comment> comments;
-    public CommentAdapter(Venue venue) {
-        this.venue = venue;
+    Context context;
+
+    public CommentAdapter(String venueId, Context context) {
+        this.context = context;
+        this.venueId = venueId;
         this.service = ServiceFactory.createRetrofitService(VenueService.class, NewVenueDetail.URL);
         this.comments = new ArrayList<>();
-        this.service.getComments(venue.getId(), 0)
+        this.service.getComments(venueId, 0)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result) -> {
@@ -52,6 +61,9 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
         Comment comment = comments.get(position);
 
         holder.name.setText(comment.getAuthor().getName());
+        Integer delta = comment.getLikes()-comment.getDislikes();
+
+        holder.votes.setText(delta.toString());
         if(comment instanceof TextComment) {
             TextComment tcomment = (TextComment)comment;
             holder.text.setText(tcomment.getText());
@@ -59,6 +71,13 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             holder.text.setText("Image");
         }
 
+        if(comment.getAuthor().getAvatar() != null) {
+            ImageCacheLoader loader = new ImageCacheLoader(context);
+            loader.loadBitmap(comment.getAuthor().getAvatar(), ImageSize.SMALL)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(bitmap -> holder.avatar.setImageBitmap(bitmap));
+        }
     }
 
     @Override
@@ -67,12 +86,18 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, text;
+        public TextView name, text, votes;
+        public ImageView avatar;
+        public ImageButton upvote, downvote;
 
         public MyViewHolder(View view) {
             super(view);
             name = (TextView) view.findViewById(R.id.name);
             text = (TextView) view.findViewById(R.id.text);
+            votes = (TextView) view.findViewById(R.id.votes);
+            avatar = (ImageView) view.findViewById(R.id.avatar);
+            upvote = (ImageButton) view.findViewById(R.id.upvote);
+            downvote = (ImageButton) view.findViewById(R.id.downvote);
         }
     }
 }
