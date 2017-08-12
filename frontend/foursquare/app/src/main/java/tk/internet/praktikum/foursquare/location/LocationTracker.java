@@ -20,8 +20,13 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
+import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.search.DeepSearchFragment;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 /**
  * LocationTracker to track Location of the User
@@ -82,6 +87,7 @@ public class LocationTracker implements
      * Start GoogleApiClient-Tracking with Balanced Power/Accuracy,
      */
     public void start() {
+        EventBus.getDefault().register(this);
         if (mGoogleApiClient != null) {
             mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(INTERVAL);
@@ -100,6 +106,7 @@ public class LocationTracker implements
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -146,5 +153,25 @@ public class LocationTracker implements
             return false;
         }
     }
+
+    public void onSearch(){
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    public void noSearch(){
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(DeepSearchFragment.SearchEvent event) {
+        if(event.isSearch == true) {
+            onSearch();
+            Log.d("KEYFOUND", "Set On Search");
+        }else{
+            noSearch();
+            Log.d("KEYFOUND", "Set NO Search");
+        }
+    }
+
 }
 
