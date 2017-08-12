@@ -46,7 +46,7 @@ public class HomeFragment extends Fragment {
 
         try {
             service.profile()
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {

@@ -68,7 +68,7 @@ public class DummyActivity extends AppCompatActivity {
 
         try {
             service.newChat(rm)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
@@ -90,7 +90,7 @@ public class DummyActivity extends AppCompatActivity {
 
         try {
             service.getConversations()
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
