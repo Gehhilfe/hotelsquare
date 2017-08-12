@@ -93,7 +93,6 @@ public class LocationTracker implements
             } else {
                 mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
             }
-
             mGoogleApiClient.connect();
         }
     }
@@ -114,7 +113,7 @@ public class LocationTracker implements
 
         // No Permissions
         if ((ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                || (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+                && (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             //TODO: Get Permissions in Runtime isn't that easy due to the need of an activtiy reference, maybe somewhere else
             Toast.makeText(context,R.string.permissongrant, Toast.LENGTH_LONG).show();
             return;
