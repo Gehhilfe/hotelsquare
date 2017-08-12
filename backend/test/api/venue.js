@@ -27,7 +27,7 @@ const mochaAsync = (fn) => {
 describe('venue', () => {
 
     let aVenue;
-    let bVenue, cVenue;
+    let bVenue;
     let user, token;
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
@@ -39,7 +39,7 @@ describe('venue', () => {
             Image.remove({}),
             Comment.Comment.remove({})
         ]);
-        let res = await request(server)
+        const res = await request(server)
             .post('/searches/venues')
             .send({
                 locationName: 'Hügelstraße, Darmstadt',
@@ -75,15 +75,6 @@ describe('venue', () => {
         res.body.should.have.property('location');
         res.body.should.have.property('images');
         res.body.images.length.should.not.be.equal(0);
-    })));
-
-    it('GET venue details Petro', (mochaAsync(async () => {
-        const res = await request(server)
-            .get('/venues/' + cVenue._id + '');
-        res.should.have.status(200);
-        res.body.should.have.property('name');
-        res.body.should.have.property('location');
-        res.body.should.have.property('images');
     })));
 
     describe('checkin', () => {
