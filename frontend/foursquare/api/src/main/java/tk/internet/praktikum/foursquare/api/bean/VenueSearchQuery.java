@@ -6,7 +6,8 @@ public class VenueSearchQuery {
     private String keyword;
     private Location location;
     private String locationName;
-    private Integer radius;
+    private int radius;
+    private int price = 0;
     private boolean only_open = false;
 
     public VenueSearchQuery(String keyword, double longitude, double latitude) {
@@ -19,32 +20,16 @@ public class VenueSearchQuery {
         this.locationName = locationName;
     }
 
-    public String getKeyword() {
-        return keyword;
-    }
-
     public void setKeyword(String keyword) {
         this.keyword = keyword;
-    }
-
-    public Location getLocation() {
-        return location;
     }
 
     public void setLocation(Location location) {
         this.location = location;
     }
 
-    public Integer getRadius() {
-        return radius;
-    }
-
-    public void setRadius(Integer radius) {
+    public void setRadius(int radius) {
         this.radius = radius;
-    }
-
-    public String getLocationName() {
-        return locationName;
     }
 
     public void setLocationName(String locationName) {
@@ -53,5 +38,9 @@ public class VenueSearchQuery {
 
     public void setOnlyOpen(boolean only_open) {
         this.only_open = only_open;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 }
