@@ -11,6 +11,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.ChatMessage;
 import tk.internet.praktikum.foursquare.api.bean.Message;
@@ -53,6 +54,16 @@ public interface ChatService {
      */
     @GET("chats/{chatId}/{page}")
     Observable<Chat> getConversation(@Path("chatId") String chatId, @Path("page") int page);
+
+    /**
+     * Retrieves chat of currently authenticated user with id chatId but only messages that are newer than provided message id
+     * Should be used to poll for new messages
+     *
+     * @param chatId id of chat
+     * @return chat history of passed ID
+     */
+    @GET("chats/{chatId}")
+    Observable<Chat> getConversation(@Path("chatId") String chatId, @Query("lastMessage") String lastMessageID);
 
     /**
      * Retrieves chat of currently authenticated user with id chatId

@@ -634,4 +634,29 @@ describe('User', () => {
             hashBefore.should.not.equal(u.password);
         }));
     });
+
+    describe('email confirmation', () => {
+        it('should activated user after confirmation', mochaAsync(async () => {
+            const registrationData = {
+                name: 'testTest',
+                email: 'mail@online.de',
+                password: 'secret'
+            };
+            let res = await request(server)
+                .post('/users')
+                .send(registrationData);
+            res.should.have.status(200);
+            let u = await User.findOne({displayName: 'testTest'});
+            u.active.should.be.equal(false);
+            res = await request(server)
+                .get('/emailConfirmation')
+                .query({
+                    id: u._id.toString(),
+                    key: u.activation_key
+                });
+            res.should.have.status(200);
+            u = await User.findOne({displayName: 'testTest'});
+            u.active.should.be.equal(true);
+        }));
+    });
 });
