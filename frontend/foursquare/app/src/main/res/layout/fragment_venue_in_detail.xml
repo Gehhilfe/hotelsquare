@@ -17,14 +17,15 @@
             android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="40"
+            android:layout_weight="45"
             android:theme="@style/AppTheme.AppBarOverlay"
             >
 
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/main.collapsing"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="45"
                 android:fitsSystemWindows="true"
                 android:gravity="bottom"
                 app:contentScrim="?attr/colorPrimary"
@@ -179,17 +180,25 @@
                                 android:paddingLeft="5dp"
                                 />
                         </LinearLayout>
+
                     </LinearLayout>
 
                 </LinearLayout>
             </android.support.design.widget.CollapsingToolbarLayout>
+            <android.support.design.widget.TabLayout
+                android:id="@+id/venue_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="5"
+                app:tabGravity="fill"
+                app:tabMode="fixed" />
         </android.support.design.widget.AppBarLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="60"
+            android:layout_weight="55"
             android:orientation="vertical">
 
             <android.support.v7.widget.RecyclerView

@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
@@ -107,6 +108,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private Image userAvatar=null;
     private boolean reachedMaxVenues;
     private Fragment parent;
+    private TabLayout tabLayout;
     public static VenueInDetailFragment newInstance(String param1, String param2) {
         VenueInDetailFragment fragment = new VenueInDetailFragment();
 
@@ -137,7 +139,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
             venueWebsiteLabel = (TextView) view.findViewById(R.id.venue_website_label);
             venueRating = (TextView) view.findViewById(R.id.venue_rating);
             venueCheckIn = (TextView) view.findViewById(R.id.venue_checkinCount);
-
+            tabLayout=(TabLayout) view.findViewById(R.id.venue_tabs);
             floatingActionMenu=(FloatingActionMenu)view.findViewById(R.id.floating_menu) ;
             venueTextCommentButton= (FloatingActionButton) floatingActionMenu.findViewById(R.id.venue_detail_text_comment_button);
             //venueTextCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_text_comment_button);

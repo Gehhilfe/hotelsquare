@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import tk.internet.praktikum.foursquare.R;
@@ -54,10 +55,14 @@ public class CommentVenueAdapter extends RecyclerView.Adapter<CommentVenueViewHo
     }
 
     public  void addMoreCommentVenues(List<Comment> comments){
+        if(this.commentVenueList==null)
+            this.commentVenueList=new ArrayList<Comment>();
         this.commentVenueList.addAll(comments);
         this.notifyDataSetChanged();
     }
     public void addCommentVenue(Comment comment){
+        if(this.commentVenueList==null)
+            this.commentVenueList=new ArrayList<Comment>();
         this.commentVenueList.add(0,comment);
         this.notifyDataSetChanged();
     }
