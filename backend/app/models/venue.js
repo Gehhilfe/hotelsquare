@@ -141,7 +141,7 @@ class VenueClass {
             this.types = _.uniq(_.concat(this.types, details.tags));
         if(details.price)
             this.price = details.price.tier;
-        if(details.photos || details.photos.groups || details.photos.groups[0].items) {
+        if(details.photos.count != 0) {
             await Promise.all(_.map(details.photos.groups[0].items, async (it) => {
                 const buffer = await this._loadPhotoFoursquare(it);
                 const img = await Image.upload(buffer, null, self);
