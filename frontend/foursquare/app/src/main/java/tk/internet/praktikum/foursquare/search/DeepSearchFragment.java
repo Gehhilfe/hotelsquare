@@ -113,6 +113,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         this.setRetainInstance(true);
         currentPage = 0;
 
+        // Post SearchEvent to EventBus
         EventBus.getDefault().post(new SearchEvent(true));
 
         return view;
@@ -454,13 +455,16 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
 
     public void onStop(){
+        //Post SearchEvent to EventBus
         EventBus.getDefault().post(new SearchEvent(false));
         super.onStop();
     }
 
+    /**
+     * SearchEvent class to adjust Accuracy and Power depending on activity
+     */
     public static class SearchEvent {
         public boolean isSearch;
-
         public SearchEvent(boolean b) {
             this.isSearch = b;
         }
