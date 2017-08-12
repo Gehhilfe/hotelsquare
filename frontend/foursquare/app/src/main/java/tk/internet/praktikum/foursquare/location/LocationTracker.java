@@ -1,14 +1,11 @@
 package tk.internet.praktikum.foursquare.location;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,10 +20,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.search.DeepSearchFragment;
-import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 /**
  * LocationTracker to track Location of the User
@@ -120,7 +115,7 @@ public class LocationTracker implements
         // No Permissions
         if ((ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 || (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            //TODO: Get Permissions in Runtime isn't that easy due to the need of an activtiy reference
+            //TODO: Get Permissions in Runtime isn't that easy due to the need of an activtiy reference, maybe somewhere else
             Toast.makeText(context,R.string.permissongrant, Toast.LENGTH_LONG).show();
             return;
         }
@@ -131,7 +126,6 @@ public class LocationTracker implements
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
         // Post to EventBus
-        Log.d("KEYFOUND", "Priority is: " + mLocationRequest.getPriority());
         EventBus.getDefault().post(new LocationEvent(mCurrentLocation));
     }
 
@@ -142,6 +136,7 @@ public class LocationTracker implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+        //TODO: Handle somehow?
         Log.d(TAG, "Connection failed: " + connectionResult.toString());
     }
 
@@ -173,11 +168,9 @@ public class LocationTracker implements
         if(event.isSearch == true) {
             stop();
             start(true);
-            Log.d("KEYFOUND", "Set On Search");
         }else{
             stop();
             start(false);
-            Log.d("KEYFOUND", "Set NO Search");
         }
     }
 
