@@ -7,6 +7,8 @@ const Schema = mongoose.Schema;
 const googleapilib = require('googleplaces');
 const config = require('config');
 
+const foursquare = require('node-foursquare')(config.foursquare);
+
 const Image = require('./image');
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -31,6 +33,8 @@ const VenueSchema = new Schema({
         type: Boolean,
         default: false
     },
+    price: Number,
+    foursquare_id: String,
     opening_hours: {
         periods: [{
             close: [{
@@ -97,17 +101,63 @@ class VenueClass {
         });
     }
 
+    _foursquareMatchSearch() {
+        const self = this;
+        return new Promise((resolve, reject) => {
+            foursquare.Venues.search(self.location.coordinates[1], self.location.coordinates[0], null, {
+                intent: 'match',
+                query: self.name
+            }, null, (err, res) => {
+                if (err)
+                    return reject(err);
+                return resolve(res);
+            });
+        });
+    }
+
+    _foursquareDetails() {
+        const self = this;
+        return new Promise((resolve, reject) => {
+            foursquare.Venues.getVenue(self.foursquare_id, null, (err, res) => {
+                if(err)
+                    return reject(err);
+                return resolve(res.venue);
+            });
+        });
+    }
+
+    async _getFoursquareDetails() {
+        const self = this;
+        const searchResult = await this._foursquareMatchSearch();
+        if (!searchResult.venues || searchResult.venues.length == 0)
+            return;
+        const v = searchResult.venues[0];
+        this.foursquare_id = v.id;
+        const details = await this._foursquareDetails();
+        if(details.tags)
+            this.types = _.uniq(_.concat(this.types, details.tags));
+        if(details.price)
+            this.price = details.price.tier;
+        if(details.photos || details.photos.groups || details.photos.groups[0].items) {
+            await Promise.all(_.map(details.photos.groups[0].items, async (it) => {
+                const buffer = await this._loadPhotoFoursquare(it);
+                const img = await Image.upload(buffer, null, self);
+                self.images.push(img);
+            }));
+        }
+    }
+
     /**
      * Return open venues
      *
      * @param {Date} datenow current date
      * @returns {bool} flag if venue is open
      */
-    isOpen(datenow){
-        if(!this.opening_hours || !this.opening_hours.periods)
+    isOpen(datenow) {
+        if (!this.opening_hours || !this.opening_hours.periods)
             return null;
         const opening_periods = this.opening_hours.periods;
-        if(!datenow){
+        if (!datenow) {
             datenow = new Date();
         }
 
@@ -119,7 +169,7 @@ class VenueClass {
         const opentimes = [];
         const closetimes = [];
 
-        for(let i = 0, len = opening_periods.length; i < len; i++) {
+        for (let i = 0, len = opening_periods.length; i < len; i++) {
             const day = opening_periods[i].open.length > 0 ? opening_periods[i].open[0].day : opening_periods[i].close[0].day;
             const days_from_zero_in_minutes = day * 24 * 60;
             for (let j = 0, len = opening_periods[i].open.length; j < len; j++) {
@@ -138,15 +188,15 @@ class VenueClass {
 
         //current time in minutes from day zero
         const currentDayAtVenue = datenow.getUTCDay();
-        const currentTimeAtVenueInMinutes = currentDayAtVenue*24*60+this.utc_offset+datenow.getUTCHours()*60 + datenow.getUTCMinutes() + this.utc_offset%60;
+        const currentTimeAtVenueInMinutes = currentDayAtVenue * 24 * 60 + this.utc_offset + datenow.getUTCHours() * 60 + datenow.getUTCMinutes() + this.utc_offset % 60;
 
         //for current time find closest opening time prior to now
         let last_open_time = opentimes[0];
         let max_open_so_far;
         let index = 0;
-        for(let i = 1, len = opentimes.length; i < len; i++) {
+        for (let i = 1, len = opentimes.length; i < len; i++) {
             max_open_so_far = opentimes[i];
-            if(currentTimeAtVenueInMinutes < max_open_so_far) {
+            if (currentTimeAtVenueInMinutes < max_open_so_far) {
                 break;
             }
             index++;
@@ -155,9 +205,9 @@ class VenueClass {
 
         //find closest closing time to last_open_time
         let closest_close;
-        if(closetimes.length > index) {
+        if (closetimes.length > index) {
             closest_close = closetimes[index];
-            if(currentTimeAtVenueInMinutes > last_open_time && currentTimeAtVenueInMinutes < closest_close){
+            if (currentTimeAtVenueInMinutes > last_open_time && currentTimeAtVenueInMinutes < closest_close) {
                 isOpen = true;
             }
         } else {
@@ -207,6 +257,38 @@ class VenueClass {
             count: checkin.count,
             last: checkin.last
         };
+    }
+
+    _loadPhotoFoursquare(photo) {
+        const client = restify.createClient({
+            url: photo.prefix + 'original' + photo.suffix
+        });
+        return new Promise((resolve, reject) => {
+            client.get('', (err, req) => {
+                if (err)
+                    return reject(err);
+
+                req.on('result', function (err, res) {
+                    if (err)
+                        return reject(err);
+
+                    let body = '';
+                    let buffer = Buffer.alloc(0);
+                    res.on('data', function (chunk) {
+                        buffer = Buffer.concat([buffer, chunk]);
+                        body += chunk;
+                    });
+
+                    res.on('end', function () {
+                        resolve(buffer);
+                    });
+
+                    res.on('error', (e) => {
+                        reject(e);
+                    });
+                });
+            });
+        });
     }
 
     _loadPhotoURLGoogle() {
@@ -277,6 +359,7 @@ class VenueClass {
 
     async loadDetails() {
         const details = await this._getPlaceDetails(this.place_id);
+        await this._getFoursquareDetails();
         if (this.photo_reference !== '') {
             const buffer = await this._loadPhotoGoogle();
             const img = await Image.upload(buffer, null, this);
@@ -296,7 +379,7 @@ class VenueClass {
     addComment(comment) {
         if (!comment.assigned.to.equals(this._id))
             return;
-        if (comment.constructor.modelName === 'ImageComment' ) {
+        if (comment.constructor.modelName === 'ImageComment') {
             this.images.push(comment.image);
         }
         if (_.indexOf(this.comments, comment._id) === -1) {
