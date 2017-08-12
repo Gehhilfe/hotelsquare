@@ -86,14 +86,19 @@ public class LocationTracker implements
     /**
      * Start GoogleApiClient-Tracking with Balanced Power/Accuracy,
      */
-    public void start() {
+    public void start(boolean search) {
         EventBus.getDefault().register(this);
         if (mGoogleApiClient != null) {
             mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(INTERVAL);
             mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-            //mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+            if(search){
+                mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            } else {
+                mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+            }
+
             mGoogleApiClient.connect();
         }
     }
@@ -126,6 +131,7 @@ public class LocationTracker implements
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
         // Post to EventBus
+        Log.d("KEYFOUND", "Priority is: " + mLocationRequest.getPriority());
         EventBus.getDefault().post(new LocationEvent(mCurrentLocation));
     }
 
@@ -165,10 +171,12 @@ public class LocationTracker implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(DeepSearchFragment.SearchEvent event) {
         if(event.isSearch == true) {
-            onSearch();
+            stop();
+            start(true);
             Log.d("KEYFOUND", "Set On Search");
         }else{
-            noSearch();
+            stop();
+            start(false);
             Log.d("KEYFOUND", "Set NO Search");
         }
     }

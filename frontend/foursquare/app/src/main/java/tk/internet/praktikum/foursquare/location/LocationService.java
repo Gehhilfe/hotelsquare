@@ -27,7 +27,7 @@ public class LocationService extends Service{
 
         // start tracker
         locationTracker = new LocationTracker(this);
-        locationTracker.start();
+        locationTracker.start(false);
         return START_STICKY;
     }
 
