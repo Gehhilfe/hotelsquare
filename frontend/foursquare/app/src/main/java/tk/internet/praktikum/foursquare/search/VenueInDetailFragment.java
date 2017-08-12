@@ -408,7 +408,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                     String token = sharedPreferences.getString(Constants.TOKEN, "");
                     Log.d(LOG, "token: " + token);
                     VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL, token);
-                    venueService.uploadAvatar(image, venueId)
+                    venueService.addImageComment(image, venueId)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(imageComment1 -> {

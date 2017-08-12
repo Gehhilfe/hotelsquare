@@ -1,12 +1,20 @@
 package tk.internet.praktikum.foursquare;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -14,6 +22,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -30,23 +41,28 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.File;
+import java.io.IOException;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MultipartBody;
 import tk.internet.praktikum.CommentAdapter;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.UploadHelper;
 import tk.internet.praktikum.foursquare.api.bean.Location;
+import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
-import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallback {
 
     public static final String URL = "https://dev.ip.stimi.ovh/";
-    public final String LOG = NewVenueDetail.class.getSimpleName();
+    public static final String LOG = NewVenueDetail.class.getSimpleName();
 
     private ImageView headerImage;
     private ProgressDialog progressDialog;
@@ -65,31 +81,41 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     private NestedScrollView scrollView;
 
     private Button callBtn, wwwBtn, checkinBtn;
+    private FloatingActionButton fabTextComment;
+    private String venueId;
+    private FloatingActionButton fabImageComment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_venue_detail);
+
+        // Setup toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        String venueId = intent.getStringExtra("VENUE_ID");
+        venueId = intent.getStringExtra("VENUE_ID");
+
+        Log.d(LOG, "Display id: "+venueId);
 
         headerImage = (ImageView) findViewById(R.id.header_image);
 
+        // Buttons
         callBtn = (Button) findViewById(R.id.call);
         wwwBtn = (Button) findViewById(R.id.www);
         checkinBtn = (Button) findViewById(R.id.checkin);
 
         scrollView = (NestedScrollView) findViewById(R.id.scrollView);
 
+        // Preview images
         image_1 = (ImageView) findViewById(R.id.image_1);
         image_2 = (ImageView) findViewById(R.id.image_2);
         image_3 = (ImageView) findViewById(R.id.image_3);
 
+        // Comment recylcer view
         commentRecyclerView = (RecyclerView) findViewById(R.id.comment_recycler_view);
 
         commentRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
@@ -112,6 +138,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         commentRecyclerView.setItemAnimator(new DefaultItemAnimator());
         commentRecyclerView.setAdapter(commentAdapter);
 
+        // Price indicator
         money = new ImageView[]{
                 (ImageView) findViewById(R.id.money_1),
                 (ImageView) findViewById(R.id.money_2),
@@ -130,6 +157,30 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         progressDialog.setMessage("Spy is looking up details...");
         progressDialog.show();
 
+        // FAB Buttons
+        fabTextComment = (FloatingActionButton) findViewById(R.id.venue_detail_text_comment_button);
+        fabImageComment = (FloatingActionButton) findViewById(R.id.venue_detail_image_commnent_button);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        fabTextComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTextDialog();
+            }
+        });
+
+        fabImageComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openImageDialog();
+            }
+        });
+
+        // Load venue data from server
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
         venueService.getDetails(venueId)
                 .subscribeOn(Schedulers.io())
@@ -180,13 +231,50 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                 });
     }
 
+    private void openTextDialog() {
+        LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
+        SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
+        if (!ls.isLoggedIn()) {
+            Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new MaterialDialog.Builder(this)
+                .title("Post Comment")
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .input("Your awesome message!", "", (dialog, input) -> {
+                    if(input.toString().isEmpty())
+                        return;
+                    VenueService vs = ServiceFactory.createRetrofitService(VenueService.class, URL, sp.getString(Constants.TOKEN, ""));
+                    TextComment comment = new TextComment(input.toString());
+                    vs.addTextComment(comment, venueId)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    (res) -> commentAdapter.addComment(res),
+                                    (err) -> Log.d(LOG, err.toString())
+                            );
+                })
+                .show();
+    }
+
+    private void openImageDialog() {
+        LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
+        SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
+        if (!ls.isLoggedIn()) {
+            Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(takePicture, 0);
+    }
+
     private void updateButtons(Venue venue) {
-        if(venue.getWebsite() != null && !venue.getWebsite().isEmpty())
+        if (venue.getWebsite() != null && !venue.getWebsite().isEmpty())
             wwwBtn.setVisibility(View.VISIBLE);
         else
             wwwBtn.setVisibility(View.INVISIBLE);
 
-        if(venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty())
+        if (venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty())
             callBtn.setVisibility(View.VISIBLE);
         else
             callBtn.setVisibility(View.INVISIBLE);
@@ -194,14 +282,15 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         checkinBtn.setOnClickListener((view) -> {
             LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
             SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
-            if(ls.isLoggedIn()) {
+            if (ls.isLoggedIn()) {
                 VenueService vs = ServiceFactory.createRetrofitService(VenueService.class, URL, sp.getString(Constants.TOKEN, ""));
                 vs.checkin(venue.getId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((res) -> Toast.makeText(getApplicationContext(), "Checked in", Toast.LENGTH_SHORT).show(),
-                                (err) -> {});
-            }else {
+                                (err) -> {
+                                });
+            } else {
                 Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
             }
         });
@@ -211,62 +300,62 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         switch (venue.getPrice()) {
             default:
             case 0:
-                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
                 break;
 
             case 1:
-                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
                 break;
 
             case 2:
-                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
                 break;
 
             case 3:
-                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
-                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
                 break;
 
             case 4:
-                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.gray));
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.gray));
                 break;
 
             case 5:
-                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
-                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(),R.color.black));
+                money[0].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[1].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[2].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[3].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                money[4].setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.black));
                 break;
         }
     }
 
     private void updateVicinty(Venue venue) {
         StringBuilder sb = new StringBuilder();
-        if(venue.getFormattedAddress() != null && !venue.getFormattedAddress().isEmpty())
+        if (venue.getFormattedAddress() != null && !venue.getFormattedAddress().isEmpty())
             sb.append(venue.getFormattedAddress()).append("\n");
-        if(venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty())
+        if (venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty())
             sb.append(venue.getPhoneNumber()).append("\n");
-        if(venue.getWebsite() != null && !venue.getWebsite().isEmpty())
+        if (venue.getWebsite() != null && !venue.getWebsite().isEmpty())
             sb.append(venue.getWebsite()).append("\n");
         infoVicinity.setText(sb.toString());
     }
@@ -290,12 +379,41 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 0:
+                if (resultCode == RESULT_OK) {
+                    SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
+                    VenueService vs = ServiceFactory.createRetrofitService(VenueService.class, URL, sp.getString(Constants.TOKEN, ""));
+                    try {
+                        Bitmap image = (Bitmap) data.getExtras().get("data");
+                        MultipartBody.Part img = UploadHelper.createMultipartBodySync(image, getApplicationContext(), false);
+                        vs.addImageComment(img, venueId)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(imageComment -> commentAdapter.addComment(imageComment),
+                                        throwable -> Log.d(LOG, throwable.toString())
+                                );
+                    } catch (Exception e) {
+                        Log.d(LOG, e.toString());
+                    }
+
+                }
+
+
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+                break;
         }
     }
 }

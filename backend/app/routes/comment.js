@@ -106,16 +106,10 @@ function getComments(model) {
             .populate({
                 path: 'comments.item',
                 populate: {
-                    path: 'author',
+                    path: 'author image',
                     populate: {
                         path: 'avatar'
                     }
-                }
-            })
-            .populate({
-                path: 'comments.item',
-                populate: {
-                    path: 'image'
                 }
             })
             .slice('comments', [10 * page, 10]);

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     List<Comment> comments;
     Context context;
     int lastPage = 0;
+    private boolean lastEmpty = false;
 
     public CommentAdapter(String venueId, Context context) {
         this.context = context;
@@ -73,9 +75,11 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
-        holder.date.setText(df.format(comment.getDate()));
+        if(comment.getDate() != null) {
+            holder.date.setText(df.format(comment.getDate()));
+            holder.votes.setText(delta.toString());
+        }
 
-        holder.votes.setText(delta.toString());
         if(comment instanceof TextComment) {
             TextComment tcomment = (TextComment)comment;
             holder.text.setText(tcomment.getText());
@@ -83,14 +87,18 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
         } else {
             ImageComment icomment = (ImageComment)comment;
             holder.text.setText("");
-            ImageCacheLoader loader = new ImageCacheLoader(context);
-            loader.loadBitmap(icomment.getImage(), ImageSize.MEDIUM)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(bitmap -> {
-                        holder.image.setImageBitmap(bitmap);
-                        holder.image.setVisibility(View.VISIBLE);
-                    });
+            if(icomment.getImage() != null) {
+                ImageCacheLoader loader = new ImageCacheLoader(context);
+                loader.loadBitmap(icomment.getImage(), ImageSize.MEDIUM)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(bitmap -> {
+                            holder.image.setImageBitmap(bitmap);
+                            holder.image.setVisibility(View.VISIBLE);
+                        });
+            }else{
+                Log.d(NewVenueDetail.LOG, "image is null");
+            }
         }
 
         if(comment.getAuthor().getAvatar() != null) {
@@ -130,14 +138,26 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     }
 
     public void loadMore() {
+        if(lastEmpty)
+            return;
+
         this.service.getComments(venueId, lastPage+1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result) -> {
+                    if(result.isEmpty()) {
+                        lastEmpty = true;
+                        return;
+                    }
                     lastPage += 1;
                     comments.addAll(result);
                     notifyDataSetChanged();
                 });
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(0, comment);
+        notifyDataSetChanged();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
