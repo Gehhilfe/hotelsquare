@@ -61,7 +61,7 @@ describe('venue', () => {
             .post('/searches/venues')
             .send({
                 locationName: 'Langen',
-                keyword: 'Bäumsche am Bahnhof',
+                keyword: 'Petro',
                 radius: 5000
             });
         cVenue = res.body.results[0];
