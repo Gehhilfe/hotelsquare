@@ -24,13 +24,15 @@ public class ImageCacheLoader {
 
     private static long cacheSize = 10 * 1024 * 1024;
     private static String baseUrl = "https://dev.ip.stimi.ovh/images/";
-    private final OkHttpClient client;
+    private static OkHttpClient client;
 
     public ImageCacheLoader(Context context) {
-        Cache cache = new Cache(context.getCacheDir(), cacheSize);
-        client = new OkHttpClient.Builder()
-                .cache(cache)
-                .build();
+        if(client == null) {
+            Cache cache = new Cache(context.getCacheDir(), cacheSize);
+            client = new OkHttpClient.Builder()
+                    .cache(cache)
+                    .build();
+        }
     }
 
     /**

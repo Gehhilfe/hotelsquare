@@ -199,6 +199,8 @@ class ImageCommentClass {
     toJSONDetails() {
         if (this.author && this.populated('author') === undefined)
             throw new restify_errors.InternalServerError('Author not populated!');
+        if (this.image && this.populated('image') === undefined)
+            throw new restify_errors.InternalServerError('Author not populated!');
         return {
             _id: this._id,
             assigned: {
