@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result) -> {
                     comments = result;
+                    notifyDataSetChanged();
         });
     }
 
@@ -61,14 +63,18 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Comment comment = comments.get(position);
-
         holder.name.setText(comment.getAuthor().getName());
         Integer delta = comment.getLikes()-comment.getDislikes();
+
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+
+        holder.date.setText(df.format(comment.getDate()));
 
         holder.votes.setText(delta.toString());
         if(comment instanceof TextComment) {
             TextComment tcomment = (TextComment)comment;
             holder.text.setText(tcomment.getText());
+            holder.text.setVisibility(View.VISIBLE);
         } else {
             ImageComment icomment = (ImageComment)comment;
             holder.text.setText("");
@@ -76,7 +82,10 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             loader.loadBitmap(icomment.getImage(), ImageSize.MEDIUM)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(bitmap -> holder.image.setImageBitmap(bitmap));
+                    .subscribe(bitmap -> {
+                        holder.image.setImageBitmap(bitmap);
+                        holder.image.setVisibility(View.VISIBLE);
+                    });
         }
 
         if(comment.getAuthor().getAvatar() != null) {
@@ -105,14 +114,14 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public ImageView image;
-        public TextView name, text, votes;
-        public ImageView avatar;
+        public TextView name, text, votes, date;
+        public ImageView avatar, image;
         public ImageButton upvote, downvote;
 
         public MyViewHolder(View view) {
             super(view);
             name = (TextView) view.findViewById(R.id.name);
+            date = (TextView) view.findViewById(R.id.date);
             text = (TextView) view.findViewById(R.id.text);
             votes = (TextView) view.findViewById(R.id.votes);
             avatar = (ImageView) view.findViewById(R.id.avatar);
