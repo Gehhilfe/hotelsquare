@@ -216,7 +216,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                 //venueSearchQuery = new VenueSearchQuery(query, dummyLocation().getLongitude(), dummyLocation().getLatitude());
                 venueSearchQuery = new VenueSearchQuery(query, currentLocation.getLongitude(), currentLocation.getLatitude());
             }
-            venueSearchQuery.setRadius(filterRadius.getProgress());
+            venueSearchQuery.setRadius(filterRadius.getProgress()*100);
             // TODO
             // Add more optional filters later
 
@@ -224,15 +224,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(venueSearchResult -> {
-                                venueSearchResult.getResults()
-                                        .forEach(e ->
-                                                {
-                                                    Log.d(LOG, e.getName());
-                                                    Log.d(LOG, "long: " + e.getLocation().getLongitude() + "lat: " + e.getLocation().getLatitude());
-                                                }
-                                        );
-
-                                venueSearchResult.getResults();
                                 venues = venueSearchResult.getResults();
                                if(venues.size()>0) {
                                    if (mapViewButton.isChecked())
@@ -331,7 +322,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                // deepSearch(searchView.getQuery().toString().trim());
+                deepSearch();
             }
         };
     }

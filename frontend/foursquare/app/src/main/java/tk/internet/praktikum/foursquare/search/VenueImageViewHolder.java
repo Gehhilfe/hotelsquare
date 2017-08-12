@@ -34,7 +34,7 @@ public class VenueImageViewHolder extends RecyclerView.ViewHolder implements OnC
 
     public  void renderImage(Image image){
         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
-        imageCacheLoader.loadBitmap(image, ImageSize.SMALL)
+        imageCacheLoader.loadBitmap(image, ImageSize.MEDIUM)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(bitmap -> {
