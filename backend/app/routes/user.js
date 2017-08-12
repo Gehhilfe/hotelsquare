@@ -11,6 +11,7 @@ const Image = require('../models/image');
 
 const ValidationError = require('../errors/ValidationError');
 
+var {FB, FacebookApiException} = require('fb');
 
 const handleValidation = (next, func) => {
     func().catch((error) => {
@@ -135,7 +136,7 @@ async function updateUser(request, response, next) {
  */
 async function register(request, response, next) {
     handleValidation(next, async () => {
-        const user = await User.create(request.params);
+        const user = await User.register(request.body.name, request.body.email, request.body.password);
 
         if(config.email) {
             const transporter = nodemailer.createTransport({
@@ -153,7 +154,7 @@ async function register(request, response, next) {
                 from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
                 to: user.email,
                 subject: 'Welcome to HOTELSQUARE',
-                text: 'Hello '+user.displayName+', have fun using HOTELSQUARE!'
+                text: 'Hello '+user.displayName+', have fun using HOTELSQUARE! But before you start please confirm your email address by clicking on this link https://dev.ip.stimi.ovh/emailConfirmation/?key='+user.activation_key+'&id='+user._id.toString()
             };
 
             await transporter.sendMail(mailOptions);
@@ -362,6 +363,75 @@ async function confirmFriendRequest(request, response, next) {
     }
 }
 
+/**
+ * Register user with information provided from facebook api
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function facebookRegister(request, response, next) {
+    FB.setAccessToken(request.params.token);
+    FB.api('me', {fields: ['id', 'name', 'email', 'cover']}, async (res) => {
+        const password = password_generate.generate({
+            length: 10,
+            numbers: true
+        });
+        const user = await User.register(res.name, res.email, password);
+        if(config.email) {
+            const transporter = nodemailer.createTransport({
+                host: config.email.server,
+                port: 587,
+                secure: false,
+                requireTLS: true,
+                auth: {
+                    user: config.email.mail,
+                    pass: config.email.password
+                }
+            });
+
+            const mailOptions = {
+                from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
+                to: user.email,
+                subject: 'HOTELSQUARE Passwordreset',
+                text: 'Hello '+user.displayName+', your password has been changed to "'+password+'" without quotes. Change your password immediately!'
+            };
+
+            await transporter.sendMail(mailOptions);
+        }
+
+        response.send(await user.save());
+        return next();
+    });
+}
+
+/**
+ * Handle email confirmation
+ *
+ * @param {IncomingMessage} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function confirmEmail(request, response, next) {
+    if(!request.params.id || !request.params.key) {
+        return next(new restify_errors.BadRequestError('Missing id or key'));
+    }
+
+    const user = await User.findOne({_id: request.params.id, activation_key: request.params.key});
+    if(!user) {
+        return next(new restify_errors.BadRequestError('Wrong id or key'));
+    }
+
+    user.active = true;
+    user.activation_key = '';
+    await user.save();
+
+    response.send('Hello '+user.displayName+' your email is succesfuly confirmed. Have fun using HOTEL-Square!');
+    return next();
+}
+
 module.exports = {
     register,
     deleteUser,
@@ -374,5 +444,7 @@ module.exports = {
     updateUser,
     removeFriend,
     search,
-    resetPassword
+    resetPassword,
+    facebookRegister,
+    confirmEmail
 };

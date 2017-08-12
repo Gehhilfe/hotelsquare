@@ -31,6 +31,8 @@ chatsocket(io);
 
 util.connectDatabase(mongoose).then(util.initDatabase);
 
+server.use(restify.queryParser());
+
 server.use(restify.plugins.bodyParser({
     maxBodySize: 1024 * 1024,
     mapParams: true,
@@ -68,6 +70,8 @@ server.get('users/id/:id', handlePromiseReject(user.profileByID));
 server.post('users/passwordreset', handlePromiseReject(user.resetPassword));
 
 server.post('users', handlePromiseReject(user.register));
+server.post('facebookUsers', handlePromiseReject(user.facebookRegister));
+
 server.post('users/:name/friend_requests', auth, handlePromiseReject(user.sendFriendRequest));
 server.put('users', auth, handlePromiseReject(user.updateUser));
 server.del('users', auth, handlePromiseReject(user.deleteUser));
@@ -128,6 +132,9 @@ server.post('searches/nearbyfriends', auth, handlePromiseReject(friend.getNearBy
 
 // Autocompletion of Places
 server.post('autocomplete', handlePromiseReject(autocompletion.complete));
+
+// Email confirmationb
+server.get('emailConfirmation', handlePromiseReject(user.confirmEmail));
 
 // Delete downloads
 server.on('after', (request) => {

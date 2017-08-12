@@ -45,13 +45,15 @@ describe('user', function () {
         validUser = {
             name: 'Test',
             email: 'test@test.de',
-            password: 'password'
+            password: 'password',
+            active: true
         };
 
         const otherUser = {
             name: 'OtherTest',
             email: 'test@2test.de',
-            password: 'password'
+            password: 'password',
+            active: true
         };
 
         Util.connectDatabase(mongoose).then(() => {
@@ -281,7 +283,8 @@ describe('user', function () {
             validUser = new User({
                 name: 'Test',
                 email: 'test@test.de',
-                password: 'password'
+                password: 'password',
+                active: true
             });
             User.remove({}, function () {
                 validUser.save(done);

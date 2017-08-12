@@ -19,6 +19,7 @@ public class Venue {
     private float rating;
     private int utc_offset;
     private int check_ins_count;
+    private int price;
     private List<Image> images;
     private List<CheckinInformation> top_check_ins;
     private List<CheckinInformation> last_check_ins;
@@ -139,5 +140,7 @@ public class Venue {
         return images;
     }
 
-
+    public int getPrice() {
+        return price;
+    }
 }
