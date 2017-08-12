@@ -42,7 +42,7 @@ public class InboxFragment extends Fragment {
 
         try {
             service.getConversations()
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             inboxResponse -> {

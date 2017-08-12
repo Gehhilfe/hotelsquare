@@ -95,7 +95,7 @@ public class ProfileFragment extends Fragment {
 
         try {
             service.profile()
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
@@ -189,7 +189,7 @@ public class ProfileFragment extends Fragment {
             try {
                 MultipartBody.Part img = UploadHelper.createMultipartBodySync(avatar, getContext(), true);
                 service.uploadAvatar(img)
-                        .subscribeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(user -> {
                             Log.d(LOG_TAG, "AVATAR ID" + user.getAvatar().getId());
@@ -209,7 +209,7 @@ public class ProfileFragment extends Fragment {
 
         try {
             service2.update(currentUser)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                         currentUser = user;

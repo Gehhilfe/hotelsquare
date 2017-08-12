@@ -1,6 +1,5 @@
 package tk.internet.praktikum.foursquare.search;
 
-import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import tk.internet.praktikum.foursquare.NewVenueDetail;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
@@ -52,13 +50,10 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
 
     @Override
     public void clickOnVenue(String venueId) {
-        Intent intent = new Intent(parentFragment.getActivity(), NewVenueDetail.class);
-        intent.putExtra("VENUE_ID", searchResultViewHolderList.get(Integer.valueOf(venueId)).getId());
-        parentFragment.getActivity().startActivity(intent);
-        /* VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();
+        VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();
         venueInDetailFragment.setVenueId(searchResultViewHolderList.get(Integer.valueOf(venueId)).getId());
         venueInDetailFragment.setParent(parentFragment);
-        redirectToFragment(venueInDetailFragment); */
+        redirectToFragment(venueInDetailFragment);
     }
     public  void addMoreVenues(List<Venue> venues){
         this.searchResultViewHolderList.addAll(venues);

@@ -123,7 +123,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                              Bundle savedInstanceState) {
         if(view==null) {
             // Inflate the layout for this fragment
-            view = inflater.inflate(R.layout.fragment_venue_detail_new, container, false);
+            view = inflater.inflate(R.layout.fragment_venue_in_detail, container, false);
             // layoutInflater=inflater;
             //this.container=container;
             imageVenueOne = (ImageView) view.findViewById(R.id.image_venue_one);
@@ -279,7 +279,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         //CommentService commentService = ServiceFactory.createRetrofitService(CommentService.class, URL);
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
         venueService.getComments(venueId, currentPage)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(comments -> {
                             updateRecyclerView(comments);
@@ -409,7 +409,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                     Log.d(LOG, "token: " + token);
                     VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL, token);
                     venueService.uploadAvatar(image, venueId)
-                            .subscribeOn(Schedulers.io())
+                            .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(imageComment1 -> {
                                         Log.d(LOG, "##### imageComment: " + imageComment1.getId());
@@ -463,7 +463,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
             Log.d(LOG, "token: " + token);
             VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL, token);
             venueService.checkin(venueId)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(checkInInformation -> {
                                 Log.d(LOG, "checkIn Count: " + checkInInformation.getCount());
@@ -631,7 +631,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         if(userAvatar==null) {
             UserService userService = ServiceFactory.createRetrofitService(UserService.class, URL);
             userService.detailsByName(userName)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                                 userAvatar = user.getAvatar();

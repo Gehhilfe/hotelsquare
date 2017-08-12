@@ -13,18 +13,9 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
-
-    <style name="Dark.Overlay" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <!--<item name="android:background">?attr/colorPrimary</item>-->
-    </style>
-
-    <style name="Dark.Overlay.LightPopup" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:background">@color/black</item>
-    </style>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
@@ -50,6 +41,7 @@
     </style>
 
 
+
     <style name="User.Tabs" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">#FFFF</item>
         <item name="tabIndicatorHeight">2dp</item>
@@ -57,12 +49,11 @@
         <item name="tabPaddingEnd">8dp</item>
         <item name="tabBackground">?attr/selectableItemBackground</item>
         <item name="tabSelectedTextColor">#1f2124</item>
-        <item name="tabTextAppearance">@style/TextAction</item>
+        <item name="tabTextAppearance">@style/MyCustomTextAppearance</item>
     </style>
 
-    <style name="TextAction" parent="TextAppearance.Design.Tab">
-        <item name="textAllCaps">true</item>
-        <item name="android:textColor">@color/colorAccent</item>
+    <style name="MyCustomTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
     </style>
 
     <!-- Chat -->
