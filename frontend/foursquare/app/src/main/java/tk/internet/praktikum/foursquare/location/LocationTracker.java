@@ -1,12 +1,16 @@
 package tk.internet.praktikum.foursquare.location;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -17,12 +21,19 @@ import com.google.android.gms.location.LocationServices;
 
 import org.greenrobot.eventbus.EventBus;
 
+import tk.internet.praktikum.foursquare.R;
 
+/**
+ * LocationTracker to track Location of the User
+ */
 public class LocationTracker implements
         LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    /**
+     * LocationEvent for greenrobot.EventBus
+     */
     public static class LocationEvent {
         public Location location;
 
@@ -32,19 +43,31 @@ public class LocationTracker implements
     }
 
     private final static String TAG = LocationTracker.class.getSimpleName();
+
+    // Interval to receive updates
     private static final long INTERVAL = 1000;
+    // Fastest Interval to receive updates
     private static final long FASTEST_INTERVAL = 1000;
+
     private Context context;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mCurrentLocation;
 
+    /**
+     * Constructor
+     *
+     * @param context
+     */
     public LocationTracker(Context context) {
         this.context = context;
 
         init();
     }
 
+    /**
+     * Initialize GoogleApiClient
+     */
     private void init() {
         if (!isGooglePlayServicesAvailable(context)) return;
 
@@ -55,51 +78,53 @@ public class LocationTracker implements
                 .build();
     }
 
+    /**
+     * Start GoogleApiClient-Tracking with Balanced Power/Accuracy,
+     */
     public void start() {
         if (mGoogleApiClient != null) {
             mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(INTERVAL);
             mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-            //mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+            //mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             mGoogleApiClient.connect();
         }
     }
 
+    /**
+     * Stop Tracking
+     */
     public void stop() {
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
-            Log.d(TAG, "Location::stop");
         }
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG, "Location tracking::Permission is missing");
-            Log.i(TAG, "Pls grant location permission: Settings > Apps > <This App> > Location");
+
+        // No Permissions
+        if ((ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                || (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            //TODO: Get Permissions in Runtime isn't that easy due to the need of an activtiy reference
+            Toast.makeText(context,R.string.permissongrant, Toast.LENGTH_LONG).show();
             return;
         }
-
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        Log.d(TAG, "Location::start");
     }
 
     @Override
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
-        Log.d("KEYFOUND", "Location("+location.getLatitude()+","+location.getLongitude()+")");
-        Log.d(TAG, "Location("+location.getLatitude()+","+location.getLongitude()+")");
-
-        // notify UI
+        // Post to EventBus
         EventBus.getDefault().post(new LocationEvent(mCurrentLocation));
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        //Nothing to do
     }
 
     @Override
@@ -107,6 +132,12 @@ public class LocationTracker implements
         Log.d(TAG, "Connection failed: " + connectionResult.toString());
     }
 
+    /**
+     * Checks of GooglePlayService is available
+     *
+     * @param context
+     * @return true, if available otherwise false
+     */
     public static boolean isGooglePlayServicesAvailable(Context context) {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
         if (ConnectionResult.SUCCESS == resultCode) {
@@ -116,3 +147,4 @@ public class LocationTracker implements
         }
     }
 }
+
