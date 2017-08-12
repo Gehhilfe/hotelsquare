@@ -21,6 +21,7 @@ import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Comment;
 import tk.internet.praktikum.foursquare.api.bean.Image;
+import tk.internet.praktikum.foursquare.api.bean.ImageComment;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
@@ -34,6 +35,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     String venueId;
     List<Comment> comments;
     Context context;
+    int lastPage = 0;
 
     public CommentAdapter(String venueId, Context context) {
         this.context = context;
@@ -68,7 +70,13 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             TextComment tcomment = (TextComment)comment;
             holder.text.setText(tcomment.getText());
         } else {
-            holder.text.setText("Image");
+            ImageComment icomment = (ImageComment)comment;
+            holder.text.setText("");
+            ImageCacheLoader loader = new ImageCacheLoader(context);
+            loader.loadBitmap(icomment.getImage(), ImageSize.MEDIUM)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(bitmap -> holder.image.setImageBitmap(bitmap));
         }
 
         if(comment.getAuthor().getAvatar() != null) {
@@ -85,7 +93,19 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
         return comments.size();
     }
 
+    public void loadMore() {
+        this.service.getComments(venueId, lastPage+1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result) -> {
+                    lastPage += 1;
+                    comments.addAll(result);
+                    notifyDataSetChanged();
+                });
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
+        public ImageView image;
         public TextView name, text, votes;
         public ImageView avatar;
         public ImageButton upvote, downvote;
@@ -98,6 +118,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             avatar = (ImageView) view.findViewById(R.id.avatar);
             upvote = (ImageButton) view.findViewById(R.id.upvote);
             downvote = (ImageButton) view.findViewById(R.id.downvote);
+            image = (ImageView) view.findViewById(R.id.image);
         }
     }
 }

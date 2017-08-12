@@ -4,13 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -55,6 +54,8 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     private RecyclerView commentRecyclerView;
     private CommentAdapter commentAdapter;
 
+    private NestedScrollView scrollView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +68,8 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
 
         headerImage = (ImageView) findViewById(R.id.header_image);
 
+        scrollView = (NestedScrollView) findViewById(R.id.scrollView);
+
         image_1 = (ImageView) findViewById(R.id.image_1);
         image_2 = (ImageView) findViewById(R.id.image_2);
         image_3 = (ImageView) findViewById(R.id.image_3);
@@ -76,7 +79,19 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         commentRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
 
         commentAdapter = new CommentAdapter(venueId, getApplicationContext());
-        RecyclerView.LayoutManager mLayoutManager = new CustomGridLayoutMaganager(getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+
+        scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+                    Log.i(NewVenueDetail.class.getName(), "BOTTOM SCROLL");
+                    commentAdapter.loadMore();
+                }
+            }
+        });
+
+        commentRecyclerView.setNestedScrollingEnabled(false);
         commentRecyclerView.setLayoutManager(mLayoutManager);
         commentRecyclerView.setItemAnimator(new DefaultItemAnimator());
         commentRecyclerView.setAdapter(commentAdapter);
