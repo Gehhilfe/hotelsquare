@@ -75,7 +75,7 @@ public class RegisterFragment extends Fragment {
         UserService service = ServiceFactory.createRetrofitService(UserService.class, URL);
 
         service.register(new User(name, email, password))
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         user -> {
