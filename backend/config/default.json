@@ -37,5 +37,12 @@
     "key": "stimi-storage",
     "secret": "6!u40ws?}QwjhpFw",
     "bucket": "test"
+  },
+  "foursquare": {
+    "secrets": {
+      "clientId": "JXUSU3TKGAOBOHMLT1DPZZHEBRWB2YFZ301LQTG2OV2QA44R",
+      "clientSecret": "JXMLL3A4WA31CA2RG0WVMETZPWJT05CFNPEBY3XHCDKJX1MY",
+      "redirectUrl": "https://dev.ip.stimi.ovh/"
+    }
   }
 }
