@@ -87,7 +87,7 @@ describe('Chat', () => {
                     res.body.participants[0].avatar.should.be.a('object');
                     res.body.messages[0].should.be.a('object');
                     res.body.messages.length.should.be.eql(2);
-                    res.body.messages[0].message.should.be.equal('new message')
+                    res.body.messages[0].message.should.be.equal('new message');
                     res.body.messages[1].message.should.be.equal('first chat');
                     return done();
                 });
