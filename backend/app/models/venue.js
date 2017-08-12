@@ -33,7 +33,10 @@ const VenueSchema = new Schema({
         type: Boolean,
         default: false
     },
-    price: Number,
+    price: {
+        type: Number,
+        default: 0
+    },
     foursquare_id: String,
     opening_hours: {
         periods: [{
@@ -402,7 +405,8 @@ class VenueClass {
             check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0),
             is_open: this.isOpen(),
             rating: this.rating_google,
-            formatted_address: this.formatted_address
+            formatted_address: this.formatted_address,
+            price: this.price
         };
     }
 
@@ -424,7 +428,8 @@ class VenueClass {
             vicinity: this.vicinity,
             rating: this.rating_google,
             formatted_address: this.formatted_address,
-            utc_offset: this.utc_offset
+            utc_offset: this.utc_offset,
+            price: this.price
         };
     }
 }
