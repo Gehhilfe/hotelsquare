@@ -26,7 +26,7 @@ const mochaAsync = (fn) => {
 
 describe('venue', () => {
 
-    let aVenue;
+    let aVenue, cVenue;
     let bVenue;
     let user, token;
     beforeEach(mochaAsync(async () => {
@@ -39,7 +39,7 @@ describe('venue', () => {
             Image.remove({}),
             Comment.Comment.remove({})
         ]);
-        const res = await request(server)
+        let res = await request(server)
             .post('/searches/venues')
             .send({
                 locationName: 'Hügelstraße, Darmstadt',
@@ -57,6 +57,14 @@ describe('venue', () => {
         bVenue.images.push(await Image.create({}));
         await bVenue.save();
         token = jsonwt.sign(user.toJSON(), config.jwt.secret, config.jwt.options);
+        res = await request(server)
+            .post('/searches/venues')
+            .send({
+                locationName: 'Langen',
+                keyword: 'Bäumsche am Bahnhof',
+                radius: 5000
+            });
+        cVenue = res.body.results[0];
     }));
 
     it('GET venue details', (mochaAsync(async () => {
