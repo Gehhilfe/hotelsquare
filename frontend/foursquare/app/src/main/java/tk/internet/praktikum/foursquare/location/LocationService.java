@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import tk.internet.praktikum.foursquare.MainActivity;
 
 /**
- * Location Service which handle the LocationTracker
+ * Handles the Location Tracker
  */
 
 public class LocationService extends Service{
@@ -24,16 +24,10 @@ public class LocationService extends Service{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startID){
+
         // start tracker
         locationTracker = new LocationTracker(this);
-        locationTracker.start();
-
-        //Intent resultIntent = new Intent(this, MainActivity.class);
-        //android.support.v4.app.TaskStackBuilder stackBuilder = android.support.v4.app.TaskStackBuilder.create(this);
-        //stackBuilder.addParentStack(MainActivity.class);
-        //stackBuilder.addNextIntent(resultIntent);
-
-        //PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        locationTracker.start(false);
         return START_STICKY;
     }
 
@@ -41,8 +35,7 @@ public class LocationService extends Service{
     @Override
     public void onDestroy(){
         super.onDestroy();
-        //if(locationTracker != null) locationTracker.stop();
-        locationTracker.stop();
+        if(locationTracker != null){locationTracker.stop();};
     }
 
     @Nullable

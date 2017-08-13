@@ -50,7 +50,12 @@ const CommentSchema = new Schema(
                 refPath: 'comments.kind'
             },
             created_at: Date
-        }]
+        }],
+        text: String,
+        image: {
+            type: Schema.Types.ObjectId,
+            ref: 'Image'
+        }
     },
     options);
 
@@ -108,10 +113,11 @@ class CommentClass {
      * @returns {undefined}
      */
     like(user) {
-        if (_.indexOf(this.likes, user._id) === -1) {
+        if (_.findIndex(this.likes, (it) => it.equals(user._id.toString())) === -1) {
             this.likes.push(user);
         }
         this.dislikes.pull(user);
+        this.rating = this.likes.length - this.dislikes.length;
     }
 
     /**
@@ -121,26 +127,27 @@ class CommentClass {
      * @returns {undefined}
      */
     dislike(user) {
-        if (_.indexOf(this.dislikes, user._id) === -1) {
+        if (_.findIndex(this.dislikes, (it) => it.equals(user._id.toString())) === -1) {
             this.dislikes.push(user);
         }
         this.likes.pull(user);
+        this.rating = this.likes.length - this.dislikes.length;
     }
 
-    async toJSONDetails() {
+    toJSONDetails() {
         return {
             _id: this._id,
             assigned: {
                 to: this.assigned.to,
                 kind: this.assigned.kind
             },
-            author: this.author.toJSONPublic(),
-            date: this.date,
-            rating: this.rating,
-            comments_count: this.comments.length,
-            comments: _.map(_.take(this.comments, 5), e => {
-                return e.item.toJSONDetails();
-            })
+            author: (this.author) ? this.author.toJSONPublic() : null,
+            created_at: this.created_at,
+            rating: this.rating//,
+            //            comments_count: this.comments.length,
+            //            comments: _.map(_.take(this.comments, 5), e => {
+            //                return e.item.toJSONDetails();
+            //            })
         };
     }
 }
@@ -169,13 +176,13 @@ class TextCommentClass {
             },
             author: this.author.toJSONPublic(),
             kind: 'TextComment',
-            date: this.date,
+            created_at: this.created_at,
             rating: this.rating,
-            text: this.text,
-            comments_count: this.comments.length,
-            comments: _.map(_.take(this.comments, 5), e => {
-                return e.item.toJSONDetails();
-            })
+            text: this.text//,
+            //comments_count: this.comments.length,
+            //comments: _.map(_.take(this.comments, 5), e => {
+            //    return e.item.toJSONDetails();
+            //})
         };
     }
 }
@@ -199,6 +206,8 @@ class ImageCommentClass {
     toJSONDetails() {
         if (this.author && this.populated('author') === undefined)
             throw new restify_errors.InternalServerError('Author not populated!');
+        if (this.image && this.populated('image') === undefined)
+            throw new restify_errors.InternalServerError('Author not populated!');
         return {
             _id: this._id,
             assigned: {
@@ -207,13 +216,13 @@ class ImageCommentClass {
             },
             author: this.author.toJSONPublic(),
             kind: 'ImageComment',
-            date: this.date,
+            created_at: this.created_at,
             rating: this.rating,
-            image: this.image,
-            comments_count: this.comments.length,
-            comments: _.map(_.take(this.comments, 5), e => {
-                return e.item.toJSONDetails();
-            })
+            image: this.image//,
+            //comments_count: this.comments.length,
+            //comments: _.map(_.take(this.comments, 5), e => {
+            //    return e.item.toJSONDetails();
+            //})
         };
     }
 }
@@ -224,19 +233,12 @@ CommentSchema.loadClass(CommentClass);
 const Comment = mongoose.model('Comment', CommentSchema);
 
 
-const textCommentSchema = new mongoose.Schema({
-    text: String
-}, options);
+const textCommentSchema = new mongoose.Schema({}, options);
 textCommentSchema.loadClass(TextCommentClass);
 
 const TextComment = Comment.discriminator('TextComment', textCommentSchema);
 
-const imageCommentSchema = new mongoose.Schema({
-    image: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
-    }
-}, options);
+const imageCommentSchema = new mongoose.Schema({}, options);
 imageCommentSchema.loadClass(ImageCommentClass);
 
 const ImageComment = Comment.discriminator('ImageComment', imageCommentSchema);

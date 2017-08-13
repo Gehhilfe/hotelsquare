@@ -30,7 +30,7 @@ public interface UserService {
      * @param id user id
      * @return profile of user
      */
-    @GET("users/id/{name}")
+    @GET("users/id/{id}")
     Observable<User> profileByID(@Path("id") String id);
 
     /**

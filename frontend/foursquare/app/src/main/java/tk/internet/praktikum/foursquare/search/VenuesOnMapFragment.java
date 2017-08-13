@@ -51,6 +51,7 @@ import tk.internet.praktikum.foursquare.user.MeFragment;
 //import android.location.Location;
 
 public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback {
+    public static final int INTERVAL_OF_FRIEND_POS_UPDATES = 20000;
     private final String LOG = VenuesOnMapFragment.class.getSimpleName();
     private View view;
     private GoogleMap map;
@@ -70,6 +71,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private List<Venue> allVenues;
     private MainActivity ma;
     private Fragment parent;
+    private long lastUpdate = 0;
 
     public VenuesOnMapFragment() {
         // Required empty public constructor
@@ -336,23 +338,25 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
-        profileService.getNearByFriends(userLocation)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(nearbyFriends -> {
-                            friends = nearbyFriends;
-                            Log.d("KEYFOUND", "Size of Nearby Friends " + friends.size());
+        if(lastUpdate + INTERVAL_OF_FRIEND_POS_UPDATES < System.currentTimeMillis() ) {
+            lastUpdate = System.currentTimeMillis();
+            profileService.getNearByFriends(userLocation)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(nearbyFriends -> {
+                                friends = nearbyFriends;
+                                Log.d("KEYFOUND", "Size of Nearby Friends " + friends.size());
 
-                            for (User f : friends) {
-                                updateFriendsLocation(f);
-                                Log.d("KEYFOUND", "SetMarker: " + f);
-                            }
+                                for (User f : friends) {
+                                    updateFriendsLocation(f);
+                                    Log.d("KEYFOUND", "SetMarker: " + f);
+                                }
 
-                        },
-                        throwable -> {
-                            Log.d(LOG,"Exception: "+throwable.getMessage());
-                        });
-
+                            },
+                            throwable -> {
+                                Log.d(LOG, "Exception: " + throwable.getMessage());
+                            });
+        }
     }
 
     public void setUser() {

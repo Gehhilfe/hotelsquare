@@ -76,7 +76,7 @@ public class LoginFragment extends Fragment {
          * Would be more clean if we used java 1.8 target with Retrolambda
          */
         service.postSession(new LoginCredentials(email, password))
-                .subscribeOn(Schedulers.newThread())                // call is executed i a new thread
+                .subscribeOn(Schedulers.io())                // call is executed i a new thread
                 .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
                 .subscribe(
                         tokenInformation -> {
