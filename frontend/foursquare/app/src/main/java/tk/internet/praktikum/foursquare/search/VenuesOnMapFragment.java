@@ -341,14 +341,22 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         LatLng friendLocation = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
         Log.d("KEYFOUND", "For: " + friend.getDisplayName());
 
-        // if not in Map Already
-        if(!markerFriendMap.containsValue(friend)){
+        // get matching friend
+        User tmpFriend = matchedFriend(friend);
+        // if one was found
+        if(tmpFriend != null){
+            // get belonging marker
+            Marker tmpMarker = getFriendMarker(tmpFriend);
+            // remove it
+            markerFriendMap.remove(tmpMarker);
+            tmpMarker.remove();
+            friendBitmapMap.remove(tmpFriend);
+            Log.d("KEYFOUND", "Removed!");
+        }
             Marker tmp = map.addMarker(new MarkerOptions()
                     .position(friendLocation)
                     .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position))
             );
-            Log.d("KEYFOUND", "Is new!");
-
             // load Images for marker
             if (friend.getAvatar() != null) {
                 ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
@@ -359,12 +367,23 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                             friendBitmapMap.put(friend, bitmap);
                         });
             }
-
+            Log.d("KEYFOUND", "ADDED!");
             markerFriendMap.put(tmp, friend);
             return;
-        } else {
-            Log.d("KEYFOUND", "Is on already!");
+    }
+
+    /**
+     * Return matching stored friend by DisplayName
+     * @param u, user to be found in Hashmap
+     * @return found user or null
+     */
+    private User matchedFriend(User u){
+        for(Map.Entry<Marker, User> entry : markerFriendMap.entrySet()){
+           if(entry.getValue().getDisplayName().equals(u.getDisplayName())){
+                return entry.getValue();
+            }
         }
+        return null;
     }
 
     //TODO:
@@ -428,7 +447,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         }
         // set user position
         userLocation = mainActivity.getUserLocation();
-
+        Log.d("KEYFOUND", "USER IS SET");
         // get user info
         try {
             if (!(LocalStorage.
@@ -494,6 +513,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // Update your Friends' Positions
         if ((LocalStorage.
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")) != "") {
+            Log.d("KEYFOUND", "UPDATE FRIENDS");
             updateFriendsMarker();
         }
     }
