@@ -35,6 +35,7 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
  */
 
 public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapter<CommentAdapter.MyViewHolder> {
+    private static final String LOG = CommentAdapter.class.getName();
     VenueService service;
     String venueId;
     List<Comment> comments;
@@ -53,7 +54,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                 .subscribe((result) -> {
                     comments = result;
                     notifyDataSetChanged();
-                });
+                }, (err) -> Log.d(LOG, err.toString(), err));
     }
 
     @Override
@@ -88,7 +89,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                             holder.image.setImageBitmap(bitmap);
                             holder.image.setVisibility(View.VISIBLE);
                             holder.text.setVisibility(View.GONE);
-                        });
+                        }, (err) -> Log.d(LOG, err.toString(), err));
             } else {
                 Log.d(NewVenueDetail.LOG, "image is null");
             }
@@ -158,7 +159,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                     lastPage += 1;
                     comments.addAll(result);
                     notifyDataSetChanged();
-                });
+                }, (err) -> Log.d(LOG, err.toString(), err));
     }
 
     public void addComment(Comment comment) {

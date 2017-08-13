@@ -53,4 +53,6 @@
     <string name="loginToContinue">Continue</string>
     <string name="permissongrant">Please grant location permission</string>
     <string name="title_activity_new_venue_detail">NewVenueDetail</string>
+    <string name="title_activity_venue_gallery">VenueGalleryActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>
