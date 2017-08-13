@@ -135,7 +135,7 @@ class CommentClass {
                 kind: this.assigned.kind
             },
             author: this.author.toJSONPublic(),
-            date: this.date,
+            created_at: this.created_at,
             rating: this.rating,
             comments_count: this.comments.length,
             comments: _.map(_.take(this.comments, 5), e => {
@@ -169,7 +169,7 @@ class TextCommentClass {
             },
             author: this.author.toJSONPublic(),
             kind: 'TextComment',
-            date: this.date,
+            created_at: this.created_at,
             rating: this.rating,
             text: this.text,
             comments_count: this.comments.length,
@@ -207,7 +207,7 @@ class ImageCommentClass {
             },
             author: this.author.toJSONPublic(),
             kind: 'ImageComment',
-            date: this.date,
+            created_at: this.created_at,
             rating: this.rating,
             image: this.image,
             comments_count: this.comments.length,

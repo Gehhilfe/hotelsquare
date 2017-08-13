@@ -13,7 +13,7 @@ public abstract class Comment {
    /* private String text;*/
     private int likes_count;
     private int dislikes_count;
-    private Date date;
+    private Date created_at;
 
     public Comment() {}
 
@@ -38,7 +38,7 @@ public abstract class Comment {
     }
 
     public void setDate(Date date) {
-        this.date = date;
+        this.created_at = date;
     }
 
     public User getAuthor() {
@@ -54,7 +54,7 @@ public abstract class Comment {
     }
 
     public Date getDate() {
-        return date;
+        return created_at;
     }
 
     public String getId() {

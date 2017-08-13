@@ -82,6 +82,11 @@
 
         <service android:name=".location.LocationService"/>
 
+        <activity
+            android:name=".NewVenueDetail"
+            android:label="@string/title_activity_new_venue_detail"
+            android:theme="@style/AppTheme" />
+
     </application>
 
 </manifest>

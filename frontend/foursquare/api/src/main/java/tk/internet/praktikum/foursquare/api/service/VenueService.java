@@ -78,5 +78,5 @@ public interface VenueService {
      */
     @Multipart
     @POST("venues/{id}/comments/image")
-    Observable<ImageComment> uploadAvatar(@Part MultipartBody.Part image, @Path("id") String id);
+    Observable<ImageComment> addImageComment(@Part MultipartBody.Part image, @Path("id") String id);
 }
