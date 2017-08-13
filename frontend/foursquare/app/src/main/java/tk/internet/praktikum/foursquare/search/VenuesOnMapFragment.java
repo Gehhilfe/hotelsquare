@@ -59,6 +59,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private Venue tmp;
     private Bitmap bmap;
     private Location userLocation;
+    private User user = new User();
+    private Bitmap userImage;
 
     private Marker myPosition;
 
@@ -176,13 +178,22 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
                     venueImage.setImageBitmap(friendBitmapMap.get(friend));
 
+                // Handle logged-in User Marker
+                } else if((LocalStorage.getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""))  != ""){
+                    // check if logged-in user
+
+                        TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
+                        tvTitle.setText(user.getDisplayName());
+                        CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
+                        venueImage.setImageBitmap(userImage);
+
                 // Handle User Marker
                 } else {
-                    // check if logged-in user
-                    if((LocalStorage.getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""))  != ""){
-                        //TODO: load and set and stuff
-                    }
-                    //TODO: dunno what to do here, maybe default stuff?
+                    TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
+                    tvTitle.setText(R.string.thatsme);
+                    // Set Image
+                    CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
+                    venueImage.setImageResource(R.drawable.marker_position);
                 }
                 return myContentsView;
             }
@@ -222,10 +233,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     fragmentTransaction.commit();
                 }
                 // else do nothing
-                //TODO: check if true
             }
         });
-    }
+    } // end: onMapReady
 
     /**
      * Updates the Map with the given Venue marker
@@ -287,7 +297,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         setUser();
         updateFriendsMarker();
 
-        //TODO: Shouldn't we move the Camera to the User's Position?
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(venues.get(0).getLocation().getLatitude(), venues.get(0).getLocation().getLongitude()), 14));
 
     }
@@ -392,8 +401,30 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         mainActivity = (MainActivity) getActivity();
         userLocation = new Location(0,0);
         userLocation = mainActivity.getUserLocation();
-        //TODO: delete
-        Log.d("KEYFOUND", "UserLocation is: " + userLocation.getLatitude() + " , " + userLocation.getLongitude());
+
+        ProfileService profileService = ServiceFactory
+                .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        profileService.profile()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        user -> {
+                            this.user = user;
+                            Log.d("KEYFOUND" , " Got user!");
+                        });
+
+        if (user.getAvatar() != null) {
+            ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+            imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(bitmap -> {
+                        userImage = bitmap;
+                    });
+        }
+
         myPosition = map.addMarker(new MarkerOptions()
                 .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
                 .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
