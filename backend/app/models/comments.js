@@ -50,7 +50,12 @@ const CommentSchema = new Schema(
                 refPath: 'comments.kind'
             },
             created_at: Date
-        }]
+        }],
+        text: String,
+        image: {
+            type: Schema.Types.ObjectId,
+            ref: 'Image'
+        }
     },
     options);
 
@@ -199,6 +204,8 @@ class ImageCommentClass {
     toJSONDetails() {
         if (this.author && this.populated('author') === undefined)
             throw new restify_errors.InternalServerError('Author not populated!');
+        if (this.image && this.populated('image') === undefined)
+            throw new restify_errors.InternalServerError('Author not populated!');
         return {
             _id: this._id,
             assigned: {
@@ -224,19 +231,12 @@ CommentSchema.loadClass(CommentClass);
 const Comment = mongoose.model('Comment', CommentSchema);
 
 
-const textCommentSchema = new mongoose.Schema({
-    text: String
-}, options);
+const textCommentSchema = new mongoose.Schema({}, options);
 textCommentSchema.loadClass(TextCommentClass);
 
 const TextComment = Comment.discriminator('TextComment', textCommentSchema);
 
-const imageCommentSchema = new mongoose.Schema({
-    image: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
-    }
-}, options);
+const imageCommentSchema = new mongoose.Schema({}, options);
 imageCommentSchema.loadClass(ImageCommentClass);
 
 const ImageComment = Comment.discriminator('ImageComment', imageCommentSchema);

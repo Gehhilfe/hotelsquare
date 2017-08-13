@@ -77,6 +77,15 @@ describe('venue', () => {
         res.body.images.length.should.not.be.equal(0);
     })));
 
+    it('GET venue details Petro', (mochaAsync(async () => {
+        const res = await request(server)
+            .get('/venues/' + cVenue._id + '');
+        res.should.have.status(200);
+        res.body.should.have.property('name');
+        res.body.should.have.property('location');
+        res.body.should.have.property('images');
+    })));
+
     describe('checkin', () => {
         it('should count checkin', (mochaAsync(async () => {
             let res = await request(server)

@@ -62,7 +62,7 @@ public class ChatFragment extends Fragment {
 
         try {
             service.getConversation(chatId, 0)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             chatResponse -> {
@@ -94,7 +94,7 @@ public class ChatFragment extends Fragment {
         try {
             service.getConversation(chatId, 0)
                     .repeatWhen(done -> done.delay(10, TimeUnit.SECONDS))
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             chatResponse -> {
@@ -129,7 +129,7 @@ public class ChatFragment extends Fragment {
         try {
             Message msg = new Message(inputMsg.getText().toString());
             service.replyMessage(chatId, msg)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             chatResponse -> {
