@@ -78,9 +78,12 @@ describe('comments', () => {
             it('should not change the number of likes', () => {
                 comment.like(user);
                 comment.likes.length.should.be.equal(1);
+                comment.toJSONDetails().rating.should.be.equal(1);
+
 
                 textComment.like(user);
                 textComment.likes.length.should.be.equal(1);
+                textComment.toJSONDetails().rating.should.be.equal(1);
             });
         });
 

@@ -71,7 +71,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Comment comment = comments.get(position);
         holder.name.setText(comment.getAuthor().getName());
-        Integer delta = comment.getLikes() - comment.getDislikes();
+        Integer delta = comment.getRating();
         holder.votes.setText(String.format("%d", delta));
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
@@ -118,9 +118,9 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                 service.like(comment.getId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(res -> {
-                            Integer count = Integer.parseInt(holder.votes.getText().toString()) + 1;
-                            holder.votes.setText(String.format("%d", count));
+                        .subscribe(cmt -> {
+                            Integer d = cmt.getRating();
+                            holder.votes.setText(String.format("%d", d));
                         }, err -> Log.d("CommentAdapter", err.toString(), err));
             } else {
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
@@ -135,9 +135,9 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                 service.dislike(comment.getId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(res -> {
-                            Integer count = Integer.parseInt(holder.votes.getText().toString()) - 1;
-                            holder.votes.setText(String.format("%d", count));
+                        .subscribe(cmt -> {
+                            Integer d = cmt.getRating();
+                            holder.votes.setText(String.format("%d", d));
                         }, err -> Log.d("CommentAdapter", err.toString(), err));
                 ;
             } else {

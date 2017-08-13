@@ -25,7 +25,7 @@ public interface CommentService {
      * @param id comment id
      */
     @PUT("comments/{id}/like")
-    Observable<Object> like(@Path("id") String id);
+    Observable<Comment> like(@Path("id") String id);
 
     /**
      * Get 10 comments to comment identified by id
@@ -41,7 +41,7 @@ public interface CommentService {
      * @param id comment id
      */
     @PUT("comments/{id}/dislike")
-    Observable<Object> dislike(@Path("id") String id);
+    Observable<Comment> dislike(@Path("id") String id);
 
     /**
      * Adds a text comment to the comment
