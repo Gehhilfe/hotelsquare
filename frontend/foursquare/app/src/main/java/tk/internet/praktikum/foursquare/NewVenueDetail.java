@@ -63,6 +63,8 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
 
     public static final String URL = "https://dev.ip.stimi.ovh/";
     public static final String LOG = NewVenueDetail.class.getSimpleName();
+    public static final int REQUEST_PICTURE = 0;
+    public static final int REQUEST_GALLERY = 1;
 
     private ImageView headerImage;
     private ProgressDialog progressDialog;
@@ -99,7 +101,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         Intent intent = getIntent();
         venueId = intent.getStringExtra("VENUE_ID");
 
-        Log.d(LOG, "Display id: "+venueId);
+        Log.d(LOG, "Display id: " + venueId);
 
         headerImage = (ImageView) findViewById(R.id.header_image);
 
@@ -166,19 +168,9 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     protected void onStart() {
         super.onStart();
 
-        fabTextComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openTextDialog();
-            }
-        });
+        fabTextComment.setOnClickListener(v -> openTextDialog());
 
-        fabImageComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openImageDialog();
-            }
-        });
+        fabImageComment.setOnClickListener(v -> openImageDialog());
 
         // Load venue data from server
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
@@ -242,7 +234,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                 .title("Post Comment")
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .input("Your awesome message!", "", (dialog, input) -> {
-                    if(input.toString().isEmpty())
+                    if (input.toString().isEmpty())
                         return;
                     VenueService vs = ServiceFactory.createRetrofitService(VenueService.class, URL, sp.getString(Constants.TOKEN, ""));
                     TextComment comment = new TextComment(input.toString());
@@ -264,8 +256,23 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
             Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
             return;
         }
-        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(takePicture, 0);
+        new MaterialDialog.Builder(this)
+                .title("Add Image Comment")
+                .items(new String[]{
+                        "Take Picture",
+                        "Choose from Gallery"
+                })
+                .itemsCallback((dialog, itemView, position, text) -> {
+                    if(position == 0) {
+                        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(takePicture, REQUEST_PICTURE);
+                    } else {
+                        Intent chooseFromGallery = new Intent(Intent.ACTION_GET_CONTENT);
+                        chooseFromGallery.setType("image/*");
+                        startActivityForResult(Intent.createChooser(chooseFromGallery, "Select Picture"), REQUEST_GALLERY);
+                    }
+                })
+                .show();
     }
 
     private void updateButtons(Venue venue) {
@@ -390,11 +397,11 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
+        VenueService vs = ServiceFactory.createRetrofitService(VenueService.class, URL, sp.getString(Constants.TOKEN, ""));
         switch (requestCode) {
-            case 0:
+            case REQUEST_PICTURE:
                 if (resultCode == RESULT_OK) {
-                    SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
-                    VenueService vs = ServiceFactory.createRetrofitService(VenueService.class, URL, sp.getString(Constants.TOKEN, ""));
                     try {
                         Bitmap image = (Bitmap) data.getExtras().get("data");
                         MultipartBody.Part img = UploadHelper.createMultipartBodySync(image, getApplicationContext(), false);
@@ -409,7 +416,25 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                     }
 
                 }
+                break;
 
+            case REQUEST_GALLERY:
+                if(resultCode == RESULT_OK) {
+                    try {
+                        Uri uri = data.getData();
+                        Bitmap image = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                        MultipartBody.Part img = UploadHelper.createMultipartBodySync(image, getApplicationContext(), false);
+                        vs.addImageComment(img, venueId)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(imageComment -> commentAdapter.addComment(imageComment),
+                                        throwable -> Log.d(LOG, throwable.toString())
+                                );
+                    } catch (Exception e) {
+                        Log.d(LOG, e.toString());
+                    }
+                }
+                break;
 
             default:
                 super.onActivityResult(requestCode, resultCode, data);

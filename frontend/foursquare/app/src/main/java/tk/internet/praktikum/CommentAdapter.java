@@ -56,7 +56,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                 .subscribe((result) -> {
                     comments = result;
                     notifyDataSetChanged();
-        });
+                });
     }
 
     @Override
@@ -71,23 +71,23 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Comment comment = comments.get(position);
         holder.name.setText(comment.getAuthor().getName());
-        Integer delta = comment.getLikes()-comment.getDislikes();
-
+        Integer delta = comment.getLikes() - comment.getDislikes();
+        holder.votes.setText(String.format("%d", delta));
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
-        if(comment.getDate() != null) {
+        if (comment.getDate() != null) {
             holder.date.setText(df.format(comment.getDate()));
-            holder.votes.setText(delta.toString());
         }
 
-        if(comment instanceof TextComment) {
-            TextComment tcomment = (TextComment)comment;
+        if (comment instanceof TextComment) {
+            TextComment tcomment = (TextComment) comment;
             holder.text.setText(tcomment.getText());
             holder.text.setVisibility(View.VISIBLE);
+            holder.image.setVisibility(View.GONE);
         } else {
-            ImageComment icomment = (ImageComment)comment;
-            holder.text.setText("");
-            if(icomment.getImage() != null) {
+            ImageComment icomment = (ImageComment) comment;
+            holder.text.setText(" ");
+            if (icomment.getImage() != null) {
                 ImageCacheLoader loader = new ImageCacheLoader(context);
                 loader.loadBitmap(icomment.getImage(), ImageSize.MEDIUM)
                         .subscribeOn(Schedulers.io())
@@ -95,27 +95,34 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                         .subscribe(bitmap -> {
                             holder.image.setImageBitmap(bitmap);
                             holder.image.setVisibility(View.VISIBLE);
+                            holder.text.setVisibility(View.GONE);
                         });
-            }else{
+            } else {
                 Log.d(NewVenueDetail.LOG, "image is null");
             }
         }
 
-        if(comment.getAuthor().getAvatar() != null) {
+        if (comment.getAuthor().getAvatar() != null) {
             ImageCacheLoader loader = new ImageCacheLoader(context);
             loader.loadBitmap(comment.getAuthor().getAvatar(), ImageSize.SMALL)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(bitmap -> holder.avatar.setImageBitmap(bitmap));
+                    .subscribe(bitmap -> holder.avatar.setImageBitmap(bitmap), err -> Log.d("CommentAdapter", err.toString(), err));
         }
 
         holder.upvote.setOnClickListener((event) -> {
             LocalStorage ls = LocalStorage.getLocalStorageInstance(context);
             SharedPreferences sp = LocalStorage.getSharedPreferences(context);
-            if(ls.isLoggedIn()) {
+            if (ls.isLoggedIn()) {
                 CommentService service = ServiceFactory.createRetrofitService(CommentService.class, NewVenueDetail.URL, sp.getString(Constants.TOKEN, ""));
-                service.like(comment.getId());
-            }else {
+                service.like(comment.getId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(res -> {
+                            Integer count = Integer.parseInt(holder.votes.getText().toString()) + 1;
+                            holder.votes.setText(String.format("%d", count));
+                        }, err -> Log.d("CommentAdapter", err.toString(), err));
+            } else {
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
             }
         });
@@ -123,10 +130,17 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
         holder.downvote.setOnClickListener((event) -> {
             LocalStorage ls = LocalStorage.getLocalStorageInstance(context);
             SharedPreferences sp = LocalStorage.getSharedPreferences(context);
-            if(ls.isLoggedIn()) {
+            if (ls.isLoggedIn()) {
                 CommentService service = ServiceFactory.createRetrofitService(CommentService.class, NewVenueDetail.URL, sp.getString(Constants.TOKEN, ""));
-                service.dislike(comment.getId());
-            }else {
+                service.dislike(comment.getId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(res -> {
+                            Integer count = Integer.parseInt(holder.votes.getText().toString()) - 1;
+                            holder.votes.setText(String.format("%d", count));
+                        }, err -> Log.d("CommentAdapter", err.toString(), err));
+                ;
+            } else {
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
             }
         });
@@ -138,14 +152,14 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     }
 
     public void loadMore() {
-        if(lastEmpty)
+        if (lastEmpty)
             return;
 
-        this.service.getComments(venueId, lastPage+1)
+        this.service.getComments(venueId, lastPage + 1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result) -> {
-                    if(result.isEmpty()) {
+                    if (result.isEmpty()) {
                         lastEmpty = true;
                         return;
                     }
