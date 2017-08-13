@@ -330,14 +330,23 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void updateButtons(Venue venue) {
-        if (venue.getWebsite() != null && !venue.getWebsite().isEmpty())
+        if (venue.getWebsite() != null && !venue.getWebsite().isEmpty()) {
             wwwBtn.setVisibility(View.VISIBLE);
-        else
+            wwwBtn.setOnClickListener(v -> {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(venue.getWebsite()));
+                startActivity(i);
+            });
+        }else
             wwwBtn.setVisibility(View.GONE);
 
-        if (venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty())
+        if (venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty()) {
             callBtn.setVisibility(View.VISIBLE);
-        else
+            callBtn.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", venue.getPhoneNumber(), null));
+                startActivity(intent);
+            });
+        } else
             callBtn.setVisibility(View.GONE);
 
         checkinBtn.setOnClickListener((view) -> {
