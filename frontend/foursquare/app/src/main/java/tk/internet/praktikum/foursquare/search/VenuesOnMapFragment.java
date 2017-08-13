@@ -127,7 +127,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // set Usermarker
         setUser();
 
-        //TODO:
+        //TODO: Should we do this? I don't know, have to think about it
         //updateFriendsMarker();
 
         // custom InfoWindow for all Markers
@@ -159,13 +159,16 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     if (venue.isOpen()) {
                         tvOpen.setText(getString(R.string.open_now));
                     }
+
                     CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
+
                     // load Image if possible, else default
                     if (venueBitmapMap.containsKey(venue)) {
                         venueImage.setImageBitmap(venueBitmapMap.get(venue));
                     } else {
                         venueImage.setImageResource(R.mipmap.ic_location_city_black_24dp);
                     }
+
                 // Handle Friend Marker
                 } else if (markerFriendMap.containsKey(marker)) {
 
@@ -184,10 +187,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     // Set Image
                     CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
                     venueImage.setImageBitmap(friendBitmapMap.get(friend));
-
                 // Handle logged-in User Marker
-                } else if((LocalStorage.getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""))  != ""){
-                    // check if logged-in user
+                } else if(!(LocalStorage.getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")){
 
                         TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
                         tvTitle.setText(user.getDisplayName());
@@ -202,7 +203,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 } else {
                     TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
                     tvTitle.setText(R.string.thatsme);
-                    // Set Image
                     CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
                     venueImage.setImageResource(R.drawable.marker_position);
                     TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
@@ -239,15 +239,15 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 } else if (markerFriendMap.containsKey(marker)) {
                     //TODO: "Call FriendFragment"
                 // if User, go to Me-Fragment
-                } else if ((LocalStorage.
-                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""))  != "") {
+                } else if (!(LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
                     MeFragment meFragment = new MeFragment();
                     FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.fragment_container, meFragment);
                     fragmentTransaction.addToBackStack(meFragment.getTag());
                     fragmentTransaction.commit();
                 }
-                // else do nothing
+                // else do nothing (case: user not  logged-in)
             }
         });
     } // end: onMapReady
@@ -308,9 +308,13 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         for (Venue venue : venues) {
             updateVenueLocation(venue);
         }
-        // set user and Friends
+        // set user
         setUser();
-        updateFriendsMarker();
+        // and friends if logged-in
+        if (!(LocalStorage.
+                getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
+            updateFriendsMarker();
+        }
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(venues.get(0).getLocation().getLatitude(), venues.get(0).getLocation().getLongitude()), 14));
 
@@ -419,10 +423,12 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         if(myPosition != null){
             myPosition.remove();
         }
+        // set user position
         mainActivity = (MainActivity) getActivity();
         userLocation = new Location(0,0);
         userLocation = mainActivity.getUserLocation();
 
+        // get user info
         try {
             if (!(LocalStorage.
                     getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")){
@@ -437,10 +443,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     .subscribe(
                             user -> {
                                 this.user = user;
-                                Log.d("KEYFOUND", " Got user!");
                             });
-
-            if (user.getAvatar() != null) {
+            // get user Avatar
                 ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
                 imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
                         .subscribeOn(Schedulers.io())
@@ -448,10 +452,10 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                         .subscribe(bitmap -> {
                             userImage = bitmap;
                         });
-                }
+
             }
         }catch(Exception e){
-            Log.d("KEYFOUND", "e is: " + e);
+            e.printStackTrace();
         }
         myPosition = map.addMarker(new MarkerOptions()
                 .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
