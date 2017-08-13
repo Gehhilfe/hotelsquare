@@ -127,7 +127,7 @@ class CommentClass {
      * @returns {undefined}
      */
     dislike(user) {
-        if (_.findIndex(this.likes, (it) => it.equals(user._id.toString())) === -1) {
+        if (_.findIndex(this.dislikes, (it) => it.equals(user._id.toString())) === -1) {
             this.dislikes.push(user);
         }
         this.likes.pull(user);
