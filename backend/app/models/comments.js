@@ -117,6 +117,7 @@ class CommentClass {
             this.likes.push(user);
         }
         this.dislikes.pull(user);
+        this.rating = this.likes.length - this.dislikes.length;
     }
 
     /**
@@ -130,22 +131,23 @@ class CommentClass {
             this.dislikes.push(user);
         }
         this.likes.pull(user);
+        this.rating = this.likes.length - this.dislikes.length;
     }
 
-    async toJSONDetails() {
+    toJSONDetails() {
         return {
             _id: this._id,
             assigned: {
                 to: this.assigned.to,
                 kind: this.assigned.kind
             },
-            author: this.author.toJSONPublic(),
+            author: (this.author) ? this.author.toJSONPublic() : null,
             created_at: this.created_at,
-            rating: this.rating,
-            comments_count: this.comments.length,
-            comments: _.map(_.take(this.comments, 5), e => {
-                return e.item.toJSONDetails();
-            })
+            rating: this.rating//,
+            //            comments_count: this.comments.length,
+            //            comments: _.map(_.take(this.comments, 5), e => {
+            //                return e.item.toJSONDetails();
+            //            })
         };
     }
 }
@@ -176,11 +178,11 @@ class TextCommentClass {
             kind: 'TextComment',
             created_at: this.created_at,
             rating: this.rating,
-            text: this.text,
-            comments_count: this.comments.length,
-            comments: _.map(_.take(this.comments, 5), e => {
-                return e.item.toJSONDetails();
-            })
+            text: this.text//,
+            //comments_count: this.comments.length,
+            //comments: _.map(_.take(this.comments, 5), e => {
+            //    return e.item.toJSONDetails();
+            //})
         };
     }
 }
@@ -216,11 +218,11 @@ class ImageCommentClass {
             kind: 'ImageComment',
             created_at: this.created_at,
             rating: this.rating,
-            image: this.image,
-            comments_count: this.comments.length,
-            comments: _.map(_.take(this.comments, 5), e => {
-                return e.item.toJSONDetails();
-            })
+            image: this.image//,
+            //comments_count: this.comments.length,
+            //comments: _.map(_.take(this.comments, 5), e => {
+            //    return e.item.toJSONDetails();
+            //})
         };
     }
 }
