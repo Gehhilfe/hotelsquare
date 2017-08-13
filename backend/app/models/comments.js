@@ -162,6 +162,7 @@ class TextCommentClass {
             cmt.assignTo(assigned_to);
         }
         cmt.text = text;
+        cmt.created_at = Date.now();
         return await cmt.save();
     }
 
@@ -199,6 +200,7 @@ class ImageCommentClass {
         }
         await icmt.save();
         icmt.image.assignTo(icmt);
+        icmt.created_at = Date.now();
         await icmt.image.save();
         return icmt;
     }
