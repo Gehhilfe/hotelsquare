@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import tk.internet.praktikum.foursquare.MainActivity;
 
 /**
- * Location Service which handle the LocationTracker
+ * Handles the Location Tracker
  */
 
 public class LocationService extends Service{
@@ -24,6 +24,7 @@ public class LocationService extends Service{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startID){
+
         // start tracker
         locationTracker = new LocationTracker(this);
         locationTracker.start(false);

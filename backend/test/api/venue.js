@@ -26,8 +26,8 @@ const mochaAsync = (fn) => {
 
 describe('venue', () => {
 
-    let aVenue;
-    let bVenue, cVenue;
+    let aVenue, cVenue;
+    let bVenue;
     let user, token;
     beforeEach(mochaAsync(async () => {
         mongoose.Promise = global.Promise;
