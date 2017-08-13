@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -44,6 +45,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.File;
 import java.io.IOException;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MultipartBody;
@@ -53,9 +55,11 @@ import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.UploadHelper;
+import tk.internet.praktikum.foursquare.api.bean.CheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
+import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -83,9 +87,14 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     private NestedScrollView scrollView;
 
     private Button callBtn, wwwBtn, checkinBtn;
+    private FloatingActionMenu fabMenu;
     private FloatingActionButton fabTextComment;
     private String venueId;
     private FloatingActionButton fabImageComment;
+
+    private TextView[] leaderboard_name;
+    private TextView[] leaderboard_count;
+    private CircleImageView[] leaderboard_avatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +113,25 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         Log.d(LOG, "Display id: " + venueId);
 
         headerImage = (ImageView) findViewById(R.id.header_image);
+
+        // Leaderboard
+        leaderboard_name = new TextView[]{
+                (TextView) findViewById(R.id.leaderboard_1_name),
+                (TextView) findViewById(R.id.leaderboard_2_name),
+                (TextView) findViewById(R.id.leaderboard_3_name)
+        };
+
+        leaderboard_count = new TextView[]{
+                (TextView) findViewById(R.id.leaderboard_1_count),
+                (TextView) findViewById(R.id.leaderboard_2_count),
+                (TextView) findViewById(R.id.leaderboard_3_count)
+        };
+
+        leaderboard_avatar = new CircleImageView[]{
+                (CircleImageView) findViewById(R.id.leaderboard_1_avatar),
+                (CircleImageView) findViewById(R.id.leaderboard_2_avatar),
+                (CircleImageView) findViewById(R.id.leaderboard_3_avatar)
+        };
 
         // Buttons
         callBtn = (Button) findViewById(R.id.call);
@@ -160,6 +188,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         progressDialog.show();
 
         // FAB Buttons
+        fabMenu = (FloatingActionMenu) findViewById(R.id.floating_menu);
         fabTextComment = (FloatingActionButton) findViewById(R.id.venue_detail_text_comment_button);
         fabImageComment = (FloatingActionButton) findViewById(R.id.venue_detail_image_commnent_button);
     }
@@ -184,6 +213,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                     updateVenueLocation(venue.getLocation());
                     updatePrice(venue);
                     updateButtons(venue);
+                    updateLeaderboard(venue);
                     if (venue.getImages().size() > 0) {
                         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
 
@@ -223,7 +253,30 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                 });
     }
 
+    private void updateLeaderboard(Venue venue) {
+        UserService us = ServiceFactory.createRetrofitService(UserService.class, URL);
+        for(int i = 0; i < 3 && i < venue.getTopCheckins().size(); i++) {
+            CheckinInformation info = venue.getTopCheckins().get(i);
+            leaderboard_count[i].setText(String.format("%d", info.getCount()));
+            final int current = i;
+            us.profileByID(info.getUserID())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((res) -> {
+                        leaderboard_name[current].setText(res.getName());
+                        ImageCacheLoader icl = new ImageCacheLoader(getApplicationContext());
+                        if(res.getAvatar() != null) {
+                            icl.loadBitmap(res.getAvatar(), ImageSize.SMALL)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe((bitmap) -> leaderboard_avatar[current].setImageBitmap(bitmap), (err) -> Log.d(LOG, err.toString(), err));
+                        }
+                    }, (err) -> Log.d(LOG, err.toString(), err));
+        }
+    }
+
     private void openTextDialog() {
+        fabMenu.close(true);
         LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
         SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
         if (!ls.isLoggedIn()) {
@@ -250,6 +303,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void openImageDialog() {
+        fabMenu.close(true);
         LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
         SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
         if (!ls.isLoggedIn()) {
@@ -279,12 +333,12 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         if (venue.getWebsite() != null && !venue.getWebsite().isEmpty())
             wwwBtn.setVisibility(View.VISIBLE);
         else
-            wwwBtn.setVisibility(View.INVISIBLE);
+            wwwBtn.setVisibility(View.GONE);
 
         if (venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty())
             callBtn.setVisibility(View.VISIBLE);
         else
-            callBtn.setVisibility(View.INVISIBLE);
+            callBtn.setVisibility(View.GONE);
 
         checkinBtn.setOnClickListener((view) -> {
             LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
@@ -360,10 +414,13 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         StringBuilder sb = new StringBuilder();
         if (venue.getFormattedAddress() != null && !venue.getFormattedAddress().isEmpty())
             sb.append(venue.getFormattedAddress()).append("\n");
+        else if  (venue.getVicinity() != null && !venue.getVicinity().isEmpty())
+            sb.append(venue.getVicinity()).append("\n");
         if (venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty())
             sb.append(venue.getPhoneNumber()).append("\n");
         if (venue.getWebsite() != null && !venue.getWebsite().isEmpty())
             sb.append(venue.getWebsite()).append("\n");
+        sb.append(venue.getCheckInCount()+ " Checkins").append("\n");
         infoVicinity.setText(sb.toString());
     }
 
