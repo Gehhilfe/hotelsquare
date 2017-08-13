@@ -22,10 +22,15 @@ const User = require('../models/user');
  * @returns {undefined}
  */
 async function like(request, response, next) {
-    const comment = await Comment.findOne({_id: request.params.id});
+    const comment = await Comment.findOne({_id: request.params.id}).populate({
+        path: 'author image',
+        populate: {
+            path: 'avatar'
+        }
+    });
     comment.like(request.authentication);
     await comment.save();
-    response.send(comment);
+    response.send(comment.toJSONDetails());
     return next();
 }
 
@@ -39,10 +44,15 @@ async function like(request, response, next) {
  * @returns {undefined}
  */
 async function dislike(request, response, next) {
-    const comment = await Comment.findOne({_id: request.params.id});
+    const comment = await Comment.findOne({_id: request.params.id}).populate({
+        path: 'author image',
+        populate: {
+            path: 'avatar'
+        }
+    });
     comment.dislike(request.authentication);
     await comment.save();
-    response.send(comment);
+    response.send(comment.toJSONDetails());
     return next();
 }
 

@@ -419,7 +419,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                 break;
 
             case REQUEST_GALLERY:
-                if(requestCode == RESULT_OK) {
+                if(resultCode == RESULT_OK) {
                     try {
                         Uri uri = data.getData();
                         Bitmap image = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
