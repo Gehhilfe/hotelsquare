@@ -137,6 +137,8 @@ class VenueClass {
         const v = searchResult.venues[0];
         this.foursquare_id = v.id;
         const details = await this._foursquareDetails();
+        if(details.contact && details.contact.phone)
+            this.phone_number = details.contact.phone;
         if(details.tags)
             this.types = _.uniq(_.concat(this.types, details.tags));
         if(details.price)
@@ -372,7 +374,8 @@ class VenueClass {
         this.opening_hours = details.result.opening_hours;
         this.utc_offset = details.result.utc_offset;
         this.website = details.result.website;
-        this.phone_number = details.result.phone_number;
+        if(details.result.phone_number)
+            this.phone_number = details.result.phone_number;
         this.icon_url = details.result.icon;
         this.vicinity = details.result.vicinity;
         this.formatted_address = details.result.formatted_address;
