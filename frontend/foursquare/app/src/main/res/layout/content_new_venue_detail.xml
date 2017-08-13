@@ -261,7 +261,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="Unkown" />
+                            android:text="Unkown"
+                            android:textColor="@color/colorAccent" />
 
                         <TextView
                             android:id="@+id/leaderboard_2_count"
@@ -296,7 +297,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="Unkown" />
+                            android:text="Unkown"
+                            android:textColor="@color/colorAccent" />
 
                         <TextView
                             android:id="@+id/leaderboard_1_count"
@@ -331,7 +333,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="Unkown" />
+                            android:text="Unkown"
+                            android:textColor="@color/colorAccent" />
 
                         <TextView
                             android:id="@+id/leaderboard_3_count"

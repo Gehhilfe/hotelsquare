@@ -70,7 +70,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Comment comment = comments.get(position);
-        holder.name.setText(comment.getAuthor().getName());
+        holder.name.setText(comment.getAuthor().getDisplayName());
         Integer delta = comment.getRating();
         holder.votes.setText(String.format("%d", delta));
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);

@@ -263,7 +263,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((res) -> {
-                        leaderboard_name[current].setText(res.getName());
+                        leaderboard_name[current].setText(res.getDisplayName());
                         ImageCacheLoader icl = new ImageCacheLoader(getApplicationContext());
                         if(res.getAvatar() != null) {
                             icl.loadBitmap(res.getAvatar(), ImageSize.SMALL)
