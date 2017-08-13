@@ -44,6 +44,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -95,6 +96,8 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     private TextView[] leaderboard_name;
     private TextView[] leaderboard_count;
     private CircleImageView[] leaderboard_avatar;
+    private RecyclerView lastHereRecylcer;
+    private LastHereAdapter lastHereAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,6 +185,18 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         SupportMapFragment mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView));
         mapFragment.getMapAsync(this);
 
+
+        // Last here recylcer
+        lastHereRecylcer = (RecyclerView) findViewById(R.id.last_here_recylcer_view);
+
+        lastHereAdapter = new LastHereAdapter(new ArrayList<CheckinInformation>(), getApplicationContext());
+
+
+        lastHereRecylcer.setNestedScrollingEnabled(false);
+        lastHereRecylcer.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        lastHereRecylcer.setItemAnimator(new DefaultItemAnimator());
+        lastHereRecylcer.setAdapter(lastHereAdapter);
+
         progressDialog = new ProgressDialog(this, 0);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Spy is looking up details...");
@@ -214,6 +229,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                     updatePrice(venue);
                     updateButtons(venue);
                     updateLeaderboard(venue);
+                    lastHereAdapter.setData(venue.getLastCheckins());
                     if (venue.getImages().size() > 0) {
                         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
 

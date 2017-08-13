@@ -2,7 +2,6 @@ package tk.internet.praktikum;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,22 +12,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.foursquare.DateFormat;
 import tk.internet.praktikum.foursquare.NewVenueDetail;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Comment;
-import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.ImageComment;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
-import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
@@ -71,14 +68,9 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Comment comment = comments.get(position);
         holder.name.setText(comment.getAuthor().getDisplayName());
-        Integer delta = comment.getRating();
-        holder.votes.setText(String.format("%d", delta));
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+        holder.votes.setText(String.format("%d", comment.getRating()));
 
-        if (comment.getDate() != null) {
-            holder.date.setText(df.format(comment.getDate()));
-        }
-
+        holder.date.setText(DateFormat.getFriendlyTime(comment.getDate()));
         if (comment instanceof TextComment) {
             TextComment tcomment = (TextComment) comment;
             holder.text.setText(tcomment.getText());
