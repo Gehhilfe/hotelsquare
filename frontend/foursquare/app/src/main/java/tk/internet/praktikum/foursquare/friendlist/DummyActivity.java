@@ -65,7 +65,7 @@ public class DummyActivity extends AppCompatActivity {
         List<String> recipitants = new ArrayList<>();
         recipitants.add("5980da1eaead6e0015b903be");
         RecipientMessage rm = new RecipientMessage(recipitants, "Test Chat mit Janus");
-
+/*
         try {
             service.newChat(rm)
                     .subscribeOn(Schedulers.io())
@@ -80,7 +80,7 @@ public class DummyActivity extends AppCompatActivity {
                     );
         }catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void loadChat() {
