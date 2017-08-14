@@ -533,6 +533,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LocationTracker.LocationEvent event) {
         // Update your own Position
+        setUser();
         // Update your Friends' Positions
         if ((LocalStorage.
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")) != "") {
