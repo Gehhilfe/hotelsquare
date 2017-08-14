@@ -57,7 +57,11 @@
         <item name="tabPaddingEnd">8dp</item>
         <item name="tabBackground">?attr/selectableItemBackground</item>
         <item name="tabSelectedTextColor">#1f2124</item>
-        <item name="tabTextAppearance">@style/TextAction</item>
+        <item name="tabTextAppearance">@style/MyCustomText</item>
+    </style>
+
+    <style name="MyCustomText" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
     </style>
 
     <style name="TextAction" parent="TextAppearance.Design.Tab">

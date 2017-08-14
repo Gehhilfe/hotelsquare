@@ -29,12 +29,12 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.UserService;
-import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.foursquare.user.UserActivity;
 
@@ -123,7 +123,8 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_history) {
             // call history activity
-            Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+            intent.putExtra("userID", "");
             startActivityForResult(intent, 0);
         } else if (id == R.id.nav_me) {
             // call login activity if didn't login util now
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
             // call history activity
-            Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
+            Intent intent = new Intent(getApplicationContext(), UserActivity.class);
             startActivityForResult(intent, 0);
         }
 
