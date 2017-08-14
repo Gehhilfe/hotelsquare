@@ -11,6 +11,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import tk.internet.praktikum.foursquare.api.bean.FriendListResponse;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequestResponse;
 import tk.internet.praktikum.foursquare.api.bean.Location;
@@ -50,6 +51,14 @@ public interface ProfileService {
      */
     @GET("profile/friends/{page}")
     Observable<FriendListResponse> friends(@Path("page") int page);
+
+    /**
+     * Retrvies profile if he is friend with the authenticated user
+     * @param other_id id of possible friend
+     * @return
+     */
+    @GET("profile/friends")
+    Observable<FriendListResponse> profileIfFriends(@Query("only") String other_id);
 
     /**
      * Retrieves all friends near by

@@ -154,7 +154,7 @@ async function register(request, response, next) {
                 from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
                 to: user.email,
                 subject: 'Welcome to HOTELSQUARE',
-                text: 'Hello '+user.displayName+', have fun using HOTELSQUARE! But before you start please confirm your email address by clicking on this link https://dev.ip.stimi.ovh/emailConfirmation/?key='+user.activation_key+'&id='+user._id.toString()
+                text: 'Hello '+user.displayName+', have fun using HOTELSQUARE! But before you start please confirm your email address by clicking on this link https://dev.ip.stimi.ovh/emailConfirmation?key='+user.activation_key+'&id='+user._id.toString()
             };
 
             await transporter.sendMail(mailOptions);

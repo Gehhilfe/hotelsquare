@@ -145,22 +145,15 @@ describe('Chat', () => {
     });
 
     describe('POST chat', () => {
-        it('should start a chat with an initial message', (done) => {
-            const chatdata = {
-                recipients: [
-                    other._id
-                ],
-                message: 'test message'
-            };
+        it('should start a chat', (done) => {
             request(server)
                 .post('/chats')
                 .set('x-auth', token)
-                .send(chatdata)
+                .query({other_id: other._id.toString()})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('object');
                     res.body.messages.should.be.a('array');
-                    res.body.messages[0].should.be.a('object');
                     return done();
                 });
         });
