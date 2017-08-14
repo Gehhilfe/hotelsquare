@@ -117,20 +117,20 @@
                 android:orientation="horizontal"
                 android:weightSum="100">
 
-                <Button
+                <ToggleButton
                     android:id="@+id/price_optional_filter"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="3dp"
-                    android:layout_weight="20"
+                    android:layout_weight="50"
                     android:background="@drawable/optional_filter_button"
                     android:filterTouchesWhenObscured="false"
                     android:text="@string/price"
                     android:textSize="25px" />
 
-                <Button
+                <!--<Button
                     android:id="@+id/liked_optional_filter"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -139,31 +139,31 @@
                     android:layout_weight="20"
                     android:background="@drawable/optional_filter_button"
                     android:text="@string/liked"
-                    android:textSize="25px" />
+                    android:textSize="25px" />-->
 
-                <Button
+                <ToggleButton
                     android:id="@+id/open_now_optional_filter"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_marginRight="3dp"
-                    android:layout_weight="25"
+                    android:layout_weight="50"
                     android:background="@drawable/optional_filter_button"
                     android:text="@string/open_now"
                     android:textSize="25px" />
 
-                <Button
-                    android:id="@+id/saved_optional_filter"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginRight="3dp"
-                    android:layout_weight="20"
-                    android:background="@drawable/optional_filter_button"
-                    android:text="@string/saved"
-                    android:textSize="25px" />
+                <!--<Button-->
+                    <!--android:id="@+id/saved_optional_filter"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_alignParentTop="true"-->
+                    <!--android:layout_marginRight="3dp"-->
+                    <!--android:layout_weight="20"-->
+                    <!--android:background="@drawable/optional_filter_button"-->
+                    <!--android:text="@string/saved"-->
+                    <!--android:textSize="25px" />-->
 
-                <Button
+           <!--     <Button
                     android:id="@+id/more_optional_filter"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -172,7 +172,7 @@
                     android:layout_weight="15"
                     android:background="@drawable/optional_filter_button"
                     android:text="@string/more"
-                    android:textSize="25px" />
+                    android:textSize="25px" />-->
 
 
             </LinearLayout>

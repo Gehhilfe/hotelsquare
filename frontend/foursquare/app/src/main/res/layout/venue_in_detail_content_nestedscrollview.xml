@@ -139,7 +139,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
-                        android:text="WWW"
+                        android:text="@string/venue_website"
                         android:textAppearance="@style/TextAction" />
 
                     <Button
@@ -148,7 +148,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
-                        android:text="Call"
+                        android:text="@string/venue_call"
                         android:textAppearance="@style/TextAction" />
 
                     <Button
@@ -157,7 +157,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
-                        android:text="Check in"
+                        android:text="@string/venue_check_in"
                         android:textAppearance="@style/TextAction" />
                 </LinearLayout>
             </LinearLayout>

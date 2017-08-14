@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SearchEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -76,7 +75,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private boolean isChangedSearchText = false;
     private boolean submitNewQuery;
     private boolean reachedMaxVenues;
-
+    private ToggleButton price_button,openNow_button;
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -99,12 +98,23 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         mapViewButton.setTextOn(null);
         isMapView = false;
         mapViewButton.setChecked(true);
+        price_button=(ToggleButton)view.findViewById(R.id.price_optional_filter) ;
+        openNow_button=(ToggleButton)view.findViewById(R.id.open_now_optional_filter);
+        price_button.setText(R.string.price);
+        price_button.setTextOn(null);
+        price_button.setTextOff(null);
+        price_button.setChecked(false);
+        openNow_button.setText(R.string.open_now);
+        openNow_button.setTextOff(null);
+        openNow_button.setTextOn(null);
+
         filterLocation.onCommitCompletion(null);
 
         filterLocation.addTextChangedListener(createTextWatcherLocation());
         filterLocation.setOnItemClickListener(createOnItemClick());
         filterRadius.setOnSeekBarChangeListener(createOnSeekBarChangeListener());
         mapViewButton.setOnClickListener(toggleMapView());
+
         initVenueStatePageAdapter();
         setHasOptionsMenu(true);
         keyword = getArguments().getString("keyword");
@@ -218,13 +228,13 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             } else {
                 // gets current location based on gps; "Near me"
                 Location currentLocation=((MainActivity)getActivity()).getUserLocation();
-                //Toast.makeText(getActivity().getApplicationContext(), currentLocation.toString(), Toast.LENGTH_LONG).show();
                 Log.d(LOG, "current location: long- " + currentLocation.getLongitude() + "lat- " + currentLocation.getLatitude());
-                //venueSearchQuery = new VenueSearchQuery(query, dummyLocation().getLongitude(), dummyLocation().getLatitude());
                 venueSearchQuery = new VenueSearchQuery(query, currentLocation.getLongitude(), currentLocation.getLatitude());
             }
-            venueSearchQuery.setRadius(filterRadius.getProgress());
-            // TODO
+            venueSearchQuery.setRadius(filterRadius.getProgress()*10);
+            Log.d(LOG,"radius:"+filterRadius.getProgress());
+            Log.d(LOG,"ischecked: "+openNow_button.isChecked());
+            venueSearchQuery.setOnlyOpen(openNow_button.isChecked());
             // Add more optional filters later
 
             VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
@@ -336,15 +346,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     }
 
 
-    /**
-     * dummy location for testing "near me"
-     *
-     * @return
-     */
-    /*public Location dummyLocation() {
-        // Luisen Darmstadt
-        return new Location(8.6511929, 49.8728253);
-    }*/
     public View.OnClickListener toggleMapView() {
         return new View.OnClickListener() {
             @Override
