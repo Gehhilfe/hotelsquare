@@ -471,28 +471,27 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
      * Set the user on the Map
      */
     public void setUser() {
-        if(myPosition != null){
-            myPosition.remove();
-        }
+
         // set user position
         userLocation = mainActivity.getUserLocation();
-        // get user info
+
+        // get user Data
         try {
             if (!(LocalStorage.
                     getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")){
 
                 ProfileService profileService = ServiceFactory
-                    .createRetrofitService(ProfileService.class, URL, LocalStorage.
-                            getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+                        .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                                getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
-            profileService.profile()
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            user -> {
-                                this.user = user;
-                            });
-            // get user Avatar
+                profileService.profile()
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                user -> {
+                                    this.user = user;
+                                });
+                // get user Avatar
                 ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
                 imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
                         .subscribeOn(Schedulers.io())
@@ -501,14 +500,37 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                             userImage = bitmap;
                         });
 
+
             }
         }catch(Exception e){
             e.printStackTrace();
         }
-        myPosition = map.addMarker(new MarkerOptions()
-                .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
-                .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
 
+        //If position has not changed, no new Marker
+        if(myPosition != null && myPosition.getPosition().latitude == userLocation.getLatitude() && myPosition.getPosition().longitude == userLocation.getLongitude()){
+            Log.d("MARKERS", "No new!");
+            return;
+        }
+
+        // If no user Marker yet
+        if(myPosition == null){
+            myPosition = map.addMarker(new MarkerOptions()
+                    .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
+                    .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
+            Log.d("MARKERS", "No Marker yet!");
+            return;
+        }
+
+        //if position changed and marker already set
+        if(myPosition != null && myPosition.getPosition().longitude != userLocation.getLongitude()){
+            myPosition.remove();
+            //myPosition.setPosition(pos);
+            Log.d("MARKERS", "Changed!");
+            myPosition = map.addMarker(new MarkerOptions()
+                    .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
+                    .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
+            return;
+        }
     }
 
         // TODO: Delete?
@@ -543,6 +565,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")) != "") {
             updateFriendsMarker();
             Log.d("KGK", "THIS IS FRAGMENT: " + this.thisID + "  " + overAllID);
+            Log.d("MARKERS", "Location: " + event.location);
             if (thisID < overAllID) {
                 EventBus.getDefault().unregister(this);
             }
