@@ -8,7 +8,7 @@ const Message = require('../models/message');
 
 /**
  * Starts new Chat
- *
+ * @Deprecated
  * @param {Object} request request
  * @param {Object} response response
  * @param {Function} next next handler
@@ -137,6 +137,48 @@ async function getConversations(request, response, next) {
 }
 
 /**
+ * Retrieves an existing conversation from the user to user or creates one
+ *
+ * @param {Object} request request
+ * @param {Object} response response
+ * @param {Function} next next handler
+ * @returns {undefined}
+ */
+async function getOrCreateConversation(request, response, next) {
+    if(!request.params.other_id)
+        return next(new errors.BadRequestError('other_id is missing'));
+    let chat = await Chat.findOne({
+        participants: {$all: [request.params.other_id,  request.authentication._id]}
+    }).populate({
+        path: 'messages',
+        populate: {
+            path: 'sender',
+            populate: {
+                path: 'avatar'
+            }
+        },
+        options: {
+            limit: 1,
+            sort: {date: -1}
+        }
+    }).populate({
+        path: 'participants',
+        populate: {
+            path: 'avatar'
+        }
+    });
+    if(chat) {
+        response.send(chat);
+        return next();
+    } else {
+        chat = await Chat.create({
+            participants: [request.authentication._id, request.params.other_id]
+        });
+        getOrCreateConversation(request, response, next);
+    }
+}
+
+/**
  * Retrieves whole conversation history of a chat
  *
  * @param {Object} request request
@@ -188,8 +230,8 @@ async function getConversation(request, response, next) {
 }
 
 module.exports = {
-    newChat,
     replyMessage,
     getConversation,
-    getConversations
+    getConversations,
+    getOrCreateConversation
 };

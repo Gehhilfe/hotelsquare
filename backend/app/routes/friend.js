@@ -50,9 +50,14 @@ async function getNearByFriends(request, response, next) {
     });
 
     const location = (request.body)?request.body:user.location;
+    let filterSet = user.friends;
+    
+    if(request.params.only) {
+        filterSet = _.intersection(filterSet, [request.params.only]);
+    }
 
     const users = await User.find({
-        _id : { $in : user.friends },
+        _id : { $in : filterSet },
         incognito: false
     }).where('location').near({
         center: location,

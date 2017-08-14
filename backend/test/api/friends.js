@@ -74,6 +74,18 @@ describe('Friends', () => {
         res.body.friends.length.should.be.equal(1);
     })));
 
+    it('GET profile/friends only query', (mochaAsync(async () => {
+        const res = await request(server)
+            .get('/profile/friends')
+            .set('x-auth', peterToken)
+            .query({'only': peter2._id})
+            .send();
+
+        res.should.have.status(200);
+        res.body.friends.should.be.a('array');
+        res.body.friends.length.should.be.equal(1);
+    })));
+
     it('search nearybyfriends', (mochaAsync(async () => {
         const res = await request(server)
             .post('/searches/nearbyfriends')
