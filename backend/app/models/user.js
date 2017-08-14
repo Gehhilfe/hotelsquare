@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const mongoose = require('mongoose');
 const restify = require('restify');
 const restify_errors = require('restify-errors');
@@ -71,6 +72,20 @@ const UserSchema = new Schema({
         type: Boolean,
         default: false
     },
+    check_ins: [{
+        venue: {
+            type: Schema.Types.ObjectId,
+            ref: 'Venue'
+        },
+        count: {
+            type: Number,
+            default: 0
+        },
+        last: {
+            type: Date,
+            default: Date.now()
+        }
+    }],
     activation_key: String,
     age: Number,
     city: String
@@ -157,6 +172,49 @@ class UserClass {
         return [o1, o2];
     }
 
+
+    /**
+     * Check ins user
+     *
+     * @param {Venue} venue to check into
+     * @returns {undefined}
+     */
+    checkIn(venue) {
+        // Search for checkin
+        let index = -1;
+        let checkin = _.find(this.check_ins, (v, i) => {
+            if (v.venue.equals(venue._id)) {
+                index = i;
+                return true;
+            } else
+                return false;
+        });
+
+        // Create new checkin when non found
+        if (!checkin) {
+            checkin = {
+                venue: venue,
+                count: 0
+            };
+        }
+
+        // Increment counter and reset last visit date
+        checkin.count += 1;
+        checkin.last = Date.now();
+
+        // Update element in collection
+        if (index === -1)
+            this.check_ins.push(checkin);
+        else
+            this.check_ins[index] = checkin;
+
+        return {
+            venue: venue._id,
+            count: checkin.count,
+            last: checkin.last
+        };
+    }
+
     update(data) {
         const self = this;
 
@@ -221,6 +279,8 @@ class UserClass {
         } else {
             delete obj.avatar;
         }
+        obj.top_check_ins = _.take(_.sortBy(this.check_ins, 'count'), 1);
+        obj.last_check_ins = _.take(_.sortBy(this.check_ins, 'last'), 1);
         return obj;
     }
 
@@ -250,7 +310,9 @@ class UserClass {
             city: this.city,
             age: this.age,
             gender: this.gender,
-            location: location
+            location: location,
+            top_check_ins: _.take(_.sortBy(this.check_ins, 'count'), 1),
+            last_check_ins: _.take(_.sortBy(this.check_ins, 'last'), 1)
         };
     }
 }
