@@ -51,5 +51,6 @@
     <string name="cancel">Cancel</string>
     <string name="sendComment">Send</string>
     <string name="loginToContinue">Continue</string>
-
+    <string name="permissongrant">Please grant location permission</string>
+    <string name="thatsme">"That's me!"</string>
 </resources>
