@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import tk.internet.praktikum.foursquare.NewVenueDetail;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
 /**
@@ -53,7 +53,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
 
     @Override
     public void clickOnVenue(String venueId) {
-        Intent intent = new Intent(parentFragment.getActivity(), NewVenueDetail.class);
+        Intent intent = new Intent(parentFragment.getActivity(), VenueInDetailsNestedScrollView.class);
         intent.putExtra("VENUE_ID", searchResultViewHolderList.get(Integer.valueOf(venueId)).getId());
         parentFragment.getActivity().startActivity(intent);
         /* VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();

@@ -1,6 +1,7 @@
 package tk.internet.praktikum.foursquare.search;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -36,6 +37,7 @@ import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
@@ -266,13 +268,16 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 if (markerVenueMap.containsKey(marker)) {
 
                     //TODO:
-                    VenueInDetailFragment venueInDetailFragment = new VenueInDetailFragment();
+                   /* VenueInDetailFragment venueInDetailFragment = new VenueInDetailFragment();
                     venueInDetailFragment.setParent(parent);
                     venueInDetailFragment.setVenueId(markerVenueMap.get(marker).getId());
                     FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.fragment_container, venueInDetailFragment);
                     fragmentTransaction.addToBackStack(venueInDetailFragment.getTag());
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commit();*/
+                    Intent intent = new Intent(parent.getActivity(), VenueInDetailsNestedScrollView.class);
+                    intent.putExtra("VENUE_ID", markerVenueMap.get(marker).getId());
+                    parent.getActivity().startActivity(intent);
                 // if Friend, got to Friend-Details
                 } else if (markerFriendMap.containsKey(marker)) {
                     //TODO: "Call FriendFragment"

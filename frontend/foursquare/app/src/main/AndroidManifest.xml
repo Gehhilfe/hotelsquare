@@ -82,7 +82,7 @@
         <service android:name=".location.LocationService" />
 
         <activity
-            android:name=".NewVenueDetail"
+            android:name=".VenueInDetailsNestedScrollView"
             android:label="@string/title_activity_new_venue_detail"
             android:theme="@style/AppTheme" />
 

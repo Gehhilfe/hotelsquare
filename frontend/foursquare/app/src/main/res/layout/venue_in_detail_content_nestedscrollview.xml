@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="tk.internet.praktikum.foursquare.NewVenueDetail"
-    tools:showIn="@layout/activity_new_venue_detail">
+    tools:context="tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView"
+    tools:showIn="@layout/activity_venue_detail_nestedscrollview">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -348,6 +348,8 @@
             android:id="@+id/comment_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:scrollbars="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 
