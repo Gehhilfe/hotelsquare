@@ -256,22 +256,6 @@ function queryAllVenuesFromGoogle(location, keyword, next_page_token = '') {
 }
 
 /**
- * Gets comments of a venue
- *
- * @param {IncomingMessage} request request
- * @param {Object} response response
- * @param {Function} next next handler
- * @returns {undefined}
- */
-async function getComments(request, response, next) {
-    const venue = await Venue.findOne({_id: request.params.id}).populate({path: 'comments', model: 'Comment'});
-    await Venue.populate(venue, {path: 'comments.author', model: 'User'});
-    await Venue.populate(venue, {path: 'comments.comments', model: 'Comment'});
-    response.json(venue.comments);
-    return next();
-}
-
-/**
  * Checkins authenticated user into venue given per parameter id
  *
  * @param {IncomingMessage} request request
@@ -280,17 +264,22 @@ async function getComments(request, response, next) {
  * @returns {undefined}
  */
 async function checkin(request, response, next) {
-    const venue = await Venue.findOne({_id: request.params.id});
+    const [venue, user] = await Promise.all([
+        Venue.findOne({_id: request.params.id}), User.findOne({_id: request.authentication._id})
+    ]);
+
+    user.checkIn(venue);
     response.send(venue.checkIn(request.authentication));
-    await venue.save();
+
+    Promise.all([
+        venue.save(),
+        user.save()
+    ]);
     return next();
 }
 
 module.exports = {
     queryVenue,
-    queryAllVenuesFromGoogle,
-    searchVenuesInDB,
-    getComments,
     getVenue,
     checkin
 };
