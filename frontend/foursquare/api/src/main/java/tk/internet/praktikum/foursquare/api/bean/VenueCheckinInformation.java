@@ -2,13 +2,17 @@ package tk.internet.praktikum.foursquare.api.bean;
 
 import java.util.Date;
 
-public class CheckinInformation {
-    private String user;
+/**
+ * Created by gehhi on 14.08.2017.
+ */
+
+public class VenueCheckinInformation {
+    private String venue;
     private int count;
     private Date last;
 
-    public String getUserID() {
-        return user;
+    public String getVenueID() {
+        return venue;
     }
 
     public int getCount() {

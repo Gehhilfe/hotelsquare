@@ -18,11 +18,11 @@ public interface ChatService {
     /**
      * Pushes a chat to a dedicated recipient
      *
-     * @param message First message including all recipients
+     * @param otherUserId ID of other user to receive or start chat with
      * @return chatId and status message ("New Chat")
      */
     @POST("chats")
-    Observable<Chat> newChat(@Body RecipientMessage message);
+    Observable<Chat> getOrStartChat(@Query("other_id") String otherUserId);
 
     /**
      * Replies to an old message

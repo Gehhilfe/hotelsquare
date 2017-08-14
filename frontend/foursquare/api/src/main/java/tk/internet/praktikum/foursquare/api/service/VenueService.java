@@ -11,7 +11,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
-import tk.internet.praktikum.foursquare.api.bean.CheckinInformation;
+import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Comment;
 import tk.internet.praktikum.foursquare.api.bean.ImageComment;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
@@ -52,7 +52,7 @@ public interface VenueService {
      * @return checkin information
      */
     @PUT("venues/{id}/checkin")
-    Observable<CheckinInformation> checkin(@Path("id") String id);
+    Observable<UserCheckinInformation> checkin(@Path("id") String id);
 
     /**
      * Get 10 comments to venue identified by id
@@ -78,5 +78,5 @@ public interface VenueService {
      */
     @Multipart
     @POST("venues/{id}/comments/image")
-    Observable<ImageComment> uploadAvatar(@Part MultipartBody.Part image, @Path("id") String id);
+    Observable<ImageComment> addImageComment(@Part MultipartBody.Part image, @Path("id") String id);
 }

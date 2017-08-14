@@ -16,6 +16,8 @@ public class User implements Serializable {
     private int age;
     private Location location;
     private boolean incognito;
+    private List<VenueCheckinInformation> top_check_ins;
+    private List<VenueCheckinInformation> last_check_ins;
 
     @SerializedName("update_at")
     private Date updatedAt;
@@ -112,6 +114,14 @@ public class User implements Serializable {
 
     public void setIncognito(boolean incognito) {
         this.incognito = incognito;
+    }
+
+    public List<VenueCheckinInformation> getTopCheckins() {
+        return top_check_ins;
+    }
+
+    public List<VenueCheckinInformation> getLastCheckins() {
+        return last_check_ins;
     }
 
     public Gender getGender() {

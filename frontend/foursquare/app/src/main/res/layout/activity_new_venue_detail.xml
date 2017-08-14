@@ -68,7 +68,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_gravity="bottom|right">
+        android:layout_gravity="bottom|right"
+        android:layout_margin="@dimen/fab_margin">
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/venue_detail_image_commnent_button"
@@ -76,7 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
             android:src="@mipmap/image_comment"
-            app:fab_label="Image comment"
+            app:fab_label="Post Image"
             app:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
@@ -85,25 +86,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
             android:src="@mipmap/text_commemnt"
-            app:fab_label="Text comment"
-            app:fab_size="mini" />
-
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/venue_detail_images"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:src="@mipmap/venue_images"
-            app:fab_label="Pictures"
-            app:fab_size="mini" />
-
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/venue_checkin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:src="@mipmap/checkin"
-            app:fab_label="Check in"
+            app:fab_label="Post Text"
             app:fab_size="mini" />
     </com.github.clans.fab.FloatingActionMenu>
 

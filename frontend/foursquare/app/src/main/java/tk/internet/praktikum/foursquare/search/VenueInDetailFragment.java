@@ -108,7 +108,6 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
     private Image userAvatar=null;
     private boolean reachedMaxVenues;
     private Fragment parent;
-    private TabLayout tabLayout;
     public static VenueInDetailFragment newInstance(String param1, String param2) {
         VenueInDetailFragment fragment = new VenueInDetailFragment();
 
@@ -125,7 +124,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                              Bundle savedInstanceState) {
         if(view==null) {
             // Inflate the layout for this fragment
-            view = inflater.inflate(R.layout.fragment_venue_detail_new, container, false);
+            view = inflater.inflate(R.layout.fragment_venue_in_detail, container, false);
             // layoutInflater=inflater;
             //this.container=container;
             imageVenueOne = (ImageView) view.findViewById(R.id.image_venue_one);
@@ -410,7 +409,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                     String token = sharedPreferences.getString(Constants.TOKEN, "");
                     Log.d(LOG, "token: " + token);
                     VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL, token);
-                    venueService.uploadAvatar(image, venueId)
+                    venueService.addImageComment(image, venueId)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(imageComment1 -> {
@@ -633,7 +632,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         if(userAvatar==null) {
             UserService userService = ServiceFactory.createRetrofitService(UserService.class, URL);
             userService.detailsByName(userName)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                                 userAvatar = user.getAvatar();

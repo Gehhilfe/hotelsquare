@@ -27,6 +27,9 @@
 
     <uses-feature android:name="android.hardware.location.gps" />
 
+    <!-- uses to call venues -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -40,7 +43,7 @@
         <activity
             android:name=".user.UserActivity"
             android:label="@string/title_activity_profile"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme" />
         <activity android:name=".abstracts.DrawerLayoutActivity" />
         <activity
             android:name=".MainActivity"
@@ -56,13 +59,13 @@
 
         <activity
             android:name=".friendlist.DummyActivity"
-            android:theme="@style/AppTheme.Dark" />
+            android:theme="@style/AppTheme" />
         <activity
-            android:name=".user.DummyProfile"
-            android:theme="@style/AppTheme.Dark" />
+            android:name=".user.ProfileActivity"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".chat.DummyChatActivity"
-            android:theme="@style/AppTheme.Dark" />
+            android:theme="@style/AppTheme" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -81,7 +84,8 @@
         <activity
             android:name=".NewVenueDetail"
             android:label="@string/title_activity_new_venue_detail"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+
     </application>
 
 </manifest>
