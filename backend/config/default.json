@@ -30,7 +30,7 @@
     "key": ""
   },
   "googleapi": {
-    "GOOGLE_PLACES_API_KEY": "AIzaSyCK1nUagKpUd3I5i415iNaiXz5Cl2l9QM8",
+    "GOOGLE_PLACES_API_KEY": "AIzaSyBxx-kkw7jMsJJ9yJGygJDUt6i894fgz3s",
     "GOOGLE_PLACES_OUTPUT_FORMAT": "json"
   },
   "minio": {

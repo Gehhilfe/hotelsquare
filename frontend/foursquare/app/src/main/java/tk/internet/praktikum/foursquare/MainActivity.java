@@ -29,12 +29,12 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.UserService;
-import tk.internet.praktikum.foursquare.friendlist.DummyActivity;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.foursquare.user.UserActivity;
 
@@ -45,11 +45,11 @@ public class MainActivity extends AppCompatActivity
     private final int REQUEST_LOGIN = 0;
 
 
-    private Location userLocation = new Location(0,0);
+    private Location userLocation = new Location(0, 0);
     private Handler handler = new Handler();
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User locationUser = new User();
-    private int PARAM_INTERVAL = 60000;
+    private int PARAM_INTERVAL = 10000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment);
+
+        handler.postDelayed(sendLocation, PARAM_INTERVAL);
     }
 
     @Override
@@ -121,12 +123,13 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_history) {
             // call history activity
-            Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+            intent.putExtra("userID", "");
             startActivityForResult(intent, 0);
         } else if (id == R.id.nav_me) {
             // call login activity if didn't login util now
             if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-               Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivityForResult(intent, REQUEST_LOGIN);
                /*try {
                     fragment = LoginGeneralFragment.class.newInstance();
@@ -138,11 +141,10 @@ public class MainActivity extends AppCompatActivity
                 }*/
             } else {
                 try {
-                fragment = MeFragment.class.newInstance();
-                redirectToFragment(fragment);
+                    fragment = MeFragment.class.newInstance();
+                    redirectToFragment(fragment);
                     setTitle(item);
-                }
-                catch (InstantiationException e) {
+                } catch (InstantiationException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -154,9 +156,9 @@ public class MainActivity extends AppCompatActivity
 
             // Insert the fragment by replacing any existing fragment
 
-    }else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_manage) {
             // call history activity
-            Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
+            Intent intent = new Intent(getApplicationContext(), UserActivity.class);
             startActivityForResult(intent, 0);
         }
 
@@ -165,14 +167,15 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void redirectToFragment(Fragment fragment){
-            //FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container, fragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+    private void redirectToFragment(Fragment fragment) {
+        //FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
-    private  void setTitle(MenuItem item){
+
+    private void setTitle(MenuItem item) {
         item.setChecked(true);
         // Set action bar title
         setTitle(item.getTitle());
@@ -205,7 +208,7 @@ public class MainActivity extends AppCompatActivity
         startService(new Intent(this, LocationService.class)); // start tracking service
 
         // off-topic -> ignore this
-        if(!(EventBus.getDefault().isRegistered(this))){
+        if (!(EventBus.getDefault().isRegistered(this))) {
             EventBus.getDefault().register(this);
         }
 
@@ -222,49 +225,51 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * Listen for new database entries from background service
+     *
      * @param event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LocationTracker.LocationEvent event) {
-        Log.d("SUBSRIBE", "This is: "  + event.location);
+        Log.d("SUBSRIBE", "This is: " + event.location);
         // Update User Location on Map
-       userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
+        userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
         // Update User Location on Server
         if ((LocalStorage.
-                getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""))  != "") {
+                getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "")) != "") {
             sendUserLocation(userLocation);
         }
     }
 
     private void sendUserLocation(Location userLocation) {
         locationUser.setLocation(userLocation);
-        handler.postDelayed(sendLocation, PARAM_INTERVAL);
-
     }
 
-    public Location getUserLocation(){
+    public Location getUserLocation() {
         return userLocation;
     }
 
     private Runnable sendLocation = new Runnable() {
         @Override
         public void run() {
+            String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+            if(token == "")
+                return;
+
             UserService service = ServiceFactory
-                    .createRetrofitService(UserService.class, URL, LocalStorage.
-                            getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+                    .createRetrofitService(UserService.class, URL, token);
 
             service.update(locationUser)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                                 locationUser = user;
-                        Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
+                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
                             },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                     );
-            handler.postDelayed(this,PARAM_INTERVAL);
+            handler.postDelayed(this, PARAM_INTERVAL);
         }
 
     };

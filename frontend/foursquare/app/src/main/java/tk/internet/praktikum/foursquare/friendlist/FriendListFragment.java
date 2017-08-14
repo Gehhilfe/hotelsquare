@@ -40,7 +40,7 @@ public class FriendListFragment extends Fragment {
 
         try {
             service.friends(0)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             friendListResponse -> {

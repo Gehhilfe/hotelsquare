@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#ff4081</color>
 
     <color name="primary">#E43F3F</color>
     <color name="primary_dark">#E12929</color>
@@ -35,4 +35,5 @@
     <color name="transparent">@android:color/transparent</color>
     <color name="orange">@android:color/holo_blue_light</color>
     <color name="background_tab_pressed">#6633B5E5</color>
+    <color name="detail_info_background">#33FFFFFF</color>
 </resources>

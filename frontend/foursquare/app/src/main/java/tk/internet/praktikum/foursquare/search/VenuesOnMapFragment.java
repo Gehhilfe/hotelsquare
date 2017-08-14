@@ -522,3 +522,4 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         }
     }
 }
+

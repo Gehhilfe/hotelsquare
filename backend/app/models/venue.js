@@ -137,11 +137,13 @@ class VenueClass {
         const v = searchResult.venues[0];
         this.foursquare_id = v.id;
         const details = await this._foursquareDetails();
+        if(details.contact && details.contact.phone)
+            this.phone_number = details.contact.phone;
         if(details.tags)
             this.types = _.uniq(_.concat(this.types, details.tags));
         if(details.price)
             this.price = details.price.tier;
-        if(details.photos || details.photos.groups || details.photos.groups[0].items) {
+        if(details.photos && details.photos.count !== 0) {
             await Promise.all(_.map(details.photos.groups[0].items, async (it) => {
                 const buffer = await this._loadPhotoFoursquare(it);
                 const img = await Image.upload(buffer, null, self);
@@ -372,7 +374,8 @@ class VenueClass {
         this.opening_hours = details.result.opening_hours;
         this.utc_offset = details.result.utc_offset;
         this.website = details.result.website;
-        this.phone_number = details.result.phone_number;
+        if(details.result.phone_number)
+            this.phone_number = details.result.phone_number;
         this.icon_url = details.result.icon;
         this.vicinity = details.result.vicinity;
         this.formatted_address = details.result.formatted_address;
@@ -418,8 +421,8 @@ class VenueClass {
             location: this.location,
             types: this.types,
             images: this.images,
-            last_check_ins: _.take(_.sortBy(this.check_ins, 'last'), 5),
-            top_check_ins: _.take(_.sortBy(this.check_ins, 'count'), 5),
+            last_check_ins: _.take(_.reverse(_.sortBy(this.check_ins, 'last')), 5),
+            top_check_ins: _.take(_.reverse(_.sortBy(this.check_ins, 'count')), 5),
             check_ins_count: _.reduce(this.check_ins, (res, val) => res += val.count, 0),
             opening_hours: this.opening_hours,
             is_open: this.isOpen(),
