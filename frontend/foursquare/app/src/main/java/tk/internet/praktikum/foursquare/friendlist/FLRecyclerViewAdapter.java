@@ -49,28 +49,6 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     private Context context;
     private LayoutInflater inflater;
     private List<User> friendList = Collections.emptyList();
-    private int[] dummyProfilePictures = {
-            R.mipmap.ic_account_circle_black_24dp,
-            R.mipmap.ic_history_black_24dp,
-            R.mipmap.ic_launcher,
-            R.mipmap.ic_location_search,
-            R.mipmap.ic_lock_outline_black_24dp,
-            R.mipmap.ic_mail_outline_black_24dp,
-            R.mipmap.location,
-            R.mipmap.ic_account_circle_black_24dp,
-            R.mipmap.ic_history_black_24dp,
-            R.mipmap.ic_launcher,
-            R.mipmap.ic_location_search,
-            R.mipmap.ic_lock_outline_black_24dp,
-            R.mipmap.ic_mail_outline_black_24dp,
-            R.mipmap.location,
-            R.mipmap.ic_account_circle_black_24dp,
-            R.mipmap.ic_history_black_24dp,
-            R.mipmap.ic_launcher,
-            R.mipmap.ic_location_search,
-            R.mipmap.ic_lock_outline_black_24dp,
-            R.mipmap.ic_mail_outline_black_24dp,
-            R.mipmap.location};
 
     public FLRecyclerViewAdapter(Context context, List<User> friendList) {
         inflater = LayoutInflater.from(context);

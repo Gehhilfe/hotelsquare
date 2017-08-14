@@ -21,8 +21,8 @@ public class Venue {
     private int check_ins_count;
     private int price;
     private List<Image> images;
-    private List<CheckinInformation> top_check_ins;
-    private List<CheckinInformation> last_check_ins;
+    private List<UserCheckinInformation> top_check_ins;
+    private List<UserCheckinInformation> last_check_ins;
     private String website;
     private boolean is_open;
 
@@ -128,11 +128,11 @@ public class Venue {
         return check_ins_count;
     }
 
-    public List<CheckinInformation> getTopCheckins() {
+    public List<UserCheckinInformation> getTopCheckins() {
         return top_check_ins;
     }
 
-    public List<CheckinInformation> getLastCheckins() {
+    public List<UserCheckinInformation> getLastCheckins() {
         return last_check_ins;
     }
 

@@ -264,16 +264,22 @@ function queryAllVenuesFromGoogle(location, keyword, next_page_token = '') {
  * @returns {undefined}
  */
 async function checkin(request, response, next) {
-    const venue = await Venue.findOne({_id: request.params.id});
+    const [venue, user] = await Promise.all([
+        Venue.findOne({_id: request.params.id}), User.findOne({_id: request.authentication._id})
+    ]);
+
+    user.checkIn(venue);
     response.send(venue.checkIn(request.authentication));
-    await venue.save();
+
+    Promise.all([
+        venue.save(),
+        user.save()
+    ]);
     return next();
 }
 
 module.exports = {
     queryVenue,
-    queryAllVenuesFromGoogle,
-    searchVenuesInDB,
     getVenue,
     checkin
 };
