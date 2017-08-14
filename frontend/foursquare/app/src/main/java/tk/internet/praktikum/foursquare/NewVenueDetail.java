@@ -46,7 +46,7 @@ import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.UploadHelper;
-import tk.internet.praktikum.foursquare.api.bean.CheckinInformation;
+import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
@@ -247,7 +247,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     private void updateLeaderboard(Venue venue) {
         UserService us = ServiceFactory.createRetrofitService(UserService.class, URL);
         for(int i = 0; i < 3 && i < venue.getTopCheckins().size(); i++) {
-            CheckinInformation info = venue.getTopCheckins().get(i);
+            UserCheckinInformation info = venue.getTopCheckins().get(i);
             leaderboard_count[i].setText(String.format("%d", info.getCount()));
             final int current = i;
             us.profileByID(info.getUserID())
