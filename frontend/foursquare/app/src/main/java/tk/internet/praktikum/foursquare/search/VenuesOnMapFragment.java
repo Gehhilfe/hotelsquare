@@ -62,6 +62,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private User user = new User();
     private Bitmap userImage;
 
+
+    private ProfileService profileService;
+
     private Marker myPosition;
 
     private List<User> friends = new ArrayList<User>();
@@ -415,10 +418,11 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             //create HashMap
             //markerFriendMap = new HashMap<Marker, User>();
 
-            ProfileService profileService = ServiceFactory
-                    .createRetrofitService(ProfileService.class, URL, LocalStorage.
-                            getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
-
+            if( profileService == null) {
+                profileService = ServiceFactory
+                        .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                                getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+            }
             profileService.getNearByFriends(userLocation)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
