@@ -9,7 +9,7 @@ public class FriendRequestResponse {
     };
 
     public FriendRequestResponse(boolean accept) {
-        this.accept = false;
+        this.accept = accept;
     };
 
     public boolean isAccept() {

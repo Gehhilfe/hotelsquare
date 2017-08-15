@@ -42,7 +42,6 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.home_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        List<HomeData> data = Collections.emptyList();
 
         try {
             service.profile()
@@ -51,7 +50,7 @@ public class HomeFragment extends Fragment {
                     .subscribe(
                             user -> {
                                 this.user = user;
-                                recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), data, user.getFriendRequests()));
+                                recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), user.getFriendRequests()));
                                 friendRequests = user.getFriendRequests();
                             },
                             throwable -> {
