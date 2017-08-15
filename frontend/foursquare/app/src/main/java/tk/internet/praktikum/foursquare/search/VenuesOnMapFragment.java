@@ -48,6 +48,7 @@ import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.MeFragment;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
 
 /**
  * Fragment for the Venues on the Map
@@ -281,6 +282,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 // if Friend, got to Friend-Details
                 } else if (markerFriendMap.containsKey(marker)) {
                     //TODO: "Call FriendFragment"
+                    Intent intent = new Intent(parent.getActivity(), ProfileActivity.class);
+                    intent.putExtra("userID", markerFriendMap.get(marker).getId());
+                    parent.getActivity().startActivity(intent);
                 // if User, go to Me-Fragment
                 } else if (!(LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("") && !markerFriendMap.containsKey(marker)) {
