@@ -180,11 +180,14 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.d(LOG, "Action: onQueryTextSubmit");
-        venues=new ArrayList<Venue>();
-        submitNewQuery=true;
-        currentPage=0;
-        reachedMaxVenues=false;
-        deepSearch();
+        if(!query.equals(lastQuery)) {
+            venues = new ArrayList<Venue>();
+            submitNewQuery = true;
+            currentPage = 0;
+            reachedMaxVenues = false;
+            initVenueStatePageAdapter();
+            deepSearch();
+        }
         return true;
     }
 
@@ -241,9 +244,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(venueSearchResult -> {
-
-                                venues = venueSearchResult.getResults();
-                               if(venues.size()>0) {
+                                List venuesList = venueSearchResult.getResults();
+                               if(venuesList.size()>0) {
+                                   venues.addAll(venuesList);
                                    if (mapViewButton.isChecked())
                                        displayVenuesList();
                                    else {
