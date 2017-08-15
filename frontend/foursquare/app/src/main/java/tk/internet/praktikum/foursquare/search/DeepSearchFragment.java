@@ -231,7 +231,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                 Log.d(LOG, "current location: long- " + currentLocation.getLongitude() + "lat- " + currentLocation.getLatitude());
                 venueSearchQuery = new VenueSearchQuery(query, currentLocation.getLongitude(), currentLocation.getLatitude());
             }
-            venueSearchQuery.setRadius(filterRadius.getProgress()*10);
+            venueSearchQuery.setRadius(filterRadius.getProgress());
             Log.d(LOG,"radius:"+filterRadius.getProgress());
             Log.d(LOG,"ischecked: "+openNow_button.isChecked());
             venueSearchQuery.setOnlyOpen(openNow_button.isChecked());
