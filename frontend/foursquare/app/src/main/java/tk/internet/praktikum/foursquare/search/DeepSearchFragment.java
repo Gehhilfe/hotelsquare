@@ -76,6 +76,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private boolean submitNewQuery;
     private boolean reachedMaxVenues;
     private ToggleButton price_button,openNow_button;
+    private  boolean isQueryFromFastSearch=false;
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -118,8 +119,10 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         initVenueStatePageAdapter();
         setHasOptionsMenu(true);
         keyword = getArguments().getString("keyword");
-        if (keyword != null && !keyword.trim().isEmpty() && !isChangedSearchText)
+        if (keyword != null && !keyword.trim().isEmpty() && !isChangedSearchText) {
             lastQuery = keyword;
+            isQueryFromFastSearch=true;
+        }
         this.setRetainInstance(true);
         currentPage = 0;
 
@@ -180,12 +183,9 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.d(LOG, "Action: onQueryTextSubmit");
-        if(!query.equals(lastQuery)) {
-            venues = new ArrayList<Venue>();
-            submitNewQuery = true;
-            currentPage = 0;
-            reachedMaxVenues = false;
-            initVenueStatePageAdapter();
+        if(!query.equals(lastQuery) || isQueryFromFastSearch) {
+            isQueryFromFastSearch=false;
+            resetParameters();
             deepSearch();
         }
         return true;
@@ -343,6 +343,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                resetParameters();
                 deepSearch();
             }
         };
@@ -455,6 +456,13 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
                     }
                 };
+    }
+    private void resetParameters(){
+        venues = new ArrayList<Venue>();
+        submitNewQuery = true;
+        currentPage = 0;
+        reachedMaxVenues = false;
+        initVenueStatePageAdapter();
     }
 
 
