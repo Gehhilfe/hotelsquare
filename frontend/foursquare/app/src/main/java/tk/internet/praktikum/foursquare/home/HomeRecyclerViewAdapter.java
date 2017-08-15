@@ -67,6 +67,8 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                         .subscribe(
                                 user -> {
                                     Toast.makeText(context, "Friend request accepted!", Toast.LENGTH_SHORT).show();
+                                    friendRequestList.remove(getAdapterPosition());
+                                    notifyDataSetChanged();
                                 },
                                 throwable -> {
                                     Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -91,7 +93,9 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 user -> {
-                                    int a = 5;
+                                    Toast.makeText(context, "Friend request declined!", Toast.LENGTH_SHORT).show();
+                                    friendRequestList.remove(getAdapterPosition());
+                                    notifyDataSetChanged();
                                 },
                                 throwable -> {
                                     Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
