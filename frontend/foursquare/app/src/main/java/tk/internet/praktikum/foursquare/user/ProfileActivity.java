@@ -2,7 +2,11 @@ package tk.internet.praktikum.foursquare.user;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -10,13 +14,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ActionProvider;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -28,8 +37,10 @@ import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Gender;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
+import tk.internet.praktikum.foursquare.chat.ChatListViewAdapter;
 import tk.internet.praktikum.foursquare.chat.DummyChatActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -54,8 +65,8 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_profile);
 
         userID = getIntent().getStringExtra("userID");
-        userID = "599071a509ad180015af8b27"; // janus nicht auf flist von peter
-        //userID = "599071a509ad180015af8b25"; // Admin auf FList von peter
+        userID = "59932b6e91b5ff0014d90863"; // janus nicht auf flist von peter
+        //userID = "5991b968802bf20015a4051d"; // Admin auf FList von peter
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
         setSupportActionBar(toolbar);
@@ -91,7 +102,7 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.friends(0)
+            service.profileIfFriends(userID)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
@@ -121,8 +132,7 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.detailsByName("janus")
-           // service.profileByID(userID)
+            service.profileByID(userID)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
@@ -184,14 +194,30 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
     }
 
     private void startChat() {
-        // TODO - GET CHAT ID, falls es keien gibt neuen chat erstellen => wechseln
-        String chatID = "599071a609ad180015af8b2c";
-        Intent intent = new Intent(getApplicationContext(), DummyChatActivity.class);
-        intent.putExtra("chatId", chatID);
-        intent.putExtra("currentUserName", "wahrscinenlich egal");
-        startActivityForResult(intent, 0);
-    }
+        ChatService service = ServiceFactory
+                .createRetrofitService(ChatService.class, URL, LocalStorage.
+                        getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
+        try {
+            service.getOrStartChat(userID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            chatResponse -> {
+                                chatResponse.getChatId();
+                                Intent intent = new Intent(getApplicationContext(), DummyChatActivity.class);
+                                intent.putExtra("chatId", chatResponse.getChatId());
+                                intent.putExtra("currentUserName", "wahrscinenlich egal");
+                                startActivityForResult(intent, 0);
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
