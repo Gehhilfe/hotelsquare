@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,15 +19,12 @@ import java.util.Objects;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
-import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.User;
-import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.UserActivity;
 
 class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAdapter.InboxViewHolder> {
 
@@ -51,18 +47,7 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         public void onClick(View v) {
             if (v.getId() == R.id.inbox_msg) {
                 Toast.makeText(v.getContext(), "To Chat " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
-                ChatFragment fragment = new ChatFragment();
-                Bundle args = new Bundle();
-                args.putString("chatId", chatList.get(getAdapterPosition()).getChatId());
-                args.putString("currentUserName", currentUserName);
-                fragment.setArguments(args);
-                /*
-                FragmentTransaction transaction = inboxFragment.getFragmentManager().beginTransaction();
-                transaction.replace(R.id.inbox_layout, fragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-                */
-                Intent intent = new Intent(context, DummyChatActivity.class);
+                Intent intent = new Intent(context, ChatActivity.class);
                 intent.putExtra("chatId", chatList.get(getAdapterPosition()).getChatId());
                 intent.putExtra("currentUserName", currentUserName);
                 activity.startActivityForResult(intent, 0);
@@ -136,7 +121,9 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         }
 
         holder.name.setText(chatPartner.getName());
-        holder.preview.setText(currentChat.getMessages().get(currentChat.getMessages().size() - 1).getMessage());
+
+        if (currentChat.getMessages().size() > 0)
+            holder.preview.setText(currentChat.getMessages().get(currentChat.getMessages().size() - 1).getMessage());
     }
 
     @Override
