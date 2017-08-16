@@ -185,7 +185,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         // Last here recylcer
         lastHereRecylcer = (RecyclerView) findViewById(R.id.last_here_recylcer_view);
 
-        lastHereAdapter = new LastHereAdapter(new ArrayList<CheckinInformation>(), getApplicationContext());
+        lastHereAdapter = new LastHereAdapter(new ArrayList<UserCheckinInformation>(), getApplicationContext());
 
 
         lastHereRecylcer.setNestedScrollingEnabled(false);
@@ -268,7 +268,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     private void updateLeaderboard(Venue venue) {
         UserService us = ServiceFactory.createRetrofitService(UserService.class, URL);
         for (int i = 0; i < 3 && i < venue.getTopCheckins().size(); i++) {
-            CheckinInformation info = venue.getTopCheckins().get(i);
+            UserCheckinInformation info = venue.getTopCheckins().get(i);
             leaderboard_count[i].setText(String.format("%d", info.getCount()));
             final int current = i;
             us.profileByID(info.getUserID())
@@ -476,7 +476,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

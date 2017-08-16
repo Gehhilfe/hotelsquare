@@ -17,7 +17,7 @@ import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
-import tk.internet.praktikum.foursquare.api.bean.CheckinInformation;
+import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 
 /**
@@ -27,10 +27,10 @@ import tk.internet.praktikum.foursquare.api.service.UserService;
 public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyViewHolder> {
     private final static String LOG = LastHereAdapter.class.getSimpleName();
     private final Context context;
-    private ArrayList<CheckinInformation> checkinInformations;
-    private List<CheckinInformation> data;
+    private ArrayList<UserCheckinInformation> checkinInformations;
+    private List<UserCheckinInformation> data;
 
-    public LastHereAdapter(ArrayList<CheckinInformation> checkinInformations, Context context) {
+    public LastHereAdapter(ArrayList<UserCheckinInformation> checkinInformations, Context context) {
         this.checkinInformations = checkinInformations;
         this.context = context;
     }
@@ -45,7 +45,7 @@ public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyView
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        CheckinInformation info = checkinInformations.get(position);
+        UserCheckinInformation info = checkinInformations.get(position);
 
         holder.date.setText(DateFormat.getFriendlyTime(info.getLastDate()));
 
@@ -72,7 +72,7 @@ public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyView
         return checkinInformations.size();
     }
 
-    public void setData(List<CheckinInformation> data) {
+    public void setData(List<UserCheckinInformation> data) {
         checkinInformations.clear();
         checkinInformations.addAll(data);
         notifyDataSetChanged();
