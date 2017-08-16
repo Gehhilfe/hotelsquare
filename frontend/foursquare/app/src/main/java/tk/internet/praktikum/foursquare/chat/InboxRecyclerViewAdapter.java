@@ -25,6 +25,7 @@ import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
 
 class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAdapter.InboxViewHolder> {
 
@@ -40,21 +41,39 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
             preview = (TextView) itemView.findViewById(R.id.inbox_preview);
 
             itemView.setOnClickListener(this);
-            sendMsg.setOnClickListener(this);
+            avatar.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            if (v.getId() == R.id.inbox_msg) {
-                Toast.makeText(v.getContext(), "To Chat " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra("chatId", chatList.get(getAdapterPosition()).getChatId());
-                intent.putExtra("currentUserName", currentUserName);
-                activity.startActivityForResult(intent, 0);
+            if (v.getId() == R.id.inbox_avatar) {
+                loadProfile();
             } else {
-                Toast.makeText(v.getContext(), "Profile " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+                startChat();
             }
 
+        }
+
+        private void loadProfile() {
+            Chat currentChat = chatList.get(getAdapterPosition());
+            User chatPartner = new User();
+
+            for (User user : currentChat.getParticipants()) {
+                if (!Objects.equals(user.getName(), currentUserName)) {
+                    chatPartner = user;
+                }
+            }
+
+            Intent intent = new Intent(context, ProfileActivity.class);
+            intent.putExtra("userID", chatPartner.getId());
+            activity.startActivityForResult(intent, 0);
+        }
+
+        private void startChat() {
+            Intent intent = new Intent(context, ChatActivity.class);
+            intent.putExtra("chatId", chatList.get(getAdapterPosition()).getChatId());
+            intent.putExtra("currentUserName", currentUserName);
+            activity.startActivityForResult(intent, 0);
         }
     }
 
@@ -65,14 +84,6 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
     private InboxFragment inboxFragment;
     private Activity activity;
 
-
-    public InboxRecylcerViewAdapter(Context context, List<Chat> inbox, InboxFragment inboxFragment) {
-        inflater = LayoutInflater.from(context);
-        this.chatList = inbox;
-        this.context = context;
-        currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
-        this.inboxFragment = inboxFragment;
-    }
 
     public InboxRecylcerViewAdapter(Context context, List<Chat> inbox, InboxFragment inboxFragment, Activity activity) {
         inflater = LayoutInflater.from(context);
