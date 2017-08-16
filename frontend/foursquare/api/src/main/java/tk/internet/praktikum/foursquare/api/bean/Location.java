@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Location {
+public class Location  {
     private String type = "Point";
     private List<Double> coordinates;
 

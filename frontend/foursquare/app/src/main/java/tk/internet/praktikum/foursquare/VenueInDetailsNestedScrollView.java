@@ -52,6 +52,7 @@ import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.search.VenueImagesActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class VenueInDetailsNestedScrollView extends AppCompatActivity implements OnMapReadyCallback {
@@ -82,6 +83,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
     private FloatingActionButton fabTextComment;
     private String venueId;
     private FloatingActionButton fabImageComment;
+    private FloatingActionButton venueImagesButton;
+
 
     private TextView[] leaderboard_name;
     private TextView[] leaderboard_count;
@@ -182,6 +185,9 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         fabMenu = (FloatingActionMenu) findViewById(R.id.floating_menu);
         fabTextComment = (FloatingActionButton) findViewById(R.id.venue_detail_text_comment_button);
         fabImageComment = (FloatingActionButton) findViewById(R.id.venue_detail_image_commnent_button);
+        venueImagesButton = (FloatingActionButton) findViewById(R.id.venue_detail_images);
+
+        venueImagesButton.setOnClickListener(v -> venueImages());
     }
 
     @Override
@@ -497,5 +503,12 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
         }
+    }
+    private void venueImages() {
+        Intent intent = new Intent(getApplicationContext(), VenueImagesActivity.class);
+        intent.putExtra("venueID", venueId);
+        this.startActivity(intent);
+
+
     }
 }

@@ -57,4 +57,5 @@
     <string name="venue_website">WWW</string>
     <string name="venue_call">Call</string>
     <string name="venue_check_in">Check in</string>
+    <string name="title_activity_venue_images">VenueImagesActivity</string>
 </resources>

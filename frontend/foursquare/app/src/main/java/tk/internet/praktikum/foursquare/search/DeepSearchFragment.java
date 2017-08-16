@@ -440,10 +440,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                         Log.d(LOG, " ******* onItemclick ******");
                         String query = searchView.getQuery().toString();
                         if (!query.isEmpty()) {
-                            venues=new ArrayList<Venue>();
-                           // submitNewQuery=true;
-                            currentPage=0;
-                            reachedMaxVenues=false;
+                            resetParameters();
                             progressDialog = new ProgressDialog(getActivity(), 1);
                             progressDialog.setIndeterminate(true);
                             progressDialog.setMessage("Waiting for searching...");

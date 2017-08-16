@@ -56,7 +56,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".friendlist.DummyActivity"
             android:theme="@style/AppTheme" />
@@ -83,9 +82,11 @@
 
         <activity
             android:name=".VenueInDetailsNestedScrollView"
-            android:label="@string/title_activity_new_venue_detail"
             android:theme="@style/AppTheme" />
-
+        <activity
+            android:name=".search.VenueImagesActivity"
+            android:label="Pictures"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
