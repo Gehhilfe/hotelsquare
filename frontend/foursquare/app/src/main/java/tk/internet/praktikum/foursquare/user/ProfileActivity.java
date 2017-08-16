@@ -1,12 +1,7 @@
 package tk.internet.praktikum.foursquare.user;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,20 +9,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.ActionProvider;
-import android.view.ContextMenu;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.Collections;
 import java.util.List;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
@@ -40,21 +29,17 @@ import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
-import tk.internet.praktikum.foursquare.chat.ChatListViewAdapter;
-import tk.internet.praktikum.foursquare.chat.DummyChatActivity;
+import tk.internet.praktikum.foursquare.chat.ChatActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class ProfileActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
-    private static final String LOG_TAG = ProfileActivity.class.getSimpleName();
     private final String URL = "https://dev.ip.stimi.ovh/";
-    private User currentUser = new User();
     private User otherUser = new User();
     private TextView name, email, city, age;
     private RadioButton male, female, none;
     private ImageView avatarPicture;
     private FloatingActionButton fab;
-    private Bitmap avatar;
     private String userID;
 
     public ProfileActivity() {}
@@ -65,8 +50,6 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_profile);
 
         userID = getIntent().getStringExtra("userID");
-        userID = "59932b6e91b5ff0014d90863"; // janus nicht auf flist von peter
-        //userID = "5991b968802bf20015a4051d"; // Admin auf FList von peter
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
         setSupportActionBar(toolbar);
@@ -108,12 +91,17 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                     .subscribe(
                             friendListResponse -> {
                                 List<User> friendList = friendListResponse.getFriends();
+                                boolean isFriend = false;
 
                                 for (User user : friendList)
                                     if (user.getId().equals(userID)) {
                                         fab.setImageResource(R.mipmap.ic_chat_black_48dp);
+                                        isFriend = true;
+                                    }
+
+                                    if  (isFriend) {
                                         fab.setOnClickListener(v -> startChat());
-                                    } else {
+                                    }else {
                                         fab.setOnClickListener(v -> addFriend());
                                     }
                             },
@@ -205,9 +193,8 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                     .subscribe(
                             chatResponse -> {
                                 chatResponse.getChatId();
-                                Intent intent = new Intent(getApplicationContext(), DummyChatActivity.class);
+                                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
                                 intent.putExtra("chatId", chatResponse.getChatId());
-                                intent.putExtra("currentUserName", "wahrscinenlich egal");
                                 startActivityForResult(intent, 0);
                             },
                             throwable -> {
