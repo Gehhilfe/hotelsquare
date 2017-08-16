@@ -19,9 +19,6 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
-
-    <!--<include layout="@layout/content_venue_images"--> />
-
-
+    <include layout="@layout/content_venue_images" />
 
 </android.support.design.widget.CoordinatorLayout>
