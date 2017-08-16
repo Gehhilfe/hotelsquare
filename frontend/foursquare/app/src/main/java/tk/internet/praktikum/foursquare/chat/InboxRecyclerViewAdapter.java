@@ -19,6 +19,7 @@ import java.util.Objects;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
+import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
@@ -66,17 +67,19 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
 
             Intent intent = new Intent(context, ProfileActivity.class);
             intent.putExtra("userID", chatPartner.getId());
-            activity.startActivityForResult(intent, 0);
+            activity.startActivityForResult(intent, REQUEST_PROFILE);
         }
 
         private void startChat() {
             Intent intent = new Intent(context, ChatActivity.class);
             intent.putExtra("chatId", chatList.get(getAdapterPosition()).getChatId());
             intent.putExtra("currentUserName", currentUserName);
-            activity.startActivityForResult(intent, 0);
+            activity.startActivityForResult(intent, REQUEST_CHAT);
         }
     }
 
+    private final int REQUEST_CHAT = 1;
+    private final int REQUEST_PROFILE = 2;
     private Context context;
     private LayoutInflater inflater;
     private List<Chat> chatList = Collections.emptyList();

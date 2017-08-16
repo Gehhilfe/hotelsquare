@@ -67,7 +67,7 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
                                     chatResponse.getChatId();
                                     Intent intent = new Intent(context, ChatActivity.class);
                                     intent.putExtra("chatId", chatResponse.getChatId());
-                                    activity.startActivityForResult(intent, 0);
+                                    activity.startActivityForResult(intent, REQUEST_CHAT);
                                 },
                                 throwable -> {
                                     Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -81,10 +81,12 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
         private void loadProfile() {
             Intent intent = new Intent(context, ProfileActivity.class);
             intent.putExtra("userID", friendList.get(getAdapterPosition()).getId());
-            activity.startActivityForResult(intent, 0);
+            activity.startActivityForResult(intent, REQUEST_PROFILE);
         }
     }
 
+    private final int REQUEST_CHAT = 1;
+    private final int REQUEST_PROFILE = 2;
     private final String URL = "https://dev.ip.stimi.ovh/";
     private Activity activity;
     private Context context;
