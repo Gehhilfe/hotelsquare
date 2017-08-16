@@ -1,6 +1,8 @@
 package tk.internet.praktikum.foursquare.friendlist;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +16,16 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.service.ChatService;
+import tk.internet.praktikum.foursquare.chat.ChatActivity;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
 
 public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAdapter.FriendListViewHolder> {
 
@@ -38,22 +46,56 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.fl_msg) {
-                Toast.makeText(v.getContext(), "Send Msg " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+                loadChat();
             } else {
-                Toast.makeText(v.getContext(), "Profile " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+                loadProfile();
             }
 
         }
+
+        private void loadChat() {
+            ChatService service = ServiceFactory
+                    .createRetrofitService(ChatService.class, URL, LocalStorage.
+                            getSharedPreferences(context).getString(Constants.TOKEN, ""));
+
+            try {
+                service.getOrStartChat(friendList.get(getAdapterPosition()).getId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                chatResponse -> {
+                                    chatResponse.getChatId();
+                                    Intent intent = new Intent(context, ChatActivity.class);
+                                    intent.putExtra("chatId", chatResponse.getChatId());
+                                    activity.startActivityForResult(intent, 0);
+                                },
+                                throwable -> {
+                                    Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                        );
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void loadProfile() {
+            Intent intent = new Intent(context, ProfileActivity.class);
+            intent.putExtra("userID", friendList.get(getAdapterPosition()).getId());
+            activity.startActivityForResult(intent, 0);
+        }
     }
 
+    private final String URL = "https://dev.ip.stimi.ovh/";
+    private Activity activity;
     private Context context;
     private LayoutInflater inflater;
     private List<User> friendList = Collections.emptyList();
 
-    public FLRecyclerViewAdapter(Context context, List<User> friendList) {
+    public FLRecyclerViewAdapter(Context context, List<User> friendList, Activity activity) {
         inflater = LayoutInflater.from(context);
         this.friendList = friendList;
         this.context = context;
+        this.activity = activity;
     }
 
     @Override
