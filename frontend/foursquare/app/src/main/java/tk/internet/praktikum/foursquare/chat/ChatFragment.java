@@ -33,19 +33,17 @@ public class ChatFragment extends Fragment {
     private ImageView sendBtn;
     private EditText inputMsg;
     private ChatListViewAdapter chatListViewAdapter;
-    private String chatId, currentUserName;
+    private String chatId;
     private Chat chat;
     private final String URL = "https://dev.ip.stimi.ovh/";
-    private List<ChatMessage> messages;
+    private List<ChatMessage> messages = Collections.emptyList();
     private ChatMessage lastMsg;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO - INITIALISE CHAT
         Bundle args = getArguments();
         chatId = args.getString("chatId");
-        currentUserName = args.getString("currentUserName");
     }
 
     @Override
@@ -61,22 +59,22 @@ public class ChatFragment extends Fragment {
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.getConversation(chatId, 0)
+            service.getConversation(chatId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             chatResponse -> {
                                 chat = chatResponse;
                                 messages = chat.getMessages();
-                                lastMsg = messages.get(0);
-                                Collections.reverse(messages);
+                                if (messages.size() > 0) {
+                                    lastMsg = messages.get(0);
+                                    Collections.reverse(messages);
+                                }
                                 chatListViewAdapter = new ChatListViewAdapter(messages, chat.getParticipants(), getActivity().getApplicationContext());
                                 chatView.setAdapter(chatListViewAdapter);
                                 updateLoop();
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                     );
         }catch (Exception e) {
             e.printStackTrace();
@@ -91,6 +89,7 @@ public class ChatFragment extends Fragment {
                 .createRetrofitService(ChatService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
+
         try {
             service.getConversation(chatId, 0)
                     .repeatWhen(done -> done.delay(10, TimeUnit.SECONDS))
@@ -98,30 +97,52 @@ public class ChatFragment extends Fragment {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             chatResponse -> {
-                                Date last = lastMsg.getDate();
-                                Date now = chatResponse.getMessages().get(0).getDate();
+                                if (messages.size() > 0) {
+                                    Date last = lastMsg.getDate();
+                                    Date now = chatResponse.getMessages().get(0).getDate();
 
-                                if (last.compareTo(now) == -1) {
-                                    messages.clear();
-                                    messages.addAll(chatResponse.getMessages());
-                                    lastMsg = messages.get(0);
-                                    Collections.reverse(messages);
-                                    chatListViewAdapter.notifyDataSetChanged();
+                                    if (last.compareTo(now) == -1) {
+                                        messages.clear();
+                                        messages.addAll(chatResponse.getMessages());
+                                        lastMsg = messages.get(0);
+                                        Collections.reverse(messages);
+                                        chatListViewAdapter.notifyDataSetChanged();
+                                    }
+                                }else {
+                                    if (chatResponse.getMessages().size() > 0) {
+                                        messages.clear();
+                                        messages.addAll(chatResponse.getMessages());
+                                        lastMsg = messages.get(0);
+                                        Collections.reverse(messages);
+                                        chatListViewAdapter.notifyDataSetChanged();
+                                    }
                                 }
 
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
+        /*
+        try {
+            service.getConversation(chatId, messages.get(0).getId())
+                    .repeatWhen(done -> done.delay(10, TimeUnit.SECONDS))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            chatResponse -> {
+                                messages.addAll(chatResponse.getMessages());
+                                chatListViewAdapter.notifyDataSetChanged();
+                            },
+                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
+        }catch (Exception e) {
+            e.printStackTrace();
+        }*/
     }
 
     private void send() {
-        //Toast.makeText(getActivity().getApplicationContext(), "Send: " + inputMsg.getText().toString(), Toast.LENGTH_SHORT).show();
-
         ChatService service = ServiceFactory
                 .createRetrofitService(ChatService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
@@ -134,11 +155,10 @@ public class ChatFragment extends Fragment {
                     .subscribe(
                             chatResponse -> {
                                 messages.add(chatResponse);
+                                lastMsg = chatResponse;
                                 chatListViewAdapter.notifyDataSetChanged();
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                     );
         }catch (Exception e) {
             e.printStackTrace();

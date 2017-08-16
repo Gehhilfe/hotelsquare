@@ -64,7 +64,7 @@
             android:name=".user.ProfileActivity"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".chat.DummyChatActivity"
+            android:name=".chat.ChatActivity"
             android:theme="@style/AppTheme" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
