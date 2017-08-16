@@ -102,10 +102,10 @@ Code coverage is a general criterion of static code analysis. There are several 
 \newline\newline
 For this project, the coverage test was part of the above mentioned CD-pipeline, so that it could be tracked, how much of the backend code was covered by the prior implemented tests. In case of low coverage, some more tests, covering so far not considered effects could be added. Finally, the following coverage ratios could be achieved for the backend:
 \begin{itemize}
-	\item statements: 88.13%
-	\item branches: 74.21%
-	\item functions: 82.1%
-	\item lines: 88.32%s
+	\item statements: 86.33%
+	\item branches: 70.14%
+	\item functions: 83.15%
+	\item lines: 86.34%s
 \end{itemize} 
 
 \subsection{Server and Database}
@@ -163,17 +163,17 @@ However, out of the models created with \textit{mongoose}, as stated before, the
 	\item \texttt{image}: The model contains a \texttt{uuid} (unique 128Bit ID), which is used to store the image with \textit{minio}. Furthermore, the object, to which the image is assigned (could be a comment or a venue for example), the date of creation, the author and the location are stored.
 	\item \texttt{geocoderesult}: The \texttt{geocoderesult} model is used to store the results of the query of the \textit{Google Places API}\footnote{\url{https://developers.google.com/places/?hl=de} (28.07.2017)}. Besides the actual venue object, the query time and the used keyword are stored, so that old information could be updated from time to time.
 	\item \texttt{message}: A \texttt{message} represents a message in the chat. Therefore the chat ID, the sender and a time stamp are part of the model next to the actual text. 
-	\item \texttt{searchrequest}: This model represents a search query from the app to the \textit{Google Places API}. It contains the location, where the user is searching for a keyword, the keyword and the query time.
+	\item \texttt{searchrequest}: This model represents a search query from the app to the backend and helps to reduce the queries to the \textit{Google Places API} and the \textit{Foursquare API}. It contains the location, where the user is searching for a keyword, the keyword and the query time.
 	\item \texttt{user}: A user can register by adding a display name, an e-mail address and a password. The first two parameters are used as primary keys for the database and are therefore '\texttt{unique}'. To store the name of the user, a second 'name parameter' is used, the actual '\texttt{name}' of the user. This is derived automatically by creating the lower case representation of the '\texttt{displayName}', which makes the handling and queries easier. There are few requirements for for the password strength and the length of the user name, which are checked on server-side. In case of an error a descriptive error message is sent back. \newline Besides, it is possible that a user has friends, which are users themselves and friend requests. Further important model parameters are for example the gender, the last location of the user, an incognito flag (this prevents the user from being shown in location based queries from other users; this is done on server-side) and an avatar of the user, which can be uploaded through the frontend.
-	\item \texttt{venue}: The \texttt{venue} model contains some parameters for storing venue information received by the \textit{Google Places API}. Below those are the \texttt{place\_id}, \texttt{opening\_hours} and a rating. For this project it was necessary to add further parameters for comments, which can be added by the users of the app and check-ins of the users. 
+	\item \texttt{venue}: The \texttt{venue} model contains some parameters for storing venue information received by the \textit{Google Places API} and the \textit{Foursquare API}. Below the \textit{Google Places API} information are the \texttt{place\_id}, \texttt{opening\_hours} and a rating. From the \textit{Foursquare API}, the \texttt{phone number}, \texttt{price range}, \texttt{tags} and \texttt{photos} are retrieved. For this project it was necessary to add further parameters for comments, which can be added by the users of the app and check-ins of the users. 
 \end{itemize}
 
 \begin{lstlisting}[caption={Example of a \textit{mongoose} 'Schema'. The model for a venue is shown, which contains some properties which are fetched by the \textit{Google Places API} like the \texttt{opening\_hours} or the \texttt{place\_id}. On top, own properties like the ckeck-ins or text or image comments of users are added.}, label=lst:model]
 	const VenueSchema = new Schema({
 		name: String,
-		place\_id: String,
+		place_id: String,
 		reference: String,
-		photo\_reference: String,
+		photo_reference: String,
 		types: [String],
 		location: {
 			'type': {type: String, default: 'Point'},
@@ -183,11 +183,16 @@ However, out of the models created with \textit{mongoose}, as stated before, the
 			type: Schema.Types.ObjectId,
 			ref: 'Image'
 		}],
-		details\_loaded: {
+		details_loaded: {
 			type: Boolean,
 			default: false
 		},
-		opening\_hours: {
+		price: {
+			type: Number,
+			default: 0
+		},
+		foursquare_id: String,
+		opening_hours: {
 			periods: [{
 				close: [{
 					day: Number,
@@ -199,7 +204,7 @@ However, out of the models created with \textit{mongoose}, as stated before, the
 				}]
 			}]
 		},
-		check\_ins: [{
+		check_ins: [{
 			user: {
 				type: Schema.Types.ObjectId,
 				ref: 'User'
@@ -213,20 +218,20 @@ However, out of the models created with \textit{mongoose}, as stated before, the
 				default: Date.now()
 			}
 		}],
-		utc\_offset: Number,
+		utc_offset: Number,
 		website: String,
 		vicinity: String,
 		formattedAddress: String,
-		phone\_number: Number,
-		icon\_url: String,
-		rating\_google: Number,
+		phone_number: Number,
+		icon_url: String,
+		rating_google: Number,
 		comments: [{
 			kind: String,
 			item: {
-				type: Schema.Types.ObjectId,
-				refPath: 'comments.kind'
-			},
-			created\_at: Date
+			type: Schema.Types.ObjectId,
+			refPath: 'comments.kind'
+		},
+			created_at: Date
 		}]
 	});
 \end{lstlisting}
@@ -305,6 +310,7 @@ To achieve having a running server providing all the necessary functionality nee
 	const baseFileName = URLSafeBase64.encode(img.uuid);
 	\end{lstlisting}
 	\item \texttt{googleplaces}: This package is used to facilitate the access to the \textit{Google Places API}.\footnote{\url{https://www.npmjs.com/package/googleplaces} (26.07.2017)}
+	\item \texttt{node-foursquare}: This package is a wrapper for the \textit{Foursquare API} and therefore facilitates the handling of the \textit{Foursquare API} requests.\footnote{\url{https://www.npmjs.com/package/node-foursquare} (15.08.2017)} 
 	\item \texttt{json-web-token}: \textit{JSON} web tokens are compact, \textit{URL}-safe \textit{JSON} based access tokens, which can be used to verify claims. It consists of three parts: the header (defines the token type, and the encryption method), the payload (this is a \textit{JSON} object, which describes the claims) and the signature (the signature is normed as \textit{JSON Web Signature, JWS} in RFC 7515). All parts are \texttt{base64} encoded and separated by a point. In this project, the payload contains user information so that the sender can directly be authenticated and is known without putting its name to the body or parameter list of the request.	\footnote{\url{https://www.npmjs.com/package/json-web-token} (26.07.2017)}
 	\item \texttt{lodash}: \textit{lodash} introduces easy to use lambda functions to \textit{JavaScript}. This makes working with arrays, numbers, objects, strings, etc. easy, fast, readable and maintainable. The library provides modular methods for iterating, manipulating and creating composite functions.\footnote{\url{https://lodash.com/} (26.07.2017)}
 	\begin{lstlisting}[caption={Example usage of \textit{lodash} functionality. The shown line of code is extracted from the 'addComment' method. By using this package, in this single line all comments of the current object, where the comments are added, are sorted and the order gets reversed. It is much more readable and compact than coding this by hand.}, label=lst:lodash]
