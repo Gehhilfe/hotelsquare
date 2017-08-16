@@ -56,7 +56,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".friendlist.DummyActivity"
             android:theme="@style/AppTheme" />
@@ -85,7 +84,15 @@
             android:name=".NewVenueDetail"
             android:label="@string/title_activity_new_venue_detail"
             android:theme="@style/AppTheme" />
-
+        <activity
+            android:name=".VenueGalleryActivity"
+            android:label="@string/title_activity_venue_gallery"
+            android:parentActivityName=".NewVenueDetail"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="tk.internet.praktikum.foursquare.NewVenueDetail" />
+        </activity>
     </application>
 
 </manifest>

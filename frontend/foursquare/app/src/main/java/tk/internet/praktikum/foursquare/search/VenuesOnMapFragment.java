@@ -424,7 +424,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
             }
             profileService.getNearByFriends(userLocation)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(nearbyFriends -> {
                                 friends = nearbyFriends;
@@ -462,7 +462,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                             getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
             profileService.profile()
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
