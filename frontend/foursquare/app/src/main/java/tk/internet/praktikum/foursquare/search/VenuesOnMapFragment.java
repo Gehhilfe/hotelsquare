@@ -112,17 +112,18 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
         this.setRetainInstance(true);
 
-        // register to EventBus
-        if (!(EventBus.getDefault().isRegistered(this))) {
-            EventBus.getDefault().register(this);
-        }
-
         //work-around
         overAllID++;
         thisID = overAllID;
 
         parent = this;
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        EventBus.getDefault().register(this);
+        super.onStart();
     }
 
     @Override
@@ -570,6 +571,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LocationTracker.LocationEvent event) {
+        if (thisID < overAllID) {
+            EventBus.getDefault().unregister(this);
+        }
         // Update your own Position
         setUser();
         // Update your Friends' Positions
@@ -578,11 +582,13 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             updateFriendsMarker();
             Log.d("KGK", "THIS IS FRAGMENT: " + this.thisID + "  " + overAllID);
             Log.d("MARKERS", "Location: " + event.location);
-            if (thisID < overAllID) {
-                EventBus.getDefault().unregister(this);
-            }
         }
     }
 
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
 }
 

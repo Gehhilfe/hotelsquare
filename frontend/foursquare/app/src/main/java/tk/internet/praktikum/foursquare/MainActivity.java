@@ -1,5 +1,7 @@
 package tk.internet.praktikum.foursquare;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -276,13 +278,23 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         Log.d("LOCATION", "StartService");
-        startService(new Intent(this, LocationService.class)); // start tracking service
+        if(!isMyServiceRunning(LocationService.class))
+            startService(new Intent(this, LocationService.class)); // start tracking service
 
         // off-topic -> ignore this
         if (!(EventBus.getDefault().isRegistered(this))) {
             EventBus.getDefault().register(this);
         }
+    }
 
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -292,6 +304,12 @@ public class MainActivity extends AppCompatActivity
         // off-topic -> ignore this
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        EventBus.getDefault().unregister(this);
+        super.onPause();
     }
 
     /**
