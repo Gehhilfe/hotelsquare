@@ -61,9 +61,5 @@
         ]
       }
     ]
-  },
-  "logstash": {
-    "host": "logstash",
-    "port": 5000
   }
 }
