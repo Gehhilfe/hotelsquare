@@ -65,6 +65,9 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // TODO - Title = Name der Person?
+        setTitle("Profile");
+
         name = (TextView) findViewById(R.id.profile_name);
         email = (TextView) findViewById(R.id.profile_email);
         city = (TextView) findViewById(R.id.profile_city);
@@ -212,18 +215,31 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.nav_search) {
-            setResult(0, null);
-            finish();
-        } else if (id == R.id.nav_history) {
-            setResult(1, null);
-            finish();
-        } else if (id == R.id.nav_me) {
-            setResult(2, null);
-            finish();
-        }else if (id == R.id.nav_manage) {
-            setResult(3, null);
-            finish();
+        switch (id) {
+            case R.id.nav_search:
+                setResult(0, null);
+                finish();
+                break;
+            case R.id.nav_search_person:
+                setResult(1, null);
+                finish();
+                break;
+            case R.id.nav_history:
+                setResult(2, null);
+                finish();
+                break;
+            case R.id.nav_me:
+                setResult(3, null);
+                finish();
+                break;
+            case R.id.nav_manage:
+                setResult(4, null);
+                finish();
+                break;
+            case R.id.nav_login_logout:
+                setResult(5, null);
+                finish();
+                break;
         }
         return true;
     }
@@ -236,27 +252,6 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

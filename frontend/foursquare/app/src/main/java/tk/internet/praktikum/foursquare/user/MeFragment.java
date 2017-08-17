@@ -80,12 +80,11 @@ public class MeFragment extends Fragment {
         itemLogout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener(){
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                // Todo
-                // call logout service
+                // Todo - call logout service
                 LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).deleteLoggedInInformation();
                 Intent intent = new Intent(getActivity().getApplicationContext(), MainActivity.class);
                 startActivityForResult(intent, 0);
-                return true; //
+                return true;
             }
         });
 
