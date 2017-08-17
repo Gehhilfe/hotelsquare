@@ -5,9 +5,11 @@
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:overScrollMode="never"
+    android:scrollbars="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="tk.internet.praktikum.foursquare.NewVenueDetail"
-    tools:showIn="@layout/activity_new_venue_detail">
+    tools:context="tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView"
+    tools:showIn="@layout/activity_venue_detail_nestedscrollview">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -137,7 +139,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
-                        android:text="WWW"
+                        android:text="@string/venue_website"
                         android:textAppearance="@style/TextAction" />
 
                     <Button
@@ -146,7 +148,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
-                        android:text="Call"
+                        android:text="@string/venue_call"
                         android:textAppearance="@style/TextAction" />
 
                     <Button
@@ -155,7 +157,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
-                        android:text="Check in"
+                        android:text="@string/venue_check_in"
                         android:textAppearance="@style/TextAction" />
                 </LinearLayout>
             </LinearLayout>
@@ -381,6 +383,8 @@
             android:id="@+id/comment_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:scrollbars="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 

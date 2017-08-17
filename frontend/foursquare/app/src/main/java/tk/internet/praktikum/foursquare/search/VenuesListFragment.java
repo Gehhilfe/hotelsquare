@@ -28,9 +28,7 @@ public class VenuesListFragment extends Fragment {
     private int firstVisibleItem;
     private int currentVisibleItem;
     private int maxLastVisibleItemPosition=0;
-    private boolean scrolledVenue;
     private DeepSearchFragment parent;
-    private boolean endOfList;
     View view;
 
     public DeepSearchFragment getParent() {
@@ -135,15 +133,8 @@ public class VenuesListFragment extends Fragment {
                     maxLastVisibleItemPosition=Math.max(maxLastVisibleItemPosition,lastVisibleItemPosition);
                     parent.deepSearch();
                 }
-
-                // Toast.makeText(getContext(), linearLayoutManager.getChildCount(),Toast.LENGTH_LONG).show();
-
             }
         });
-    }
-
-    public void detectScrollDown(){
-
     }
 
     public int getCurrentPage() {

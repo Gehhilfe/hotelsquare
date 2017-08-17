@@ -147,11 +147,7 @@ public class LocationTracker implements
      */
     public static boolean isGooglePlayServicesAvailable(Context context) {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
-        if (ConnectionResult.SUCCESS == resultCode) {
-            return true;
-        } else {
-            return false;
-        }
+        return ConnectionResult.SUCCESS == resultCode;
     }
 
     public void onSearch(){

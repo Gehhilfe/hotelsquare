@@ -63,7 +63,16 @@
             android:name=".user.ProfileActivity"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".chat.DummyChatActivity"
+            android:name=".chat.ChatActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".history.HistoryActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".user.SettingsActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".search.SearchPersonActivity"
             android:theme="@style/AppTheme" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -81,18 +90,25 @@
         <service android:name=".location.LocationService" />
 
         <activity
-            android:name=".NewVenueDetail"
-            android:label="@string/title_activity_new_venue_detail"
+            android:name=".VenueInDetailsNestedScrollView"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".VenueGalleryActivity"
             android:label="@string/title_activity_venue_gallery"
-            android:parentActivityName=".NewVenueDetail"
+            android:parentActivityName=".VenueInDetailsNestedScrollView"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="tk.internet.praktikum.foursquare.NewVenueDetail" />
+                android:value="tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView" />
         </activity>
+        <activity
+            android:name=".search.VenueImagesActivity"
+            android:label="Pictures"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".search.FullScreenVenueImage"
+            android:label="@string/title_activity_full_screen_venue_image"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

@@ -49,7 +49,7 @@ public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyView
 
         holder.date.setText(DateFormat.getFriendlyTime(info.getLastDate()));
 
-        UserService us = ServiceFactory.createRetrofitService(UserService.class, NewVenueDetail.URL);
+        UserService us = ServiceFactory.createRetrofitService(UserService.class, VenueInDetailsNestedScrollView.URL);
 
         us.profileByID(info.getUserID())
                 .subscribeOn(Schedulers.io())

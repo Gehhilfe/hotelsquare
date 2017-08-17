@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +37,7 @@ public class ChatListViewAdapter extends BaseAdapter {
 
     private String LOG_TAG = ChatListViewAdapter.class.getSimpleName();
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("HH:mm");
-    private List<ChatMessage> messages;
+    private List<ChatMessage> messages = Collections.emptyList();
     private Context context;
     private User currentUser;
 

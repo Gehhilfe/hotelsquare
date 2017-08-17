@@ -46,7 +46,7 @@ public class VenueImageAdapter extends RecyclerView.Adapter<VenueImageViewHolder
 
     @Override
     public int getItemCount() {
-        return venueImages.size();
+        return venueImages!=null?venueImages.size():0;
     }
 
 }

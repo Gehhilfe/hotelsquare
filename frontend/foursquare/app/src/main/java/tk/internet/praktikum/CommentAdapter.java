@@ -18,8 +18,8 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.DateFormat;
-import tk.internet.praktikum.foursquare.NewVenueDetail;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
@@ -46,7 +46,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     public CommentAdapter(String venueId, Context context) {
         this.context = context;
         this.venueId = venueId;
-        this.service = ServiceFactory.createRetrofitService(VenueService.class, NewVenueDetail.URL);
+        this.service = ServiceFactory.createRetrofitService(VenueService.class, VenueInDetailsNestedScrollView.URL);
         this.comments = new ArrayList<>();
         this.service.getComments(venueId, 0)
                 .subscribeOn(Schedulers.io())
@@ -91,7 +91,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                             holder.text.setVisibility(View.GONE);
                         }, (err) -> Log.d(LOG, err.toString(), err));
             } else {
-                Log.d(NewVenueDetail.LOG, "image is null");
+                Log.d(VenueInDetailsNestedScrollView.LOG, "image is null");
             }
         }
 
@@ -107,7 +107,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             LocalStorage ls = LocalStorage.getLocalStorageInstance(context);
             SharedPreferences sp = LocalStorage.getSharedPreferences(context);
             if (ls.isLoggedIn()) {
-                CommentService service = ServiceFactory.createRetrofitService(CommentService.class, NewVenueDetail.URL, sp.getString(Constants.TOKEN, ""));
+                CommentService service = ServiceFactory.createRetrofitService(CommentService.class, VenueInDetailsNestedScrollView.URL, sp.getString(Constants.TOKEN, ""));
                 service.like(comment.getId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -124,7 +124,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             LocalStorage ls = LocalStorage.getLocalStorageInstance(context);
             SharedPreferences sp = LocalStorage.getSharedPreferences(context);
             if (ls.isLoggedIn()) {
-                CommentService service = ServiceFactory.createRetrofitService(CommentService.class, NewVenueDetail.URL, sp.getString(Constants.TOKEN, ""));
+                CommentService service = ServiceFactory.createRetrofitService(CommentService.class, VenueInDetailsNestedScrollView.URL, sp.getString(Constants.TOKEN, ""));
                 service.dislike(comment.getId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -132,7 +132,6 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                             Integer d = cmt.getRating();
                             holder.votes.setText(String.format("%d", d));
                         }, err -> Log.d("CommentAdapter", err.toString(), err));
-                ;
             } else {
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
             }

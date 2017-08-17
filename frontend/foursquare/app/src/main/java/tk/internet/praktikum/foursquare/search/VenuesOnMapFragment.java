@@ -1,6 +1,7 @@
 package tk.internet.praktikum.foursquare.search;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -36,6 +37,7 @@ import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
@@ -46,6 +48,9 @@ import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.MeFragment;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
+
+//import com.google.maps.android.clustering.ClusterManager;
 
 /**
  * Fragment for the Venues on the Map
@@ -63,7 +68,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private Bitmap userImage;
 
 
-    private ProfileService profileService;
+    private static ProfileService profileService;
+    private static int overAllID = 0;
+    private int thisID = 0;
 
     private Marker myPosition;
 
@@ -75,7 +82,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private List<Venue> allVenues;
     private MainActivity mainActivity;
     private Fragment parent;
-
+    int i = 0;
+    // private ClusterManager<Location> locationClusterManager;
     public VenuesOnMapFragment() {
         // Required empty public constructor
     }
@@ -104,13 +112,18 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
         this.setRetainInstance(true);
 
-        // register to EventBus
-        if (!(EventBus.getDefault().isRegistered(this))) {
-            EventBus.getDefault().register(this);
-        }
+        //work-around
+        overAllID++;
+        thisID = overAllID;
 
         parent = this;
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        EventBus.getDefault().register(this);
+        super.onStart();
     }
 
     @Override
@@ -120,7 +133,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         super.onDestroy();
     }
 
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // set Map
@@ -129,9 +141,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
         // set Usermarker
         setUser();
-
-        //TODO: Should we do this? I don't know, have to think about it
-        //updateFriendsMarker();
 
         // custom InfoWindow for all Markers
         class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
@@ -161,10 +170,11 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     TextView tvOpen = ((TextView) myContentsView.findViewById(R.id.isopen));
                     if (venue.isOpen()) {
                         tvOpen.setText(getString(R.string.open_now));
+                    } else {
+                        tvOpen.setText("");
                     }
 
                     CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
-
                     // load Image if possible, else default
                     if (venueBitmapMap.containsKey(venue)) {
                         venueImage.setImageBitmap(venueBitmapMap.get(venue));
@@ -184,34 +194,47 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
                     if (friend.getCity() != null) {
                         tvRate.setText(friend.getCity());
+                    } else {
+                        tvRate.setText("");
                     }
                     TextView tvOpen = ((TextView) myContentsView.findViewById(R.id.isopen));
                     if (friend.getAge() != 0) {
                         tvOpen.setText(Integer.toString(friend.getAge()));
+                    } else {
+                        tvOpen.setText("");
                     }
+
                     // Set Image
                     CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
                     if (friendBitmapMap.get(friend) != null) {
                         venueImage.setImageBitmap(friendBitmapMap.get(friend));
-                        Log.d("KEYFOUND", "Bitmap is: " + friendBitmapMap.get(friend));
                     } else {
                         venueImage.setImageResource(R.mipmap.user_avatar);
                     }
 
                     // Handle logged-in User Marker
                 } else if (!(LocalStorage.getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("") && !markerFriendMap.containsKey(marker)) {
-                    Log.d("KEYFOUND", "Marker is USER" + !markerFriendMap.containsKey(marker) + markerFriendMap.size());
+                    Log.d("KEYFOUND", "Marker is USER");
                     TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
                     tvTitle.setText(user.getDisplayName());
                     CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
-                    venueImage.setImageBitmap(userImage);
+                    if (userImage != null) {
+                        venueImage.setImageBitmap(userImage);
+                    } else {
+                        venueImage.setImageResource(R.mipmap.user_avatar);
+                    }
+
                     TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
                     if (user.getCity() != null) {
                         tvRate.setText(user.getCity());
+                    } else {
+                        tvRate.setText("");
                     }
                     TextView tvOpen = ((TextView) myContentsView.findViewById(R.id.isopen));
                     if (user.getAge() != 0) {
                         tvOpen.setText(Integer.toString(user.getAge()));
+                    } else {
+                        tvOpen.setText("");
                     }
 
                     // Handle User Marker
@@ -219,10 +242,13 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     Log.d("KEYFOUND", "Marker is unlogged User");
                     TextView tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
                     tvTitle.setText(R.string.thatsme);
+
                     CircleImageView venueImage = ((CircleImageView) myContentsView.findViewById(R.id.img));
-                    venueImage.setImageResource(R.drawable.marker_position);
+                    venueImage.setImageResource(R.mipmap.user_avatar);
+
                     TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
                     tvRate.setText("");
+
                     TextView tvOpen = ((TextView) myContentsView.findViewById(R.id.isopen));
                     tvOpen.setText("");
                 }
@@ -244,16 +270,24 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             public void onInfoWindowClick(Marker marker) {
                 // if Venue, got to Venue-Details
                 if (markerVenueMap.containsKey(marker)) {
-                    VenueInDetailFragment venueInDetailFragment = new VenueInDetailFragment();
+
+                    //TODO:
+                   /* VenueInDetailFragment venueInDetailFragment = new VenueInDetailFragment();
                     venueInDetailFragment.setParent(parent);
                     venueInDetailFragment.setVenueId(markerVenueMap.get(marker).getId());
                     FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.fragment_container, venueInDetailFragment);
                     fragmentTransaction.addToBackStack(venueInDetailFragment.getTag());
-                    fragmentTransaction.commit();
+                    fragmentTransaction.commit();*/
+                    Intent intent = new Intent(parent.getActivity(), VenueInDetailsNestedScrollView.class);
+                    intent.putExtra("VENUE_ID", markerVenueMap.get(marker).getId());
+                    parent.getActivity().startActivity(intent);
                     // if Friend, got to Friend-Details
                 } else if (markerFriendMap.containsKey(marker)) {
                     //TODO: "Call FriendFragment"
+                    Intent intent = new Intent(parent.getActivity(), ProfileActivity.class);
+                    intent.putExtra("userID", markerFriendMap.get(marker).getId());
+                    parent.getActivity().startActivity(intent);
                     // if User, go to Me-Fragment
                 } else if (!(LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("") && !markerFriendMap.containsKey(marker)) {
@@ -333,8 +367,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
             updateFriendsMarker();
         }
-
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(venues.get(0).getLocation().getLatitude(), venues.get(0).getLocation().getLongitude()), 14));
+        Location centerLocation=calculateClusteringCenterLocation(venues);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 12));
 
     }
 
@@ -345,7 +379,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
      */
     public void updateFriendsLocation(User friend) {
         LatLng friendLocation = new LatLng(friend.getLocation().getLatitude(), friend.getLocation().getLongitude());
-        Log.d("KEYFOUND", "For: " + friend.getDisplayName());
 
         // get matching friend
         User tmpFriend = matchedFriend(friend);
@@ -419,16 +452,16 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         if (!(LocalStorage.
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
 
-            //create HashMap
-            //markerFriendMap = new HashMap<Marker, User>();
-
             if (profileService == null) {
+
                 profileService = ServiceFactory
                         .createRetrofitService(ProfileService.class, URL, LocalStorage.
                                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+                Log.d("KGK", "New PS created " + profileService);
             }
+            Log.d("KGK", "PS search for friends " + profileService);
             profileService.getNearByFriends(userLocation)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(nearbyFriends -> {
                                 friends = nearbyFriends;
@@ -442,7 +475,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                             throwable -> {
                                 Log.d(LOG, "Exception: " + throwable.getMessage());
                             });
-
         }
     }
 
@@ -450,13 +482,11 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
      * Set the user on the Map
      */
     public void setUser() {
-        if (myPosition != null) {
-            myPosition.remove();
-        }
+
         // set user position
         userLocation = mainActivity.getUserLocation();
-        Log.d("KEYFOUND", "USER IS SET");
-        // get user info
+
+        // get user Data
         try {
             if (!(LocalStorage.
                     getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
@@ -466,32 +496,52 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
                 profileService.profile()
-                        .subscribeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 user -> {
                                     this.user = user;
-
                                     // get user Avatar
-                                    if (user.getAvatar() != null) {
-                                        ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
-                                        imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(bitmap -> {
-                                                    userImage = bitmap;
-                                                });
-                                    }
+                                    if(user.getAvatar() == null)
+                                        return;
+                                    ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+                                    imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(bitmap -> {
+                                                userImage = bitmap;
+                                            });
                                 });
-
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        myPosition = map.addMarker(new MarkerOptions()
-                .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
-                .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
 
+        //If position has not changed, no new Marker
+        if (myPosition != null && myPosition.getPosition().latitude == userLocation.getLatitude() && myPosition.getPosition().longitude == userLocation.getLongitude()) {
+            Log.d("MARKERS", "No new!");
+            return;
+        }
+
+        // If no user Marker yet
+        if (myPosition == null) {
+            myPosition = map.addMarker(new MarkerOptions()
+                    .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
+                    .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
+            Log.d("MARKERS", "No Marker yet!");
+            return;
+        }
+
+        //if position changed and marker already set
+        if (myPosition != null && myPosition.getPosition().longitude != userLocation.getLongitude()) {
+            myPosition.remove();
+            //myPosition.setPosition(pos);
+            Log.d("MARKERS", "Changed!");
+            myPosition = map.addMarker(new MarkerOptions()
+                    .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
+                    .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
+            return;
+        }
     }
 
     // TODO: Delete?
@@ -509,8 +559,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
 
     }*/
     protected Location calculateClusteringCenterLocation(List<Venue> venues) {
-        //Todo
-        return null;
+        return new Location(venues.stream().mapToDouble(location -> location.getLocation().getLongitude()).average().getAsDouble(),
+                venues.stream().mapToDouble(location -> location.getLocation().getLatitude()).average().getAsDouble());
+
     }
 
     /**
@@ -520,14 +571,24 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LocationTracker.LocationEvent event) {
+        if (thisID < overAllID) {
+            EventBus.getDefault().unregister(this);
+        }
         // Update your own Position
         setUser();
         // Update your Friends' Positions
         if ((LocalStorage.
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")) != "") {
-            Log.d("KEYFOUND", "UPDATE FRIENDS");
             updateFriendsMarker();
+            Log.d("KGK", "THIS IS FRAGMENT: " + this.thisID + "  " + overAllID);
+            Log.d("MARKERS", "Location: " + event.location);
         }
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 }
 

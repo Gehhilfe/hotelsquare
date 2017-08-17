@@ -123,7 +123,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
                              Bundle savedInstanceState) {
         if(view==null) {
             // Inflate the layout for this fragment
-            view = inflater.inflate(R.layout.fragment_venue_detail_new, container, false);
+            view = inflater.inflate(R.layout.fragment_venue_in_detail, container, false);
             // layoutInflater=inflater;
             //this.container=container;
             imageVenueOne = (ImageView) view.findViewById(R.id.image_venue_one);
@@ -137,7 +137,6 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
             venueWebsiteLabel = (TextView) view.findViewById(R.id.venue_website_label);
             venueRating = (TextView) view.findViewById(R.id.venue_rating);
             venueCheckIn = (TextView) view.findViewById(R.id.venue_checkinCount);
-
             floatingActionMenu=(FloatingActionMenu)view.findViewById(R.id.floating_menu) ;
             venueTextCommentButton= (FloatingActionButton) floatingActionMenu.findViewById(R.id.venue_detail_text_comment_button);
             //venueTextCommentButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_text_comment_button);
@@ -631,7 +630,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         if(userAvatar==null) {
             UserService userService = ServiceFactory.createRetrofitService(UserService.class, URL);
             userService.detailsByName(userName)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                                 userAvatar = user.getAvatar();

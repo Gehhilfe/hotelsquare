@@ -44,7 +44,7 @@ public class FriendListFragment extends Fragment {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             friendListResponse -> {
-                                recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), friendListResponse.getFriends()));
+                                recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), friendListResponse.getFriends(), getActivity()));
                             },
                             throwable -> {
                                 Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();

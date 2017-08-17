@@ -1,15 +1,16 @@
 package tk.internet.praktikum.foursquare.user;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -26,22 +27,21 @@ import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Gender;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
-import tk.internet.praktikum.foursquare.chat.DummyChatActivity;
+import tk.internet.praktikum.foursquare.chat.ChatActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class ProfileActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
-    private static final String LOG_TAG = ProfileActivity.class.getSimpleName();
+    private final int REQUEST_CHAT = 1;
     private final String URL = "https://dev.ip.stimi.ovh/";
-    private User currentUser = new User();
     private User otherUser = new User();
     private TextView name, email, city, age;
     private RadioButton male, female, none;
     private ImageView avatarPicture;
     private FloatingActionButton fab;
-    private Bitmap avatar;
     private String userID;
 
     public ProfileActivity() {}
@@ -52,8 +52,6 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_profile);
 
         userID = getIntent().getStringExtra("userID");
-        userID = "599071a509ad180015af8b27"; // janus nicht auf flist von peter
-        //userID = "599071a509ad180015af8b25"; // Admin auf FList von peter
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
         setSupportActionBar(toolbar);
@@ -66,6 +64,9 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // TODO - Title = Name der Person?
+        setTitle("Profile");
 
         name = (TextView) findViewById(R.id.profile_name);
         email = (TextView) findViewById(R.id.profile_email);
@@ -89,18 +90,23 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.friends(0)
+            service.profileIfFriends(userID)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             friendListResponse -> {
                                 List<User> friendList = friendListResponse.getFriends();
+                                boolean isFriend = false;
 
                                 for (User user : friendList)
                                     if (user.getId().equals(userID)) {
                                         fab.setImageResource(R.mipmap.ic_chat_black_48dp);
+                                        isFriend = true;
+                                    }
+
+                                    if  (isFriend) {
                                         fab.setOnClickListener(v -> startChat());
-                                    } else {
+                                    }else {
                                         fab.setOnClickListener(v -> addFriend());
                                     }
                             },
@@ -119,8 +125,7 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.detailsByName("janus")
-           // service.profileByID(userID)
+            service.profileByID(userID)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
@@ -182,29 +187,59 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
     }
 
     private void startChat() {
-        // TODO - GET CHAT ID, falls es keien gibt neuen chat erstellen => wechseln
-        String chatID = "599071a609ad180015af8b2c";
-        Intent intent = new Intent(getApplicationContext(), DummyChatActivity.class);
-        intent.putExtra("chatId", chatID);
-        intent.putExtra("currentUserName", "wahrscinenlich egal");
-        startActivityForResult(intent, 0);
-    }
+        ChatService service = ServiceFactory
+                .createRetrofitService(ChatService.class, URL, LocalStorage.
+                        getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
+        try {
+            service.getOrStartChat(userID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            chatResponse -> {
+                                chatResponse.getChatId();
+                                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                                intent.putExtra("chatId", chatResponse.getChatId());
+                                startActivityForResult(intent, REQUEST_CHAT);
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        // TODO - Entwerder finish und weitere navigation im onactivityresult (mittels result codes)
-        // TODO - oder finish und parameter (item) mitgeben. new itent => set data => item id, item name
-        if (id == R.id.nav_search) {
-            return true;
-        } else if (id == R.id.nav_history) {
-            return true;
-        } else if (id == R.id.nav_me) {
-            return true;
-        }else if (id == R.id.nav_manage) {
-            return true;
+        switch (id) {
+            case R.id.nav_search:
+                setResult(0, null);
+                finish();
+                break;
+            case R.id.nav_search_person:
+                setResult(1, null);
+                finish();
+                break;
+            case R.id.nav_history:
+                setResult(2, null);
+                finish();
+                break;
+            case R.id.nav_me:
+                setResult(3, null);
+                finish();
+                break;
+            case R.id.nav_manage:
+                setResult(4, null);
+                finish();
+                break;
+            case R.id.nav_login_logout:
+                setResult(5, null);
+                finish();
+                break;
         }
         return true;
     }
@@ -220,23 +255,25 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CHAT:
+                switch (resultCode) {
+                    case 0:
+                        setResult(resultCode, null);
+                        finish();
+                    case 1:
+                        setResult(resultCode, null);
+                        finish();
+                    case 2:
+                        setResult(resultCode, null);
+                        finish();
+                    case 4:
+                        setResult(resultCode, null);
+                        finish();
+                }
+                break;
         }
-        return super.onOptionsItemSelected(item);
     }
 }

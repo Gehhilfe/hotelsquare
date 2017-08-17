@@ -15,14 +15,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
-import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
-import tk.internet.praktikum.foursquare.api.bean.Gender;
-import tk.internet.praktikum.foursquare.api.bean.Message;
 import tk.internet.praktikum.foursquare.api.bean.RecipientMessage;
 import tk.internet.praktikum.foursquare.api.service.ChatService;
-import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class DummyActivity extends AppCompatActivity {

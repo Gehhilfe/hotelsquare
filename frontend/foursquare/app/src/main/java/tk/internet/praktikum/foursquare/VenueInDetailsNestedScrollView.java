@@ -7,8 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
@@ -38,8 +36,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -52,18 +48,19 @@ import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.UploadHelper;
-import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
+import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.search.VenueImagesActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
-public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallback {
+public class VenueInDetailsNestedScrollView extends AppCompatActivity implements OnMapReadyCallback {
 
     public static final String URL = "https://dev.ip.stimi.ovh/";
-    public static final String LOG = NewVenueDetail.class.getSimpleName();
+    public static final String LOG = VenueInDetailsNestedScrollView.class.getSimpleName();
     public static final int REQUEST_PICTURE = 0;
     public static final int REQUEST_GALLERY = 1;
 
@@ -88,6 +85,8 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     private FloatingActionButton fabTextComment;
     private String venueId;
     private FloatingActionButton fabImageComment;
+    private FloatingActionButton venueImagesButton;
+
 
     private TextView[] leaderboard_name;
     private TextView[] leaderboard_count;
@@ -98,7 +97,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_venue_detail);
+        setContentView(R.layout.activity_venue_detail_nestedscrollview);
 
         // Setup toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -156,7 +155,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
-                    Log.i(NewVenueDetail.class.getName(), "BOTTOM SCROLL");
+                    Log.i(VenueInDetailsNestedScrollView.class.getName(), "BOTTOM SCROLL");
                     commentAdapter.loadMore();
                 }
             }
@@ -202,6 +201,9 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
         fabMenu = (FloatingActionMenu) findViewById(R.id.floating_menu);
         fabTextComment = (FloatingActionButton) findViewById(R.id.venue_detail_text_comment_button);
         fabImageComment = (FloatingActionButton) findViewById(R.id.venue_detail_image_commnent_button);
+        venueImagesButton = (FloatingActionButton) findViewById(R.id.venue_detail_images);
+
+        venueImagesButton.setOnClickListener(v -> venueImages());
     }
 
     @Override
@@ -261,7 +263,7 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                                     }, (err) -> Log.d(LOG, err.toString(), err));
                     }
                 }, err -> {
-                    Log.d(NewVenueDetail.class.getName(), err.toString());
+                    Log.d(VenueInDetailsNestedScrollView.class.getName(), err.toString());
                 });
     }
 
@@ -528,5 +530,12 @@ public class NewVenueDetail extends AppCompatActivity implements OnMapReadyCallb
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
         }
+    }
+    private void venueImages() {
+        Intent intent = new Intent(getApplicationContext(), VenueImagesActivity.class);
+        intent.putExtra("venueID", venueId);
+        this.startActivity(intent);
+
+
     }
 }

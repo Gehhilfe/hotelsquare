@@ -11,6 +11,15 @@
             android:viewportHeight="24.0"
             android:viewportWidth="24.0"/>
         <item
+            android:id="@+id/nav_search_person"
+            android:icon="@mipmap/ic_search_black_24dp"
+            android:title="Search Person"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportHeight="24.0"
+            android:viewportWidth="24.0"/>
+        <!-- TODO - icon, titel in der activity ändern.-->
+        <item
             android:id="@+id/nav_history"
             android:icon="@mipmap/ic_history_black_24dp"
             android:title="History"
@@ -29,7 +38,16 @@
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="Settings" />
+        <!-- TODO - icon, titel in der activity ändern.-->
+        <item
+            android:id="@+id/nav_login_logout"
+            android:icon="@mipmap/ic_perm_identity_black_24dp"
+            android:title="Login/Logout"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportHeight="24.0"
+            android:viewportWidth="24.0"/>
     </group>
 
    <!-- <item android:title="Communicate">
