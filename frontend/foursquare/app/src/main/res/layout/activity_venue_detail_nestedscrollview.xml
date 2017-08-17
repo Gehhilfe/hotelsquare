@@ -88,14 +88,6 @@
             android:src="@mipmap/text_commemnt"
             app:fab_label="Post Text"
             app:fab_size="mini" />
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/venue_detail_images"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:src="@mipmap/venue_images"
-            app:fab_label="Pictures"
-            app:fab_size="mini" />
     </com.github.clans.fab.FloatingActionMenu>
 
 </android.support.design.widget.CoordinatorLayout>

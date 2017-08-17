@@ -205,9 +205,6 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         fabMenu = (FloatingActionMenu) findViewById(R.id.floating_menu);
         fabTextComment = (FloatingActionButton) findViewById(R.id.venue_detail_text_comment_button);
         fabImageComment = (FloatingActionButton) findViewById(R.id.venue_detail_image_commnent_button);
-        venueImagesButton = (FloatingActionButton) findViewById(R.id.venue_detail_images);
-
-        venueImagesButton.setOnClickListener(v -> venueImages());
     }
 
     @Override
@@ -534,12 +531,5 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
         }
-    }
-    private void venueImages() {
-        Intent intent = new Intent(getApplicationContext(), VenueImagesActivity.class);
-        intent.putExtra("venueID", venueId);
-        this.startActivity(intent);
-
-
     }
 }
