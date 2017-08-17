@@ -32,8 +32,8 @@ import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.ProfileActivity;
 import tk.internet.praktikum.foursquare.user.MeFragment;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
 import tk.internet.praktikum.foursquare.user.UserActivity;
 
 //import android.app.FragmentTransaction;
@@ -234,14 +234,7 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
-                    try {
-                        fragment = MeFragment.class.newInstance();
-                        redirectToFragment(fragment);
-                    } catch (java.lang.InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+                    meNavigation(meMenu);
                 }
                 break;
             case REQUEST_CHAT:

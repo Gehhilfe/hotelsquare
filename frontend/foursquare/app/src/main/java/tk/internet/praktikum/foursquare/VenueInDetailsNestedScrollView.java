@@ -7,8 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
@@ -38,8 +36,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -205,6 +201,9 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         fabMenu = (FloatingActionMenu) findViewById(R.id.floating_menu);
         fabTextComment = (FloatingActionButton) findViewById(R.id.venue_detail_text_comment_button);
         fabImageComment = (FloatingActionButton) findViewById(R.id.venue_detail_image_commnent_button);
+        venueImagesButton = (FloatingActionButton) findViewById(R.id.venue_detail_images);
+
+        venueImagesButton.setOnClickListener(v -> venueImages());
     }
 
     @Override
@@ -531,5 +530,12 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
         }
+    }
+    private void venueImages() {
+        Intent intent = new Intent(getApplicationContext(), VenueImagesActivity.class);
+        intent.putExtra("venueID", venueId);
+        this.startActivity(intent);
+
+
     }
 }

@@ -254,7 +254,7 @@
                     android:src="@mipmap/text_commemnt"
                     fab:fab_label="Text comment"
                     fab:fab_size="mini" />
-
+<!--
                 <com.github.clans.fab.FloatingActionButton
                     android:id="@+id/venue_detail_images"
                     android:layout_width="wrap_content"
@@ -262,7 +262,7 @@
                     android:layout_gravity="bottom|right"
                     android:src="@mipmap/venue_images"
                     fab:fab_label="Pictures"
-                    fab:fab_size="mini" />
+                    fab:fab_size="mini" />-->
 
                 <com.github.clans.fab.FloatingActionButton
                     android:id="@+id/venue_checkin"
