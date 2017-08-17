@@ -58,4 +58,5 @@
     <string name="venue_call">Call</string>
     <string name="venue_check_in">Check in</string>
     <string name="title_activity_venue_images">VenueImagesActivity</string>
+    <string name="title_activity_full_screen_venue_image">FullScreenVenueImage</string>
 </resources>

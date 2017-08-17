@@ -86,6 +86,10 @@
         <activity
             android:name=".search.VenueImagesActivity"
             android:label="Pictures"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".search.FullScreenVenueImage"
+            android:label="@string/title_activity_full_screen_venue_image"
             android:theme="@style/AppTheme"></activity>
     </application>
 

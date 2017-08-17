@@ -1,5 +1,6 @@
 package tk.internet.praktikum.foursquare.search;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +19,16 @@ import tk.internet.praktikum.foursquare.api.bean.Image;
 public class VenueImageAdapter_2 extends RecyclerView.Adapter<VenueImageViewHolder> {
     List<Image> venueImages;
     Context context;
+    private Activity activity;
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
     public VenueImageAdapter_2(List<Image> venueImages){
         this.venueImages=venueImages;
 
@@ -29,6 +40,7 @@ public class VenueImageAdapter_2 extends RecyclerView.Adapter<VenueImageViewHold
         View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.venue_image_item,parent,false);
         VenueImageViewHolder venueImageViewHolder= new VenueImageViewHolder(view);
         venueImageViewHolder.setContext(context);
+        venueImageViewHolder.setActivity(getActivity());
         return  venueImageViewHolder;
     }
 

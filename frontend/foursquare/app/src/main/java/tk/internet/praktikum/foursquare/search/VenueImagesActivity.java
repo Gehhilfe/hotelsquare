@@ -51,6 +51,7 @@ public class VenueImagesActivity extends AppCompatActivity {
 
                         if(images.size()>0){
                             venueImageAdapter = new VenueImageAdapter_2(images);
+                            venueImageAdapter.setActivity(getParent());
                             venueImageAdapter.setContext(getApplicationContext());
                             recyclerView.setAdapter(venueImageAdapter);
                          }
