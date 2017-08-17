@@ -41,7 +41,7 @@ import tk.internet.praktikum.foursquare.api.bean.Image;
 public class FastSearchFragment extends Fragment {
 
     private List<Category> _categories;
-    private static final List<String> categoriesAsList = Arrays.asList("infrastructure", "food&drinks", "recreation", "service", "shops");
+    private static final List<String> categoriesAsList = Arrays.asList("food&drinks", "urlaub&erholung", "service", "shops", "infrastruktur");
     private static final Map<String, List<String>> categoryList;
 
     private RecyclerView rv_fast_search;
@@ -49,11 +49,11 @@ public class FastSearchFragment extends Fragment {
     static {
         categoryList = new HashMap<String, List<String>>();
         //must be same as name of xml file!!! (or a second list with the filenames must be created
-        categoryList.put("infrastructure", Arrays.asList("airport", "harbour", "evcharger"));
-        categoryList.put("food&drinks", Arrays.asList("beer", "coffee", "vegetarian"));
-        categoryList.put("recreation", Arrays.asList("beach", "castle", "zoo"));
-        categoryList.put("service", Arrays.asList("bank", "gasstation", "carwash"));
-        categoryList.put("shops", Arrays.asList("supermarket", "florist", "musicshop"));
+        categoryList.put("food&drinks", Arrays.asList("bier", "kaffee", "vegetarisch"));
+        categoryList.put("urlaub&erholung", Arrays.asList("strand", "burg", "zoo"));
+        categoryList.put("service", Arrays.asList("bank", "tankstelle", "autowaschanlage"));
+        categoryList.put("shops", Arrays.asList("supermarkt", "florist", "musik"));
+        categoryList.put("infrastruktur", Arrays.asList("flughafen", "hafen", "elektrotankstelle"));
     }
 
     private void createContent(){
