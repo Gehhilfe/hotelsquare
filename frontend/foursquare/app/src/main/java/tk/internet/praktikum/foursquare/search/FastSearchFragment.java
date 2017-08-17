@@ -49,7 +49,7 @@ public class FastSearchFragment extends Fragment {
     static {
         categoryList = new HashMap<String, List<String>>();
         //must be same as name of xml file!!! (or a second list with the filenames must be created
-        categoryList.put("food&drinks", Arrays.asList("bier", "kaffee", "vegetarisch"));
+        categoryList.put("food&drinks", Arrays.asList("bier", "cafe", "vegetarisch"));
         categoryList.put("urlaub&erholung", Arrays.asList("strand", "burg", "zoo"));
         categoryList.put("service", Arrays.asList("bank", "tankstelle", "autowaschanlage"));
         categoryList.put("shops", Arrays.asList("supermarkt", "florist", "musik"));
