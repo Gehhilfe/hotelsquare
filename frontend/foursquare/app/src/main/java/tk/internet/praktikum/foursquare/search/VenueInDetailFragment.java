@@ -154,7 +154,7 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
             //invisibleFloatingButton();
             venueImagesButton = (FloatingActionButton) view.findViewById(R.id.venue_detail_images);
 
-            venueImagesButton.setOnClickListener(v -> venueImages());
+            //venueImagesButton.setOnClickListener(v -> venueImages());
 
             recyclerView = (RecyclerView) view.findViewById(R.id.comments_venue);
             linearLayoutManager = new LinearLayoutManager(getContext());
@@ -601,14 +601,14 @@ public class VenueInDetailFragment extends Fragment implements OnMapReadyCallbac
         });
     }
 
-    private void venueImages() {
+/*    private void venueImages() {
         System.out.println("I am here");
           VenueImagesFragment venueImagesFragment=new VenueImagesFragment();
           venueImagesFragment.setParent(this.getParent());
           venueImagesFragment.setImages(images);
           redirectToFragment(venueImagesFragment);
 
-    }
+    }*/
 
     private void redirectToFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction = this.getParent().getFragmentManager().beginTransaction();
