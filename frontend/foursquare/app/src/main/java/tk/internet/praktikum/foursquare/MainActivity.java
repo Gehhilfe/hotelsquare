@@ -29,22 +29,27 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.UserService;
+import tk.internet.praktikum.foursquare.history.HistoryActivity;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
+import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
+import tk.internet.praktikum.foursquare.user.SettingsActivity;
 import tk.internet.praktikum.foursquare.user.UserActivity;
-
-//import android.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
     private final int REQUEST_CHAT = 1;
     private final int REQUEST_PROFILE = 2;
+    private final int REQUEST_SEARCH_PERSON = 3;
+    private final int REQUEST_HISTORY = 4;
+    private final int REQUEST_SETTINGS = 5;
+
     private MenuItem searchMenu, meMenu;
 
     private Location userLocation = new Location(0, 0);
@@ -129,20 +134,24 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void searchPersonNavigation() {
+        Intent intent = new Intent(getApplicationContext(), SearchPersonActivity.class);
+        startActivityForResult(intent, REQUEST_SEARCH_PERSON);
+    }
+
     private void historyNavigation() {
-        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-        intent.putExtra("userID", "");
-        startActivityForResult(intent, 0);
+        Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
+        startActivityForResult(intent, REQUEST_HISTORY);
     }
 
     private void meNavigation(MenuItem item) {
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivityForResult(intent, REQUEST_LOGIN);
+            login();
         } else {
             try {
                 Fragment fragment = MeFragment.class.newInstance();
                 redirectToFragment(fragment);
+                // TODO - Title = mein name?
                 setTitle(item);
             } catch (InstantiationException e) {
                 e.printStackTrace();
@@ -152,62 +161,45 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void manageNavigation() {
-        Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-        startActivityForResult(intent, 0);
+    private void settingsNavigation() {
+        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivityForResult(intent, REQUEST_SETTINGS);
     }
+
+    private void login() {
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivityForResult(intent, REQUEST_LOGIN);
+    }
+
+    private void logout() {}
 
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
-        Fragment fragment = null;
 
-        if (id == R.id.nav_search) {
-            searchNavigation(item);
-            // call Search fast activity
-            /*
-            try {
-                fragment = FastSearchFragment.class.newInstance();
-                redirectToFragment(fragment);
-                setTitle(item);
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }*/
-        } else if (id == R.id.nav_history) {
-            // call history activity
-            historyNavigation();
-            /*
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            intent.putExtra("userID", "");
-            startActivityForResult(intent, 0);*/
-        } else if (id == R.id.nav_me) {
-            // call login activity if didn't login util now
-            meNavigation(item);
-            /*
-            if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivityForResult(intent, REQUEST_LOGIN);
-            } else {
-                try {
-                    fragment = MeFragment.class.newInstance();
-                    redirectToFragment(fragment);
-                    setTitle(item);
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }*/
-        } else if (id == R.id.nav_manage) {
-            // call history activity
-            manageNavigation();
-            /*
-            Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-            startActivityForResult(intent, 0);*/
+        switch (id) {
+            case R.id.nav_search:
+                searchNavigation(item);
+                break;
+            case R.id.nav_search_person:
+                searchPersonNavigation();
+                break;
+            case R.id.nav_history:
+                historyNavigation();
+                break;
+            case R.id.nav_me:
+                meNavigation(item);
+                break;
+            case R.id.nav_manage:
+                settingsNavigation();
+                break;
+            case R.id.nav_login_logout:
+                if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+                    login();
+                else
+                    logout();
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -232,7 +224,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Fragment fragment = null;
         switch (requestCode) {
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
@@ -245,32 +236,120 @@ public class MainActivity extends AppCompatActivity
                         searchNavigation(searchMenu);
                         break;
                     case 1:
-                        historyNavigation();
+                        searchPersonNavigation();
                         break;
                     case 2:
+                        historyNavigation();
+                        break;
+                    case 3:
                         meNavigation(meMenu);
                         break;
                     case 4:
-                        manageNavigation();
+                        settingsNavigation();
+                        break;
+                    case 5:
+                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+                            login();
+                        else
+                            logout();
                         break;
                 }
-                break;
             case REQUEST_PROFILE:
                 switch (resultCode) {
                     case 0:
                         searchNavigation(searchMenu);
                         break;
                     case 1:
-                        historyNavigation();
+                        searchPersonNavigation();
                         break;
                     case 2:
+                        historyNavigation();
+                        break;
+                    case 3:
                         meNavigation(meMenu);
                         break;
                     case 4:
-                        manageNavigation();
+                        settingsNavigation();
+                        break;
+                    case 5:
+                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+                            login();
+                        else
+                            logout();
                         break;
                 }
-                break;
+            case REQUEST_HISTORY:
+                switch (resultCode) {
+                    case 0:
+                        searchNavigation(searchMenu);
+                        break;
+                    case 1:
+                        searchPersonNavigation();
+                        break;
+                    case 2:
+                        historyNavigation();
+                        break;
+                    case 3:
+                        meNavigation(meMenu);
+                        break;
+                    case 4:
+                        settingsNavigation();
+                        break;
+                    case 5:
+                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+                            login();
+                        else
+                            logout();
+                        break;
+                }
+            case REQUEST_SETTINGS:
+                switch (resultCode) {
+                    case 0:
+                        searchNavigation(searchMenu);
+                        break;
+                    case 1:
+                        searchPersonNavigation();
+                        break;
+                    case 2:
+                        historyNavigation();
+                        break;
+                    case 3:
+                        meNavigation(meMenu);
+                        break;
+                    case 4:
+                        settingsNavigation();
+                        break;
+                    case 5:
+                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+                            login();
+                        else
+                            logout();
+                        break;
+                }
+            case REQUEST_SEARCH_PERSON:
+                switch (resultCode) {
+                    case 0:
+                        searchNavigation(searchMenu);
+                        break;
+                    case 1:
+                        searchPersonNavigation();
+                        break;
+                    case 2:
+                        historyNavigation();
+                        break;
+                    case 3:
+                        meNavigation(meMenu);
+                        break;
+                    case 4:
+                        settingsNavigation();
+                        break;
+                    case 5:
+                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+                            login();
+                        else
+                            logout();
+                        break;
+                }
         }
     }
 
@@ -362,5 +441,4 @@ public class MainActivity extends AppCompatActivity
         }
 
     };
-
 }
