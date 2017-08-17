@@ -14,8 +14,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="75dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="75dp">
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
@@ -226,6 +226,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/activity_vertical_margin"
                     android:gravity="center"
                     android:text="Leaderboard"
                     android:textSize="26dp" />
@@ -263,7 +264,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="Unkown" />
+                            android:text="Unkown"
+                            android:textColor="@color/colorAccent" />
 
                         <TextView
                             android:id="@+id/leaderboard_2_count"
@@ -298,7 +300,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="Unkown" />
+                            android:text="Unkown"
+                            android:textColor="@color/colorAccent" />
 
                         <TextView
                             android:id="@+id/leaderboard_1_count"
@@ -333,7 +336,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="Unkown" />
+                            android:text="Unkown"
+                            android:textColor="@color/colorAccent" />
 
                         <TextView
                             android:id="@+id/leaderboard_3_count"
@@ -343,6 +347,35 @@
                             android:text="0" />
                     </LinearLayout>
                 </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/activity_vertical_margin"
+                    android:gravity="center"
+                    android:text="Last Checkins"
+                    android:textSize="26dp" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/last_here_recylcer_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                </android.support.v7.widget.RecyclerView>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

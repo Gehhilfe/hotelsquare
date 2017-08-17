@@ -83,7 +83,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private MainActivity mainActivity;
     private Fragment parent;
     int i = 0;
-   // private ClusterManager<Location> locationClusterManager;
+    // private ClusterManager<Location> locationClusterManager;
     public VenuesOnMapFragment() {
         // Required empty public constructor
     }
@@ -500,17 +500,17 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                         .subscribe(
                                 user -> {
                                     this.user = user;
+                                    // get user Avatar
+                                    if(user.getAvatar() == null)
+                                        return;
+                                    ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
+                                    imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(bitmap -> {
+                                                userImage = bitmap;
+                                            });
                                 });
-                // get user Avatar
-                ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
-                imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(bitmap -> {
-                            userImage = bitmap;
-                        });
-
-
             }
         } catch (Exception e) {
             e.printStackTrace();

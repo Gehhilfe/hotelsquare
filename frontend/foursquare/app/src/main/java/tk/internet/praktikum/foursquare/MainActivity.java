@@ -1,7 +1,5 @@
 package tk.internet.praktikum.foursquare;
 
-//import android.app.Fragment;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,7 +41,9 @@ import tk.internet.praktikum.foursquare.user.UserActivity;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
-
+    private final int REQUEST_CHAT = 1;
+    private final int REQUEST_PROFILE = 2;
+    private MenuItem searchMenu, meMenu;
 
     private Location userLocation = new Location(0, 0);
     private Handler handler = new Handler();
@@ -66,6 +66,17 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        Menu tmpMenu = navigationView.getMenu();
+        for (int i = 0; i < tmpMenu.size(); i++) {
+            tmpMenu.getItem(i);
+            if (tmpMenu.getItem(i).getItemId() == R.id.nav_search) {
+                searchMenu = tmpMenu.getItem(i);
+            } else if (tmpMenu.getItem(i).getItemId() == R.id.nav_me) {
+                meMenu = tmpMenu.getItem(i);
+            }
+        }
+
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment);
 
@@ -104,6 +115,47 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void searchNavigation(MenuItem item) {
+        try {
+            Fragment fragment = FastSearchFragment.class.newInstance();
+            redirectToFragment(fragment);
+            setTitle(item);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void historyNavigation() {
+        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+        intent.putExtra("userID", "");
+        startActivityForResult(intent, 0);
+    }
+
+    private void meNavigation(MenuItem item) {
+        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivityForResult(intent, REQUEST_LOGIN);
+        } else {
+            try {
+                Fragment fragment = MeFragment.class.newInstance();
+                redirectToFragment(fragment);
+                setTitle(item);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void manageNavigation() {
+        Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+        startActivityForResult(intent, 0);
+    }
+
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -111,7 +163,9 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
 
         if (id == R.id.nav_search) {
+            searchNavigation(item);
             // call Search fast activity
+            /*
             try {
                 fragment = FastSearchFragment.class.newInstance();
                 redirectToFragment(fragment);
@@ -120,25 +174,21 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
-            }
+            }*/
         } else if (id == R.id.nav_history) {
             // call history activity
+            historyNavigation();
+            /*
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             intent.putExtra("userID", "");
-            startActivityForResult(intent, 0);
+            startActivityForResult(intent, 0);*/
         } else if (id == R.id.nav_me) {
             // call login activity if didn't login util now
+            meNavigation(item);
+            /*
             if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivityForResult(intent, REQUEST_LOGIN);
-               /*try {
-                    fragment = LoginGeneralFragment.class.newInstance();
-                    redirectToFragment(fragment);
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }*/
             } else {
                 try {
                     fragment = MeFragment.class.newInstance();
@@ -149,17 +199,13 @@ public class MainActivity extends AppCompatActivity
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
-
-
-            }
-
-
-            // Insert the fragment by replacing any existing fragment
-
+            }*/
         } else if (id == R.id.nav_manage) {
             // call history activity
+            manageNavigation();
+            /*
             Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-            startActivityForResult(intent, 0);
+            startActivityForResult(intent, 0);*/
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -168,7 +214,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void redirectToFragment(Fragment fragment) {
-        //FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(null);
@@ -185,17 +230,50 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Fragment fragment = null;
         switch (requestCode) {
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     try {
-                        Fragment fragment = MeFragment.class.newInstance();
+                        fragment = MeFragment.class.newInstance();
                         redirectToFragment(fragment);
                     } catch (java.lang.InstantiationException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
+                }
+                break;
+            case REQUEST_CHAT:
+                switch (resultCode) {
+                    case 0:
+                        searchNavigation(searchMenu);
+                        break;
+                    case 1:
+                        historyNavigation();
+                        break;
+                    case 2:
+                        meNavigation(meMenu);
+                        break;
+                    case 4:
+                        manageNavigation();
+                        break;
+                }
+                break;
+            case REQUEST_PROFILE:
+                switch (resultCode) {
+                    case 0:
+                        searchNavigation(searchMenu);
+                        break;
+                    case 1:
+                        historyNavigation();
+                        break;
+                    case 2:
+                        meNavigation(meMenu);
+                        break;
+                    case 4:
+                        manageNavigation();
+                        break;
                 }
                 break;
         }
@@ -273,6 +351,5 @@ public class MainActivity extends AppCompatActivity
         }
 
     };
-
 
 }

@@ -52,16 +52,18 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        // TODO - Entwerder finish und weitere navigation im onactivityresult (mittels result codes)
-        // TODO - oder finish und parameter (item) mitgeben. new itent => set data => item id, item name
         if (id == R.id.nav_search) {
-            return true;
+            setResult(0, null);
+            finish();
         } else if (id == R.id.nav_history) {
-            return true;
+            setResult(1, null);
+            finish();
         } else if (id == R.id.nav_me) {
-            return true;
+            setResult(2, null);
+            finish();
         }else if (id == R.id.nav_manage) {
-            return true;
+            setResult(3, null);
+            finish();
         }
         return true;
     }

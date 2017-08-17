@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -34,6 +35,7 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class ProfileActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
+    private final int REQUEST_CHAT = 1;
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User otherUser = new User();
     private TextView name, email, city, age;
@@ -195,7 +197,7 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                                 chatResponse.getChatId();
                                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
                                 intent.putExtra("chatId", chatResponse.getChatId());
-                                startActivityForResult(intent, 0);
+                                startActivityForResult(intent, REQUEST_CHAT);
                             },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -210,16 +212,18 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        // TODO - Entwerder finish und weitere navigation im onactivityresult (mittels result codes)
-        // TODO - oder finish und parameter (item) mitgeben. new itent => set data => item id, item name
         if (id == R.id.nav_search) {
-            return true;
+            setResult(0, null);
+            finish();
         } else if (id == R.id.nav_history) {
-            return true;
+            setResult(1, null);
+            finish();
         } else if (id == R.id.nav_me) {
-            return true;
+            setResult(2, null);
+            finish();
         }else if (id == R.id.nav_manage) {
-            return true;
+            setResult(3, null);
+            finish();
         }
         return true;
     }
@@ -253,5 +257,28 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CHAT:
+                switch (resultCode) {
+                    case 0:
+                        setResult(resultCode, null);
+                        finish();
+                    case 1:
+                        setResult(resultCode, null);
+                        finish();
+                    case 2:
+                        setResult(resultCode, null);
+                        finish();
+                    case 4:
+                        setResult(resultCode, null);
+                        finish();
+                }
+                break;
+        }
     }
 }

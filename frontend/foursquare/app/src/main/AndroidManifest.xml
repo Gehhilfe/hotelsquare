@@ -84,6 +84,15 @@
             android:name=".VenueInDetailsNestedScrollView"
             android:theme="@style/AppTheme" />
         <activity
+            android:name=".VenueGalleryActivity"
+            android:label="@string/title_activity_venue_gallery"
+            android:parentActivityName=".VenueInDetailsNestedScrollView"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView" />
+        </activity>
+        <activity
             android:name=".search.VenueImagesActivity"
             android:label="Pictures"
             android:theme="@style/AppTheme" />

@@ -84,6 +84,9 @@ server.del('profile/avatar', auth, handlePromiseReject(user.deleteAvatar));
 server.get('profile/friends', auth, handlePromiseReject(friend.getFriends));
 server.get('profile/friends/:page', auth, handlePromiseReject(friend.getFriends));
 server.del('profile/friends/:name', auth, handlePromiseReject(user.removeFriend));
+
+server.get('profile/friend_requests', auth, handlePromiseReject(friend.getFriendRequests));
+server.get('profile/friend_requests/:page', auth, handlePromiseReject(friend.getFriendRequests));
 server.put('profile/friend_requests/:name', auth, handlePromiseReject(user.confirmFriendRequest));
 
 // Chat
