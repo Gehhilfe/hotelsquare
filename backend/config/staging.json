@@ -4,8 +4,8 @@
     "name": "staging"
   },
   "email": {
-    "server": "teamstimi.de",
-    "mail": "hotelsquare@stimi.ovh",
+    "server": "mail.stimi.ovh",
+    "mail": "hotelsquare@mail.stimi.ovh",
     "password": "hZrxg9GCFGgrYZGr"
   },
   "bootstrap": {
