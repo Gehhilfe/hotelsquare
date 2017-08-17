@@ -34,8 +34,9 @@ public class SearchPersonActivity extends AppCompatActivity implements Navigatio
         navigationView.setNavigationItemSelectedListener(this);
         setTitle("Search Person");
 
+        fragment = new PersonSearchFragment();
         // TODO - initialise fragment
-        //addFragment();
+        addFragment();
     }
 
     public void addFragment() {
