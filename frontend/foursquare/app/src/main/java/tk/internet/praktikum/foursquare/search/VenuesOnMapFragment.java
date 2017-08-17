@@ -460,7 +460,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             }
             Log.d("KGK", "PS search for friends " + profileService);
             profileService.getNearByFriends(userLocation)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(nearbyFriends -> {
                                 friends = nearbyFriends;
@@ -506,9 +506,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(bitmap -> {
-                            userImage = bitmap;
-                        });
+                        .subscribe(
+                                user -> {
+                                    this.user = user;
 
 
             }

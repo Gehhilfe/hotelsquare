@@ -28,6 +28,15 @@ public interface ProfileService {
     Observable<User> profile();
 
     /**
+     * Retrieves a bunch of friendrequest by users
+     *
+     * @param page result page
+     * @return List<User> list of open friendrequests by user in list
+     */
+    @GET("profile/friend_requests/{page}")
+    Observable<List<User>> getFriendRequests(@Query("page") int page);
+
+    /**
      * Answers pending friend request
      *
      * @param name     User name of request sender

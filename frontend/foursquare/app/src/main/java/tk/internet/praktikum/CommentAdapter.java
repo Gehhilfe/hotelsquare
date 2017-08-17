@@ -12,12 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.foursquare.DateFormat;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
@@ -35,6 +35,7 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
  */
 
 public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapter<CommentAdapter.MyViewHolder> {
+    private static final String LOG = CommentAdapter.class.getName();
     VenueService service;
     String venueId;
     List<Comment> comments;
@@ -53,7 +54,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                 .subscribe((result) -> {
                     comments = result;
                     notifyDataSetChanged();
-                });
+                }, (err) -> Log.d(LOG, err.toString(), err));
     }
 
     @Override
@@ -67,15 +68,10 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Comment comment = comments.get(position);
-        holder.name.setText(comment.getAuthor().getName());
-        Integer delta = comment.getRating();
-        holder.votes.setText(String.format("%d", delta));
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+        holder.name.setText(comment.getAuthor().getDisplayName());
+        holder.votes.setText(String.format("%d", comment.getRating()));
 
-        if (comment.getDate() != null) {
-            holder.date.setText(df.format(comment.getDate()));
-        }
-
+        holder.date.setText(DateFormat.getFriendlyTime(comment.getDate()));
         if (comment instanceof TextComment) {
             TextComment tcomment = (TextComment) comment;
             holder.text.setText(tcomment.getText());
@@ -93,7 +89,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                             holder.image.setImageBitmap(bitmap);
                             holder.image.setVisibility(View.VISIBLE);
                             holder.text.setVisibility(View.GONE);
-                        });
+                        }, (err) -> Log.d(LOG, err.toString(), err));
             } else {
                 Log.d(VenueInDetailsNestedScrollView.LOG, "image is null");
             }
@@ -162,7 +158,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                     lastPage += 1;
                     comments.addAll(result);
                     notifyDataSetChanged();
-                });
+                }, (err) -> Log.d(LOG, err.toString(), err));
     }
 
     public void addComment(Comment comment) {

@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
@@ -35,6 +37,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -89,6 +95,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
     private TextView[] leaderboard_name;
     private TextView[] leaderboard_count;
     private CircleImageView[] leaderboard_avatar;
+    private RecyclerView lastHereRecylcer;
+    private LastHereAdapter lastHereAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +184,18 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         SupportMapFragment mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView));
         mapFragment.getMapAsync(this);
 
+
+        // Last here recylcer
+        lastHereRecylcer = (RecyclerView) findViewById(R.id.last_here_recylcer_view);
+
+        lastHereAdapter = new LastHereAdapter(new ArrayList<UserCheckinInformation>(), getApplicationContext());
+
+
+        lastHereRecylcer.setNestedScrollingEnabled(false);
+        lastHereRecylcer.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        lastHereRecylcer.setItemAnimator(new DefaultItemAnimator());
+        lastHereRecylcer.setAdapter(lastHereAdapter);
+
         progressDialog = new ProgressDialog(this, 0);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Spy is looking up details...");
@@ -211,6 +231,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                     updatePrice(venue);
                     updateButtons(venue);
                     updateLeaderboard(venue);
+                    lastHereAdapter.setData(venue.getLastCheckins());
                     if (venue.getImages().size() > 0) {
                         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
 
@@ -219,7 +240,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(bitmap -> {
                                     headerImage.setImageBitmap(bitmap);
-                                });
+                                }, (err) -> Log.d(LOG, err.toString(), err));
 
                         if (venue.getImages().size() > 1)
                             imageCacheLoader.loadBitmap(venue.getImages().get(1), ImageSize.SMALL)
@@ -227,7 +248,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(bitmap -> {
                                         image_1.setImageBitmap(bitmap);
-                                    });
+                                    }, (err) -> Log.d(LOG, err.toString(), err));
 
                         if (venue.getImages().size() > 2)
                             imageCacheLoader.loadBitmap(venue.getImages().get(2), ImageSize.SMALL)
@@ -235,7 +256,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(bitmap -> {
                                         image_2.setImageBitmap(bitmap);
-                                    });
+                                    }, (err) -> Log.d(LOG, err.toString(), err));
 
                         if (venue.getImages().size() > 3)
                             imageCacheLoader.loadBitmap(venue.getImages().get(3), ImageSize.SMALL)
@@ -243,7 +264,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(bitmap -> {
                                         image_3.setImageBitmap(bitmap);
-                                    });
+                                    }, (err) -> Log.d(LOG, err.toString(), err));
                     }
                 }, err -> {
                     Log.d(VenueInDetailsNestedScrollView.class.getName(), err.toString());
@@ -252,7 +273,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
     private void updateLeaderboard(Venue venue) {
         UserService us = ServiceFactory.createRetrofitService(UserService.class, URL);
-        for(int i = 0; i < 3 && i < venue.getTopCheckins().size(); i++) {
+        for (int i = 0; i < 3 && i < venue.getTopCheckins().size(); i++) {
             UserCheckinInformation info = venue.getTopCheckins().get(i);
             leaderboard_count[i].setText(String.format("%d", info.getCount()));
             final int current = i;
@@ -260,9 +281,9 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((res) -> {
-                        leaderboard_name[current].setText(res.getName());
+                        leaderboard_name[current].setText(res.getDisplayName());
                         ImageCacheLoader icl = new ImageCacheLoader(getApplicationContext());
-                        if(res.getAvatar() != null) {
+                        if (res.getAvatar() != null) {
                             icl.loadBitmap(res.getAvatar(), ImageSize.SMALL)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
@@ -314,7 +335,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                         "Choose from Gallery"
                 })
                 .itemsCallback((dialog, itemView, position, text) -> {
-                    if(position == 0) {
+                    if (position == 0) {
                         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         startActivityForResult(takePicture, REQUEST_PICTURE);
                     } else {
@@ -334,7 +355,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 i.setData(Uri.parse(venue.getWebsite()));
                 startActivity(i);
             });
-        }else
+        } else
             wwwBtn.setVisibility(View.GONE);
 
         if (venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty()) {
@@ -354,13 +375,23 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 vs.checkin(venue.getId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe((res) -> Toast.makeText(getApplicationContext(), "Checked in", Toast.LENGTH_SHORT).show(),
-                                (err) -> {
-                                });
+                        .subscribe(
+                                (res) -> Toast.makeText(getApplicationContext(), "Checked in", Toast.LENGTH_SHORT).show(),
+                                (err) -> Log.d(LOG, err.toString(), err));
             } else {
                 Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
             }
         });
+
+        image_1.setOnClickListener(view -> openGallery(venue));
+        image_2.setOnClickListener(view -> openGallery(venue));
+        image_3.setOnClickListener(view -> openGallery(venue));
+    }
+
+    private void openGallery(Venue venue) {
+        Intent intent = new Intent(this, VenueGalleryActivity.class);
+        intent.putParcelableArrayListExtra(VenueGalleryActivity.INTENT_EXTRA_IMAGES, new ArrayList<>(venue.getImages()));
+        startActivity(intent);
     }
 
     private void updatePrice(Venue venue) {
@@ -420,13 +451,13 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         StringBuilder sb = new StringBuilder();
         if (venue.getFormattedAddress() != null && !venue.getFormattedAddress().isEmpty())
             sb.append(venue.getFormattedAddress()).append("\n");
-        else if  (venue.getVicinity() != null && !venue.getVicinity().isEmpty())
+        else if (venue.getVicinity() != null && !venue.getVicinity().isEmpty())
             sb.append(venue.getVicinity()).append("\n");
         if (venue.getPhoneNumber() != null && !venue.getPhoneNumber().isEmpty())
             sb.append(venue.getPhoneNumber()).append("\n");
         if (venue.getWebsite() != null && !venue.getWebsite().isEmpty())
             sb.append(venue.getWebsite()).append("\n");
-        sb.append(venue.getCheckInCount()+ " Checkins").append("\n");
+        sb.append(venue.getCheckInCount() + " Checkins").append("\n");
         infoVicinity.setText(sb.toString());
     }
 
@@ -451,7 +482,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -482,7 +513,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 break;
 
             case REQUEST_GALLERY:
-                if(resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     try {
                         Uri uri = data.getData();
                         Bitmap image = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
