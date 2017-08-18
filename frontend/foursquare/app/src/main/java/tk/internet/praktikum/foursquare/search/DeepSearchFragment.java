@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -64,7 +63,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private View view;
     private boolean isNearMe;
     private boolean isMapView;
-    private ViewPager venuesViewPager;
+    private VenueViewPager venuesViewPager;
     private VenuesListFragment venuesListFragment = null;
     private String keyword;
     private int currentPage;
@@ -86,7 +85,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_deep_search, container, false);
-        venuesViewPager = (ViewPager) view.findViewById(R.id.venues_result);
+        venuesViewPager = (VenueViewPager) view.findViewById(R.id.venues_result);
         filterLocation = (AutoCompleteTextView) view.findViewById(R.id.location);
 
         filterRadius = (SeekBar) view.findViewById(R.id.seekBarRadius);
@@ -99,12 +98,12 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         mapViewButton.setTextOn(null);
         isMapView = false;
         mapViewButton.setChecked(true);
-        price_button=(ToggleButton)view.findViewById(R.id.price_optional_filter) ;
+       // price_button=(ToggleButton)view.findViewById(R.id.price_optional_filter) ;
         openNow_button=(ToggleButton)view.findViewById(R.id.open_now_optional_filter);
-        price_button.setText(R.string.price);
-        price_button.setTextOn(null);
-        price_button.setTextOff(null);
-        price_button.setChecked(false);
+       // price_button.setText(R.string.price);
+        //price_button.setTextOn(null);
+        //price_button.setTextOff(null);
+        //price_button.setChecked(false);
         openNow_button.setText(R.string.open_now);
         openNow_button.setTextOff(null);
         openNow_button.setTextOn(null);
