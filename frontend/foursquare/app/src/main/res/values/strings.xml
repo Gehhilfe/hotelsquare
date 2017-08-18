@@ -61,4 +61,10 @@
     <string name="venue_check_in">Check in</string>
     <string name="title_activity_venue_images">VenueImagesActivity</string>
     <string name="title_activity_full_screen_venue_image">FullScreenVenueImage</string>
+    <string-array name="langArray">
+        <item>English</item>
+        <item>Deutsch</item>
+    </string-array>
+    <string name="langSelect">Select Language</string>
+    <string name="incognito">Incognito Mode</string>
 </resources>
