@@ -1,6 +1,8 @@
 package tk.internet.praktikum.foursquare.search;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,8 +29,10 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
     private TextView address;
     private TextView rating;
     private ImageView image;
+    private TextView shortNameOverImage;
     private SearchResultAdapterListener searchResultAdapterListener;
     private Context context;
+    private Drawable defaultVenueImage;
     public SearchResultViewHolder(View itemResult,SearchResultAdapterListener searchResultAdapterListener){
         super(itemResult);
         this.searchResultAdapterListener=searchResultAdapterListener;
@@ -37,6 +41,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
         address=(TextView)itemView.findViewById(R.id.item_address);
         rating=(TextView)itemView.findViewById(R.id.rating);
         image=(ImageView) itemView.findViewById(R.id.item_image);
+        shortNameOverImage=(TextView)itemView.findViewById(R.id.item_short_name);
         itemView.setOnClickListener(this);
     }
     public void render(Venue searchResult){
@@ -56,7 +61,21 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
                   });
         }
         else {
-            this.image.setVisibility(View.GONE);
+
+            this.image.setDrawingCacheEnabled(true);
+            Bitmap bitmap= null;
+            try {
+                bitmap = Utils.decodeResourceImage(getContext(),"default_image",50,50);
+                this.image.setImageBitmap(bitmap);
+                this.shortNameOverImage.setText(searchResult.getName().substring(0,1).toUpperCase());
+                this.shortNameOverImage.setVisibility(View.VISIBLE);
+                this.image.setVisibility(View.VISIBLE);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            //this.image.setVisibility(View.GONE);
         }
         this.rating.setText(String.valueOf(searchResult.getRating()));
 
