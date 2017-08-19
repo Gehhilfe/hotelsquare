@@ -5,6 +5,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -47,7 +48,7 @@ public interface ProfileService {
     /**
      * Retrvies friends list for user
      * @param page number page starts with 0
-     * @return
+     * @return FriendListResponse
      */
     @GET("profile/friends/{page}")
     Observable<FriendListResponse> friends(@Path("page") int page);
@@ -55,7 +56,7 @@ public interface ProfileService {
     /**
      * Retrvies profile if he is friend with the authenticated user
      * @param other_id id of possible friend
-     * @return
+     * @return FriendListReponse
      */
     @GET("profile/friends")
     Observable<FriendListResponse> profileIfFriends(@Query("only") String other_id);
@@ -68,4 +69,11 @@ public interface ProfileService {
      */
     @POST("searches/nearbyfriends")
     Observable<List<User>> getNearByFriends(@Body Location location);
+
+    /**
+     * Deletes authenticated user =(
+     * @return User that was deleted bye bye
+     */
+    @DELETE("users")
+    Observable<User> delete();
 }
