@@ -48,7 +48,7 @@ const handleValidation = (next, func) => {
  * @returns {undefined}
  */
 async function search(request, response, next) {
-    let query = User.find({ name: new RegExp(request.body.name, 'i'), _id: {$ne: request.authentication._id}  }).populate('avatar');
+    let query = User.find({ name: new RegExp(request.body.name, 'i'), _id: {$ne: request.authentication._id}, active: true, deleted: false  }).populate('avatar');
     if(request.body.gender)
         query = query.where('gender').equals(request.body.gender);
     let result = await query;
@@ -79,7 +79,7 @@ async function profile(request, response, next) {
         selfRequest = true;
     }
 
-    let user = await User.findOne({name: request.params.name}).populate('avatar').exec();
+    let user = await User.findOne({name: request.params.name, active: true, deleted: false}).populate('avatar').exec();
     if (user === null)
         return next(new restify_errors.NotFoundError());
     if (!selfRequest) {
@@ -100,7 +100,7 @@ async function profile(request, response, next) {
  * @returns {undefined}
  */
 async function profileByID(request, response, next) {
-    const user = await User.findOne({_id: request.params.id}).populate('avatar');
+    const user = await User.findOne({_id: request.params.id, active: true}).populate('avatar');
     response.send(user.toJSONPublic());
     return next();
 }
@@ -116,7 +116,7 @@ async function profileByID(request, response, next) {
  */
 async function updateUser(request, response, next) {
     handleValidation(next, async () => {
-        let user = await User.findOne({_id: request.authentication._id}).populate('avatar');
+        let user = await User.findOne({_id: request.authentication._id, active: true, deleted: false}).populate('avatar');
         user.update(request.body);
         user = await user.save();
 
@@ -219,8 +219,10 @@ async function resetPassword(request, response, next) {
  * @returns {undefined}
  */
 async function deleteUser(request, response, next) {
-    const res = await User.findByIdAndRemove(request.authentication._id).populate('avatar');
-    response.json(res);
+    const user = await User.findOne({_id: request.authentication._id});
+    user.deleted = true;
+    await user.save();
+    response.json(user);
     return next();
 }
 
