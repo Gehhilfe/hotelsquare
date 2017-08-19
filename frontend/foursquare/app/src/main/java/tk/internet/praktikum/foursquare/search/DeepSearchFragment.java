@@ -84,6 +84,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private int lastPrice;
     private  boolean isQueryFromFastSearch=false;
     private boolean lastOpenNow;
+    private Drawable selected_prices_background,unselected_prices_background,selected_money,unselected_money;
+
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -120,12 +122,12 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         prices.add(price_5);
         openNow_button=(ToggleButton)view.findViewById(R.id.open_now_optional_filter);
         setDefaultPriceToggleButton();
+        getDrawable();
         openNow_button.setText(R.string.open_now);
         openNow_button.setTextOff(null);
         openNow_button.setTextOn(null);
-
         filterLocation.onCommitCompletion(null);
-
+         openNow_button.setOnClickListener(openNowListener());
         filterLocation.addTextChangedListener(createTextWatcherLocation());
         filterLocation.setOnItemClickListener(createOnItemClick());
 
@@ -147,6 +149,18 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
         return view;
     }
+
+    private View.OnClickListener openNowListener() {
+       return new View.OnClickListener(){
+           @Override
+           public void onClick(View v) {
+               resetParameters();
+               deepSearch();
+           }
+       };
+
+    }
+
     public void setDefaultPriceToggleButton(){
         for(int i=0;i<this.prices.size();i++){
             ToggleButton price=this.prices.get(i);
@@ -155,6 +169,15 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             price.setTextOff(null);
             price.setChecked(false);
             setOnClickToggleButtonPrice(price,i);
+        }
+    }
+
+    public void getDrawable(){
+        {
+            selected_prices_background = getContext().getDrawable(getContext().getResources().getIdentifier("selected_price", "drawable", getContext().getPackageName()));
+            unselected_prices_background = getContext().getDrawable(getContext().getResources().getIdentifier("unselected_price", "drawable", getContext().getPackageName()));
+            selected_money=getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_coloraccent_24dp", "drawable", getContext().getPackageName()));
+            unselected_money=getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_gray_24dp", "drawable", getContext().getPackageName()));
         }
     }
     public void initVenueStatePageAdapter() {
@@ -212,6 +235,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             isQueryFromFastSearch=false;
             resetParameters();
             deepSearch();
+
         }
         return true;
     }
@@ -264,6 +288,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             Log.d(LOG,"ischecked: "+openNow_button.isChecked());
             lastOpenNow=openNow_button.isChecked();
             price=updatePrice();
+            //Toast.makeText(getContext(),"price: "+price,Toast.LENGTH_SHORT).show();
             venueSearchQuery.setOnlyOpen(openNow_button.isChecked());
             venueSearchQuery.setPrice(price);
             // Add more optional filters later
@@ -497,30 +522,27 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                     @Override
                     public void onClick(View v) {
                         Drawable icon;
-
-                        if(!toggleButton.isChecked()) {
-                            icon = getContext().getDrawable(getContext().getResources().getIdentifier("selected_price", "drawable", getContext().getPackageName()));
-
-                            toggleButton.setBackgroundDrawable(getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_coloraccent_24dp", "drawable", getContext().getPackageName())));
+                        Log.d(LOG," *** togglebutton state: "+toggleButton.isChecked());
+                        if(toggleButton.isChecked()) {
+                            icon = selected_prices_background;
+                            toggleButton.setBackgroundDrawable(selected_money);
                              for(int i=0;i<index;i++){
                                  ToggleButton selectedPrice=prices.get(i);
-                                 selectedPrice.setBackgroundDrawable(getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_coloraccent_24dp", "drawable", getContext().getPackageName())));
+                                 selectedPrice.setChecked(true);
+                                 selectedPrice.setBackgroundDrawable(selected_money);
                              }
                             for(int i=index+1;i<prices.size();i++){
                                 ToggleButton unselectedPrice=prices.get(i);
-                                unselectedPrice.setBackgroundDrawable(getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_gray_24dp", "drawable", getContext().getPackageName())));
+                                unselectedPrice.setChecked(false);
+                                unselectedPrice.setBackgroundDrawable(unselected_money);
                             }
                         }
                         else {
-                            icon = getContext().getDrawable(getContext().getResources().getIdentifier("unselected_price", "drawable", getContext().getPackageName()));
-                            toggleButton.setBackgroundDrawable(getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_gray_24dp", "drawable", getContext().getPackageName())));
-                            for(int i=0;i<index;i++){
+                            icon = unselected_prices_background;
+                            for(int i=0;i<prices.size();i++){
                                 ToggleButton unselectedPrice=prices.get(i);
-                                unselectedPrice.setBackgroundDrawable(getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_gray_24dp", "drawable", getContext().getPackageName())));
-                            }
-                            for(int i=index+1;i<prices.size();i++){
-                                ToggleButton unselectedPrice=prices.get(i);
-                                unselectedPrice.setBackgroundDrawable(getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_gray_24dp", "drawable", getContext().getPackageName())));
+                                unselectedPrice.setChecked(false);
+                                unselectedPrice.setBackgroundDrawable(unselected_money);
                             }
                         }
                         priceLinearLayout.setBackground(icon);
