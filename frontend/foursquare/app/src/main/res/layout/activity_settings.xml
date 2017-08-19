@@ -36,7 +36,54 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                >
+
+                <Spinner
+                    android:id="@+id/lang_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_margin="10dp"
+                    android:entries="@array/langArray"
+                    android:layout_height="wrap_content" />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                >
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16dp"
+                    android:layout_margin="10dp"
+                    android:text="@string/incognito" />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                >
+                <Button
+                    android:id="@+id/delete_profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Delete Profile" />
+            </android.support.v7.widget.CardView>
+
         </LinearLayout>
+
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
@@ -48,4 +95,3 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
 </android.support.v4.widget.DrawerLayout>
-

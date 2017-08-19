@@ -124,5 +124,14 @@ public class LocalStorage {
         return sharedPreferences.getBoolean(Constants.IS_LOGGED_IN,false);
     }
 
-
+    /**
+     *
+     * @param key
+     * @param value
+     */
+    public void setLanguage(String key, String value){
+        SharedPreferences.Editor editor = getEditor();
+        editor.putString(key, value);
+        editor.commit();
+    }
 }
