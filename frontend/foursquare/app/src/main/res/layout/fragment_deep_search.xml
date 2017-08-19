@@ -134,7 +134,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="3dp"
                     android:layout_weight="50"
-                    android:background="@drawable/optional_filter_button"
+                    android:background="@drawable/opennow_filter_button"
                     android:filterTouchesWhenObscured="false"
                     android:text="@string/price"
                     android:textSize="25px" />-->
@@ -146,56 +146,57 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="3dp"
                     android:layout_weight="50"
-                    android:paddingRight="5dp"
-                    android:paddingBottom="5dp"
-                    android:paddingTop="5dp"
-                    android:background="@drawable/optional_filter_button"
+                    android:background="@drawable/unselected_price"
                     android:filterTouchesWhenObscured="false"
                     android:orientation="horizontal"
-                    android:text="@string/price"
-                    android:textSize="25px">
+                    android:paddingBottom="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingTop="5dp"
+                    android:textSize="12sp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="24dp"
+                        android:layout_alignParentTop="true"
                         android:padding="5dp"
                         android:text="@string/price"
-                        android:layout_alignParentTop="true"
 
-                        android:textSize="25px"/>
-                    <ImageView
-                        android:id="@+id/money_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_attach_money_black_24dp"
-                        android:tint="@color/gray" />
+                        android:textSize="12sp" />
 
-                    <ImageView
-                        android:id="@+id/money_2"
+                    <ToggleButton
+                        android:id="@+id/price_1"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_attach_money_black_24dp"
+                        android:background="@drawable/ic_attach_money_gray_24dp"
                         android:tint="@color/gray" />
 
-                    <ImageView
-                        android:id="@+id/money_3"
+                    <ToggleButton
+                        android:id="@+id/price_2"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_attach_money_black_24dp"
+                        android:background="@drawable/ic_attach_money_gray_24dp"
                         android:tint="@color/gray" />
 
-                    <ImageView
-                        android:id="@+id/money_4"
+                    <ToggleButton
+                        android:id="@+id/price_3"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_attach_money_black_24dp"
+                        android:background="@drawable/ic_attach_money_gray_24dp"
                         android:tint="@color/gray" />
 
-                    <ImageView
-                        android:id="@+id/money_5"
+                    <ToggleButton
+                        android:id="@+id/price_4"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_attach_money_black_24dp"
+                        android:background="@drawable/ic_attach_money_gray_24dp"
                         android:tint="@color/gray" />
+
+                    <ToggleButton
+                        android:id="@+id/price_5"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="@drawable/ic_attach_money_gray_24dp"
+                        android:tint="@color/colorAccent" />
                 </LinearLayout>
 
                 <!--<Button
@@ -205,7 +206,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginRight="3dp"
                     android:layout_weight="20"
-                    android:background="@drawable/optional_filter_button"
+                    android:background="@drawable/opennow_filter_button"
                     android:text="@string/liked"
                     android:textSize="25px" />-->
 
@@ -216,9 +217,9 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginRight="3dp"
                     android:layout_weight="50"
-                    android:background="@drawable/optional_filter_button"
+                    android:background="@drawable/opennow_filter_button"
                     android:text="@string/open_now"
-                    android:textSize="25px" />
+                    android:textSize="14sp" />
 
                 <!--<Button-->
                     <!--android:id="@+id/saved_optional_filter"-->
@@ -227,7 +228,7 @@
                     <!--android:layout_alignParentTop="true"-->
                     <!--android:layout_marginRight="3dp"-->
                     <!--android:layout_weight="20"-->
-                    <!--android:background="@drawable/optional_filter_button"-->
+                    <!--android:background="@drawable/opennow_filter_button"-->
                     <!--android:text="@string/saved"-->
                     <!--android:textSize="25px" />-->
 
@@ -238,7 +239,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginRight="5dp"
                     android:layout_weight="15"
-                    android:background="@drawable/optional_filter_button"
+                    android:background="@drawable/opennow_filter_button"
                     android:text="@string/more"
                     android:textSize="25px" />-->
 
