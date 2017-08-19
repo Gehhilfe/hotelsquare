@@ -58,6 +58,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
                   .subscribe(bitmap -> {
                       this.image.setImageBitmap(bitmap);
                       this.image.setVisibility(View.VISIBLE);
+                      this.shortNameOverImage.setVisibility(View.GONE);
                   });
         }
         else {
