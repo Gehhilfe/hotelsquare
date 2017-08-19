@@ -44,6 +44,7 @@ describe('User', () => {
             email: 'peter123@cool.de',
             password: 'peter99',
             gender: 'm',
+            active: true,
             avatar: avatar
         });
         peterToken = jsonwt.sign(peter.toJSON(), config.jwt.secret, config.jwt.options);
@@ -52,11 +53,12 @@ describe('User', () => {
             name: 'peter1112',
             email: 'peter1223@cool.de',
             password: 'peter99',
+            active: true,
             gender: 'f'
         });
         peter2Token = jsonwt.sign(peter2.toJSON(), config.jwt.secret, config.jwt.options);
 
-        await User.create({name: 'peter1113', email: 'peter12223@cool.de', password: 'peter99'});
+        await User.create({name: 'peter1113', email: 'peter12223@cool.de', password: 'peter99', active: true});
     }));
 
     describe('GET user', () => {
@@ -310,7 +312,8 @@ describe('User', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     User.findById(peter._doc._id, (error, user) => {
-                        expect(user).to.be.null;
+                        expect(user).to.not.be.null;
+                        user.deleted.should.be.true;
                         return done();
                     });
                 });

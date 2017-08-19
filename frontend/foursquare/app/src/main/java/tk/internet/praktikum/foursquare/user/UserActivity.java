@@ -1,85 +1,103 @@
 package tk.internet.praktikum.foursquare.user;
 
+
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
+import tk.internet.praktikum.foursquare.history.dummy.DummyHistoryFragment;
+import tk.internet.praktikum.foursquare.home.HomeFragment;
 
-public class UserActivity extends AppCompatActivity {
-
-    private TabLayout tabLayout;
+public class UserActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private UserStatePagerAdapter userStatePagerAdapter;
     private ViewPager fragmentContainer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.me_toolbar);
         setSupportActionBar(toolbar);
 
-        tabLayout= (TabLayout) findViewById(R.id.tabs);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
-        fragmentContainer = (ViewPager) findViewById(R.id.user_fragment_container);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        setTitle("Me");
 
-        TabLayout.Tab homeTab=tabLayout.newTab();
-
-        homeTab.setText("Home").setIcon(R.mipmap.user_home);
-        TabLayout.Tab profileTab=tabLayout.newTab();
-        profileTab.setText("Profile").setIcon(R.mipmap.user_profile);
-        TabLayout.Tab historyTab=tabLayout.newTab();
-        historyTab.setText("History").setIcon(R.mipmap.user_history);
-
-        TabLayout.Tab friendsTab=tabLayout.newTab();
-        friendsTab.setText("Friends").setIcon(R.mipmap.user_friends);
-
-        TabLayout.Tab inbox=tabLayout.newTab();
-        inbox.setText("Inbox").setIcon(R.mipmap.user_message);
-
-        tabLayout.addTab(homeTab);
-        tabLayout.addTab(profileTab);
-        tabLayout.addTab(historyTab);
-        tabLayout.addTab(friendsTab);
-        tabLayout.addTab(inbox);
-
+        fragmentContainer = (ViewPager) findViewById(R.id.me_fragment_container);
         userStatePagerAdapter = new UserStatePagerAdapter(getSupportFragmentManager(), getApplicationContext());
         initialiseFragmentContainer(fragmentContainer);
-        fragmentContainer.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(createOnTabSelectedListener());
+
+        TabLayout tabLayout= (TabLayout) findViewById(R.id.me_tabs);
+        tabLayout.setupWithViewPager(fragmentContainer);
     }
 
     private void initialiseFragmentContainer(ViewPager container) {
-        //userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
+        userStatePagerAdapter.addFragment(new HomeFragment(), "Home");
+        userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
+        userStatePagerAdapter.addFragment(new DummyHistoryFragment(), "History");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
+        userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);
     }
 
-    public void setFragment(int fragmentId) {
-        fragmentContainer.setCurrentItem(fragmentId);
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.nav_search:
+                setResult(0, null);
+                finish();
+                break;
+            case R.id.nav_search_person:
+                setResult(1, null);
+                finish();
+                break;
+            case R.id.nav_history:
+                setResult(2, null);
+                finish();
+                break;
+            case R.id.nav_me:
+                setResult(3, null);
+                finish();
+                break;
+            case R.id.nav_manage:
+                setResult(4, null);
+                finish();
+                break;
+            case R.id.nav_login_logout:
+                setResult(5, null);
+                finish();
+                break;
+        }
+
+        return true;
     }
 
-    public  TabLayout.OnTabSelectedListener createOnTabSelectedListener(){
-        return new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                setFragment(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        };
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
-
-
 }

@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity
     private final int REQUEST_SEARCH_PERSON = 3;
     private final int REQUEST_HISTORY = 4;
     private final int REQUEST_SETTINGS = 5;
+    private final int REQUEST_ME = 6;
 
     private MenuItem searchMenu, meMenu;
 
@@ -148,6 +149,9 @@ public class MainActivity extends AppCompatActivity
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             login();
         } else {
+            Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+            startActivityForResult(intent, REQUEST_ME);
+            /*
             try {
                 Fragment fragment = MeFragment.class.newInstance();
                 redirectToFragment(fragment);
@@ -158,6 +162,7 @@ public class MainActivity extends AppCompatActivity
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
+            */
         }
     }
 
