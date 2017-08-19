@@ -3,11 +3,11 @@ package tk.internet.praktikum.foursquare.search;
 //import android.app.Fragment;
 
 import android.app.ProgressDialog;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -64,7 +65,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private View view;
     private boolean isNearMe;
     private boolean isMapView;
-    private ViewPager venuesViewPager;
+    private VenueViewPager venuesViewPager;
     private VenuesListFragment venuesListFragment = null;
     private String keyword;
     private int currentPage;
@@ -75,8 +76,16 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private boolean isChangedSearchText = false;
     private boolean submitNewQuery;
     private boolean reachedMaxVenues;
-    private ToggleButton price_button,openNow_button;
+    private LinearLayout priceLinearLayout;
+    private ToggleButton openNow_button;
+    private ToggleButton price_1,price_2,price_3,price_4,price_5;
+    private List<ToggleButton> prices;
+    private  int price;
+    private int lastPrice;
     private  boolean isQueryFromFastSearch=false;
+    private boolean lastOpenNow;
+    private Drawable selected_prices_background,unselected_prices_background,selected_money,unselected_money;
+
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -86,7 +95,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_deep_search, container, false);
-        venuesViewPager = (ViewPager) view.findViewById(R.id.venues_result);
+        venuesViewPager = (VenueViewPager) view.findViewById(R.id.venues_result);
         filterLocation = (AutoCompleteTextView) view.findViewById(R.id.location);
 
         filterRadius = (SeekBar) view.findViewById(R.id.seekBarRadius);
@@ -99,20 +108,29 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         mapViewButton.setTextOn(null);
         isMapView = false;
         mapViewButton.setChecked(true);
-        price_button=(ToggleButton)view.findViewById(R.id.price_optional_filter) ;
+        priceLinearLayout=(LinearLayout) view.findViewById(R.id.price_optional_filter) ;
+        price_1=(ToggleButton) view.findViewById(R.id.price_1);
+        price_2=(ToggleButton) view.findViewById(R.id.price_2);
+        price_3=(ToggleButton) view.findViewById(R.id.price_3);
+        price_4=(ToggleButton) view.findViewById(R.id.price_4);
+        price_5=(ToggleButton) view.findViewById(R.id.price_5);
+        prices=new ArrayList<>();
+        prices.add(price_1);
+        prices.add(price_2);
+        prices.add(price_3);
+        prices.add(price_4);
+        prices.add(price_5);
         openNow_button=(ToggleButton)view.findViewById(R.id.open_now_optional_filter);
-        price_button.setText(R.string.price);
-        price_button.setTextOn(null);
-        price_button.setTextOff(null);
-        price_button.setChecked(false);
+        setDefaultPriceToggleButton();
+        getDrawable();
         openNow_button.setText(R.string.open_now);
         openNow_button.setTextOff(null);
         openNow_button.setTextOn(null);
-
         filterLocation.onCommitCompletion(null);
-
+         openNow_button.setOnClickListener(openNowListener());
         filterLocation.addTextChangedListener(createTextWatcherLocation());
         filterLocation.setOnItemClickListener(createOnItemClick());
+
         filterRadius.setOnSeekBarChangeListener(createOnSeekBarChangeListener());
         mapViewButton.setOnClickListener(toggleMapView());
 
@@ -125,13 +143,43 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         }
         this.setRetainInstance(true);
         currentPage = 0;
-
+        price=0;
         // Post SearchEvent to EventBus
         EventBus.getDefault().post(new SearchEvent(true));
 
         return view;
     }
 
+    private View.OnClickListener openNowListener() {
+       return new View.OnClickListener(){
+           @Override
+           public void onClick(View v) {
+               resetParameters();
+               deepSearch();
+           }
+       };
+
+    }
+
+    public void setDefaultPriceToggleButton(){
+        for(int i=0;i<this.prices.size();i++){
+            ToggleButton price=this.prices.get(i);
+            price.setText(null);
+            price.setTextOn(null);
+            price.setTextOff(null);
+            price.setChecked(false);
+            setOnClickToggleButtonPrice(price,i);
+        }
+    }
+
+    public void getDrawable(){
+        {
+            selected_prices_background = getContext().getDrawable(getContext().getResources().getIdentifier("selected_price", "drawable", getContext().getPackageName()));
+            unselected_prices_background = getContext().getDrawable(getContext().getResources().getIdentifier("unselected_price", "drawable", getContext().getPackageName()));
+            selected_money=getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_coloraccent_24dp", "drawable", getContext().getPackageName()));
+            unselected_money=getContext().getDrawable(getContext().getResources().getIdentifier("ic_attach_money_gray_24dp", "drawable", getContext().getPackageName()));
+        }
+    }
     public void initVenueStatePageAdapter() {
         venueStatePageAdapter = new VenueStatePageAdapter(getFragmentManager());
         venueStatePageAdapter.initVenuesFragment();
@@ -183,10 +231,11 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.d(LOG, "Action: onQueryTextSubmit");
-        if(!query.equals(lastQuery) || isQueryFromFastSearch) {
+        if(!query.equals(lastQuery) || isQueryFromFastSearch||!(openNow_button.isChecked() &&lastOpenNow)) {
             isQueryFromFastSearch=false;
             resetParameters();
             deepSearch();
+
         }
         return true;
     }
@@ -237,7 +286,11 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             venueSearchQuery.setRadius(filterRadius.getProgress()*1000);
             Log.d(LOG,"radius:"+filterRadius.getProgress());
             Log.d(LOG,"ischecked: "+openNow_button.isChecked());
+            lastOpenNow=openNow_button.isChecked();
+            price=updatePrice();
+            //Toast.makeText(getContext(),"price: "+price,Toast.LENGTH_SHORT).show();
             venueSearchQuery.setOnlyOpen(openNow_button.isChecked());
+            venueSearchQuery.setPrice(price);
             // Add more optional filters later
 
             VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
@@ -462,6 +515,59 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         initVenueStatePageAdapter();
     }
 
+
+    private  void setOnClickToggleButtonPrice(ToggleButton toggleButton,int index){
+        toggleButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Drawable icon;
+                        Log.d(LOG," *** togglebutton state: "+toggleButton.isChecked());
+                        if(toggleButton.isChecked()) {
+                            icon = selected_prices_background;
+                            toggleButton.setBackgroundDrawable(selected_money);
+                             for(int i=0;i<index;i++){
+                                 ToggleButton selectedPrice=prices.get(i);
+                                 selectedPrice.setChecked(true);
+                                 selectedPrice.setBackgroundDrawable(selected_money);
+                             }
+                            for(int i=index+1;i<prices.size();i++){
+                                ToggleButton unselectedPrice=prices.get(i);
+                                unselectedPrice.setChecked(false);
+                                unselectedPrice.setBackgroundDrawable(unselected_money);
+                            }
+                        }
+                        else {
+                            icon = unselected_prices_background;
+                            for(int i=0;i<prices.size();i++){
+                                ToggleButton unselectedPrice=prices.get(i);
+                                unselectedPrice.setChecked(false);
+                                unselectedPrice.setBackgroundDrawable(unselected_money);
+                            }
+                        }
+                        priceLinearLayout.setBackground(icon);
+                        resetParameters();
+                        deepSearch();
+                    }
+
+                });
+    }
+
+
+    public  int updatePrice(){
+        if(price_5.isChecked())
+            return 5;
+        else if(price_4.isChecked())
+            return 4;
+       else if(price_3.isChecked())
+            return 3;
+        else if(price_2.isChecked())
+            return 2;
+        else if(price_1.isChecked())
+            return 1;
+        else return 0;
+
+    }
 
     public void onStop(){
         //Post SearchEvent to EventBus
