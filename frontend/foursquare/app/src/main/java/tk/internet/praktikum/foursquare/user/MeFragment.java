@@ -41,7 +41,7 @@ public class MeFragment extends Fragment {
         tabLayout= (TabLayout) view.findViewById(R.id.tabs);
 
         fragmentContainer = (ViewPager) view.findViewById(R.id.user_fragment_container);
-
+        /*
         TabLayout.Tab homeTab=tabLayout.newTab();
 
         homeTab.setText("Home").setIcon(R.mipmap.user_home);
@@ -61,7 +61,7 @@ public class MeFragment extends Fragment {
         tabLayout.addTab(historyTab);
         tabLayout.addTab(friendsTab);
         tabLayout.addTab(inbox);
-
+*/
         userStatePagerAdapter = new UserStatePagerAdapter(getFragmentManager(), getContext());
         initialiseFragmentContainer(fragmentContainer);
         fragmentContainer.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
