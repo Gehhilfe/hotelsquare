@@ -72,6 +72,10 @@ const UserSchema = new Schema({
         type: Boolean,
         default: false
     },
+    deleted: {
+        type: Boolean,
+        default: false
+    },
     check_ins: [{
         venue: {
             type: Schema.Types.ObjectId,
@@ -130,7 +134,11 @@ class UserClass {
             name = name.name;
         }
         return new Promise(function (resolve, reject) {
-            self.findOne({$or: [{displayName: name}, {email: name}, {name: name}], active: true}).then(function (res) {
+            self.findOne({
+                $or: [{displayName: name}, {email: name}, {name: name}],
+                active: true,
+                deleted: false
+            }).then(function (res) {
                 const foundUser = res;
                 if (res === null)
                     return reject();
@@ -268,20 +276,27 @@ class UserClass {
     }
 
     toJSON() {
-        const obj = this.toObject({
-            depopulate: true
-        });
-        delete obj.password;
-        if (this.avatar) {
-            if (this.populated('avatar') === undefined)
-                throw new restify_errors.InternalServerError('User avatar not populated!');
-            obj.avatar = this.avatar.toJSON();
+        if (this.deleted) {
+            return {
+                name: 'deleted',
+                displayName: 'Deleted'
+            };
         } else {
-            delete obj.avatar;
+            const obj = this.toObject({
+                depopulate: true
+            });
+            delete obj.password;
+            if (this.avatar) {
+                if (this.populated('avatar') === undefined)
+                    throw new restify_errors.InternalServerError('User avatar not populated!');
+                obj.avatar = this.avatar.toJSON();
+            } else {
+                delete obj.avatar;
+            }
+            obj.top_check_ins = _.take(_.sortBy(this.check_ins, 'count'), 1);
+            obj.last_check_ins = _.take(_.sortBy(this.check_ins, 'last'), 1);
+            return obj;
         }
-        obj.top_check_ins = _.take(_.sortBy(this.check_ins, 'count'), 1);
-        obj.last_check_ins = _.take(_.sortBy(this.check_ins, 'last'), 1);
-        return obj;
     }
 
     toJSONToken() {
@@ -301,19 +316,26 @@ class UserClass {
             avatar = this.avatar.toJSON();
         }
 
-        return {
-            _id: this._id,
-            name: this.name,
-            displayName: this.displayName,
-            friends_count: this.friends.length,
-            avatar: avatar,
-            city: this.city,
-            age: this.age,
-            gender: this.gender,
-            location: location,
-            top_check_ins: _.take(_.sortBy(this.check_ins, 'count'), 1),
-            last_check_ins: _.take(_.sortBy(this.check_ins, 'last'), 1)
-        };
+        if (this.deleted) {
+            return {
+                name: 'deleted',
+                displayName: 'Deleted'
+            };
+        } else {
+            return {
+                _id: this._id,
+                name: this.name,
+                displayName: this.displayName,
+                friends_count: this.friends.length,
+                avatar: avatar,
+                city: this.city,
+                age: this.age,
+                gender: this.gender,
+                location: location,
+                top_check_ins: _.take(_.sortBy(this.check_ins, 'count'), 1),
+                last_check_ins: _.take(_.sortBy(this.check_ins, 'last'), 1)
+            };
+        }
     }
 }
 
