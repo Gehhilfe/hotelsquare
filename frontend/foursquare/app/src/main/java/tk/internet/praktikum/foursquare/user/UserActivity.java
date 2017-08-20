@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -63,7 +65,7 @@ public class UserActivity extends AppCompatActivity implements NavigationView.On
     private void initialiseFragmentContainer(ViewPager container) {
         userStatePagerAdapter.addFragment(new HomeFragment(), "Home");
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
-        userStatePagerAdapter.addFragment(new DummyHistoryFragment(), "History");
+        // userStatePagerAdapter.addFragment(new DummyHistoryFragment(), "History");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);
