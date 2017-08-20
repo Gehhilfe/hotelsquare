@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User locationUser = new User();
     private int PARAM_INTERVAL = 10000;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         Menu tmpMenu = navigationView.getMenu();
@@ -172,17 +173,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void login() {
+       // navigationView.getMenu().clear();
+       // navigationView.inflateMenu(R.menu.activity_main_drawer_logout);
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivityForResult(intent, REQUEST_LOGIN);
     }
 
-    private void logout() {}
+    private void logout() {
+        //navigationView.getMenu().clear();
+        //navigationView.inflateMenu(R.menu.activity_main_drawer);
+        LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivityForResult(intent, 0);
+    }
 
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         switch (id) {
             case R.id.nav_search:
                 searchNavigation(item);
@@ -200,10 +208,17 @@ public class MainActivity extends AppCompatActivity
                 settingsNavigation();
                 break;
             case R.id.nav_login_logout:
-                if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+                if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
                     login();
-                else
+                    item.setTitle("Logout");
+                    return false;
+                } else {
                     logout();
+                    item.setTitle("Login");
+                }
+                break;
+            case R.id.nav_logout:
+                logout();
                 break;
         }
 
@@ -232,7 +247,8 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
-                    meNavigation(meMenu);
+                    // meNavigation(meMenu);
+                    break;
                 }
                 break;
             case REQUEST_CHAT:
