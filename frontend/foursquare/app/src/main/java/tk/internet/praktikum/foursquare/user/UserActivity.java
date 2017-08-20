@@ -15,8 +15,9 @@ import android.view.MenuItem;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
-import tk.internet.praktikum.foursquare.history.dummy.DummyHistoryFragment;
 import tk.internet.praktikum.foursquare.home.HomeFragment;
+
+//import tk.internet.praktikum.foursquare.history.dummy.DummyHistoryFragment;
 
 public class UserActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private UserStatePagerAdapter userStatePagerAdapter;
@@ -51,7 +52,7 @@ public class UserActivity extends AppCompatActivity implements NavigationView.On
     private void initialiseFragmentContainer(ViewPager container) {
         userStatePagerAdapter.addFragment(new HomeFragment(), "Home");
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
-        userStatePagerAdapter.addFragment(new DummyHistoryFragment(), "History");
+       // userStatePagerAdapter.addFragment(new DummyHistoryFragment(), "History");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);

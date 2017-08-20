@@ -13,7 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -28,6 +30,9 @@ import tk.internet.praktikum.foursquare.api.bean.ImageComment;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.history.HistoryEntry;
+import tk.internet.praktikum.foursquare.history.HistoryType;
+import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 /**
@@ -42,7 +47,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     Context context;
     int lastPage = 0;
     private boolean lastEmpty = false;
-
+    private String venueName;
     public CommentAdapter(String venueId, Context context) {
         this.context = context;
         this.venueId = venueId;
@@ -114,6 +119,8 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                         .subscribe(cmt -> {
                             Integer d = cmt.getRating();
                             holder.votes.setText(String.format("%d", d));
+                            HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.LIKECOMMENT,getVenueName(),venueId,new Date());
+                            LocalDataBaseManager.getLocalDatabaseManager(context).getDaoSession().getHistoryEntryDao().save(historyEntry);
                         }, err -> Log.d("CommentAdapter", err.toString(), err));
             } else {
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
@@ -131,6 +138,8 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                         .subscribe(cmt -> {
                             Integer d = cmt.getRating();
                             holder.votes.setText(String.format("%d", d));
+                            HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.DISLIKE_COMMENT,getVenueName(),venueId,new Date());
+                            LocalDataBaseManager.getLocalDatabaseManager(context).getDaoSession().getHistoryEntryDao().save(historyEntry);
                         }, err -> Log.d("CommentAdapter", err.toString(), err));
             } else {
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
@@ -182,5 +191,13 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             downvote = (ImageButton) view.findViewById(R.id.downvote);
             image = (ImageView) view.findViewById(R.id.image);
         }
+    }
+
+    public String getVenueName() {
+        return venueName;
+    }
+
+    public void setVenueName(String venueName) {
+        this.venueName = venueName;
     }
 }

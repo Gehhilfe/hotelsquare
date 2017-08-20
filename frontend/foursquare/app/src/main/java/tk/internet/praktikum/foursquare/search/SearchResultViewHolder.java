@@ -2,7 +2,6 @@ package tk.internet.praktikum.foursquare.search;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,7 +31,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
     private TextView shortNameOverImage;
     private SearchResultAdapterListener searchResultAdapterListener;
     private Context context;
-    private Drawable defaultVenueImage;
+
     public SearchResultViewHolder(View itemResult,SearchResultAdapterListener searchResultAdapterListener){
         super(itemResult);
         this.searchResultAdapterListener=searchResultAdapterListener;
@@ -46,7 +45,6 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
     }
     public void render(Venue searchResult){
         this.name.setText(searchResult.getName());
-       //this.address.setText(searchResult.getPlace_id());
         this.address.setText(searchResult.getFormattedAddress());
         List<Image> images=searchResult.getImages();
         if(images.size()>0) {

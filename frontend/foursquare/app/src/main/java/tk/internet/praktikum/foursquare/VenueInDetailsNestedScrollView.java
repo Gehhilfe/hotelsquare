@@ -37,6 +37,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -54,7 +56,11 @@ import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.history.DaoSession;
+import tk.internet.praktikum.foursquare.history.HistoryEntry;
+import tk.internet.praktikum.foursquare.history.HistoryType;
 import tk.internet.praktikum.foursquare.search.VenueImagesActivity;
+import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class VenueInDetailsNestedScrollView extends AppCompatActivity implements OnMapReadyCallback {
@@ -93,6 +99,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
     private CircleImageView[] leaderboard_avatar;
     private RecyclerView lastHereRecylcer;
     private LastHereAdapter lastHereAdapter;
+    private DaoSession daoSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +156,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         commentRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
 
         commentAdapter = new CommentAdapter(venueId, getApplicationContext());
+
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 
         scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
@@ -202,9 +210,10 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         fabTextComment = (FloatingActionButton) findViewById(R.id.venue_detail_text_comment_button);
         fabImageComment = (FloatingActionButton) findViewById(R.id.venue_detail_image_commnent_button);
         venueImagesButton = (FloatingActionButton) findViewById(R.id.venue_detail_images);
-
         venueImagesButton.setOnClickListener(v -> venueImages());
+
     }
+
 
     @Override
     protected void onStart() {
@@ -222,6 +231,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 .subscribe(venue -> {
                     progressDialog.dismiss();
                     toolbar.setTitle(venue.getName());
+                    commentAdapter.setVenueName(venue.getName());
                     updateVicinty(venue);
                     updateVenueLocation(venue.getLocation());
                     updatePrice(venue);
@@ -372,7 +382,12 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
-                                (res) -> Toast.makeText(getApplicationContext(), "Checked in", Toast.LENGTH_SHORT).show(),
+                                (res) ->
+                                {
+                                    Toast.makeText(getApplicationContext(), "Checked in", Toast.LENGTH_SHORT).show();
+                                    HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.CHECKIN,venue.getName(),venue.getId(),new Date());
+                                    LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession().getHistoryEntryDao().save(historyEntry);
+                                },
                                 (err) -> Log.d(LOG, err.toString(), err));
             } else {
                 Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
@@ -531,6 +546,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 break;
         }
     }
+
     private void venueImages() {
         Intent intent = new Intent(getApplicationContext(), VenueImagesActivity.class);
         intent.putExtra("venueID", venueId);

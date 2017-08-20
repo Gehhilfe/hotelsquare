@@ -35,7 +35,8 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
         setTitle("History");
 
         // TODO - initialise fragment
-        //addFragment();
+        fragment=new HistoryFragment();
+        addFragment();
     }
 
     public void addFragment() {

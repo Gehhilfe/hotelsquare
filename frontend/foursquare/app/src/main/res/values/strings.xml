@@ -67,4 +67,9 @@
     </string-array>
     <string name="langSelect">Select Language</string>
     <string name="incognito">Incognito Mode</string>
+    <string name="history_state_check_in">Checked in</string>
+    <string name="history_state_visit">Visited</string>
+    <string name="history_state_like">Liked a comment</string>
+    <string name="history_state_dislike">Disliked a comment</string>
+
 </resources>
