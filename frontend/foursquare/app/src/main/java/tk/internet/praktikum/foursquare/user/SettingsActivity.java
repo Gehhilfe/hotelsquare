@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -32,6 +33,7 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
+import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class SettingsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -79,7 +81,7 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // continue with delete
-                                try{
+                                try {
                                     ProfileService profileService = ServiceFactory
                                             .createRetrofitService(ProfileService.class, URL, LocalStorage.
                                                     getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
@@ -94,7 +96,7 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
                                             });
 
 
-                                } catch (Exception e){
+                                } catch (Exception e) {
                                     Log.d(TAG, "Exception: deleteProfileButton:onClick");
                                 }
                             }
@@ -139,82 +141,90 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
         incognitoModeCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(incognitoModeCheckBox.isChecked()){
 
-                    try{
-                        ProfileService profileService = ServiceFactory
-                                .createRetrofitService(ProfileService.class, URL, LocalStorage.
-                                        getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+                String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+                if (token == "")
+                    return;
 
-                        profileService.delete()
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(user -> {
-                                    Log.d(TAG, "User: " + user.getDisplayName() + " was deleted");
-                                }, throwable -> {
-                                    Log.d(TAG, "Exception: delete");
-                                });
+                try {
+                    UserService service = ServiceFactory
+                            .createRetrofitService(UserService.class, URL, token);
 
-
-                    } catch (Exception e){
-                        Log.d(TAG, "Exception: deleteProfileButton:onClick");
+                    User tmp = new User();
+                    if (incognitoModeCheckBox.isChecked()) {
+                        tmp.setIncognito(true);
+                    } else {
+                        tmp.setIncognito(false);
                     }
+                    // send to server
+                    service.update(tmp).subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(user -> {
+                                        Log.d(TAG, "Incognito Mode was set");
+                                    },
+                                    throwable -> {
+                                        Log.d(TAG, "Exception: Incognito Mode: true");
+                                    }
+                            );
 
+                } catch (Exception e) {
+                    Log.d(TAG, "Exception: at UserService");
                 }
+
+                setTitle("Settings");
+
+
+                // TODO - initialise fragment
+                //addFragment();
             }
         });
-        setTitle("Settings");
-
-
-        // TODO - initialise fragment
-        //addFragment();
     }
 
-   // public void addFragment() {
-        //getSupportFragmentManager().beginTransaction().add(R.id.settings_activity_container, fragment).commit();
-   // }
+            // public void addFragment() {
+            //getSupportFragmentManager().beginTransaction().add(R.id.settings_activity_container, fragment).commit();
+            // }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.nav_search:
-                setResult(0, null);
-                finish();
-                break;
-            case R.id.nav_search_person:
-                setResult(1, null);
-                finish();
-                break;
-            case R.id.nav_history:
-                setResult(2, null);
-                finish();
-                break;
-            case R.id.nav_me:
-                setResult(3, null);
-                finish();
-                break;
-            case R.id.nav_manage:
-                setResult(4, null);
-                finish();
-                break;
-            case R.id.nav_login_logout:
-                setResult(5, null);
-                finish();
-                break;
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                // Handle navigation view item clicks here.
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.nav_search:
+                        setResult(0, null);
+                        finish();
+                        break;
+                    case R.id.nav_search_person:
+                        setResult(1, null);
+                        finish();
+                        break;
+                    case R.id.nav_history:
+                        setResult(2, null);
+                        finish();
+                        break;
+                    case R.id.nav_me:
+                        setResult(3, null);
+                        finish();
+                        break;
+                    case R.id.nav_manage:
+                        setResult(4, null);
+                        finish();
+                        break;
+                    case R.id.nav_login_logout:
+                        setResult(5, null);
+                        finish();
+                        break;
+                }
+
+                return true;
+            }
+
+            @Override
+            public void onBackPressed() {
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                } else {
+                    super.onBackPressed();
+                }
+            }
         }
-
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-}
