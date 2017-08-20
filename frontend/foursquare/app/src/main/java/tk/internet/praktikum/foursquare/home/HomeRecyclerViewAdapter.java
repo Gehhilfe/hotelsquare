@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -109,7 +110,7 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     private List<FriendRequest> friendRequestList = Collections.emptyList();
     private List<User> userList = Collections.emptyList();
     private HashMap<String, String> idNameMap = new HashMap<>();
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.Y HH:mm");
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.y HH:mm",  Locale.ENGLISH);
     private final String URL = "https://dev.ip.stimi.ovh/";
 
 

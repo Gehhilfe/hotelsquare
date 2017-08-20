@@ -32,6 +32,7 @@
             <android.support.design.widget.TabLayout
                 android:id="@+id/me_tabs"
                 style="@style/User.Tabs"
+                app:tabTextColor="@color/iron"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:tabGravity="fill"
@@ -53,6 +54,6 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer" />
+        app:menu="@menu/activity_main_drawer_logout" />
 </android.support.v4.widget.DrawerLayout>
 
