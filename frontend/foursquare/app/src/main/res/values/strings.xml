@@ -71,5 +71,9 @@
     <string name="history_state_visit">Visited</string>
     <string name="history_state_like">Liked a comment</string>
     <string name="history_state_dislike">Disliked a comment</string>
+    <string name="history_state_text_comment">Wrote a comment</string>
+    <string name="history_state_image_comment">Posted a picture</string>
+
+
 
 </resources>

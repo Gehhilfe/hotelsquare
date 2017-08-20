@@ -56,7 +56,6 @@ import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
-import tk.internet.praktikum.foursquare.history.DaoSession;
 import tk.internet.praktikum.foursquare.history.HistoryEntry;
 import tk.internet.praktikum.foursquare.history.HistoryType;
 import tk.internet.praktikum.foursquare.search.VenueImagesActivity;
@@ -99,7 +98,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
     private CircleImageView[] leaderboard_avatar;
     private RecyclerView lastHereRecylcer;
     private LastHereAdapter lastHereAdapter;
-    private DaoSession daoSession;
+    private String venueName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -232,6 +231,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                     progressDialog.dismiss();
                     toolbar.setTitle(venue.getName());
                     commentAdapter.setVenueName(venue.getName());
+                    venueName=venue.getName();
                     updateVicinty(venue);
                     updateVenueLocation(venue.getLocation());
                     updatePrice(venue);
@@ -319,7 +319,9 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    (res) -> commentAdapter.addComment(res),
+                                    (res) ->{commentAdapter.addComment(res);
+                                        HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.TEXT_COMMENT,venueName,venueId,new Date());
+                                        LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession().getHistoryEntryDao().insert(historyEntry);},
                                     (err) -> Log.d(LOG, err.toString())
                             );
                 })
@@ -349,6 +351,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                         chooseFromGallery.setType("image/*");
                         startActivityForResult(Intent.createChooser(chooseFromGallery, "Select Picture"), REQUEST_GALLERY);
                     }
+                    HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.IMAGE_COMMENT,venueName,venueId,new Date());
+                    LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession().getHistoryEntryDao().insert(historyEntry);
                 })
                 .show();
     }
@@ -386,7 +390,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                                 {
                                     Toast.makeText(getApplicationContext(), "Checked in", Toast.LENGTH_SHORT).show();
                                     HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.CHECKIN,venue.getName(),venue.getId(),new Date());
-                                    LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession().getHistoryEntryDao().save(historyEntry);
+                                    LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession().getHistoryEntryDao().insert(historyEntry);
+
                                 },
                                 (err) -> Log.d(LOG, err.toString(), err));
             } else {

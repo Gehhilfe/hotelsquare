@@ -27,7 +27,6 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.ChatMessage;
 import tk.internet.praktikum.foursquare.api.bean.Message;
-import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 

@@ -22,6 +22,7 @@ public class HistoryEntry {
     private String uid;
 
     @Convert(converter = HistoryConverter.class, columnType = Integer.class)
+    @NotNull
     private HistoryType historyType;
 
     @NotNull
@@ -33,8 +34,8 @@ public class HistoryEntry {
     @NotNull
     private Date date;
 
-    @Generated(hash = 22492394)
-    public HistoryEntry(@NotNull String uid, HistoryType historyType, @NotNull String venueName, @NotNull String referenceVenueId,
+    @Generated(hash = 673055006)
+    public HistoryEntry(@NotNull String uid, @NotNull HistoryType historyType, @NotNull String venueName, @NotNull String referenceVenueId,
             @NotNull Date date) {
         this.uid = uid;
         this.historyType = historyType;

@@ -120,7 +120,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                             Integer d = cmt.getRating();
                             holder.votes.setText(String.format("%d", d));
                             HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.LIKECOMMENT,getVenueName(),venueId,new Date());
-                            LocalDataBaseManager.getLocalDatabaseManager(context).getDaoSession().getHistoryEntryDao().save(historyEntry);
+                            LocalDataBaseManager.getLocalDatabaseManager(context).getDaoSession().getHistoryEntryDao().insert(historyEntry);
                         }, err -> Log.d("CommentAdapter", err.toString(), err));
             } else {
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
@@ -139,7 +139,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                             Integer d = cmt.getRating();
                             holder.votes.setText(String.format("%d", d));
                             HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.DISLIKE_COMMENT,getVenueName(),venueId,new Date());
-                            LocalDataBaseManager.getLocalDatabaseManager(context).getDaoSession().getHistoryEntryDao().save(historyEntry);
+                            LocalDataBaseManager.getLocalDatabaseManager(context).getDaoSession().getHistoryEntryDao().insert(historyEntry);
                         }, err -> Log.d("CommentAdapter", err.toString(), err));
             } else {
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();

@@ -17,7 +17,7 @@ public class LocalDataBaseManager {
     private static  LocalDataBaseManager localDataBaseManager;
 
     public static LocalDataBaseManager getLocalDatabaseManager(Context context){
-        return localDataBaseManager!=null?  localDataBaseManager:getLocalDatabaseManager(context);
+        return localDataBaseManager!=null?  localDataBaseManager:new LocalDataBaseManager(context);
     }
     public LocalDataBaseManager(Context context){
          this.context=context;

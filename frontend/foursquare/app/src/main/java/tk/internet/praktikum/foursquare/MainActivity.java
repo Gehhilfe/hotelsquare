@@ -21,7 +21,6 @@ import android.widget.Toast;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.greenrobot.greendao.database.Database;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -30,8 +29,6 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.UserService;
-import tk.internet.praktikum.foursquare.history.DaoMaster;
-import tk.internet.praktikum.foursquare.history.DaoSession;
 import tk.internet.praktikum.foursquare.history.HistoryActivity;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
@@ -39,8 +36,6 @@ import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.MeFragment;
-import tk.internet.praktikum.foursquare.user.ProfileActivity;
 import tk.internet.praktikum.foursquare.user.SettingsActivity;
 import tk.internet.praktikum.foursquare.user.UserActivity;
 
@@ -63,7 +58,6 @@ public class MainActivity extends AppCompatActivity
     private int PARAM_INTERVAL = 10000;
     private NavigationView navigationView;
 
-    private DaoSession daoSession;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,13 +89,6 @@ public class MainActivity extends AppCompatActivity
 
         handler.postDelayed(sendLocation, PARAM_INTERVAL);
     }
-
-    public void initDatabase(){
-        DaoMaster.DevOpenHelper helper=new DaoMaster.DevOpenHelper(this,"history-db");
-        Database database=helper.getReadableDb();
-        daoSession=new DaoMaster(database).newSession();
-    }
-
 
     @Override
     public void onBackPressed() {

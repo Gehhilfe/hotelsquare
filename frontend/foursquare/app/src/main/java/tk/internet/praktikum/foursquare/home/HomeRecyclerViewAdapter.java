@@ -25,7 +25,6 @@ import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequest;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequestResponse;
-import tk.internet.praktikum.foursquare.api.bean.Gender;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
