@@ -49,7 +49,8 @@
                 android:inputType="text"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:paddingLeft="4dp" />
+                android:paddingLeft="4dp"
+                android:imeOptions="actionSend"/>
 
             <ImageView
                 android:id="@+id/chat_send"

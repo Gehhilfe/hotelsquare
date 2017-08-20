@@ -3,12 +3,15 @@ package tk.internet.praktikum.foursquare.chat;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Collections;
@@ -81,9 +84,19 @@ public class ChatFragment extends Fragment {
         }
 
          sendBtn.setOnClickListener(v -> send());
-        
+
+        inputMsg.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND)
+                    send();
+                return true;
+            }
+        });
+
         return view;
     }
+
     private void updateLoop() {
         ChatService service = ServiceFactory
                 .createRetrofitService(ChatService.class, URL, LocalStorage.
@@ -165,6 +178,5 @@ public class ChatFragment extends Fragment {
         }
 
         inputMsg.setText("");
-        inputMsg.clearFocus();
     }
 }
