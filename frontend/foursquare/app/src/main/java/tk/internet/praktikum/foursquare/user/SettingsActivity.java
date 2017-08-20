@@ -1,12 +1,15 @@
 package tk.internet.praktikum.foursquare.user;
 
 
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -17,11 +20,18 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class SettingsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -30,6 +40,8 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
     Spinner selectLanguageSpinner;
     CheckBox incognitoModeCheckBox;
     String TAG = this.getClass().getSimpleName();
+    private String URL = "https://dev.ip.stimi.ovh/";
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +68,44 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
             @Override
             public void onClick(View v) {
 
-                try{
-
-                    //TODO: Delete Profil in Server, jump to Main Activity?
-                } catch (Exception e){
-                    Log.d(TAG, "Exception in deleteProfileButton:onClick");
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(SettingsActivity.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(SettingsActivity.this);
                 }
+                builder.setTitle("Delete Account")
+                        .setMessage("Are you sure you want to delete your Profile?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                try{
+                                    ProfileService profileService = ServiceFactory
+                                            .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                                                    getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+                                    profileService.delete()
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(user -> {
+                                                Log.d(TAG, "User: " + user.getDisplayName() + " was deleted");
+                                            }, throwable -> {
+                                                Log.d(TAG, "Exception: delete");
+                                            });
+
+
+                                } catch (Exception e){
+                                    Log.d(TAG, "Exception: deleteProfileButton:onClick");
+                                }
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
             }
         });
 
@@ -96,7 +140,26 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
             @Override
             public void onClick(View v) {
                 if(incognitoModeCheckBox.isChecked()){
-                    //TODO: Send incognito Request
+
+                    try{
+                        ProfileService profileService = ServiceFactory
+                                .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                                        getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+                        profileService.delete()
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(user -> {
+                                    Log.d(TAG, "User: " + user.getDisplayName() + " was deleted");
+                                }, throwable -> {
+                                    Log.d(TAG, "Exception: delete");
+                                });
+
+
+                    } catch (Exception e){
+                        Log.d(TAG, "Exception: deleteProfileButton:onClick");
+                    }
+
                 }
             }
         });
