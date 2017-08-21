@@ -47,7 +47,7 @@
                     android:id="@+id/lang_spinner"
                     android:layout_width="match_parent"
                     android:layout_margin="10dp"
-                    android:entries="@array/langArray"
+                    android:entries="@array/languages"
                     android:layout_height="wrap_content" />
 
             </android.support.v7.widget.CardView>

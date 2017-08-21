@@ -2,11 +2,15 @@ package tk.internet.praktikum.foursquare.login;
 
 //import android.app.FragmentTransaction;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
 public class LoginActivity extends AppCompatActivity {
     private LoginFragment loginFragment;
@@ -55,5 +59,11 @@ public class LoginActivity extends AppCompatActivity {
                 fragmentTransaction.commit();
                 break;
         }
+    }
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
     }
 }

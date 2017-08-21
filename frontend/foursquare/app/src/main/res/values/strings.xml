@@ -61,9 +61,13 @@
     <string name="venue_check_in">Check in</string>
     <string name="title_activity_venue_images">VenueImagesActivity</string>
     <string name="title_activity_full_screen_venue_image">FullScreenVenueImage</string>
-    <string-array name="langArray">
+    <string-array name="languages">
         <item>English</item>
-        <item>Deutsch</item>
+        <item>German</item>
+    </string-array>
+    <string-array name="locale">
+        <item>en</item>
+        <item>de</item>
     </string-array>
     <string name="langSelect">Select Language</string>
     <string name="incognito">Incognito Mode</string>
@@ -73,6 +77,7 @@
     <string name="history_state_dislike">Disliked a comment</string>
     <string name="history_state_text_comment">Wrote a comment</string>
     <string name="history_state_image_comment">Posted a picture</string>
+    <!-- menu-->
 
 
 

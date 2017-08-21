@@ -44,5 +44,8 @@
     <string name="suggestion_hotel">Hotel</string>
     <string name="suggestion_restaurant">Restaurant</string>
 
-
+    <string-array name="languages">
+        <item>Englisch</item>
+        <item>Deutsch</item>
+    </string-array>
 </resources>

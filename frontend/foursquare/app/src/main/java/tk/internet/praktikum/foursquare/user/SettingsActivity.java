@@ -1,7 +1,10 @@
 package tk.internet.praktikum.foursquare.user;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -20,7 +23,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -32,6 +35,7 @@ import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
 public class SettingsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -108,25 +112,31 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
             }
         });
 
-        List<String> langList = new ArrayList<String>();
-        langList.add("English");
-        langList.add("Deutsch");
+        List<String> langList = Arrays.asList(getApplicationContext().getResources().getStringArray(R.array.languages));
+        List<String> localeList=Arrays.asList(getApplicationContext().getResources().getStringArray(R.array.locale));
 
         // Creating adapter for spinner
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, langList);
-
+        String currentLocale=LocalStorage.getSharedPreferences(getApplicationContext()).getString("LANGUAGE","de");
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
+        int selectedIndex=0;
+         for(int i=0;i<localeList.size();i++){
+             if(currentLocale.equals(localeList.get(i))) {
+                 selectedIndex = i;
+                 break;
+             }
+         }
         // attaching data adapter to spinner
         selectLanguageSpinner.setAdapter(dataAdapter);
-
+        selectLanguageSpinner.setSelection(selectedIndex);
         selectLanguageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getItemAtPosition(position).toString();
                 Log.d("HUSSO", "item is: " + item);
-                LocalStorage.getLocalStorageInstance(getApplicationContext()).setLanguage("LANGUAGE", item);
+                int index= langList.indexOf(item);
+                LocalStorage.getLocalStorageInstance(getApplicationContext()).setLanguage("LANGUAGE", localeList.get(index));
             }
 
             @Override
@@ -177,51 +187,65 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
         });
     }
 
-            // public void addFragment() {
-            //getSupportFragmentManager().beginTransaction().add(R.id.settings_activity_container, fragment).commit();
-            // }
+    // public void addFragment() {
+    //getSupportFragmentManager().beginTransaction().add(R.id.settings_activity_container, fragment).commit();
+    // }
 
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                // Handle navigation view item clicks here.
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.nav_search:
-                        setResult(0, null);
-                        finish();
-                        break;
-                    case R.id.nav_search_person:
-                        setResult(1, null);
-                        finish();
-                        break;
-                    case R.id.nav_history:
-                        setResult(2, null);
-                        finish();
-                        break;
-                    case R.id.nav_me:
-                        setResult(3, null);
-                        finish();
-                        break;
-                    case R.id.nav_manage:
-                        setResult(4, null);
-                        finish();
-                        break;
-                    case R.id.nav_login_logout:
-                        setResult(5, null);
-                        finish();
-                        break;
-                }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
 
-                return true;
-            }
-
-            @Override
-            public void onBackPressed() {
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                if (drawer.isDrawerOpen(GravityCompat.START)) {
-                    drawer.closeDrawer(GravityCompat.START);
-                } else {
-                    super.onBackPressed();
-                }
-            }
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.nav_search:
+                setResult(0, null);
+                finish();
+                break;
+            case R.id.nav_search_person:
+                setResult(1, null);
+                finish();
+                break;
+            case R.id.nav_history:
+                setResult(2, null);
+                finish();
+                break;
+            case R.id.nav_me:
+                setResult(3, null);
+                finish();
+                break;
+            case R.id.nav_manage:
+                setResult(4, null);
+                finish();
+                break;
+            case R.id.nav_login_logout:
+                setResult(5, null);
+                finish();
+                break;
         }
+
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
+    }
+
+
+}
