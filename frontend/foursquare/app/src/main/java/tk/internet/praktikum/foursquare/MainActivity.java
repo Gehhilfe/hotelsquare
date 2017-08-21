@@ -16,6 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -25,9 +28,14 @@ import org.greenrobot.eventbus.ThreadMode;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
+import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
+import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Gender;
+import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.history.HistoryActivity;
 import tk.internet.praktikum.foursquare.location.LocationService;
@@ -50,6 +58,8 @@ public class MainActivity extends AppCompatActivity
     private final int REQUEST_ME = 6;
 
     private MenuItem searchMenu, meMenu;
+    private TextView userName;
+    private ImageView avatar;
 
     private Location userLocation = new Location(0, 0);
     private Handler handler = new Handler();
@@ -84,10 +94,54 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        View parentView = navigationView.getHeaderView(0);
+        userName = (TextView) parentView.findViewById(R.id.nav_header_name);
+        avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
+
+        if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+            initialiseNavigationHeader();
+
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment);
 
         handler.postDelayed(sendLocation, PARAM_INTERVAL);
+    }
+
+    private void initialiseNavigationHeader() {
+        ProfileService service = ServiceFactory
+                .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                        getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        try {
+            service.profile()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            user -> {
+                                userName.setText(user.getName());
+                                if (user.getAvatar() != null) {
+                                    ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
+                                    imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(bitmap -> {
+                                                        avatar.setImageBitmap(bitmap);
+                                                    },
+                                                    throwable -> {
+                                                        Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                            );
+                                } else {
+                                    avatar.setImageResource(R.mipmap.user_avatar);
+                                }
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -243,6 +297,7 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
+                    initialiseNavigationHeader();
                     // meNavigation(meMenu);
                     break;
                 }
