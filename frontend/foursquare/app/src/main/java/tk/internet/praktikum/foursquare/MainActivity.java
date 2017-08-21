@@ -240,6 +240,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        // TODO - SIMPLIFY THIS MONSTER
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_search:
@@ -293,6 +294,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // TODO - SIMPLIFY THIS MONSTER
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_LOGIN:
