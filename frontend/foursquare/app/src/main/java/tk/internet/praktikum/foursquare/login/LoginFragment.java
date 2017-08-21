@@ -88,6 +88,7 @@ public class LoginFragment extends Fragment {
 
                         },
                         throwable -> {
+                            Toast.makeText(getActivity().getBaseContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                             failedLogin();
                             progressDialog.dismiss();
                         }
@@ -131,7 +132,6 @@ public class LoginFragment extends Fragment {
     private void failedLogin() {
         Log.d(LOG_TAG, "Failed login.");
         loginBtn.setEnabled(true);
-        Toast.makeText(getActivity().getBaseContext(), "Failed to login.", Toast.LENGTH_LONG).show();
     }
 
     /**

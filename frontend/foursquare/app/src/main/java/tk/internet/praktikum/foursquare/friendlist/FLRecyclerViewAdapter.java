@@ -67,6 +67,7 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
                                     chatResponse.getChatId();
                                     Intent intent = new Intent(context, ChatActivity.class);
                                     intent.putExtra("chatId", chatResponse.getChatId());
+                                    intent.putExtra("Parent", "UserActivity");
                                     activity.startActivityForResult(intent, REQUEST_CHAT);
                                 },
                                 throwable -> {
@@ -81,7 +82,8 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
         private void loadProfile() {
             Intent intent = new Intent(context, ProfileActivity.class);
             intent.putExtra("userID", friendList.get(getAdapterPosition()).getId());
-            activity.startActivityForResult(intent, REQUEST_PROFILE);
+            intent.putExtra("Parent", "UserActivity");
+            activity.startActivity(intent);
         }
     }
 

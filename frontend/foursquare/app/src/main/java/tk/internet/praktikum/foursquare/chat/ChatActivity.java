@@ -13,8 +13,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 
-public class ChatActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class ChatActivity extends AppCompatActivity {
     private ChatFragment fragment;
 
     @Override
@@ -23,15 +25,7 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_chat);
         Toolbar toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
         setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setTitle("Chat");
 
@@ -51,45 +45,28 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.nav_search:
-                setResult(0, null);
-                finish();
-                break;
-            case R.id.nav_search_person:
-                setResult(1, null);
-                finish();
-                break;
-            case R.id.nav_history:
-                setResult(2, null);
-                finish();
-                break;
-            case R.id.nav_me:
-                setResult(3, null);
-                finish();
-                break;
-            case R.id.nav_manage:
-                setResult(4, null);
-                finish();
-                break;
-            case R.id.nav_login_logout:
-                setResult(5, null);
-                finish();
-                break;
-        }
-        return true;
+    public Intent getSupportParentActivityIntent() {
+        return getParentActivityIntentImpl();
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+    public Intent getParentActivityIntent() {
+        return getParentActivityIntentImpl();
+    }
+
+    private Intent getParentActivityIntentImpl() {
+        Intent i = null;
+        Bundle bundle = getIntent().getExtras();
+        String parentActivity = bundle.getString("Parent");
+
+        if (parentActivity.equals("UserActivity")) {
+            i = new Intent(this, UserActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         } else {
-            super.onBackPressed();
+            i = new Intent(this, ProfileActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         }
+
+        return i;
     }
 }
