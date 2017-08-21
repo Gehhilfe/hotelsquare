@@ -66,6 +66,7 @@ class PersonSearchResultAdapter extends RecyclerView.Adapter<PersonSearchResultA
 
         holder.itemView.setOnClickListener(l -> {
             Intent intent = new Intent(context, ProfileActivity.class);
+            intent.putExtra("Parent", "SearchPerson");
             intent.putExtra("userID", user.getId());
             context.startActivity(intent);
         });

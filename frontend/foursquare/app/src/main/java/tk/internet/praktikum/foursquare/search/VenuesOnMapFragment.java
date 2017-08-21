@@ -49,6 +49,7 @@ import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 
 //import com.google.maps.android.clustering.ClusterManager;
 
@@ -291,11 +292,15 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     // if User, go to Me-Fragment
                 } else if (!(LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("") && !markerFriendMap.containsKey(marker)) {
+                    Intent intent = new Intent(parent.getActivity(), UserActivity.class);
+                    startActivity(intent);
+                    /*
                     MeFragment meFragment = new MeFragment();
                     FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
                     fragmentTransaction.replace(R.id.fragment_container, meFragment);
                     fragmentTransaction.addToBackStack(meFragment.getTag());
                     fragmentTransaction.commit();
+                    */
                 }
                 // else do nothing (case: user not  logged-in)
             }
