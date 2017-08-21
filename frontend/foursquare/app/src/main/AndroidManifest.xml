@@ -43,7 +43,9 @@
         <activity
             android:name=".user.UserActivity"
             android:label="@string/title_activity_profile"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".MainActivity" />
+
         <activity android:name=".abstracts.DrawerLayoutActivity" />
         <activity
             android:name=".MainActivity"
