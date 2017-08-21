@@ -21,6 +21,7 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
+import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
@@ -31,11 +32,11 @@ import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.chat.ChatActivity;
+import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
-public class ProfileActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class ProfileActivity extends AppCompatActivity {
 
-    private final int REQUEST_CHAT = 1;
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User otherUser = new User();
     private TextView name, email, city, age;
@@ -55,15 +56,7 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
         setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // TODO - Title = Name der Person?
         setTitle("Profile");
@@ -200,7 +193,8 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                                 chatResponse.getChatId();
                                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
                                 intent.putExtra("chatId", chatResponse.getChatId());
-                                startActivityForResult(intent, REQUEST_CHAT);
+                                intent.putExtra("Parent", "ProfileActivity");
+                                startActivity(intent);
                             },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -212,68 +206,31 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.nav_search:
-                setResult(0, null);
-                finish();
-                break;
-            case R.id.nav_search_person:
-                setResult(1, null);
-                finish();
-                break;
-            case R.id.nav_history:
-                setResult(2, null);
-                finish();
-                break;
-            case R.id.nav_me:
-                setResult(3, null);
-                finish();
-                break;
-            case R.id.nav_manage:
-                setResult(4, null);
-                finish();
-                break;
-            case R.id.nav_login_logout:
-                setResult(5, null);
-                finish();
-                break;
-        }
-        return true;
+    public Intent getSupportParentActivityIntent() {
+        return getParentActivityIntentImpl();
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+    public Intent getParentActivityIntent() {
+        return getParentActivityIntentImpl();
+    }
+
+    private Intent getParentActivityIntentImpl() {
+        Intent i = null;
+        Bundle bundle = getIntent().getExtras();
+        String parentActivity = bundle.getString("Parent");
+
+        if (parentActivity.equals("UserActivity")) {
+            i = new Intent(this, UserActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        } else if (parentActivity.equals("SearchPerson")) {
+            i = new Intent(this, SearchPersonActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         } else {
-            super.onBackPressed();
+                i = new Intent(this, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         }
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_CHAT:
-                switch (resultCode) {
-                    case 0:
-                        setResult(resultCode, null);
-                        finish();
-                    case 1:
-                        setResult(resultCode, null);
-                        finish();
-                    case 2:
-                        setResult(resultCode, null);
-                        finish();
-                    case 4:
-                        setResult(resultCode, null);
-                        finish();
-                }
-                break;
-        }
+        return i;
     }
 }

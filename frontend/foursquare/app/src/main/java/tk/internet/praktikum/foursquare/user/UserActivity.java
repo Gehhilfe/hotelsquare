@@ -22,7 +22,7 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 //import tk.internet.praktikum.foursquare.history.dummy.DummyHistoryFragment;
 
-public class UserActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class UserActivity extends AppCompatActivity  {
     private UserStatePagerAdapter userStatePagerAdapter;
     private ViewPager fragmentContainer;
 
@@ -34,14 +34,7 @@ public class UserActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = (Toolbar) findViewById(R.id.me_toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
         setTitle("Me");
 
         fragmentContainer = (ViewPager) findViewById(R.id.me_fragment_container);
@@ -50,6 +43,8 @@ public class UserActivity extends AppCompatActivity implements NavigationView.On
 
         TabLayout tabLayout= (TabLayout) findViewById(R.id.me_tabs);
         tabLayout.setupWithViewPager(fragmentContainer);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void logout() {
@@ -66,48 +61,5 @@ public class UserActivity extends AppCompatActivity implements NavigationView.On
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.nav_search:
-                setResult(0, null);
-                finish();
-                break;
-            case R.id.nav_search_person:
-                setResult(1, null);
-                finish();
-                break;
-            case R.id.nav_history:
-                setResult(2, null);
-                finish();
-                break;
-            case R.id.nav_me:
-                setResult(3, null);
-                finish();
-                break;
-            case R.id.nav_manage:
-                setResult(4, null);
-                finish();
-                break;
-            case R.id.nav_logout:
-                logout();
-                break;
-        }
-
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 }
