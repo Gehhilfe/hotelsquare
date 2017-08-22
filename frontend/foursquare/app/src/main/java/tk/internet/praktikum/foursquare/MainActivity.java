@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -72,14 +73,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
         String language=sharedPreferences.getString("LANGUAGE","de");
         Locale locale=new Locale(language);
         System.out.println("MainActivity onCreate Language: "+language);
-        AdjustedContextWrapper.wrap(getBaseContext(),language);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -525,21 +524,22 @@ public class MainActivity extends AppCompatActivity
 
     };
 
-    @Override
+   @Override
     protected void attachBaseContext(Context newBase) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
         String language=sharedPreferences.getString("LANGUAGE","de");
         super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
     }
 
-    /*@Override
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
         String language=sharedPreferences.getString("LANGUAGE","de");
         Locale locale=new Locale(language);
-        System.out.println("onConfigurationChanged Language: "+language);
+        System.out.println("###### MainActivity onConfigurationChanged Language: "+language);
         AdjustedContextWrapper.wrap(getBaseContext(),language);
+        super.onConfigurationChanged(newConfig);
 
-    }*/
+
+    }
 }

@@ -30,7 +30,12 @@ public class UserActivity extends AppCompatActivity  {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        System.out.println("UserActivity onCreate Language: "+language);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_user);
         Toolbar toolbar = (Toolbar) findViewById(R.id.me_toolbar);
         setSupportActionBar(toolbar);

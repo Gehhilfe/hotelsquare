@@ -1,9 +1,6 @@
 package tk.internet.praktikum.foursquare.user;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
-import java.util.Locale;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -32,7 +28,6 @@ import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.chat.ChatActivity;
 import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -232,7 +227,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         return i;
     }
-
+/*
     @Override
     protected void attachBaseContext(Context newBase) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
@@ -247,5 +242,5 @@ public class ProfileActivity extends AppCompatActivity {
         Locale locale=new Locale(language);
         AdjustedContextWrapper.wrap(getBaseContext(),language);
 
-    }
+    }*/
 }
