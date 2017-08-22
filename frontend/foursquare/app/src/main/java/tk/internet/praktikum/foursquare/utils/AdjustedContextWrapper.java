@@ -64,4 +64,10 @@ public class AdjustedContextWrapper extends ContextWrapper {
         config.setLocale(locale);
     }
 
+    public static String getString(Context context,int id,String language){
+        return  context.getResources().getString(id,language);
+    }
+
+
+
 }

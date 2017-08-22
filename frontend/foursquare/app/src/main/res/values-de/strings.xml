@@ -1,4 +1,6 @@
 <resources>
+    <string name="foursquare_slogan">Erkunden die Welt um dich herum</string>
+
     <string name="app_name">Hotelsquare</string>
     <string name="login_email">Email</string>
     <string name="login_password">Passwort</string>
@@ -18,15 +20,24 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <string name="action_search">Suchen</string>
+    <string name="action_search_person">Suchen Person</string>
+    <string name="action_history">Verlauf</string>
     <string name="action_settings">Einstellung</string>
+    <string name="action_me">Mich</string>
+    <string name="action_login">Anmelden</string>
     <string name="action_logout">Abmelden</string>
+
     <string name="reset_password_lbl">Geben Sie Ihre Email um Ihr Passwort zurückzusetzen.</string>
     <string name="reset_password">Passwort zurücksetzen</string>
     <string name="searching_question">Was suchst du jetzt?</string>
-    <string name="large_text">abcd demo</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="action_search">Suchen</string>
+
+    <!-- User -->
+    <string name="user_tab_requests">Anfragen</string>
+    <string name="user_tab_profile">Profil</string>
+    <string name="user_tab_friends">Freunden</string>
+    <string name="user_tab_inbox">Inbox</string>
+
     <string name="profile_upload_avatar">Hochladen</string>
     <string name="title_activity_maps">Map</string>
     <string name="liked">Mag</string>
@@ -34,18 +45,136 @@
     <string name="open_now">Öffnen jetzt</string>
     <string name="price">Kosten</string>
     <string name="saved">Speichern</string>
-    <string name="suggestion_beer">Bier</string>
-    <string name="suggestion_breakfast">Frühstück</string>
-    <string name="suggestion_bookstore">Buchhandlung</string>
-    <string name="suggestion_cafe">Cafe</string>
-    <string name="suggestion_cinema">Kino</string>
-    <string name="suggestion_event">Event</string>
-    <string name="suggestion_gas_station">Tankstelle</string>
-    <string name="suggestion_hotel">Hotel</string>
-    <string name="suggestion_restaurant">Restaurant</string>
+    <string name="venue_call">Anrufen</string>
+    <string name="venue_check_in">Einschecken</string>
+    <string name="langSelect">Sprache auswählen</string>
+    <string name="incognito">Incognito Mode</string>
+    <string name="history_state_check_in">Eingescheckt</string>
+    <string name="history_state_visit">Besucht</string>
+    <string name="history_state_like">Gefällt mir einen Kommentar</string>
+    <string name="history_state_dislike">Gefällt mir einen Kommentar nicht</string>
+    <string name="history_state_text_comment">Geschrieben einen Kommentar</string>
+    <string name="history_state_image_comment">Hochgeladen ein Bild</string>
+    <string name="button_post_image">Bild hochladen</string>
+    <string name="button_post_text">Kommentar schreiben</string>
+    <string name="button_pictures">Bilders</string>
+    <string name="title_activity_venue_gallery">Gallery</string>
 
     <string-array name="languages">
         <item>Englisch</item>
         <item>Deutsch</item>
     </string-array>
+    <string-array name="locale">
+        <item>en</item>
+        <item>de</item>
+    </string-array>
+    <string name="category_1">
+        Essen&amp;Trinken
+    </string>
+    <string name="category_2">
+        Urlaub&amp;Erholung
+    </string>
+    <string name="category_3">
+       Services
+    </string>
+    <string name="category_4">
+       Geschäfte
+    </string>
+    <string name="category_5">
+        Infrastruktur
+    </string>
+
+    <!--- C1-->
+    <array name="beer">
+        <item>bier</item>
+        <item>Bier</item>
+    </array>
+    <array name="cafe">
+        <item>cafe</item>
+        <item>Cafe</item>
+    </array>
+    <array name="vegetarian">
+        <item>vegetarisch</item>
+        <item>Vegetarisch</item>
+    </array>
+
+    <array name="food_drink">
+        <item>@array/beer</item>
+        <item>@array/cafe</item>
+        <item>@array/vegetarian</item>
+    </array>
+    <!--- C2-->
+    <array name="beach">
+        <item>strand</item>
+        <item>Strand</item>
+    </array>
+    <array name="castle">
+        <item>burg</item>
+        <item>Burg</item>
+    </array>
+    <array name="zoo">
+        <item>zoo</item>
+        <item>Zoo</item>
+    </array>
+    <array name="holiday_relaxation">
+        <item>@array/beach</item>
+        <item>@array/castle</item>
+        <item>@array/zoo</item>
+    </array>
+    <!--- C3-->
+    <array name="bank">
+        <item>bank</item>
+        <item>Bank</item>
+    </array>
+    <array name="gas_station">
+        <item>tankstelle</item>
+        <item>Tankstelle</item>
+    </array>
+    <array name="car_wash">
+        <item>autowaschanlage</item>
+        <item>Autowaschanlage</item>
+    </array>
+    <array name="service">
+        <item>@array/bank</item>
+        <item>@array/gas_station</item>
+        <item>@array/car_wash</item>
+    </array>
+    <!--- C4-->
+    <array name="supermarket">
+        <item>supermarkt</item>
+        <item>Supermarkt</item>
+    </array>
+    <array name="florist">
+        <item>florist</item>
+        <item>Blumengeschäft</item>
+    </array>
+    <array name="music">
+        <item>musik</item>
+        <item>Musik</item>
+    </array>
+    <array name="shops">
+        <item>@array/supermarket</item>
+        <item>@array/florist</item>
+        <item>@array/music</item>
+    </array>
+
+    <!--- C5-->
+    <array name="airport">
+        <item>flughafen</item>
+        <item>Flughafen</item>
+    </array>
+    <array name="harbor">
+        <item>hafen</item>
+        <item>Hafen</item>
+    </array>
+    <array name="electrical_charging_station">
+        <item>elektrotankstelle</item>
+        <item>Elektrotankstelle</item>
+    </array>
+    <array name="infrastructure">
+        <item>@array/airport</item>
+        <item>@array/harbor</item>
+        <item>@array/electrical_charging_station</item>
+    </array>
+
 </resources>

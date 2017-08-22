@@ -1,8 +1,10 @@
 package tk.internet.praktikum.foursquare;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -61,6 +63,7 @@ import tk.internet.praktikum.foursquare.history.HistoryType;
 import tk.internet.praktikum.foursquare.search.VenueImagesActivity;
 import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
 public class VenueInDetailsNestedScrollView extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -105,6 +108,10 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_venue_detail_nestedscrollview);
 
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        System.out.println("Language: "+language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
         // Setup toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -308,7 +315,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
             return;
         }
         new MaterialDialog.Builder(this)
-                .title("Post Comment")
+                .title("Post image")
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .input("Your awesome message!", "", (dialog, input) -> {
                     if (input.toString().isEmpty())
@@ -557,6 +564,22 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         intent.putExtra("venueID", venueId);
         this.startActivity(intent);
 
+
+    }
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        System.out.println("Language: "+language);
+        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        System.out.println("onConfigurationChanged Language: "+language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
 
     }
 }

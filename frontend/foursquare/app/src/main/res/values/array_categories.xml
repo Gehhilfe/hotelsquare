@@ -1,112 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="category_1">
-        Food&amp;Drinks
-    </string>
-    <string name="category_2">
-        Holiday&amp;Relaxation
-    </string>
-    <string name="category_3">
-       Services
-    </string>
-    <string name="category_4">
-       Shops
-    </string>
-    <string name="category_5">
-        Infrastructure
-    </string>
+    <!-- <string name="category_1">
+         Food&amp;Drinks
+     </string>
+     <string name="category_2">
+         Holiday&amp;Relaxation
+     </string>
+     <string name="category_3">
+        Services
+     </string>
+     <string name="category_4">
+        Shops
+     </string>
+     <string name="category_5">
+         Infrastructure
+     </string>
 
-    <!--- C1-->
-    <array name="beer">
-        <item>bier</item>
-        <item>Beer</item>
-    </array>
-    <array name="cafe">
-        <item>cafe</item>
-        <item>Cafe</item>
-    </array>
-    <array name="vegetarian">
-        <item>vegetarisch</item>
-        <item>Vegetarian</item>
-    </array>
+     &lt;!&ndash;- C1&ndash;&gt;
+     <array name="beer">
+         <item>bier</item>
+         <item>Beer</item>
+     </array>
+     <array name="cafe">
+         <item>cafe</item>
+         <item>Cafe</item>
+     </array>
+     <array name="vegetarian">
+         <item>vegetarisch</item>
+         <item>Vegetarian</item>
+     </array>
 
-    <array name="food_drink">
-        <item>@array/beer</item>
-        <item>@array/cafe</item>
-        <item>@array/vegetarian</item>
-    </array>
-    <!--- C2-->
-    <array name="beach">
-        <item>strand</item>
-        <item>Beach</item>
-    </array>
-    <array name="castle">
-        <item>burg</item>
-        <item>Castle</item>
-    </array>
-    <array name="zoo">
-        <item>zoo</item>
-        <item>Zoo</item>
-    </array>
-    <array name="holiday_relaxation">
-        <item>@array/beach</item>
-        <item>@array/castle</item>
-        <item>@array/zoo</item>
-    </array>
-    <!--- C3-->
-    <array name="bank">
-        <item>bank</item>
-        <item>Bank</item>
-    </array>
-    <array name="gas_station">
-        <item>tankstelle</item>
-        <item>Gas station</item>
-    </array>
-    <array name="car_wash">
-        <item>autowaschanlage</item>
-        <item>Car wash</item>
-    </array>
-    <array name="service">
-        <item>@array/bank</item>
-        <item>@array/gas_station</item>
-        <item>@array/car_wash</item>
-    </array>
-    <!--- C4-->
-    <array name="supermarket">
-        <item>supermarkt</item>
-        <item>Supermarket</item>
-    </array>
-    <array name="florist">
-        <item>florist</item>
-        <item>Florist</item>
-    </array>
-    <array name="music">
-        <item>musik</item>
-        <item>Music</item>
-    </array>
-    <array name="shops">
-        <item>@array/supermarket</item>
-        <item>@array/florist</item>
-        <item>@array/music</item>
-    </array>
+     <array name="food_drink">
+         <item>@array/beer</item>
+         <item>@array/cafe</item>
+         <item>@array/vegetarian</item>
+     </array>
+     &lt;!&ndash;- C2&ndash;&gt;
+     <array name="beach">
+         <item>strand</item>
+         <item>Beach</item>
+     </array>
+     <array name="castle">
+         <item>burg</item>
+         <item>Castle</item>
+     </array>
+     <array name="zoo">
+         <item>zoo</item>
+         <item>Zoo</item>
+     </array>
+     <array name="holiday_relaxation">
+         <item>@array/beach</item>
+         <item>@array/castle</item>
+         <item>@array/zoo</item>
+     </array>
+     &lt;!&ndash;- C3&ndash;&gt;
+     <array name="bank">
+         <item>bank</item>
+         <item>Bank</item>
+     </array>
+     <array name="gas_station">
+         <item>tankstelle</item>
+         <item>Gas station</item>
+     </array>
+     <array name="car_wash">
+         <item>autowaschanlage</item>
+         <item>Car wash</item>
+     </array>
+     <array name="service">
+         <item>@array/bank</item>
+         <item>@array/gas_station</item>
+         <item>@array/car_wash</item>
+     </array>
+     &lt;!&ndash;- C4&ndash;&gt;
+     <array name="supermarket">
+         <item>supermarkt</item>
+         <item>Supermarket</item>
+     </array>
+     <array name="florist">
+         <item>florist</item>
+         <item>Florist</item>
+     </array>
+     <array name="music">
+         <item>musik</item>
+         <item>Music</item>
+     </array>
+     <array name="shops">
+         <item>@array/supermarket</item>
+         <item>@array/florist</item>
+         <item>@array/music</item>
+     </array>
 
-    <!--- C5-->
-    <array name="airport">
-        <item>flughafen</item>
-        <item>Airport</item>
-    </array>
-    <array name="harbor">
-        <item>hafen</item>
-        <item>Harbor</item>
-    </array>
-    <array name="electrical_charging_station">
-        <item>elektrotankstelle</item>
-        <item>E-charging station</item>
-    </array>
-    <array name="infrastructure">
-        <item>@array/airport</item>
-        <item>@array/harbor</item>
-        <item>@array/electrical_charging_station</item>
-    </array>
-
-</resources>
+     &lt;!&ndash;- C5&ndash;&gt;
+     <array name="airport">
+         <item>flughafen</item>
+         <item>Airport</item>
+     </array>
+     <array name="harbor">
+         <item>hafen</item>
+         <item>Harbor</item>
+     </array>
+     <array name="electrical_charging_station">
+         <item>elektrotankstelle</item>
+         <item>E-charging station</item>
+     </array>
+     <array name="infrastructure">
+         <item>@array/airport</item>
+         <item>@array/harbor</item>
+         <item>@array/electrical_charging_station</item>
+     </array>
+ -->
+ </resources>

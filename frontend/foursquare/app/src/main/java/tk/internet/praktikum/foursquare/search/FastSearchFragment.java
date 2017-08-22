@@ -69,12 +69,9 @@ public class FastSearchFragment extends Fragment {
             if (resId < 0) {
                 continue;
             }
-            TypedArray category_items= getContext().getResources().obtainTypedArray(resId);
-           /* Drawable icon = category_items.getDrawable(category_items.getResourceId(0,-1));
-            int itemNameResId=category_items.getResourceId(1,-1);*/
+           // TypedArray category_items= getContext().getResources().obtainTypedArray(resId);
             String[] itemsArray=getContext().getResources().getStringArray(resId);
             String itemName = itemsArray[1];
-            System.out.println("resource: "+itemsArray[0]);
             Drawable icon = getContext().getDrawable(getContext().getResources().getIdentifier(itemsArray[0], "drawable", getContext().getPackageName()));
             itemsMap.put(itemName, icon);
             itemsName.add(itemName);
@@ -90,10 +87,10 @@ public class FastSearchFragment extends Fragment {
         for (String categoryName: categoriesAsList) {
             Map<String, Drawable> elements = (Map<String, Drawable>) categoriesMap.get(categoryName).get(1);
             List<String> elementsAsList = (List<String>) categoriesMap.get(categoryName).get(0);
-            Log.d(FastSearchFragment.class.getSimpleName(), "Elements: " + elements.toString() + "     " + " as List: " + elementsAsList);
+           // Log.d(FastSearchFragment.class.getSimpleName(), "Elements: " + elements.toString() + "     " + " as List: " + elementsAsList);
             _categories.add(new Category(categoryName, elements, elementsAsList));
-            Log.d(FastSearchFragment.class.getSimpleName(), "Categories");
-            Log.d(FastSearchFragment.class.getSimpleName(), _categories.toString());
+           /* Log.d(FastSearchFragment.class.getSimpleName(), "Categories");
+            Log.d(FastSearchFragment.class.getSimpleName(), _categories.toString());*/
         }
     }
 
@@ -110,10 +107,11 @@ public class FastSearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_fast_search, container, false);
+
         initCategories();
         createContent();
-        Log.d(FastSearchFragment.class.getSimpleName(), "Categories");
-        Log.d(FastSearchFragment.class.getSimpleName(), _categories.toString());
+        //Log.d(FastSearchFragment.class.getSimpleName(), "Categories");
+       // Log.d(FastSearchFragment.class.getSimpleName(), _categories.toString());
 
         rv_fast_search = (RecyclerView) view.findViewById(R.id.rv_fast_search);
 
@@ -127,16 +125,9 @@ public class FastSearchFragment extends Fragment {
 
         //searchView=(SearchView)view.findViewById(R.id.fast_search);
         setHasOptionsMenu(true);
-        /**for (int i=1;i<10;i++){
-         String buttonId=PREFIX_SUGGESTION+i;
-         Button button = (Button) view.findViewById(getResources().getIdentifier(buttonId,"id",getActivity().getPackageName().toString()));
-         button.setOnClickListener(v->deepSearch(button.getText().toString()));
-         }*/
-
         Typeface type = Typeface.createFromAsset(getContext().getAssets(), "fonts/Pacifico.ttf");
         hotelsquare = (TextView) view.findViewById(R.id.hotelsquare);
         hotelsquare.setTypeface(type);
-
         return view;
     }
 
@@ -295,5 +286,6 @@ public class FastSearchFragment extends Fragment {
             return data.size();
         }
     }
+
 
 }

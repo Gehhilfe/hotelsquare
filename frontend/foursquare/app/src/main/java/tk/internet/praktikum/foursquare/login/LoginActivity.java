@@ -4,9 +4,12 @@ package tk.internet.praktikum.foursquare.login;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+
+import java.util.Locale;
 
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
@@ -65,5 +68,14 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
         String language=sharedPreferences.getString("LANGUAGE","de");
         super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        Locale locale=new Locale(language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
     }
 }

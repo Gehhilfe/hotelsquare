@@ -1,6 +1,9 @@
 package tk.internet.praktikum.foursquare.history;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -11,7 +14,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import java.util.Locale;
+
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
 public class HistoryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     // TODO - Hier das Fragment mit HistoryFragment tauschen
@@ -21,6 +28,11 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.history_toolbar);
         setSupportActionBar(toolbar);
 
@@ -32,9 +44,8 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        setTitle("History");
+        setTitle(getApplicationContext().getResources().getString(R.string.action_history));
 
-        // TODO - initialise fragment
         fragment=new HistoryFragment();
         addFragment();
     }
@@ -85,5 +96,20 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
         } else {
             super.onBackPressed();
         }
+    }
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        Locale locale=new Locale(language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
     }
 }

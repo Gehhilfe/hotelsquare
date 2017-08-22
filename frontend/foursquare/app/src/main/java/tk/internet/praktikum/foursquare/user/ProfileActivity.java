@@ -3,21 +3,18 @@ package tk.internet.praktikum.foursquare.user;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -61,7 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // TODO - Title = Name der Person?
-        setTitle("Profile");
+        setTitle(getApplicationContext().getResources().getString(R.string.user_tab_profile));
 
         name = (TextView) findViewById(R.id.profile_name);
         email = (TextView) findViewById(R.id.profile_email);
@@ -241,5 +238,14 @@ public class ProfileActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
         String language=sharedPreferences.getString("LANGUAGE","de");
         super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        Locale locale=new Locale(language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
     }
 }

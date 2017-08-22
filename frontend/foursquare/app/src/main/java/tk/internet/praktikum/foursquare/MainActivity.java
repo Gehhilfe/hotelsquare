@@ -26,14 +26,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Locale;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
-import tk.internet.praktikum.foursquare.api.bean.Gender;
-import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
@@ -74,6 +74,13 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        Locale locale=new Locale(language);
+        System.out.println("MainActivity onCreate Language: "+language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -263,11 +270,11 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_login_logout:
                 if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
                     login();
-                    item.setTitle("Logout");
+                    item.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
                     return false;
                 } else {
                     logout();
-                    item.setTitle("Login");
+                    item.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
                 }
                 break;
             case R.id.nav_logout:
@@ -524,4 +531,15 @@ public class MainActivity extends AppCompatActivity
         String language=sharedPreferences.getString("LANGUAGE","de");
         super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
     }
+
+    /*@Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        Locale locale=new Locale(language);
+        System.out.println("onConfigurationChanged Language: "+language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
+    }*/
 }

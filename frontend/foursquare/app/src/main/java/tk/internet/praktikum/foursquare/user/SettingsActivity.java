@@ -2,54 +2,36 @@ package tk.internet.praktikum.foursquare.user;
 
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.Spinner;
 
-import java.util.Arrays;
-import java.util.List;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.api.ServiceFactory;
-import tk.internet.praktikum.foursquare.api.bean.User;
-import tk.internet.praktikum.foursquare.api.service.ProfileService;
-import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
 public class SettingsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    Button deleteProfileButton;
-    Spinner selectLanguageSpinner;
-    CheckBox incognitoModeCheckBox;
-    String TAG = this.getClass().getSimpleName();
-    private String URL = "https://dev.ip.stimi.ovh/";
-    private User user;
+    private Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        System.out.println("SettingActivity Language: "+language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.settings_toolbar);
         setSupportActionBar(toolbar);
 
@@ -61,140 +43,17 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        setTitle(getApplicationContext().getResources().getString(R.string.action_settings));
+        fragment=new SettingsFragment();
+        addFragment();
 
-        deleteProfileButton = (Button) findViewById(R.id.delete_profile);
-        selectLanguageSpinner = (Spinner) findViewById(R.id.lang_spinner);
-        incognitoModeCheckBox = (CheckBox) findViewById(R.id.checkBox);
-
-
-        deleteProfileButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                AlertDialog.Builder builder;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder = new AlertDialog.Builder(SettingsActivity.this, android.R.style.Theme_Material_Dialog_Alert);
-                } else {
-                    builder = new AlertDialog.Builder(SettingsActivity.this);
-                }
-                builder.setTitle("Delete Account")
-                        .setMessage("Are you sure you want to delete your Profile?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // continue with delete
-                                try {
-                                    ProfileService profileService = ServiceFactory
-                                            .createRetrofitService(ProfileService.class, URL, LocalStorage.
-                                                    getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
-
-                                    profileService.delete()
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(user -> {
-                                                Log.d(TAG, "User: " + user.getDisplayName() + " was deleted");
-                                            }, throwable -> {
-                                                Log.d(TAG, "Exception: delete");
-                                            });
-
-
-                                } catch (Exception e) {
-                                    Log.d(TAG, "Exception: deleteProfileButton:onClick");
-                                }
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });
-
-        List<String> langList = Arrays.asList(getApplicationContext().getResources().getStringArray(R.array.languages));
-        List<String> localeList=Arrays.asList(getApplicationContext().getResources().getStringArray(R.array.locale));
-
-        // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, langList);
-        String currentLocale=LocalStorage.getSharedPreferences(getApplicationContext()).getString("LANGUAGE","de");
-        // Drop down layout style - list view with radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        int selectedIndex=0;
-         for(int i=0;i<localeList.size();i++){
-             if(currentLocale.equals(localeList.get(i))) {
-                 selectedIndex = i;
-                 break;
-             }
-         }
-        // attaching data adapter to spinner
-        selectLanguageSpinner.setAdapter(dataAdapter);
-        selectLanguageSpinner.setSelection(selectedIndex);
-        selectLanguageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String item = parent.getItemAtPosition(position).toString();
-                Log.d("HUSSO", "item is: " + item);
-                int index= langList.indexOf(item);
-                LocalStorage.getLocalStorageInstance(getApplicationContext()).setLanguage("LANGUAGE", localeList.get(index));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // do nothing
-            }
-        });
-
-        incognitoModeCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-                if (token == "")
-                    return;
-
-                try {
-                    UserService service = ServiceFactory
-                            .createRetrofitService(UserService.class, URL, token);
-
-                    User tmp = new User();
-                    if (incognitoModeCheckBox.isChecked()) {
-                        tmp.setIncognito(true);
-                    } else {
-                        tmp.setIncognito(false);
-                    }
-                    // send to server
-                    service.update(tmp).subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(user -> {
-                                        Log.d(TAG, "Incognito Mode was set");
-                                    },
-                                    throwable -> {
-                                        Log.d(TAG, "Exception: Incognito Mode: true");
-                                    }
-                            );
-
-                } catch (Exception e) {
-                    Log.d(TAG, "Exception: at UserService");
-                }
-
-                setTitle("Settings");
-
-
-                // TODO - initialise fragment
-                //addFragment();
-            }
-        });
     }
 
-    // public void addFragment() {
-    //getSupportFragmentManager().beginTransaction().add(R.id.settings_activity_container, fragment).commit();
-    // }
+     public void addFragment() {
+       getSupportFragmentManager().beginTransaction().add(R.id.settings_activity_container, fragment).commit();
+     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
+
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -244,7 +103,17 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
     protected void attachBaseContext(Context newBase) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
         String language=sharedPreferences.getString("LANGUAGE","de");
+        System.out.println("Language: "+language);
         super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        System.out.println("onConfigurationChanged Language: "+language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
     }
 
 
