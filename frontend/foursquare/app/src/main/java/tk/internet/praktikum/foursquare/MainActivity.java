@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -39,27 +40,25 @@ import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.history.HistoryActivity;
+import tk.internet.praktikum.foursquare.history.HistoryFragment;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
+import tk.internet.praktikum.foursquare.search.PersonSearchFragment;
 import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.SettingsActivity;
+import tk.internet.praktikum.foursquare.user.SettingsFragment;
 import tk.internet.praktikum.foursquare.user.UserActivity;
 import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
-    private final int REQUEST_CHAT = 1;
-    private final int REQUEST_PROFILE = 2;
     private final int REQUEST_SEARCH_PERSON = 3;
     private final int REQUEST_HISTORY = 4;
-    private final int REQUEST_SETTINGS = 5;
     private final int REQUEST_ME = 6;
 
-    private MenuItem searchMenu, meMenu;
     private TextView userName;
     private ImageView avatar;
 
@@ -92,16 +91,6 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        Menu tmpMenu = navigationView.getMenu();
-        for (int i = 0; i < tmpMenu.size(); i++) {
-            tmpMenu.getItem(i);
-            if (tmpMenu.getItem(i).getItemId() == R.id.nav_search) {
-                searchMenu = tmpMenu.getItem(i);
-            } else if (tmpMenu.getItem(i).getItemId() == R.id.nav_me) {
-                meMenu = tmpMenu.getItem(i);
-            }
-        }
 
         View parentView = navigationView.getHeaderView(0);
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
@@ -202,35 +191,42 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(intent, REQUEST_SEARCH_PERSON);
     }
 
+    private void searchPersonNavigation(MenuItem item) {
+        PersonSearchFragment fragment = new PersonSearchFragment();
+        redirectToFragment(fragment);
+        setTitle(item);
+    }
+
     private void historyNavigation() {
         Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
         startActivityForResult(intent, REQUEST_HISTORY);
     }
 
-    private void meNavigation(MenuItem item) {
+    private void historyNavigation(MenuItem item) {
+        HistoryFragment fragment = new HistoryFragment();
+        redirectToFragment(fragment);
+        setTitle(item);
+    }
+
+    private void meNavigation() {
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             login();
         } else {
             Intent intent = new Intent(getApplicationContext(), UserActivity.class);
             startActivityForResult(intent, REQUEST_ME);
-            /*
-            try {
-                Fragment fragment = MeFragment.class.newInstance();
-                redirectToFragment(fragment);
-                // TODO - Title = mein name?
-                setTitle(item);
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            */
         }
     }
 
     private void settingsNavigation() {
         Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-        startActivityForResult(intent, REQUEST_SETTINGS);
+        startActivity(intent);
+
+    }
+
+    private void settingsNavigation(MenuItem item) {
+        SettingsFragment fragment = new SettingsFragment();
+        redirectToFragment(fragment);
+        setTitle(item);
     }
 
     private void login() {
@@ -249,23 +245,25 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // TODO - SIMPLIFY THIS MONSTER
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_search:
                 searchNavigation(item);
                 break;
             case R.id.nav_search_person:
-                searchPersonNavigation();
+                //searchPersonNavigation();
+                searchPersonNavigation(item);
                 break;
             case R.id.nav_history:
-                historyNavigation();
+                //historyNavigation();
+                historyNavigation(item);
                 break;
             case R.id.nav_me:
-                meNavigation(item);
+                meNavigation();
                 break;
             case R.id.nav_manage:
-                settingsNavigation();
+                //settingsNavigation();
+                settingsNavigation(item);
                 break;
             case R.id.nav_login_logout:
                 if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
@@ -276,9 +274,6 @@ public class MainActivity extends AppCompatActivity
                     logout();
                     item.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
                 }
-                break;
-            case R.id.nav_logout:
-                logout();
                 break;
         }
 
@@ -303,7 +298,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO - SIMPLIFY THIS MONSTER
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_LOGIN:
@@ -311,127 +305,6 @@ public class MainActivity extends AppCompatActivity
                     initialiseNavigationHeader();
                     // meNavigation(meMenu);
                     break;
-                }
-                break;
-            case REQUEST_CHAT:
-                switch (resultCode) {
-                    case 0:
-                        searchNavigation(searchMenu);
-                        break;
-                    case 1:
-                        searchPersonNavigation();
-                        break;
-                    case 2:
-                        historyNavigation();
-                        break;
-                    case 3:
-                        meNavigation(meMenu);
-                        break;
-                    case 4:
-                        settingsNavigation();
-                        break;
-                    case 5:
-                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
-                            login();
-                        else
-                            logout();
-                        break;
-                }
-            case REQUEST_PROFILE:
-                switch (resultCode) {
-                    case 0:
-                        searchNavigation(searchMenu);
-                        break;
-                    case 1:
-                        searchPersonNavigation();
-                        break;
-                    case 2:
-                        historyNavigation();
-                        break;
-                    case 3:
-                        meNavigation(meMenu);
-                        break;
-                    case 4:
-                        settingsNavigation();
-                        break;
-                    case 5:
-                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
-                            login();
-                        else
-                            logout();
-                        break;
-                }
-            case REQUEST_HISTORY:
-                switch (resultCode) {
-                    case 0:
-                        searchNavigation(searchMenu);
-                        break;
-                    case 1:
-                        searchPersonNavigation();
-                        break;
-                    case 2:
-                        historyNavigation();
-                        break;
-                    case 3:
-                        meNavigation(meMenu);
-                        break;
-                    case 4:
-                        settingsNavigation();
-                        break;
-                    case 5:
-                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
-                            login();
-                        else
-                            logout();
-                        break;
-                }
-            case REQUEST_SETTINGS:
-                switch (resultCode) {
-                    case 0:
-                        searchNavigation(searchMenu);
-                        break;
-                    case 1:
-                        searchPersonNavigation();
-                        break;
-                    case 2:
-                        historyNavigation();
-                        break;
-                    case 3:
-                        meNavigation(meMenu);
-                        break;
-                    case 4:
-                        settingsNavigation();
-                        break;
-                    case 5:
-                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
-                            login();
-                        else
-                            logout();
-                        break;
-                }
-            case REQUEST_SEARCH_PERSON:
-                switch (resultCode) {
-                    case 0:
-                        searchNavigation(searchMenu);
-                        break;
-                    case 1:
-                        searchPersonNavigation();
-                        break;
-                    case 2:
-                        historyNavigation();
-                        break;
-                    case 3:
-                        meNavigation(meMenu);
-                        break;
-                    case 4:
-                        settingsNavigation();
-                        break;
-                    case 5:
-                        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
-                            login();
-                        else
-                            logout();
-                        break;
                 }
         }
     }
@@ -447,6 +320,12 @@ public class MainActivity extends AppCompatActivity
         if (!(EventBus.getDefault().isRegistered(this))) {
             EventBus.getDefault().register(this);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initialiseNavigationHeader();
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -532,7 +411,7 @@ public class MainActivity extends AppCompatActivity
         super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
     }
 
-    /*@Override
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
@@ -540,6 +419,5 @@ public class MainActivity extends AppCompatActivity
         Locale locale=new Locale(language);
         System.out.println("onConfigurationChanged Language: "+language);
         AdjustedContextWrapper.wrap(getBaseContext(),language);
-
-    }*/
+    }
 }
