@@ -133,9 +133,7 @@ public class SettingsFragment extends Fragment {
                 Log.d("HUSSO", "item is: " + item);
                 int index= langList.indexOf(item);
                 LocalStorage.getLocalStorageInstance(getContext()).setLanguage("LANGUAGE", localeList.get(index));
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                getContext().startActivity(intent);
+                getActivity().recreate();
             }
 
             @Override
