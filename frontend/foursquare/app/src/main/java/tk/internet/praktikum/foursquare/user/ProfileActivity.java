@@ -33,7 +33,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User otherUser = new User();
-    private TextView name, email, city, age;
+    private TextView name, city, age;
     private RadioButton male, female, none;
     private ImageView avatarPicture;
     private FloatingActionButton fab;
@@ -56,7 +56,6 @@ public class ProfileActivity extends AppCompatActivity {
         setTitle(getApplicationContext().getResources().getString(R.string.user_tab_profile));
 
         name = (TextView) findViewById(R.id.profile_name);
-        email = (TextView) findViewById(R.id.profile_email);
         city = (TextView) findViewById(R.id.profile_city);
         age = (TextView) findViewById(R.id.profile_age);
 
@@ -119,7 +118,6 @@ public class ProfileActivity extends AppCompatActivity {
                             user -> {
                                 otherUser = user;
                                 name.setText(otherUser.getDisplayName());
-                                email.setText(otherUser.getEmail());
                                 city.setText(otherUser.getCity());
                                 age.setText(Integer.toString(otherUser.getAge()));
                                 Gender gender = otherUser.getGender();
@@ -129,6 +127,9 @@ public class ProfileActivity extends AppCompatActivity {
                                     female.setChecked(true);
                                 else
                                     none.setChecked(true);
+
+                                // TODO - SET TOP CHECKINS
+                                // TODO - SET LAST CHECKINS => IMPLEMENT RECYCLER VIEW + VIEW LAYOUT
 
                                 if (otherUser.getAvatar() != null) {
                                     ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());

@@ -39,6 +39,15 @@
     <string name="user_tab_inbox">Inbox</string>
     <string name="near_me">in meiner Nähe</string>
 
+    <!-- user profile stuff -->
+    <string name="profile_city">Stadt</string>
+    <string name="profile_age">Age</string>
+    <string name="profile_gender">Geschlecht</string>
+    <string name="profile_male">Männlich</string>
+    <string name="profile_female">Weiblich</string>
+    <string name="profile_Anonymous">Anonym</string>
+
+    <!-- Other stuff -->
     <string name="profile_upload_avatar">Hochladen</string>
     <string name="title_activity_maps">Map</string>
     <string name="liked">Mag</string>
