@@ -1,6 +1,5 @@
 package tk.internet.praktikum.foursquare.search;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -16,20 +15,12 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import tk.internet.praktikum.CommentAdapter;
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
-import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.User;
-import tk.internet.praktikum.foursquare.api.service.UserService;
-import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
 
-/**
- * Created by gehhi on 17.08.2017.
- */
 
 class PersonSearchResultAdapter extends RecyclerView.Adapter<PersonSearchResultAdapter.MyViewHolder> {
     private static final String LOG = PersonSearchResultAdapter.class.getName();

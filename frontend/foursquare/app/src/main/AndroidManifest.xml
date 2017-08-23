@@ -72,18 +72,11 @@
             android:name=".chat.ChatActivity"
             android:configChanges="locale"
             android:theme="@style/AppTheme" />
-  <!--      <activity
-            android:name=".history.HistoryActivity"
-            android:configChanges="locale"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".user.SettingsActivity"
-            android:configChanges="locale"
-            android:theme="@style/AppTheme" />
+
         <activity
             android:name=".search.SearchPersonActivity"
             android:configChanges="locale"
-            android:theme="@style/AppTheme" />-->
+            android:theme="@style/AppTheme" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

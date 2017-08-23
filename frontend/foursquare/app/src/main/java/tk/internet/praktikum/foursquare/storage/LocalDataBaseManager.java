@@ -7,9 +7,6 @@ import org.greenrobot.greendao.database.Database;
 import tk.internet.praktikum.foursquare.history.DaoMaster;
 import tk.internet.praktikum.foursquare.history.DaoSession;
 
-/**
- * Created by truongtud on 04.07.2017.
- */
 
 public class LocalDataBaseManager {
     private Context context;

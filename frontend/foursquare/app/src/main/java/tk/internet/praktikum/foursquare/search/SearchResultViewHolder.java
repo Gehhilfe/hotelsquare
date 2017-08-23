@@ -17,9 +17,6 @@ import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
-/**
- * Created by truongtud on 02.07.2017.
- */
 
 public class SearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -81,7 +78,6 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
     }
     @Override
     public void onClick(View v) {
-        System.out.println(" clicked on venue item");
         searchResultAdapterListener.clickOnVenue(String.valueOf(this.getLayoutPosition()));
     }
 

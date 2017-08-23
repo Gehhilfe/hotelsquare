@@ -8,9 +8,7 @@ import android.graphics.drawable.Drawable;
 
 import java.io.InputStream;
 
-/**
- * Created by truongtud on 02.07.2017.
- */
+
 
 public class Utils {
 

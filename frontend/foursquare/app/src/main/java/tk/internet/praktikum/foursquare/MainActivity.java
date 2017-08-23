@@ -220,11 +220,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-   /* private void settingsNavigation() {
-        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-        startActivity(intent);
-
-    }*/
 
     private void settingsNavigation(MenuItem item) {
         SettingsFragment fragment = new SettingsFragment();

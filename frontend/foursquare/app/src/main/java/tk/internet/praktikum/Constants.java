@@ -1,8 +1,6 @@
 package tk.internet.praktikum;
 
-/**
- * Created by truongtud on 17.06.2017.
- */
+
 
 public class Constants {
     public  static  final String TOKEN="token";

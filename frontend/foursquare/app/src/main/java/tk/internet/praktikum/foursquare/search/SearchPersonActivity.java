@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import tk.internet.praktikum.foursquare.R;
 
 public class SearchPersonActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    // TODO - Hier das Fragment mit HistoryFragment tauschen
     private Fragment fragment;
 
     @Override

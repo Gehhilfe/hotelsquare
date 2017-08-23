@@ -17,7 +17,7 @@ import tk.internet.praktikum.foursquare.home.HomeFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
-//import tk.internet.praktikum.foursquare.history.dummy.DummyHistoryFragment;
+
 
 public class UserActivity extends AppCompatActivity  {
     private UserStatePagerAdapter userStatePagerAdapter;
@@ -54,7 +54,6 @@ public class UserActivity extends AppCompatActivity  {
     private void initialiseFragmentContainer(ViewPager container) {
         userStatePagerAdapter.addFragment(new HomeFragment(), "Home");
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
-        // userStatePagerAdapter.addFragment(new DummyHistoryFragment(), "History");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);

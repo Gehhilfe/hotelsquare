@@ -1,7 +1,5 @@
 package tk.internet.praktikum.foursquare.login;
 
-/*import android.app.Fragment;
-import android.app.FragmentTransaction;*/
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -24,7 +22,6 @@ import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.SessionService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.MeFragment;
 
 public class LoginFragment extends Fragment {
     private static final String LOG_TAG = LoginFragment.class.getSimpleName();

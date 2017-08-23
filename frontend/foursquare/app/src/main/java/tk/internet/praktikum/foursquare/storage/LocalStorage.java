@@ -8,9 +8,6 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.bean.TokenInformation;
 import tk.internet.praktikum.foursquare.api.bean.User;
 
-/**
- * Created by truongtud on 16.05.2017.
- */
 
 public class LocalStorage {
 

@@ -268,15 +268,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             public void onInfoWindowClick(Marker marker) {
                 // if Venue, got to Venue-Details
                 if (markerVenueMap.containsKey(marker)) {
-
-                    //TODO:
-                   /* VenueInDetailFragment venueInDetailFragment = new VenueInDetailFragment();
-                    venueInDetailFragment.setParent(parent);
-                    venueInDetailFragment.setVenueId(markerVenueMap.get(marker).getId());
-                    FragmentTransaction fragmentTransaction = VenuesOnMapFragment.this.getFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, venueInDetailFragment);
-                    fragmentTransaction.addToBackStack(venueInDetailFragment.getTag());
-                    fragmentTransaction.commit();*/
                     Intent intent = new Intent(parent.getActivity(), VenueInDetailsNestedScrollView.class);
                     intent.putExtra("VENUE_ID", markerVenueMap.get(marker).getId());
                     parent.getActivity().startActivity(intent);

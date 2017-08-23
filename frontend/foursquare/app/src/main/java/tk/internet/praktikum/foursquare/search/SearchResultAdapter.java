@@ -56,10 +56,6 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
         Intent intent = new Intent(parentFragment.getActivity(), VenueInDetailsNestedScrollView.class);
         intent.putExtra("VENUE_ID", searchResultViewHolderList.get(Integer.valueOf(venueId)).getId());
         parentFragment.getActivity().startActivity(intent);
-        /* VenueInDetailFragment venueInDetailFragment=new VenueInDetailFragment();
-        venueInDetailFragment.setVenueId(searchResultViewHolderList.get(Integer.valueOf(venueId)).getId());
-        venueInDetailFragment.setParent(parentFragment);
-        redirectToFragment(venueInDetailFragment); */
     }
     public  void addMoreVenues(List<Venue> venues){
         this.searchResultViewHolderList.addAll(filterVenue(venues));

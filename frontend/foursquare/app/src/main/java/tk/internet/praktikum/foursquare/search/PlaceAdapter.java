@@ -15,9 +15,6 @@ import java.util.List;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.bean.Prediction;
 
-/**
- * Created by truongtud on 18.07.2017.
- */
 
 public class PlaceAdapter extends ArrayAdapter<Prediction> {
     private List<Prediction> suggestedPlaces;

@@ -11,9 +11,6 @@ import java.util.List;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.bean.Image;
 
-/**
- * Created by truongtud on 15.08.2017.
- */
 
 public class VenueImageAdapter extends RecyclerView.Adapter<VenueImageViewHolder> {
 
