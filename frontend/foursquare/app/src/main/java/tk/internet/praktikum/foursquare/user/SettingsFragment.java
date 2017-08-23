@@ -3,7 +3,6 @@ package tk.internet.praktikum.foursquare.user;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,7 +30,6 @@ import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
 public class SettingsFragment extends Fragment {
 
@@ -135,15 +133,10 @@ public class SettingsFragment extends Fragment {
                 Log.d("HUSSO", "item is: " + item);
                 int index= langList.indexOf(item);
                 LocalStorage.getLocalStorageInstance(getContext()).setLanguage("LANGUAGE", localeList.get(index));
-                SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getContext());
-                String language=sharedPreferences.getString("LANGUAGE","de");
-                System.out.println("SettingsFragment onCreate Language: "+language);
-                AdjustedContextWrapper.wrap(getContext(),language);
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+               // getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commit();
+                Intent intent=new Intent(getContext(),MainActivity.class);
                 getContext().startActivity(intent);
-
-
+                //getActivity().recreate();
 
             }
 

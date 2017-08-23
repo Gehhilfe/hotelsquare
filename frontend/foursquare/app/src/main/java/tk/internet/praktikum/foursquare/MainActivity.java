@@ -4,11 +4,11 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,8 +27,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.Locale;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
@@ -39,19 +37,16 @@ import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
-import tk.internet.praktikum.foursquare.history.HistoryActivity;
 import tk.internet.praktikum.foursquare.history.HistoryFragment;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.search.PersonSearchFragment;
-import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.SettingsActivity;
 import tk.internet.praktikum.foursquare.user.SettingsFragment;
 import tk.internet.praktikum.foursquare.user.UserActivity;
-import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
+import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
@@ -74,8 +69,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
         String language=sharedPreferences.getString("LANGUAGE","de");
-        Locale locale=new Locale(language);
-        System.out.println("MainActivity onCreate Language: "+language);
+        LanguageHelper.updateResources(this,language);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -99,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             initialiseNavigationHeader();
 
         FastSearchFragment searchFragment = new FastSearchFragment();
-        redirectToFragment(searchFragment);
+        redirectToFragment(searchFragment,getApplicationContext().getResources().getString(R.string.action_search));
 
         handler.postDelayed(sendLocation, PARAM_INTERVAL);
     }
@@ -146,7 +140,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            int lastBackStackEntryPosition=getSupportFragmentManager().getBackStackEntryCount()-2;
+            if(lastBackStackEntryPosition>=0) {
+                FragmentManager.BackStackEntry lastBackStackEntry =
+                        getSupportFragmentManager().getBackStackEntryAt(lastBackStackEntryPosition);
+                setTitle(lastBackStackEntry.getName());
+                getSupportFragmentManager().popBackStack();
+            }
+        }
+        else {
             super.onBackPressed();
         }
     }
@@ -176,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void searchNavigation(MenuItem item) {
         try {
             Fragment fragment = FastSearchFragment.class.newInstance();
-            redirectToFragment(fragment);
+            redirectToFragment(fragment,getApplicationContext().getResources().getString(R.string.action_search));
             setTitle(item);
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -185,25 +189,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void searchPersonNavigation() {
+  /*  private void searchPersonNavigation() {
         Intent intent = new Intent(getApplicationContext(), SearchPersonActivity.class);
         startActivityForResult(intent, REQUEST_SEARCH_PERSON);
-    }
+    }*/
 
     private void searchPersonNavigation(MenuItem item) {
         PersonSearchFragment fragment = new PersonSearchFragment();
-        redirectToFragment(fragment);
+        redirectToFragment(fragment,getApplicationContext().getResources().getString(R.string.action_search_person));
         setTitle(item);
     }
-
+/*
     private void historyNavigation() {
         Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
         startActivityForResult(intent, REQUEST_HISTORY);
-    }
+    }*/
 
     private void historyNavigation(MenuItem item) {
         HistoryFragment fragment = new HistoryFragment();
-        redirectToFragment(fragment);
+        redirectToFragment(fragment,getApplicationContext().getResources().getString(R.string.action_history));
         setTitle(item);
     }
 
@@ -216,21 +220,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void settingsNavigation() {
+   /* private void settingsNavigation() {
         Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
         startActivity(intent);
 
-    }
+    }*/
 
     private void settingsNavigation(MenuItem item) {
         SettingsFragment fragment = new SettingsFragment();
-        redirectToFragment(fragment);
+        redirectToFragment(fragment,getApplicationContext().getResources().getString(R.string.action_settings));
         setTitle(item);
     }
 
     private void login() {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivityForResult(intent, REQUEST_LOGIN);
+
     }
 
     private void logout() {
@@ -281,10 +286,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void redirectToFragment(Fragment fragment) {
+    private void redirectToFragment(Fragment fragment,String backStackName) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.addToBackStack(backStackName);
         fragmentTransaction.commit();
     }
 
@@ -403,7 +408,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     };
 
-    @Override
+    public void setTitleOnBackStack(){
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+            }
+        });
+    }
+
+/*    @Override
     protected void attachBaseContext(Context newBase) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
         String language=sharedPreferences.getString("LANGUAGE","de");
@@ -418,5 +433,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Locale locale=new Locale(language);
         System.out.println("onConfigurationChanged Language: "+language);
         AdjustedContextWrapper.wrap(getBaseContext(),language);
-    }
+    }*/
 }

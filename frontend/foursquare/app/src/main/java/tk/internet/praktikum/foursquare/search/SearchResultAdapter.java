@@ -8,8 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
@@ -83,12 +83,27 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
         this.searchResultViewHolderList = searchResultViewHolderList;
     }
 
-    public List<Venue> filterVenue(List<Venue> venues){
+   /* public List<Venue> filterVenue(List<Venue> venues){
           return venues.parallelStream().filter(venue ->!containVenue(venue)).collect(Collectors.toList());
+    }*/
+   /* public boolean containVenue(Venue venue){
+        return  searchResultViewHolderList.parallelStream().filter(v->v.getId().equals(venue.getId())).findFirst().isPresent();
+    }*/
 
+    public List<Venue> filterVenue(List<Venue> venues){
+        List<Venue> newVenues=new ArrayList<>();
+          for(Venue venue:venues){
+              if(!containVenue(venue))
+                  newVenues.add(venue);
+          }
+          return newVenues;
     }
     public boolean containVenue(Venue venue){
-        return  searchResultViewHolderList.parallelStream().filter(v->v.getId().equals(venue.getId())).findFirst().isPresent();
+        for(Venue v: searchResultViewHolderList){
+            if(v.getId().equals(venue.getId()))
+                return true;
+        }
+        return  false;
     }
 
 }

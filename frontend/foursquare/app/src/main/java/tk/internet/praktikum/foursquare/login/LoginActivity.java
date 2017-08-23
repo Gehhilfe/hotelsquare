@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
+import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
 public class LoginActivity extends AppCompatActivity {
     private LoginFragment loginFragment;
@@ -22,12 +22,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
         String language=sharedPreferences.getString("LANGUAGE","de");
-        System.out.println("LoginActivity onCreate Language: "+language);
-        AdjustedContextWrapper.wrap(getBaseContext(),language);
+        LanguageHelper.updateResources(this,language);
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_login);
-
         addFragment();
     }
 
@@ -66,19 +63,6 @@ public class LoginActivity extends AppCompatActivity {
                 break;
         }
     }
-/*    @Override
-    protected void attachBaseContext(Context newBase) {
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
-    }
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        Locale locale=new Locale(language);
-        AdjustedContextWrapper.wrap(getBaseContext(),language);
 
-    }*/
+
 }

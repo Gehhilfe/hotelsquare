@@ -133,15 +133,13 @@ public class FastSearchFragment extends Fragment {
 
     private void deepSearch(String keyWord) {
 
-
-        // also gets the suggested value from 9 categories
         Fragment fragment = new DeepSearchFragment();
         Bundle bundle = new Bundle();
         bundle.putString("keyword", keyWord);
         fragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.addToBackStack(getContext().getResources().getString(R.string.action_search));
         fragmentTransaction.commit();
     }
 
