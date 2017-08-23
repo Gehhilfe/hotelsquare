@@ -205,6 +205,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         lastHereRecylcer.setNestedScrollingEnabled(false);
         lastHereRecylcer.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         lastHereRecylcer.setItemAnimator(new DefaultItemAnimator());
+        lastHereRecylcer.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL));
+
         lastHereRecylcer.setAdapter(lastHereAdapter);
 
         progressDialog = new ProgressDialog(this, 0);
@@ -568,22 +570,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
 
     }
-  /*  @Override
-    protected void attachBaseContext(Context newBase) {
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        System.out.println("Language: "+language);
-        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
-    }
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        System.out.println("onConfigurationChanged Language: "+language);
-        AdjustedContextWrapper.wrap(getBaseContext(),language);
 
-    }*/
   public View.OnClickListener seeProfileListener(User user){
       return new View.OnClickListener() {
           @Override

@@ -47,7 +47,6 @@ import tk.internet.praktikum.foursquare.api.bean.VenueSearchQuery;
 import tk.internet.praktikum.foursquare.api.service.PlaceService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 
-//import tk.internet.praktikum.foursquare.api.bean.Location;
 
 
 public class DeepSearchFragment extends Fragment implements android.support.v7.widget.SearchView.OnQueryTextListener, PlaceSelectionListener {

@@ -3,6 +3,7 @@ package tk.internet.praktikum.foursquare.search;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -86,6 +87,7 @@ public class VenuesListFragment extends Fragment {
             searchResultAdapter=new SearchResultAdapter(this, venues);
             recyclerView.setAdapter(searchResultAdapter);
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
         }
         else{
 

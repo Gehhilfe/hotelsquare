@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import tk.internet.praktikum.foursquare.R;
 
 public class HistoryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    // TODO - Hier das Fragment mit HistoryFragment tauschen
     private Fragment fragment;
 
     @Override
@@ -86,19 +85,4 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
             super.onBackPressed();
         }
     }
-    /*@Override
-    protected void attachBaseContext(Context newBase) {
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
-    }
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        Locale locale=new Locale(language);
-        AdjustedContextWrapper.wrap(getBaseContext(),language);
-
-    }*/
 }

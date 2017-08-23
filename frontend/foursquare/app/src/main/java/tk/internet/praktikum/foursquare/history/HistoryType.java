@@ -1,9 +1,5 @@
 package tk.internet.praktikum.foursquare.history;
 
-/**
- * Created by truongtud on 19.08.2017.
- */
-
 public enum HistoryType {
     CHECKIN(0),
     VISIT(1),

@@ -11,9 +11,6 @@ import org.greenrobot.greendao.converter.PropertyConverter;
 
 import java.util.Date;
 
-/**
- * Created by truongtud on 04.07.2017.
- */
 @Entity(nameInDb = "history")
 public class HistoryEntry {
 
