@@ -182,6 +182,17 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        // check not logged in, hide the unnecessary stuff
+        if (LocalStorage.
+                getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "").equals("")) {
+            deleteProfileButton.setVisibility(View.GONE);
+            incognitoModeCheckBox.setVisibility(View.GONE);
+
+        } else {
+            deleteProfileButton.setVisibility(View.VISIBLE);
+            incognitoModeCheckBox.setVisibility(View.VISIBLE);
+        }
+
         return view;
     }
 
