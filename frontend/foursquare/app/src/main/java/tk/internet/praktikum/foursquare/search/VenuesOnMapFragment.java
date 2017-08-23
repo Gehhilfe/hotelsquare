@@ -84,6 +84,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private MainActivity mainActivity;
     private Fragment parent;
     int i = 0;
+
     // private ClusterManager<Location> locationClusterManager;
     public VenuesOnMapFragment() {
         // Required empty public constructor
@@ -140,11 +141,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
         Log.d("MAPFIX", "OMR: The Map is ready and created");
-
-        // set Usermarker
-        //Log.d("MAPFIX", "OMR: User get set now");
-        //setUser();
-        //Log.d("MAPFIX", "OMR: User was set");
 
         // custom InfoWindow for all Markers
         class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
@@ -379,7 +375,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             updateFriendsMarker();
         }
         Location centerLocation=calculateClusteringCenterLocation(venues);
-        //Location centerLocation=userLocation;
+        //Location centerLocation = userLocation;
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 12));
 
     }
@@ -399,15 +395,17 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             // get belonging marker
             Marker tmpMarker = getFriendMarker(tmpFriend);
             // remove it
-            markerFriendMap.remove(tmpMarker);
-            tmpMarker.remove();
-            friendBitmapMap.remove(tmpFriend);
-            Log.d("KEYFOUND", "Removed!");
+            //markerFriendMap.remove(tmpMarker);
+            //tmpMarker.remove();
+            //friendBitmapMap.remove(tmpFriend);
+            tmpMarker.setPosition(friendLocation);
+        } else {
+            Marker tmp = map.addMarker(new MarkerOptions()
+                    .position(friendLocation)
+                    .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position))
+            );
+            markerFriendMap.put(tmp, friend);
         }
-        Marker tmp = map.addMarker(new MarkerOptions()
-                .position(friendLocation)
-                .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position))
-        );
         // load Images for marker
         if (friend.getAvatar() != null) {
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
@@ -418,8 +416,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                         friendBitmapMap.put(friend, bitmap);
                     });
         }
-        Log.d("KEYFOUND", "ADDED!");
-        markerFriendMap.put(tmp, friend);
         return;
     }
 
@@ -515,7 +511,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                                 user -> {
                                     this.user = user;
                                     // get user Avatar
-                                    if(user.getAvatar() == null)
+                                    if (user.getAvatar() == null)
                                         return;
                                     ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getContext());
                                     imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
