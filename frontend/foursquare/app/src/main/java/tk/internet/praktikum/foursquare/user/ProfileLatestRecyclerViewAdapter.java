@@ -2,6 +2,7 @@ package tk.internet.praktikum.foursquare.user;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
@@ -54,10 +56,13 @@ public class ProfileLatestRecyclerViewAdapter extends RecyclerView.Adapter<Profi
         }
 
         private void loadVenue() {
-           // TODO - LOAD VENUE DETAILS VIEW
+            Intent intent = new Intent(activity, VenueInDetailsNestedScrollView.class);
+            intent.putExtra("VENUE_ID", venueCheckinList.get(getAdapterPosition()).getVenueID());
+            activity.startActivity(intent);
         }
     }
 
+    private Activity activity;
     private final String URL = "https://dev.ip.stimi.ovh/";
     private Context context;
     private LayoutInflater inflater;
@@ -65,10 +70,11 @@ public class ProfileLatestRecyclerViewAdapter extends RecyclerView.Adapter<Profi
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.y HH:mm",  Locale.ENGLISH);
 
 
-    public ProfileLatestRecyclerViewAdapter(Context context, List<VenueCheckinInformation> venueCheckinList) {
+    public ProfileLatestRecyclerViewAdapter(Context context, List<VenueCheckinInformation> venueCheckinList, Activity activity) {
         inflater = LayoutInflater.from(context);
         this.venueCheckinList = venueCheckinList;
         this.context = context;
+        this.activity = activity;
     }
 
     @Override

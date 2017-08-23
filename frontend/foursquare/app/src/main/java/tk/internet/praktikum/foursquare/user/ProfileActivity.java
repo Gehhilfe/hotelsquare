@@ -137,7 +137,7 @@ public class ProfileActivity extends AppCompatActivity {
                                     none.setChecked(true);
 
                                 // TODO - SET LAST CHECKINS => IMPLEMENT RECYCLER VIEW + VIEW LAYOUT
-                                recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins()));
+                                recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins(), this));
                                 // TODO - SET TOP CHECKINS
 
                                 if (otherUser.getAvatar() != null) {
