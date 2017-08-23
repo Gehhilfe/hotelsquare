@@ -10,28 +10,29 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import com.akexorcist.localizationactivity.LocalizationActivity;
 
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
-public class SettingsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class SettingsActivity extends LocalizationActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private Fragment fragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-
+     public void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
         String language=sharedPreferences.getString("LANGUAGE","de");
-        System.out.println("SettingActivity Language: "+language);
+        System.out.println("SettingsActivity onCreate Language: "+language);
         AdjustedContextWrapper.wrap(getBaseContext(),language);
+        getApplicationContext().getResources().getConfiguration().getLocales();
 
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
         Toolbar toolbar = (Toolbar) findViewById(R.id.settings_toolbar);
         setSupportActionBar(toolbar);
 
@@ -99,7 +100,7 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
         }
     }
 
-    @Override
+   @Override
     protected void attachBaseContext(Context newBase) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
         String language=sharedPreferences.getString("LANGUAGE","de");
@@ -108,11 +109,12 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
         String language=sharedPreferences.getString("LANGUAGE","de");
-        System.out.println("onConfigurationChanged Language: "+language);
+        System.out.println("###### SettingsActivity onConfigurationChanged Language: "+language);
         AdjustedContextWrapper.wrap(getBaseContext(),language);
+        super.onConfigurationChanged(newConfig);
+
 
     }
 

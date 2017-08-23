@@ -247,7 +247,6 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                     lastHereAdapter.setData(venue.getLastCheckins());
                     if (venue.getImages().size() > 0) {
                         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
-
                         imageCacheLoader.loadBitmap(venue.getImages().get(0), ImageSize.MEDIUM)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())

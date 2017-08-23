@@ -2,27 +2,27 @@ package tk.internet.praktikum.foursquare.login;
 
 //import android.app.FragmentTransaction;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.Locale;
-
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
+import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
 public class LoginActivity extends AppCompatActivity {
     private LoginFragment loginFragment;
     private RegisterFragment registerFragment;
+
     private RestorePasswordFragment restorePasswordFragment;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        LanguageHelper.updateResources(this,language);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         addFragment();
@@ -63,19 +63,6 @@ public class LoginActivity extends AppCompatActivity {
                 break;
         }
     }
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
-    }
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        Locale locale=new Locale(language);
-        AdjustedContextWrapper.wrap(getBaseContext(),language);
 
-    }
+
 }

@@ -133,7 +133,11 @@ public class SettingsFragment extends Fragment {
                 Log.d("HUSSO", "item is: " + item);
                 int index= langList.indexOf(item);
                 LocalStorage.getLocalStorageInstance(getContext()).setLanguage("LANGUAGE", localeList.get(index));
-                getActivity().recreate();
+               // getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commit();
+                Intent intent=new Intent(getContext(),MainActivity.class);
+                getContext().startActivity(intent);
+                //getActivity().recreate();
+
             }
 
             @Override
