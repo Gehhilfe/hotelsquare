@@ -1,4 +1,5 @@
 <resources>
+    <!-- Register / login -->
     <string name="foursquare_slogan">Explore the world around you</string>
     <string name="app_name">Hotelsquare</string>
     <string name="login_email">Email</string>
@@ -33,11 +34,21 @@
     <string name="searching_question">What are you searching for?</string>
 
 <!-- User -->
+    <!-- Tab menu -->
     <string name="user_tab_requests">Requests</string>
     <string name="user_tab_profile">Profile</string>
     <string name="user_tab_friends">Friends</string>
     <string name="user_tab_inbox">Inbox</string>
 
+    <!-- user profile stuff -->
+    <string name="profile_city">City</string>
+    <string name="profile_age">Age</string>
+    <string name="profile_gender">Gender</string>
+    <string name="profile_male">Male</string>
+    <string name="profile_female">Female</string>
+    <string name="profile_Anonymous">Anonymous</string>
+
+    <!-- Other stuff -->
     <string name="profile_upload_avatar">Upload</string>
     <string name="title_activity_maps">Map</string>
     <string name="price">Price</string>
