@@ -47,7 +47,7 @@ public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyView
     public void onBindViewHolder(MyViewHolder holder, int position) {
         UserCheckinInformation info = checkinInformations.get(position);
 
-        holder.date.setText(DateFormat.getFriendlyTime(info.getLastDate()));
+        holder.date.setText(DateFormat.getFriendlyTime(context,info.getLastDate()));
 
         UserService us = ServiceFactory.createRetrofitService(UserService.class, VenueInDetailsNestedScrollView.URL);
 

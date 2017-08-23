@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,7 +46,6 @@ import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.MeFragment;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
 import tk.internet.praktikum.foursquare.user.UserActivity;
 

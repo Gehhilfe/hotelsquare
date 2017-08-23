@@ -37,6 +37,7 @@
     <string name="user_tab_profile">Profil</string>
     <string name="user_tab_friends">Freunden</string>
     <string name="user_tab_inbox">Inbox</string>
+    <string name="near_me">in meiner Nähe</string>
 
     <string name="profile_upload_avatar">Hochladen</string>
     <string name="title_activity_maps">Map</string>
@@ -47,8 +48,8 @@
     <string name="saved">Speichern</string>
     <string name="venue_call">Anrufen</string>
     <string name="venue_check_in">Einschecken</string>
-    <string name="langSelect">Sprache auswählen</string>
-    <string name="incognito">Incognito Mode</string>
+
+    <string name="login_first">Du musst anmelden</string>
     <string name="history_state_check_in">Eingescheckt</string>
     <string name="history_state_visit">Besucht</string>
     <string name="history_state_like">Gefällt mir einen Kommentar</string>
@@ -59,7 +60,34 @@
     <string name="button_post_text">Kommentar schreiben</string>
     <string name="button_pictures">Bilders</string>
     <string name="title_activity_venue_gallery">Gallery</string>
+    <string name="action_post_image">Bild hochladen</string>
+    <string name="action_post_text">Text kommnentieren</string>
+    <string name="action_post_text_default">Dein Kommentar!</string>
+    <string name="action_post_image_select_1">Foto machen</string>
+    <string name="action_post_image_select_2">Foto von Gallery auswählen</string>
 
+    <!-- settings-->
+    <string name="langSelect">Sprache auswählen</string>
+    <string name="incognito">Inkonito-Modus</string>
+    <string name="delete_profile">Profil löschen</string>
+
+    <!-- venue in details -->
+    <string name="leaderboard">Bestenliste</string>
+    <string name="last_checkins">Letztes Einchecken</string>
+    <string name="checkins_count">Einchecken</string>
+    <string name="a_year">einem Jahr</string>
+    <string name="years">Jahren</string>
+    <string name="a_month">einem Monat</string>
+    <string name="months">Monaten</string>
+    <string name="a_day">einem Tag</string>
+    <string name="days">Tage</string>
+    <string name="an_hour">einer Stunde</string>
+    <string name="hours">Studen</string>
+    <string name="a_minute">einer Minute</string>
+    <string name="minutes">Minuten</string>
+    <string name="a_second">einer Sekunde</string>
+    <string name="seconds">Sekunden</string>
+    <string name="about">circa</string>
     <string-array name="languages">
         <item>Englisch</item>
         <item>Deutsch</item>

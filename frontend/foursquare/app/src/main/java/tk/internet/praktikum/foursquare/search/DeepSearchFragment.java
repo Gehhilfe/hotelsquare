@@ -24,7 +24,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.common.api.Status;
@@ -208,7 +207,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem item) {
                         // Do something when collapsed
-                        Toast.makeText(getContext(),"back to fastSearch",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(),"back to fastSearch",Toast.LENGTH_SHORT).show();
                         getActivity().onBackPressed();
                         return true;
                     }
@@ -278,7 +277,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             Log.d(LOG, "#### currentQuery: " + query);
             Log.d(LOG,"++++ currentPageQuery: "+currentPage);
             VenueSearchQuery venueSearchQuery;
-            if ( filterLocation!=null && !filterLocation.getText().toString().isEmpty()&& !filterLocation.getText().toString().equals("Near Me")) {
+            if ( filterLocation!=null && !filterLocation.getText().toString().isEmpty()&& !filterLocation.getText().toString().equals(getContext().getResources().getString(R.string.near_me))) {
                 venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString().trim());
             } else {
                 // gets current location based on gps; "Near me"

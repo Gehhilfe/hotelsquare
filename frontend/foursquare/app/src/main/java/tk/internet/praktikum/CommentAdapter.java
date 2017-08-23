@@ -76,7 +76,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
         holder.name.setText(comment.getAuthor().getDisplayName());
         holder.votes.setText(String.format("%d", comment.getRating()));
 
-        holder.date.setText(DateFormat.getFriendlyTime(comment.getDate()));
+        holder.date.setText(DateFormat.getFriendlyTime(context,comment.getDate()));
         if (comment instanceof TextComment) {
             TextComment tcomment = (TextComment) comment;
             holder.text.setText(tcomment.getText());

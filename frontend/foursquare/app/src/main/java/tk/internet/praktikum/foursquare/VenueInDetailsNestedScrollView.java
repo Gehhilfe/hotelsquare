@@ -310,13 +310,13 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
         SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
         if (!ls.isLoggedIn()) {
-            Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.login_first), Toast.LENGTH_SHORT).show();
             return;
         }
         new MaterialDialog.Builder(this)
-                .title("Post image")
+                .title(getApplicationContext().getResources().getString(R.string.action_post_text))
                 .inputType(InputType.TYPE_CLASS_TEXT)
-                .input("Your awesome message!", "", (dialog, input) -> {
+                .input(getApplicationContext().getResources().getString(R.string.action_post_text_default), "", (dialog, input) -> {
                     if (input.toString().isEmpty())
                         return;
                     VenueService vs = ServiceFactory.createRetrofitService(VenueService.class, URL, sp.getString(Constants.TOKEN, ""));
@@ -339,14 +339,14 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
         SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
         if (!ls.isLoggedIn()) {
-            Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),getApplicationContext().getResources().getString(R.string.login_first), Toast.LENGTH_SHORT).show();
             return;
         }
         new MaterialDialog.Builder(this)
-                .title("Add Image Comment")
+                .title(getApplicationContext().getResources().getString(R.string.action_post_image))
                 .items(new String[]{
-                        "Take Picture",
-                        "Choose from Gallery"
+                        getApplicationContext().getResources().getString(R.string.action_post_image_select_1),
+                        getApplicationContext().getResources().getString(R.string.action_post_image_select_2)
                 })
                 .itemsCallback((dialog, itemView, position, text) -> {
                     if (position == 0) {
@@ -394,14 +394,14 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                         .subscribe(
                                 (res) ->
                                 {
-                                    Toast.makeText(getApplicationContext(), "Checked in", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(),getApplicationContext().getResources().getString(R.string.history_state_check_in), Toast.LENGTH_SHORT).show();
                                     HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.CHECKIN,venue.getName(),venue.getId(),new Date());
                                     LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession().getHistoryEntryDao().insert(historyEntry);
 
                                 },
                                 (err) -> Log.d(LOG, err.toString(), err));
             } else {
-                Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.login_first), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -479,7 +479,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
             sb.append(venue.getPhoneNumber()).append("\n");
         if (venue.getWebsite() != null && !venue.getWebsite().isEmpty())
             sb.append(venue.getWebsite()).append("\n");
-        sb.append(venue.getCheckInCount() + " Checkins").append("\n");
+        sb.append(venue.getCheckInCount() + " "+getApplicationContext().getResources().getString(R.string.checkins_count)).append("\n");
         infoVicinity.setText(sb.toString());
     }
 

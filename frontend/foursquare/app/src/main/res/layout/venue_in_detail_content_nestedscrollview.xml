@@ -228,7 +228,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_vertical_margin"
                     android:gravity="center"
-                    android:text="Leaderboard"
+                    android:text="@string/leaderboard"
                     android:textSize="26dp" />
 
                 <LinearLayout
@@ -264,7 +264,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="Unkown"
                             android:textColor="@color/colorAccent" />
 
                         <TextView
@@ -272,7 +271,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="0" />
+                             />
                     </LinearLayout>
 
                     <LinearLayout
@@ -300,7 +299,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="Unkown"
                             android:textColor="@color/colorAccent" />
 
                         <TextView
@@ -308,7 +306,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="0" />
+                            />
                     </LinearLayout>
 
                     <LinearLayout
@@ -336,15 +334,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="Unkown"
                             android:textColor="@color/colorAccent" />
 
                         <TextView
                             android:id="@+id/leaderboard_3_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:text="0" />
+                            android:layout_gravity="center_horizontal" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -366,13 +362,14 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_vertical_margin"
                     android:gravity="center"
-                    android:text="Last Checkins"
+                    android:text="@string/last_checkins"
                     android:textSize="26dp" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/last_here_recylcer_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:overScrollMode="never"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
                 </android.support.v7.widget.RecyclerView>

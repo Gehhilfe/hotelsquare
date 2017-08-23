@@ -51,7 +51,7 @@
                 android:layout_weight="80"
                 android:background="@drawable/edit_text_"
                 android:enabled="true"
-                android:hint="Near me"
+                android:hint="@string/near_me"
                 android:inputType="textPersonName"
                 />
 
