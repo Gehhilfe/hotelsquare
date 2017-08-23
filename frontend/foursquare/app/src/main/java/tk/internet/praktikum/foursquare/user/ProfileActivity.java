@@ -17,6 +17,7 @@ import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
@@ -221,7 +222,12 @@ public class ProfileActivity extends AppCompatActivity {
         } else if (parentActivity.equals("SearchPerson")) {
             i = new Intent(this, SearchPersonActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        } else {
+        }
+        else if(parentActivity.equals("VenueInDetailsNestedScrollView")){
+            i = new Intent(this, VenueInDetailsNestedScrollView.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        }
+        else {
                 i = new Intent(this, MainActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         }

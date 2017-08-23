@@ -1,10 +1,8 @@
 package tk.internet.praktikum.foursquare;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -54,6 +52,7 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.UploadHelper;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
+import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.UserService;
@@ -63,6 +62,8 @@ import tk.internet.praktikum.foursquare.history.HistoryType;
 import tk.internet.praktikum.foursquare.search.VenueImagesActivity;
 import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
 public class VenueInDetailsNestedScrollView extends AppCompatActivity implements OnMapReadyCallback {
@@ -301,6 +302,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((bitmap) -> leaderboard_avatar[current].setImageBitmap(bitmap), (err) -> Log.d(LOG, err.toString(), err));
                         }
+
+                        leaderboard_avatar[current].setOnClickListener(seeProfileListener(res));
                     }, (err) -> Log.d(LOG, err.toString(), err));
         }
     }
@@ -565,7 +568,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
 
     }
-    @Override
+  /*  @Override
     protected void attachBaseContext(Context newBase) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
         String language=sharedPreferences.getString("LANGUAGE","de");
@@ -580,5 +583,25 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         System.out.println("onConfigurationChanged Language: "+language);
         AdjustedContextWrapper.wrap(getBaseContext(),language);
 
-    }
+    }*/
+  public View.OnClickListener seeProfileListener(User user){
+      return new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+              String userName=sharedPreferences.getString(Constants.NAME,"");
+              if(user.getName().equals(userName)){
+                  Intent intent=new Intent(getApplicationContext(), UserActivity.class);
+                  startActivity(intent);
+              }
+              else{
+                  Intent intent=new Intent(getApplicationContext(), ProfileActivity.class);
+                  intent.putExtra("userID",user.getId());
+                  intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                  startActivity(intent);
+              }
+
+          }
+      };
+  }
 }
