@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="10"
-                app:srcCompat="@mipmap/ic_location" />
+                app:srcCompat="@drawable/ic_place_black_24dp" />
 
          <AutoCompleteTextView
 
@@ -97,7 +97,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="10"
-                app:srcCompat="@mipmap/radius" />
+                app:srcCompat="@drawable/ic_location_radius_black_24dp" />
 
             <SeekBar
                 android:id="@+id/seekBarRadius"
