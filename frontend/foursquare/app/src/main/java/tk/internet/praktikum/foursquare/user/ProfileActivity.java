@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -39,6 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView avatarPicture;
     private FloatingActionButton fab;
     private String userID;
+    private RecyclerView recyclerView;
 
     public ProfileActivity() {}
 
@@ -66,6 +69,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         avatarPicture = (ImageView) findViewById(R.id.profile_activity_avatar);
         fab = (FloatingActionButton) findViewById(R.id.profile_activity_fab);
+
+        recyclerView = (RecyclerView) findViewById(R.id.profile_last_checkin_recylcer_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
 
         initialiseFab();
         initialiseProfile();
@@ -129,8 +136,9 @@ public class ProfileActivity extends AppCompatActivity {
                                 else
                                     none.setChecked(true);
 
-                                // TODO - SET TOP CHECKINS
                                 // TODO - SET LAST CHECKINS => IMPLEMENT RECYCLER VIEW + VIEW LAYOUT
+                                recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins(), this));
+                                // TODO - SET TOP CHECKINS
 
                                 if (otherUser.getAvatar() != null) {
                                     ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
