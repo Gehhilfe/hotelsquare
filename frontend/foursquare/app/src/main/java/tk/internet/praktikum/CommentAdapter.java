@@ -1,6 +1,7 @@
 package tk.internet.praktikum;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -28,12 +29,15 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Comment;
 import tk.internet.praktikum.foursquare.api.bean.ImageComment;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
+import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.history.HistoryEntry;
 import tk.internet.praktikum.foursquare.history.HistoryType;
 import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 
 /**
  * Created by gehhi on 12.08.2017.
@@ -145,6 +149,8 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
             }
         });
+        holder.avatar.setOnClickListener(seeProfile(comment.getAuthor()));
+        holder.name.setOnClickListener(seeProfile(comment.getAuthor()));
     }
 
     @Override
@@ -174,7 +180,25 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
         comments.add(0, comment);
         notifyDataSetChanged();
     }
+    public View.OnClickListener seeProfile(User user) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(context);
+                String userName = sharedPreferences.getString(Constants.NAME, "");
+                if (user.getName().equals(userName)) {
+                    Intent intent = new Intent(context, UserActivity.class);
+                    context.startActivity(intent);
+                } else {
+                    Intent intent = new Intent(context, ProfileActivity.class);
+                    intent.putExtra("userID", user.getId());
+                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                    context.startActivity(intent);
+                }
 
+            }
+        };
+    }
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView name, text, votes, date;
         public ImageView avatar, image;
