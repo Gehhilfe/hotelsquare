@@ -139,9 +139,12 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // set Map
         map = googleMap;
         map.getUiSettings().setZoomControlsEnabled(true);
+        Log.d("MAPFIX", "OMR: The Map is ready and created");
 
         // set Usermarker
-        setUser();
+        //Log.d("MAPFIX", "OMR: User get set now");
+        //setUser();
+        //Log.d("MAPFIX", "OMR: User was set");
 
         // custom InfoWindow for all Markers
         class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
@@ -360,19 +363,23 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
      */
     public void updateVenuesMarker(List<Venue> venues) {
         // clear Map
-        map.clear();
+        //map.clear();
+        Log.d("MAPFIX", "UVM: Map is cleared");
 
         for (Venue venue : venues) {
             updateVenueLocation(venue);
         }
         // set user
+        Log.d("MAPFIX", "UVM: User get set now");
         setUser();
+        Log.d("MAPFIX", "UVM: User was set");
         // and friends if logged-in
         if (!(LocalStorage.
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
             updateFriendsMarker();
         }
         Location centerLocation=calculateClusteringCenterLocation(venues);
+        //Location centerLocation=userLocation;
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 12));
 
     }
@@ -488,6 +495,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
      */
     public void setUser() {
 
+        Log.d("MAPFIX", "SU: User gets his Location");
         // set user position
         userLocation = mainActivity.getUserLocation();
 
@@ -522,29 +530,40 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             e.printStackTrace();
         }
 
+        Log.d("MAPFIX", "SU: Star checks");
+
         //If position has not changed, no new Marker
-        if (myPosition != null && myPosition.getPosition().latitude == userLocation.getLatitude() && myPosition.getPosition().longitude == userLocation.getLongitude()) {
-            Log.d("MARKERS", "No new!");
+        if ((myPosition != null) && (myPosition.getPosition().latitude == userLocation.getLatitude()) && (myPosition.getPosition().longitude == userLocation.getLongitude())) {
+            Log.d("MAPFIX", "SU: No new Marker");
+
             return;
         }
 
         // If no user Marker yet
-        if (myPosition == null) {
+        if (myPosition == null && map != null) {
+            Log.d("MAPFIX", "SU: SetPosition with: " + userLocation.getLatitude() + " : " + userLocation.getLongitude());
+            LatLng tmp = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+            Log.d("MAPFIX", "SU: SetPosition with2: " + tmp.latitude + " : " + tmp.longitude);
             myPosition = map.addMarker(new MarkerOptions()
-                    .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
+                    .position(tmp)
+                    .visible(true)
                     .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
-            Log.d("MARKERS", "No Marker yet!");
+            Log.d("MAPFIX", "SU: New Marker for User");
             return;
         }
 
         //if position changed and marker already set
-        if (myPosition != null && myPosition.getPosition().longitude != userLocation.getLongitude()) {
-            myPosition.remove();
-            //myPosition.setPosition(pos);
-            Log.d("MARKERS", "Changed!");
-            myPosition = map.addMarker(new MarkerOptions()
-                    .position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
-                    .title("That's you!").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position)));
+        if ((myPosition != null) && (myPosition.getPosition().longitude != userLocation.getLongitude()) && (map != null)) {
+            //myPosition.remove();
+            Log.d("MAPFIX", "SU: SetPosition with: " + userLocation.getLatitude() + " : " + userLocation.getLongitude());
+            LatLng tmp = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+            Log.d("MAPFIX", "SU: SetPosition with2: " + tmp.latitude + " : " + tmp.longitude);
+            myPosition.setPosition(tmp);
+            Log.d("MAPFIX", "SU: Remove and add!");
+            /*myPosition = map.addMarker(new MarkerOptions()
+                    .position(new LatLng(49.877153, 8.654542))
+                    .title("That's you!")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_position))); */
             return;
         }
     }
@@ -580,13 +599,14 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             EventBus.getDefault().unregister(this);
         }
         // Update your own Position
+        Log.d("MAPFIX", "OME: onEvent set Marker");
         setUser();
         // Update your Friends' Positions
         if ((LocalStorage.
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")) != "") {
             updateFriendsMarker();
             Log.d("KGK", "THIS IS FRAGMENT: " + this.thisID + "  " + overAllID);
-            Log.d("MARKERS", "Location: " + event.location);
+            Log.d("MAPFIX", "Location: " + event.location);
         }
     }
 
