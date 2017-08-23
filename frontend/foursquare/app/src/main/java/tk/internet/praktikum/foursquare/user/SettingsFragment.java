@@ -140,6 +140,7 @@ public class SettingsFragment extends Fragment {
                 System.out.println("SettingsFragment onCreate Language: "+language);
                 AdjustedContextWrapper.wrap(getContext(),language);
                 Intent intent = new Intent(getContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 getContext().startActivity(intent);
 
 
