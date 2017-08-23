@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="5dip"
+            android:padding="3dip">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_last_venue_logo"
+            android:layout_width="50dip"
+            android:layout_height="50dip" />
+
+        <TextView
+            android:id="@+id/profile_last_venue_short_name"
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:layout_alignLeft="@+id/profile_last_venue_logo"
+            android:layout_alignTop="@+id/profile_last_venue_logo"
+            android:layout_alignRight="@+id/profile_last_venue_logo"
+            android:layout_alignBottom="@+id/profile_last_venue_logo"
+            android:gravity="center"
+            android:textSize="12dp"
+            android:textColor="#000000" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/profile_last_venue_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="6dp"
+            android:text=""
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/profile_last_venue_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="" />
+    </LinearLayout>
+
+</LinearLayout>

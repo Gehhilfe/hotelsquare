@@ -254,7 +254,7 @@ public class ProfileFragment extends Fragment {
     private void uploadPicture() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final String[] options = {"Camera", "Gallery", "Cancel"};
-        builder.setTitle("Select an option to choose your avatar.");
+        builder.setTitle("Select an option to choose your logo.");
         builder.setItems(options, (dialog, option) -> {
             switch (options[option]) {
                 case "Camera":
