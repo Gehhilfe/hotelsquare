@@ -164,10 +164,17 @@ public class ProfileActivity extends AppCompatActivity {
                                     none.setChecked(true);
 
                                 recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins(), this));
-                                topVenue = user.getTopCheckins().get(0);
-                                initialiseTopVenue(topVenue.getVenueID());
-                                venueCount.setText("# " + String.valueOf(topVenue.getCount()));
 
+                                if (user.getTopCheckins().size() > 0) {
+                                    topVenue = user.getTopCheckins().get(0);
+                                    initialiseTopVenue(topVenue.getVenueID());
+                                    venueCount.setText("# " + String.valueOf(topVenue.getCount()));
+                                } else {
+                                    venueLogo.setVisibility(View.GONE);
+                                    venueShortName.setVisibility(View.GONE);
+                                    venueName.setVisibility(View.GONE);
+                                    venueCount.setVisibility(View.GONE);
+                                }
                                 if (otherUser.getAvatar() != null) {
                                     ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
                                     imageCacheLoader.loadBitmap(otherUser.getAvatar(), ImageSize.LARGE)

@@ -41,7 +41,6 @@ public class FriendListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-
         try {
             service.friends(0)
                     .subscribeOn(Schedulers.io())
