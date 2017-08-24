@@ -14,6 +14,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private User locationUser = new User();
     private int PARAM_INTERVAL = 10000;
     private NavigationView navigationView;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -413,20 +415,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-/*    @Override
-    protected void attachBaseContext(Context newBase) {
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
-    }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        Locale locale=new Locale(language);
-        System.out.println("onConfigurationChanged Language: "+language);
-        AdjustedContextWrapper.wrap(getBaseContext(),language);
-    }*/
 }

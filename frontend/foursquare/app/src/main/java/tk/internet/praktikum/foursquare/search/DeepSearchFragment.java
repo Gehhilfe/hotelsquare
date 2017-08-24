@@ -652,9 +652,10 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             }
         }
         LocalStorage.getLocalStorageInstance(getContext()).setKeyWords(tk.internet.praktikum.Constants.KEY_WORDS,keyWords);
-        Set<String>test=sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS,null);
-       int a=1;
+        //Set<String>test=sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS,null);
+
     }
+
 
     public void onStop(){
         //Post SearchEvent to EventBus
