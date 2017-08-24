@@ -47,6 +47,10 @@
     <string name="profile_female">Weiblich</string>
     <string name="profile_Anonymous">Anonym</string>
     <string name="top_check_in">Am häufigsten Eingecheckt</string>
+    <string name="profile_cancel">Abbrechen</string>
+    <string name="profile_edit">Bearbeiten</string>
+    <string name="prof_save">Speichern</string>
+
 
 
     <!-- Other stuff -->
