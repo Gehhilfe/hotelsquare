@@ -3,6 +3,7 @@ package tk.internet.praktikum.foursquare.friendlist;
 import android.support.v4.app.Fragment;
 //import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -37,6 +39,7 @@ public class FriendListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_friendlist, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.fl_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         try {
             service.friends(0)
@@ -44,7 +47,9 @@ public class FriendListFragment extends Fragment {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             friendListResponse -> {
-                                recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), friendListResponse.getFriends(), getActivity()));
+                                List<User> friendList = friendListResponse.getFriends();
+                                friendList.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
+                                recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), friendList, getActivity()));
                             },
                             throwable -> {
                                 Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();

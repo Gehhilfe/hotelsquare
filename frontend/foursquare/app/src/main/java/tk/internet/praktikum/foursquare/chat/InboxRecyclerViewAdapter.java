@@ -78,8 +78,6 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         }
     }
 
-    private final int REQUEST_CHAT = 1;
-    private final int REQUEST_PROFILE = 2;
     private Context context;
     private LayoutInflater inflater;
     private List<Chat> chatList = Collections.emptyList();
@@ -117,6 +115,7 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
                 chatPartner = user;
             }
         }
+        // TODO - HIGHLIGHT NEW MESSAGES
 
         if (chatPartner.getAvatar() != null) {
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
