@@ -48,18 +48,14 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
         String title = "";
 
         switch (position) {
-            case 0:
-                title = " \n" + context.getResources().getString(R.string.user_tab_requests);
-                drawable = ContextCompat.getDrawable(context, R.drawable.ic_person_add_white_24dp);
-                break;
-            case 1: // profile
+            case 0: // profile
                 title = " \n" + context.getResources().getString(R.string.user_tab_profile);
                 drawable = ContextCompat.getDrawable(context, R.drawable.ic_person_white_24dp);
                 break;
-            /*case 2: // history
-                title = " \n" + " History";
-                drawable = ContextCompat.getDrawable(context, R.drawable.ic_history_black_24dp);
-                break;*/
+            case 1:
+                title = " \n" + context.getResources().getString(R.string.user_tab_requests);
+                drawable = ContextCompat.getDrawable(context, R.drawable.ic_person_add_white_24dp);
+                break;
             case 2: // friends
                 title = " \n" + context.getResources().getString(R.string.user_tab_friends);
                 drawable = ContextCompat.getDrawable(context, R.drawable.ic_people_white_24dp);

@@ -52,8 +52,8 @@ public class UserActivity extends AppCompatActivity  {
     }
 
     private void initialiseFragmentContainer(ViewPager container) {
-        userStatePagerAdapter.addFragment(new HomeFragment(), "Home");
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
+        userStatePagerAdapter.addFragment(new HomeFragment(), "Friend Request");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);
