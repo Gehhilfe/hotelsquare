@@ -180,6 +180,8 @@ public class ProfileActivity extends AppCompatActivity {
                                                         Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                                                     }
                                             );
+                                } else {
+                                    avatarPicture.setImageResource(R.mipmap.user_avatar);
                                 }
                             },
                             throwable -> {
