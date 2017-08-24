@@ -39,6 +39,7 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
             avatar = (ImageView) itemView.findViewById(R.id.fl_avatar);
             name = (TextView) itemView.findViewById(R.id.fl_name);
 
+            itemView.setLongClickable(false);
             itemView.setOnClickListener(this);
             sendMsg.setOnClickListener(this);
         }
