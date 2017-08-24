@@ -1,13 +1,16 @@
 package tk.internet.praktikum.foursquare.user;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,24 +27,32 @@ import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Gender;
+import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.bean.Venue;
+import tk.internet.praktikum.foursquare.api.bean.VenueCheckinInformation;
 import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
+import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.chat.ChatActivity;
 import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
+import tk.internet.praktikum.foursquare.search.Utils;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User otherUser = new User();
-    private TextView name, city, age;
+    private TextView name, city, age, venueName, venueShortName, venueCount;
     private RadioButton male, female, none;
-    private ImageView avatarPicture;
+    private ImageView avatarPicture, venueLogo;
     private FloatingActionButton fab;
     private String userID;
     private RecyclerView recyclerView;
+    private LinearLayout profileTopContent;
+    private VenueCheckinInformation topVenue;
+    private Toolbar toolbar;
 
     public ProfileActivity() {}
 
@@ -52,30 +63,43 @@ public class ProfileActivity extends AppCompatActivity {
 
         userID = getIntent().getStringExtra("userID");
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // TODO - Title = Name der Person?
-        setTitle(getApplicationContext().getResources().getString(R.string.user_tab_profile));
+        //setTitle(getApplicationContext().getResources().getString(R.string.user_tab_profile));
 
         name = (TextView) findViewById(R.id.profile_name);
         city = (TextView) findViewById(R.id.profile_city);
         age = (TextView) findViewById(R.id.profile_age);
+
+        venueName = (TextView) findViewById(R.id.profile_top_venue_name);
+        venueShortName = (TextView) findViewById(R.id.profile_top_venue_short_name);
+        venueCount = (TextView) findViewById(R.id.profile_top_venue_count);
 
         male = (RadioButton) findViewById(R.id.radioButton);
         female = (RadioButton) findViewById(R.id.radioButton2);
         none = (RadioButton) findViewById(R.id.radioButton3);
 
         avatarPicture = (ImageView) findViewById(R.id.profile_activity_avatar);
+        venueLogo = (ImageView) findViewById(R.id.profile_top_venue_logo);
+        profileTopContent = (LinearLayout) findViewById(R.id.profile_top_content_container);
         fab = (FloatingActionButton) findViewById(R.id.profile_activity_fab);
 
         recyclerView = (RecyclerView) findViewById(R.id.profile_last_checkin_recylcer_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-
+        profileTopContent.setOnClickListener(v -> loadVenue());
         initialiseFab();
         initialiseProfile();
+
+    }
+
+    private void loadVenue() {
+        Intent intent = new Intent(this, VenueInDetailsNestedScrollView.class);
+        intent.putExtra("VENUE_ID", topVenue.getVenueID());
+        startActivity(intent);
     }
 
     private void initialiseFab() {
@@ -124,6 +148,7 @@ public class ProfileActivity extends AppCompatActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
+                                toolbar.setTitle(user.getName());
                                 otherUser = user;
                                 name.setText(otherUser.getDisplayName());
                                 city.setText(otherUser.getCity());
@@ -136,9 +161,11 @@ public class ProfileActivity extends AppCompatActivity {
                                 else
                                     none.setChecked(true);
 
-                                // TODO - SET LAST CHECKINS => IMPLEMENT RECYCLER VIEW + VIEW LAYOUT
                                 recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins(), this));
                                 // TODO - SET TOP CHECKINS
+                                topVenue = user.getTopCheckins().get(0);
+                                initialiseTopVenue(topVenue.getVenueID());
+                                venueCount.setText(String.valueOf(topVenue.getCount()));
 
                                 if (otherUser.getAvatar() != null) {
                                     ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
@@ -152,6 +179,56 @@ public class ProfileActivity extends AppCompatActivity {
                                                         Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                                                     }
                                             );
+                                }
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void initialiseTopVenue(String venueId){
+        VenueService service = ServiceFactory
+                .createRetrofitService(VenueService.class, URL, LocalStorage.
+                        getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        try {
+            service.getDetails(venueId)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            venue -> {
+                                venueName.setText(venue.getName());
+
+                                List<Image> images=venue.getImages();
+                                if(images.size()>0) {
+                                    Image image = images.get(0);
+                                    ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
+                                    imageCacheLoader.loadBitmap(image, ImageSize.SMALL)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(bitmap -> {
+                                                venueLogo.setImageBitmap(bitmap);
+                                                venueLogo.setVisibility(View.VISIBLE);
+                                                venueShortName.setVisibility(View.GONE);
+                                            });
+                                }
+                                else {
+                                    venueLogo.setDrawingCacheEnabled(true);
+                                    Bitmap bitmap= null;
+                                    try {
+                                        bitmap = Utils.decodeResourceImage(getApplicationContext(),"default_image",50,50);
+                                        venueLogo.setImageBitmap(bitmap);
+                                        venueShortName.setText(venue.getName().substring(0,1).toUpperCase());
+                                        venueShortName.setVisibility(View.VISIBLE);
+                                        venueLogo.setVisibility(View.VISIBLE);
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             },
                             throwable -> {

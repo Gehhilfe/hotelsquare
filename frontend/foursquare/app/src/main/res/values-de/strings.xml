@@ -46,6 +46,8 @@
     <string name="profile_male">Männlich</string>
     <string name="profile_female">Weiblich</string>
     <string name="profile_Anonymous">Anonym</string>
+    <string name="top_check_in">Am häufigsten Eingecheckt</string>
+
 
     <!-- Other stuff -->
     <string name="profile_upload_avatar">Hochladen</string>

@@ -25,11 +25,9 @@ import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
-import tk.internet.praktikum.foursquare.api.bean.Gender;
 import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueCheckinInformation;
-import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.search.Utils;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
@@ -99,7 +97,7 @@ public class ProfileLatestRecyclerViewAdapter extends RecyclerView.Adapter<Profi
                     .subscribe(
                             venue -> {
                                 holder.name.setText(venue.getName());
-                                loadImage(venue, holder);
+                                loadLogo(venue, holder);
                             },
                             throwable -> {
                                 Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -112,7 +110,7 @@ public class ProfileLatestRecyclerViewAdapter extends RecyclerView.Adapter<Profi
         holder.date.setText(SIMPLE_DATE_FORMAT.format(currentCheckin.getLastDate()));
     }
 
-    public void loadImage(Venue venue, ProfileLatestViewHolder holder){
+    public void loadLogo(Venue venue, ProfileLatestViewHolder holder){
         List<Image> images=venue.getImages();
         if(images.size()>0) {
             Image image = images.get(0);
