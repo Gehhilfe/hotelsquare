@@ -98,9 +98,12 @@
                             android:id="@+id/profile_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:enabled="false"
                             android:hint="@string/name"
-                            android:inputType="textPersonName" />
+                            android:enabled="true"
+                            android:longClickable="false"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:inputType="none|textNoSuggestions" />
                     </android.support.design.widget.TextInputLayout>
 
                     <android.support.design.widget.TextInputLayout
@@ -111,9 +114,12 @@
                             android:id="@+id/profile_city"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:enabled="false"
                             android:hint="@string/profile_city"
-                            android:inputType="text" />
+                            android:enabled="true"
+                            android:clickable="false"
+                            android:longClickable="false"
+                            android:focusable="false"
+                            android:inputType="none|textNoSuggestions" />
                     </android.support.design.widget.TextInputLayout>
 
                     <android.support.design.widget.TextInputLayout
@@ -124,9 +130,12 @@
                             android:id="@+id/profile_age"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:enabled="false"
                             android:hint="@string/profile_age"
-                            android:inputType="number" />
+                            android:enabled="true"
+                            android:clickable="false"
+                            android:longClickable="false"
+                            android:focusable="false"
+                            android:inputType="none|numberDecimal" />
                     </android.support.design.widget.TextInputLayout>
 
                     <RelativeLayout
@@ -140,6 +149,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentStart="true"
                             android:layout_centerVertical="true"
+                            android:textColor="@color/black"
                             android:paddingRight="10dp"
                             android:text="@string/profile_gender" />
 
@@ -155,7 +165,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:enabled="false"
+                                android:enabled="true"
+                                android:clickable="false"
+                                android:longClickable="false"
                                 android:text="@string/profile_male" />
 
                             <RadioButton
@@ -163,7 +175,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:enabled="false"
+                                android:enabled="true"
+                                android:clickable="false"
+                                android:longClickable="false"
                                 android:text="@string/profile_female" />
 
                             <RadioButton
@@ -171,7 +185,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:enabled="false"
+                                android:enabled="true"
+                                android:clickable="false"
+                                android:longClickable="false"
                                 android:text="@string/profile_Anonymous" />
                         </RadioGroup>
                     </RelativeLayout>
@@ -212,7 +228,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/activity_horizontal_margin"
+                    android:layout_margin="@dimen/activity_horizontal_margin"
                     android:orientation="vertical">
 
                     <TextView

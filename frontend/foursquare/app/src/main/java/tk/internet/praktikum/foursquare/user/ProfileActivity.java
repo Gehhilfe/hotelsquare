@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -148,11 +149,12 @@ public class ProfileActivity extends AppCompatActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
-                                toolbar.setTitle(user.getName());
+                                String tmpName = user.getDisplayName().substring(0, 1).toUpperCase() + user.getDisplayName().substring(1);
+                                toolbar.setTitle(tmpName);
                                 otherUser = user;
-                                name.setText(otherUser.getDisplayName());
+                                name.setText(tmpName);
                                 city.setText(otherUser.getCity());
-                                age.setText(Integer.toString(otherUser.getAge()));
+                                age.setText(String.format(Locale.ENGLISH, "%1$d", otherUser.getAge()));
                                 Gender gender = otherUser.getGender();
                                 if (gender == Gender.MALE)
                                     male.setChecked(true);
@@ -162,10 +164,9 @@ public class ProfileActivity extends AppCompatActivity {
                                     none.setChecked(true);
 
                                 recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins(), this));
-                                // TODO - SET TOP CHECKINS
                                 topVenue = user.getTopCheckins().get(0);
                                 initialiseTopVenue(topVenue.getVenueID());
-                                venueCount.setText(String.valueOf(topVenue.getCount()));
+                                venueCount.setText("# " + String.valueOf(topVenue.getCount()));
 
                                 if (otherUser.getAvatar() != null) {
                                     ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
