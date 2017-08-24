@@ -3,13 +3,18 @@ package tk.internet.praktikum.foursquare.search;
 //import android.app.Fragment;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -33,7 +38,10 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -46,7 +54,7 @@ import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueSearchQuery;
 import tk.internet.praktikum.foursquare.api.service.PlaceService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
-
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 
 public class DeepSearchFragment extends Fragment implements android.support.v7.widget.SearchView.OnQueryTextListener, PlaceSelectionListener {
@@ -54,6 +62,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private final String GOOGLE_PLACE_URL = "https://maps.googleapis.com";
     private final String LOG = DeepSearchFragment.class.getSimpleName();
     private SearchView searchView;
+    //private MaterialSearchView searchView;
     private VenueStatePageAdapter venueStatePageAdapter;
     private AutoCompleteTextView filterLocation;
     private ToggleButton mapViewButton;
@@ -84,7 +93,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     private  boolean isQueryFromFastSearch=false;
     private boolean lastOpenNow;
     private Drawable selected_prices_background,unselected_prices_background,selected_money,unselected_money;
-
+    private SimpleCursorAdapter keyWordsSuggestionAdapter;
+    private final String KEY_WORD="suggestedWord";
     public DeepSearchFragment() {
         // Required empty public constructor
     }
@@ -94,6 +104,15 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_deep_search, container, false);
+
+        keyWordsSuggestionAdapter = new SimpleCursorAdapter(
+                getActivity(),
+                R.layout.key_words_list,
+                null,
+                new String[]{KEY_WORD},
+                new int[]{R.id.suggested_keyword},
+                0);
+
         venuesViewPager = (VenueViewPager) view.findViewById(R.id.venues_result);
         filterLocation = (AutoCompleteTextView) view.findViewById(R.id.location);
 
@@ -190,17 +209,33 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+      //  Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         inflater.inflate(R.menu.search_view, menu);
         final MenuItem item = menu.findItem(R.id.action_search);
         MenuItemCompat.expandActionView(item);
-        searchView = (android.support.v7.widget.SearchView) MenuItemCompat.getActionView(item);
+        searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextListener(this);
         searchView.onActionViewExpanded();
-        searchView.requestFocus();
+        //searchView.requestFocus();
         searchView.clearFocus();
         searchView.setQuery(lastQuery, true);
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionClick(int position) {
 
+                // updates search text to search box
+                CursorAdapter cursorAdapter = searchView.getSuggestionsAdapter();
+                Cursor cursor = cursorAdapter.getCursor();
+                cursor.moveToPosition(position);
+                searchView.setQuery(cursor.getString(cursor.getColumnIndex(KEY_WORD)),true);
+                return true;
+            }
+
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return true;
+            }
+        });
         MenuItemCompat.setOnActionExpandListener(item,
                 new MenuItemCompat.OnActionExpandListener() {
                     @Override
@@ -222,6 +257,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                         return true; // Return true to expand action view
                     }
                 });
+
     }
 
     @Override
@@ -232,19 +268,37 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.d(LOG, "Action: onQueryTextSubmit");
-        if(!query.equals(lastQuery) || isQueryFromFastSearch||!(openNow_button.isChecked() &&lastOpenNow)) {
+        searchView.clearFocus();
+        //||!(openNow_button.isChecked() &&lastOpenNow)
+        if(!query.equals(lastQuery) || isQueryFromFastSearch) {
             isQueryFromFastSearch=false;
             resetParameters();
             deepSearch();
 
         }
-        return true;
+
+        return false;
     }
 
     @Override
-    public boolean onQueryTextChange(String newText) {
-        //deepSearch(newText);
-        return true;
+    public boolean onQueryTextChange(String typedKeyWord) {
+        typedKeyWord=typedKeyWord.trim().toLowerCase(Locale.getDefault());
+        if(!typedKeyWord.isEmpty()) {
+            SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getContext());
+            Set<String> keyWords = sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS, null);
+            ArrayList<String> allKeyWords = new ArrayList<>(keyWords);
+            System.out.println("** allkeywords: " + allKeyWords);
+            searchView.setSuggestionsAdapter(keyWordsSuggestionAdapter);
+            final MatrixCursor matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID, KEY_WORD});
+
+            for (int i = 0; i < allKeyWords.size(); i++) {
+                String keyWord = allKeyWords.get(i);
+                if (keyWord.startsWith(typedKeyWord))
+                    matrixCursor.addRow(new Object[]{i, keyWord});
+            }
+            keyWordsSuggestionAdapter.changeCursor(matrixCursor);
+        }
+        return false;
     }
 
     public boolean isReachedMaxVenues() {
@@ -259,7 +313,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         Log.d(LOG, "**** seachView: " + searchView);
         Log.d(LOG, "#### lastQuery: " + lastQuery);
 
-        String query=searchView.getQuery().toString();
+        String query=searchView.getQuery().toString().trim();
 
         if (query == null || query.trim().isEmpty()) {
             query = lastQuery;
@@ -273,8 +327,11 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             isChangedSearchText = true;
             lastQuery = query;
             searchView.setQuery(query, false);
+            searchView.clearFocus();
             Log.d(LOG, "#### currentQuery: " + query);
             Log.d(LOG,"++++ currentPageQuery: "+currentPage);
+
+
             VenueSearchQuery venueSearchQuery;
             if ( filterLocation!=null && !filterLocation.getText().toString().isEmpty()&& !filterLocation.getText().toString().equals(getContext().getResources().getString(R.string.near_me))) {
                 venueSearchQuery = new VenueSearchQuery(query, filterLocation.getText().toString().trim());
@@ -292,13 +349,12 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             //Toast.makeText(getContext(),"price: "+price,Toast.LENGTH_SHORT).show();
             venueSearchQuery.setOnlyOpen(openNow_button.isChecked());
             venueSearchQuery.setPrice(price);
-            // Add more optional filters later
-
             VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
             venueService.queryVenue(venueSearchQuery,currentPage).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(venueSearchResult -> {
                                 List venuesList = venueSearchResult.getResults();
+                                updateKeyWords(venuesList,lastQuery);
                                if(venuesList.size()>0) {
                                    venues.addAll(venuesList);
                                    if (mapViewButton.isChecked())
@@ -361,10 +417,21 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                                         Log.d(LOG, "predictions: " + placeAutoComplete.getPredictions());
                                         List<Prediction> predictions = placeAutoComplete.getPredictions();
                                         if (placeAdapter == null || predictions.size() > 0) {
-                                            Log.d(LOG, "#### created place adapter");
-                                            placeAdapter = new PlaceAdapter(getContext(), predictions);
-                                            filterLocation.setAdapter(placeAdapter);
+
+                                            if(placeAdapter==null) {
+                                                Log.d(LOG, "#### created place adapter");
+                                                placeAdapter = new PlaceAdapter(getContext(), predictions);
+                                                filterLocation.setAdapter(placeAdapter);
+                                            }else {
+                                                Log.d(LOG, "#### update place adapter");
+                                                filterLocation.invalidate();
+                                                placeAdapter.clear();
+                                                placeAdapter.addAll(predictions);
+
+                                            }
                                             placeAdapter.notifyDataSetChanged();
+
+
                                         }
 
                                     },
@@ -567,6 +634,25 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         else if(price_1.isChecked())
             return 1;
         else return 0;
+
+    }
+
+    public void updateKeyWords(List<Venue> venues,String query){
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getContext());
+        Set<String> keyWords= sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS, null);
+        if(keyWords==null) {
+            keyWords = new HashSet<>();
+        }
+        keyWords.add(query);
+        for(Venue venue: venues){
+            List<String> types=venue.getTypes();
+            for(String type: types){
+               String keyWord=type.replace("_"," ");
+                keyWords.add(keyWord);
+            }
+        }
+        LocalStorage.getLocalStorageInstance(getContext()).setKeyWords(tk.internet.praktikum.Constants.KEY_WORDS,keyWords);
+        //Set<String>test=sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS,null);
 
     }
 

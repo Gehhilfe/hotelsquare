@@ -111,6 +111,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
         String language = sharedPreferences.getString("LANGUAGE", "de");
+
         System.out.println("Language: " + language);
         AdjustedContextWrapper.wrap(getBaseContext(), language);
         // Setup toolbar
