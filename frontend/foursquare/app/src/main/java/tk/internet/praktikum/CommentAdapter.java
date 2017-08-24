@@ -39,9 +39,6 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
 import tk.internet.praktikum.foursquare.user.UserActivity;
 
-/**
- * Created by gehhi on 12.08.2017.
- */
 
 public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapter<CommentAdapter.MyViewHolder> {
     private static final String LOG = CommentAdapter.class.getName();
@@ -75,17 +72,30 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Comment comment = comments.get(position);
         holder.name.setText(comment.getAuthor().getDisplayName());
+        holder.name.setVisibility(View.VISIBLE);
         holder.votes.setText(String.format("%d", comment.getRating()));
-
+        holder.votes.setVisibility(View.VISIBLE);
         holder.date.setText(DateFormat.getFriendlyTime(context,comment.getDate()));
+        holder.date.setVisibility(View.VISIBLE);
+
         if (comment instanceof TextComment) {
             TextComment tcomment = (TextComment) comment;
+            holder.image.setVisibility(View.GONE);
             holder.text.setText(tcomment.getText());
             holder.text.setVisibility(View.VISIBLE);
-            holder.image.setVisibility(View.GONE);
         } else {
             ImageComment icomment = (ImageComment) comment;
             holder.text.setText(" ");
@@ -100,6 +110,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                             holder.text.setVisibility(View.GONE);
                         }, (err) -> Log.d(LOG, err.toString(), err));
             } else {
+                holder.image.setVisibility(View.GONE);
                 Log.d(VenueInDetailsNestedScrollView.LOG, "image is null");
             }
         }
@@ -109,8 +120,11 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             loader.loadBitmap(comment.getAuthor().getAvatar(), ImageSize.SMALL)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(bitmap -> holder.avatar.setImageBitmap(bitmap), err -> Log.d("CommentAdapter", err.toString(), err));
+                    .subscribe(bitmap -> {holder.avatar.setImageBitmap(bitmap);
+                        holder.avatar.setVisibility(View.VISIBLE);
+                    }, err -> Log.d("CommentAdapter", err.toString(), err));
         }
+       else  holder.avatar.setVisibility(View.GONE);
 
         holder.upvote.setOnClickListener((event) -> {
             LocalStorage ls = LocalStorage.getLocalStorageInstance(context);
@@ -123,6 +137,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                         .subscribe(cmt -> {
                             Integer d = cmt.getRating();
                             holder.votes.setText(String.format("%d", d));
+                            holder.votes.setVisibility(View.VISIBLE);
                             HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.LIKECOMMENT,getVenueName(),venueId,new Date());
                             LocalDataBaseManager.getLocalDatabaseManager(context).getDaoSession().getHistoryEntryDao().insert(historyEntry);
                         }, err -> Log.d("CommentAdapter", err.toString(), err));
@@ -142,6 +157,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                         .subscribe(cmt -> {
                             Integer d = cmt.getRating();
                             holder.votes.setText(String.format("%d", d));
+                            holder.votes.setVisibility(View.VISIBLE);
                             HistoryEntry historyEntry=new HistoryEntry(UUID.randomUUID().toString(), HistoryType.DISLIKE_COMMENT,getVenueName(),venueId,new Date());
                             LocalDataBaseManager.getLocalDatabaseManager(context).getDaoSession().getHistoryEntryDao().insert(historyEntry);
                         }, err -> Log.d("CommentAdapter", err.toString(), err));
@@ -149,6 +165,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                 Toast.makeText(context, "Login first", Toast.LENGTH_SHORT).show();
             }
         });
+        holder.itemView.setVisibility(View.VISIBLE);
         holder.avatar.setOnClickListener(seeProfile(comment.getAuthor()));
         holder.name.setOnClickListener(seeProfile(comment.getAuthor()));
     }
@@ -200,12 +217,14 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
         };
     }
     public class MyViewHolder extends RecyclerView.ViewHolder {
+        View itemView;
         public TextView name, text, votes, date;
         public ImageView avatar, image;
         public ImageButton upvote, downvote;
 
         public MyViewHolder(View view) {
             super(view);
+            itemView=view;
             name = (TextView) view.findViewById(R.id.name);
             date = (TextView) view.findViewById(R.id.date);
             text = (TextView) view.findViewById(R.id.text);
@@ -214,6 +233,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             upvote = (ImageButton) view.findViewById(R.id.upvote);
             downvote = (ImageButton) view.findViewById(R.id.downvote);
             image = (ImageView) view.findViewById(R.id.image);
+
         }
     }
 
