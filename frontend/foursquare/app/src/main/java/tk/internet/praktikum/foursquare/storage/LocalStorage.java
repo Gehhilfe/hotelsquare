@@ -3,6 +3,8 @@ package tk.internet.praktikum.foursquare.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Set;
+
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.bean.TokenInformation;
@@ -129,6 +131,12 @@ public class LocalStorage {
     public void setLanguage(String key, String value){
         SharedPreferences.Editor editor = getEditor();
         editor.putString(key, value);
+        editor.commit();
+    }
+
+    public void setKeyWords(String key,Set<String> keyWords){
+        SharedPreferences.Editor editor=getEditor();
+        editor.putStringSet(key,keyWords);
         editor.commit();
     }
 }

@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
 
+import java.util.Collection;
 import java.util.List;
 
 import tk.internet.praktikum.foursquare.R;
@@ -28,6 +29,27 @@ public class PlaceAdapter extends ArrayAdapter<Prediction> {
 
     public void setSuggestedPlaces(List<Prediction> suggestedPlaces) {
         this.suggestedPlaces = suggestedPlaces;
+    }
+
+    @Override
+    public void addAll(@NonNull Collection<? extends Prediction> collection) {
+       suggestedPlaces.addAll(collection);
+    }
+
+    @Override
+    public void clear() {
+       suggestedPlaces.clear();
+    }
+
+    @Nullable
+    @Override
+    public Prediction getItem(int position) {
+        return suggestedPlaces.get(position);
+    }
+
+    @Override
+    public int getCount() {
+        return suggestedPlaces.size();
     }
 
     @NonNull

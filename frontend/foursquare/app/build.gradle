@@ -91,6 +91,7 @@ dependencies {
     compile 'net.zetetic:android-database-sqlcipher:3.5.1'
     compile 'org.greenrobot:greendao-generator:3.2.0'
     compile 'com.akexorcist:localizationactivity:1.1.2'
+    compile 'com.miguelcatalan:materialsearchview:1.4.0'
 
     testCompile 'junit:junit:4.12'
 }
