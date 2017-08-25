@@ -449,13 +449,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession();
          List<SuggestionKeyWord> keyWords = daoSession.getSuggestionKeyWordDao().queryBuilder().list();
         if (keyWords == null ||keyWords.size()==0) {
-            System.out.println(("***** readStaticKeyWords"));
+            System.out.println(("#### readStaticKeyWords"));
         String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
         for (int i = 0; i < suggestionList.length; i++) {
             SuggestionKeyWord suggestionKeyWord = new SuggestionKeyWord();
             suggestionKeyWord.setUid(UUID.randomUUID().toString());
             suggestionKeyWord.setSuggestionName(suggestionList[i]);
             daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
+
         }
          }
     }
