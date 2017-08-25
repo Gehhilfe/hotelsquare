@@ -3,9 +3,12 @@ package tk.internet.praktikum.foursquare.login;
 //import android.app.FragmentTransaction;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
@@ -20,11 +23,21 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_login);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.login_toolbar);
+        setSupportActionBar(toolbar);
+        setTitle(getApplicationContext().getResources().getString(R.string.login));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Typeface type = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Pacifico.ttf");
+        TextView hotelsquare = (TextView) findViewById(R.id.login_hotelsquare);
+        hotelsquare.setTypeface(type);
+
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
         String language=sharedPreferences.getString("LANGUAGE","de");
         LanguageHelper.updateResources(this,language);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+
         addFragment();
     }
 

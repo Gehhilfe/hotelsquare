@@ -14,6 +14,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -27,9 +28,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -239,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+
     private void settingsNavigation(MenuItem item) {
         SettingsFragment fragment = new SettingsFragment();
         redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_settings));
@@ -348,6 +350,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
             initialiseNavigationHeader();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -408,18 +411,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         public void run() {
             String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-            if (Objects.equals(token, ""))
+            if (token == "")
                 return;
 
             UserService service = ServiceFactory
                     .createRetrofitService(UserService.class, URL, token);
 
-            //TODO Send only location no more details
-            //This overides changes
-            User u = new User();
-            u.setLocation(locationUser.getLocation());
-
-            service.update(u)
+            service.update(locationUser)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
