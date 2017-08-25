@@ -99,20 +99,13 @@ public class LoginFragment extends Fragment {
     private void successfulLogin() {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
-   /*   Intent intent = new Intent(getActivity().getApplicationContext(), UserActivity.class);
-        startActivityForResult(intent, 1);*/
-        getActivity().setResult(-1, null);
-        getActivity().finish();
 
-        /*
-        try {
-            Fragment fragment = MeFragment.class.newInstance();
-            redirectToFragment(fragment);
-        } catch (java.lang.InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }*/
+        if (getArguments().getBoolean("UserActivity"))
+            getActivity().setResult(3, null);
+        else
+            getActivity().setResult(2, null);
+
+        getActivity().finish();
     }
 
     private void redirectToFragment(Fragment fragment) {

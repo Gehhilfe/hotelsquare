@@ -55,11 +55,11 @@ import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
-    private final int REQUEST_SEARCH_PERSON = 3;
-    private final int REQUEST_HISTORY = 4;
     private final int REQUEST_ME = 6;
+    private final int RESULT_USER_ACTIVITY = 3;
+    private final int RESULT_LOGIN = 2;
 
-    private MenuItem searchMenu, meMenu;
+
     private TextView userName;
     private ImageView avatar;
 
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private User locationUser = new User();
     private int PARAM_INTERVAL = 10000;
     private NavigationView navigationView;
-    private SearchView searchView;
+    private MenuItem loginMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +95,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
         readStaticKeyWords();
-        if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+
+        Menu tmpMenu = navigationView.getMenu();
+        loginMenu = null;
+        for (int i = 0; i < tmpMenu.size(); i++) {
+            tmpMenu.getItem(i);
+            if (tmpMenu.getItem(i).getItemId() == R.id.nav_login_logout) {
+                loginMenu = tmpMenu.getItem(i);
+            }
+        }
+
+        if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             initialiseNavigationHeader();
+            loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+        }
 
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
@@ -218,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void meNavigation() {
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-            login();
+            login(true);
         } else {
             Intent intent = new Intent(getApplicationContext(), UserActivity.class);
             startActivityForResult(intent, REQUEST_ME);
@@ -232,18 +244,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setTitle(item);
     }
 
-    private void login() {
+    private void login(boolean destination) {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        intent.putExtra("UserActivity", destination);
         startActivityForResult(intent, REQUEST_LOGIN);
-
     }
 
     private void logout() {
-        //navigationView.getMenu().clear();
-        //navigationView.inflateMenu(R.menu.activity_main_drawer);
         LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
+        this.recreate();
+        /*
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivityForResult(intent, 0);
+        */
     }
 
 
@@ -271,12 +284,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_login_logout:
                 if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-                    login();
-                    item.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    login(false);
                     return false;
                 } else {
                     logout();
-                    item.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
+                    //item.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
                 }
                 break;
         }
@@ -305,10 +317,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_LOGIN:
-                if (resultCode == RESULT_OK) {
+                if (resultCode == RESULT_LOGIN) {
                     initialiseNavigationHeader();
-                    // meNavigation(meMenu);
+                    loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
                     break;
+                } else if (resultCode == RESULT_USER_ACTIVITY) {
+                    initialiseNavigationHeader();
+                    loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    meNavigation();
                 }
         }
     }
@@ -329,7 +345,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        initialiseNavigationHeader();
+        if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+            initialiseNavigationHeader();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {

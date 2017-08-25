@@ -87,7 +87,7 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
             activity.startActivity(intent);
         }
     }
-    
+
     private final String URL = "https://dev.ip.stimi.ovh/";
     private Activity activity;
     private Context context;

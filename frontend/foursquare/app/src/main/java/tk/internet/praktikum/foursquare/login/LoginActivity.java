@@ -32,6 +32,9 @@ public class LoginActivity extends AppCompatActivity {
 
     public void addFragment() {
         loginFragment = new LoginFragment();
+        Bundle arg = new Bundle();
+        arg.putBoolean("UserActivity", getIntent().getBooleanExtra("UserActivity", false));
+        loginFragment.setArguments(arg);
         getSupportFragmentManager().beginTransaction().add(R.id.login_layout, loginFragment).commit();
         //getFragmentManager().beginTransaction().add(R.id.login_layout, loginFragment).commit();
     }
@@ -63,6 +66,4 @@ public class LoginActivity extends AppCompatActivity {
                 break;
         }
     }
-
-
 }

@@ -68,8 +68,6 @@ public class ProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //setTitle(getApplicationContext().getResources().getString(R.string.user_tab_profile));
-
         name = (TextView) findViewById(R.id.profile_name);
         city = (TextView) findViewById(R.id.profile_city);
         age = (TextView) findViewById(R.id.profile_age);
