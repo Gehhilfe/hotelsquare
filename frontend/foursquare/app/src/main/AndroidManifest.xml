@@ -45,7 +45,8 @@
         <activity
             android:name=".login.LoginActivity"
             android:configChanges="locale"
-            android:theme="@style/AppTheme.Dark" />
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".user.UserActivity"
             android:configChanges="locale"

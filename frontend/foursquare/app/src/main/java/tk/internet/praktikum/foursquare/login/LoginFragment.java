@@ -30,7 +30,6 @@ public class LoginFragment extends Fragment {
     private EditText userInput, passwordInput;
     private AppCompatButton loginBtn;
     private TextView registerLbl, passwordForgottenLbl;
-    private LoginGeneralFragment loginGeneralFragment;
 
 
     @Override
@@ -77,10 +76,8 @@ public class LoginFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
                 .subscribe(
                         tokenInformation -> {
-                            //UserService uservice = ServiceFactory.createRetrofitService(UserService.class, URL, tokenInformation.getToken());
                             successfulLogin();
                             progressDialog.dismiss();
-                            //Toast.makeText(getActivity().getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG).show();
                             LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveLoggedinInformation(tokenInformation, new User(email, email));
 
                         },
@@ -108,14 +105,6 @@ public class LoginFragment extends Fragment {
         getActivity().finish();
     }
 
-    private void redirectToFragment(Fragment fragment) {
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.login_layout, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
-    }
-
     /**
      * Routine to execute on Failed login. Logs the login attempt and displays a Toast for the user.
      */
@@ -129,20 +118,10 @@ public class LoginFragment extends Fragment {
      */
     private void register() {
         ((LoginActivity) getActivity()).changeFragment(1);
-        //loginGeneralFragment.changeFragment(1);
     }
 
     // TODO - Restore Password
     private void restorePassword() {
         ((LoginActivity) getActivity()).changeFragment(2);
-        // loginGeneralFragment.changeFragment(2);
-    }
-
-    public LoginGeneralFragment getLoginGeneralFragment() {
-        return loginGeneralFragment;
-    }
-
-    public void setLoginGeneralFragment(LoginGeneralFragment loginGeneralFragment) {
-        this.loginGeneralFragment = loginGeneralFragment;
     }
 }
