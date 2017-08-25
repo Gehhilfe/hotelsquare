@@ -48,7 +48,12 @@ public class FriendListFragment extends Fragment {
                     .subscribe(
                             friendListResponse -> {
                                 List<User> friendList = friendListResponse.getFriends();
-                                friendList.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
+                                friendList.sort(new Comparator<User>() {
+                                    @Override
+                                    public int compare(User o1, User o2) {
+                                        return o1.getName().compareTo(o2.getName());
+                                    }
+                                });
                                 recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), friendList, getActivity()));
                             },
                             throwable -> {
