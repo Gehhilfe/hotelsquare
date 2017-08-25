@@ -27,7 +27,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.List;
 import java.util.UUID;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -95,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View parentView = navigationView.getHeaderView(0);
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
-        readStaticKeyWords();
+
 
         Menu tmpMenu = navigationView.getMenu();
         loginMenu = null;
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 loginMenu = tmpMenu.getItem(i);
             }
         }
-
+        readStaticKeyWords();
         if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             initialiseNavigationHeader();
             loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
@@ -441,20 +440,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    public void readStaticKeyWords() {
-        DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession();
-         List<SuggestionKeyWord> keyWords = daoSession.getSuggestionKeyWordDao().queryBuilder().list();
-        if (keyWords == null ||keyWords.size()==0) {
+    public synchronized void readStaticKeyWords() {
+         LocalStorage ls = LocalStorage.getLocalStorageInstance(this);
+        if (!ls.alreadyReadStaticKeyWords()) {
             System.out.println(("#### readStaticKeyWords"));
-        String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
-        for (int i = 0; i < suggestionList.length; i++) {
-            SuggestionKeyWord suggestionKeyWord = new SuggestionKeyWord();
-            suggestionKeyWord.setUid(UUID.randomUUID().toString());
-            suggestionKeyWord.setSuggestionName(suggestionList[i]);
-            daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
+            DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession();
+            LocalStorage.getLocalStorageInstance(getApplicationContext()).saveBooleanValue(Constants.ALREADY_READ_STATIC_KEYWORDS, true);
+            String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
+            for (int i = 0; i < suggestionList.length; i++) {
+                SuggestionKeyWord suggestionKeyWord = new SuggestionKeyWord();
+                suggestionKeyWord.setUid(UUID.randomUUID().toString());
+                suggestionKeyWord.setSuggestionName(suggestionList[i]);
+                daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
 
+            }
         }
-         }
     }
 
 }

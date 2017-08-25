@@ -23,7 +23,6 @@ public class SuggestionKeyWord {
         this.suggestionName = suggestionName;
     }
 
-    @Generated(hash = 565030457)
     public SuggestionKeyWord() {
     }
 

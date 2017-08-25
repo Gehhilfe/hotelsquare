@@ -107,13 +107,20 @@ public class LocalStorage {
      */
     public void deleteLoggedInInformation() {
         SharedPreferences.Editor editor = getEditor();
-        editor.clear();
+        deleteValue(Constants.IS_LOGGED_IN);
+        deleteValue(Constants.EMAIL);
+        deleteValue(Constants.NAME);
+        deleteValue(Constants.TOKEN);
         editor.commit();
     }
 
     public boolean isLoggedIn() {
         return sharedPreferences.getBoolean(Constants.IS_LOGGED_IN, false);
     }
+    public boolean alreadyReadStaticKeyWords() {
+        return sharedPreferences.getBoolean(Constants.ALREADY_READ_STATIC_KEYWORDS,false);
+    }
+
 
     /**
      * @param key
