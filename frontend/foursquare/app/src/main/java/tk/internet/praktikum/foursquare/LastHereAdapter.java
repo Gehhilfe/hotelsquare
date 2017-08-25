@@ -20,9 +20,6 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 
-/**
- * Created by gehhi on 13.08.2017.
- */
 
 public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyViewHolder> {
     private final static String LOG = LastHereAdapter.class.getSimpleName();
@@ -47,7 +44,7 @@ public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyView
     public void onBindViewHolder(MyViewHolder holder, int position) {
         UserCheckinInformation info = checkinInformations.get(position);
 
-        holder.date.setText(DateFormat.getFriendlyTime(info.getLastDate()));
+        holder.date.setText(DateFormat.getFriendlyTime(context,info.getLastDate()));
 
         UserService us = ServiceFactory.createRetrofitService(UserService.class, VenueInDetailsNestedScrollView.URL);
 
@@ -56,14 +53,19 @@ public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyView
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((user) -> {
                     holder.name.setText(user.getDisplayName());
+                    holder.name.setVisibility(View.VISIBLE);
                     if(user.getAvatar() != null) {
                         ImageCacheLoader icl = new ImageCacheLoader(context);
                         icl.loadBitmap(user.getAvatar(), ImageSize.SMALL)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe((bitmap) -> holder.avatar.setImageBitmap(bitmap),
+                                .subscribe((bitmap) -> {holder.avatar.setImageBitmap(bitmap);
+                                                        holder.avatar.setVisibility(View.VISIBLE);}
+                                        ,
                                         (err) -> Log.d(LOG, err.toString(), err));
                     }
+                   // else holder.avatar.setVisibility(View.GONE);
+
                 }, (err) -> Log.d(LOG, err.toString(), err));
     }
 

@@ -11,7 +11,10 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -22,7 +25,6 @@ import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequest;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequestResponse;
-import tk.internet.praktikum.foursquare.api.bean.Gender;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
@@ -31,13 +33,14 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
 
     class HomeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView requst;
-        private ImageView accept, decline;
+        private ImageView accept, decline, avatar;
 
         public HomeViewHolder(View itemView) {
             super(itemView);
             requst = (TextView) itemView.findViewById(R.id.home_entry_text);
             accept = (ImageView) itemView.findViewById(R.id.home_friend_request_accept);
             decline = (ImageView) itemView.findViewById(R.id.home_friend_request_decline);
+            avatar = (ImageView) itemView.findViewById(R.id.home_avatar);
 
             accept.setOnClickListener(this);
             decline.setOnClickListener(this);
@@ -57,11 +60,8 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                     .createRetrofitService(ProfileService.class, URL, LocalStorage.
                             getSharedPreferences(context).getString(Constants.TOKEN, ""));
 
-            //String name = friendRequestList.get(getAdapterPosition()).getSenderID();
-            String name = "peter";
-
             try {
-                service.answerFriendRequest(name, new FriendRequestResponse(true))
+                service.answerFriendRequest(idNameMap.get(friendRequestList.get(getAdapterPosition()).getSenderID()), new FriendRequestResponse(true))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -84,11 +84,8 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                     .createRetrofitService(ProfileService.class, URL, LocalStorage.
                             getSharedPreferences(context).getString(Constants.TOKEN, ""));
 
-            //String name = friendRequestList.get(getAdapterPosition()).getSenderID();
-            String name = "janus";
-
             try {
-                service.answerFriendRequest(name, new FriendRequestResponse(false))
+                service.answerFriendRequest(idNameMap.get(friendRequestList.get(getAdapterPosition()).getSenderID()), new FriendRequestResponse(false))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -110,14 +107,17 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     private Context context;
     private LayoutInflater inflater;
     private List<FriendRequest> friendRequestList = Collections.emptyList();
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.Y HH:mm");
+    private List<User> userList = Collections.emptyList();
+    private HashMap<String, String> idNameMap = new HashMap<>();
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.y HH:mm",  Locale.ENGLISH);
     private final String URL = "https://dev.ip.stimi.ovh/";
 
 
-    public HomeRecyclerViewAdapter(Context context, List<FriendRequest> friendRequestList) {
+    public HomeRecyclerViewAdapter(Context context, List<FriendRequest> friendRequestList, List<User> userList) {
         inflater = LayoutInflater.from(context);
         this.friendRequestList = friendRequestList;
         this.context = context;
+        this.userList = userList;
     }
 
     @Override
@@ -130,8 +130,31 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     @Override
     public void onBindViewHolder(HomeViewHolder holder, int position) {
         FriendRequest currentFriendRequest = friendRequestList.get(position);
+        User currentUser = new User();
 
-        holder.requst.setText(SIMPLE_DATE_FORMAT.format(currentFriendRequest.getCreatedAt()) + "\n" + currentFriendRequest.getSenderID());
+        for (User user : userList)
+            if (Objects.equals(user.getId(), currentFriendRequest.getSenderID())) {
+                currentUser = user;
+                idNameMap.put(friendRequestList.get(position).getSenderID(), user.getName());
+            }
+
+        if (currentUser.getAvatar() != null) {
+            ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
+            imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.LARGE)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(bitmap -> {
+                                holder.avatar.setImageBitmap(bitmap);
+                            },
+                            throwable -> {
+                                Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+        } else {
+            holder.avatar.setImageResource(R.mipmap.user_avatar);
+        }
+
+        holder.requst.setText(SIMPLE_DATE_FORMAT.format(currentFriendRequest.getCreatedAt()) + "\n" + currentUser.getName());
     }
 
     @Override

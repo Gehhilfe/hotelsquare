@@ -14,12 +14,12 @@ import android.view.MenuItem;
 import tk.internet.praktikum.foursquare.R;
 
 public class HistoryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    // TODO - Hier das Fragment mit HistoryFragment tauschen
     private Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_history);
         Toolbar toolbar = (Toolbar) findViewById(R.id.history_toolbar);
         setSupportActionBar(toolbar);
@@ -32,10 +32,10 @@ public class HistoryActivity extends AppCompatActivity implements NavigationView
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        setTitle("History");
+        setTitle(getApplicationContext().getResources().getString(R.string.action_history));
 
-        // TODO - initialise fragment
-        //addFragment();
+        fragment=new HistoryFragment();
+        addFragment();
     }
 
     public void addFragment() {

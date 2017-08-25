@@ -30,7 +30,6 @@ public class RegisterFragment extends Fragment {
     private EditText nameInput, emailInput, passwordInput;
     private AppCompatButton registerBtn;
     private TextView loginLbl;
-    private  LoginGeneralFragment loginGeneralFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,7 +45,6 @@ public class RegisterFragment extends Fragment {
         registerBtn.setOnClickListener(v -> register());
 
        loginLbl.setOnClickListener(v -> ((LoginActivity) getActivity()).changeFragment(0));
-       // loginLbl.setOnClickListener(v -> loginGeneralFragment.changeFragment(0));
 
         return view;
     }
@@ -140,12 +138,5 @@ public class RegisterFragment extends Fragment {
         Log.d(LOG_TAG, "Failed login.");
         registerBtn.setEnabled(true);
         Toast.makeText(getActivity().getBaseContext(), "Failed to register.", Toast.LENGTH_LONG).show();
-    }
-    public LoginGeneralFragment getLoginGeneralFragment() {
-        return loginGeneralFragment;
-    }
-
-    public void setLoginGeneralFragment(LoginGeneralFragment loginGeneralFragment) {
-        this.loginGeneralFragment = loginGeneralFragment;
     }
 }

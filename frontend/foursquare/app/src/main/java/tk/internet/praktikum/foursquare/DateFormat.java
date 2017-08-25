@@ -1,14 +1,19 @@
 package tk.internet.praktikum.foursquare;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import java.util.Calendar;
 import java.util.Date;
+
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 /**
  * Created by gehhi on 13.08.2017.
  */
 
 public class DateFormat {
-    public static String getFriendlyTime(Date dateTime) {
+    public static String getFriendlyTime(Context context, Date dateTime) {
         StringBuffer sb = new StringBuffer();
         Date current = Calendar.getInstance().getTime();
         long diffInSeconds = (current.getTime() - dateTime.getTime()) / 1000;
@@ -25,12 +30,15 @@ public class DateFormat {
         long days = (diffInSeconds = (diffInSeconds / 24)) >= 30 ? diffInSeconds % 30 : diffInSeconds;
         long months = (diffInSeconds = (diffInSeconds / 30)) >= 12 ? diffInSeconds % 12 : diffInSeconds;
         long years = (diffInSeconds = (diffInSeconds / 12));
-
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(context);
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        if(language.equals("de"))
+            sb.append("vor ");
         if (years > 0) {
             if (years == 1) {
-                sb.append("a year");
+                sb.append(context.getResources().getString(R.string.a_year));
             } else {
-                sb.append(years + " years");
+                sb.append(years + " "+context.getResources().getString(R.string.years));
             }
             /*if (years <= 6 && months > 0) {
                 if (months == 1) {
@@ -41,9 +49,9 @@ public class DateFormat {
             }*/
         } else if (months > 0) {
             if (months == 1) {
-                sb.append("a month");
+                sb.append(context.getResources().getString(R.string.a_month));
             } else {
-                sb.append(months + " months");
+                sb.append(months + " "+context.getResources().getString(R.string.months));
             }
             /*if (months <= 6 && days > 0) {
                 if (days == 1) {
@@ -54,9 +62,9 @@ public class DateFormat {
             }*/
         } else if (days > 0) {
             if (days == 1) {
-                sb.append("a day");
+                sb.append(context.getResources().getString(R.string.a_day));
             } else {
-                sb.append(days + " days");
+                sb.append(days + " "+context.getResources().getString(R.string.days));
             }
             /*if (days <= 3 && hrs > 0) {
                 if (hrs == 1) {
@@ -67,31 +75,31 @@ public class DateFormat {
             }*/
         } else if (hrs > 0) {
             if (hrs == 1) {
-                sb.append("an hour");
+                sb.append(context.getResources().getString(R.string.an_hour));
             } else {
-                sb.append(hrs + " hours");
+                sb.append(hrs + " "+context.getResources().getString(R.string.hours));
             }
             /*if (min > 1) {
                 sb.append(" and " + min + " minutes");
             }*/
         } else if (min > 0) {
             if (min == 1) {
-                sb.append("a minute");
+                sb.append(context.getResources().getString(R.string.a_minute));
             } else {
-                sb.append(min + " minutes");
+                sb.append(min + " "+context.getResources().getString(R.string.minutes));
             }
             /*if (sec > 1) {
                 sb.append(" and " + sec + " seconds");
             }*/
         } else {
             if (sec <= 1) {
-                sb.append("about a second");
+                sb.append(context.getResources().getString(R.string.about)+" "+context.getResources().getString(R.string.a_second));
             } else {
-                sb.append("about " + sec + " seconds");
+                sb.append(context.getResources().getString(R.string.about)+" " + sec + " "+context.getResources().getString(R.string.seconds));
             }
         }
-
-        sb.append(" ago");
+        if(language.equals("en"))
+           sb.append(" ago");
 
 
     /*String result = new String(String.format(

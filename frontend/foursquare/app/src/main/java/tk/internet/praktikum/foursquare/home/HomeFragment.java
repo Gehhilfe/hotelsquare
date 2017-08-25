@@ -30,8 +30,6 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private final String URL = "https://dev.ip.stimi.ovh/";
-    private List<FriendRequest> friendRequests;
-    private User user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,14 +42,26 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         try {
-            service.profile()
+            service.getFriendRequests(0)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                            user -> {
-                                this.user = user;
-                                recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), user.getFriendRequests()));
-                                friendRequests = user.getFriendRequests();
+                            userList -> {
+                                try {
+                                    service.profile()
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(
+                                                    user -> {
+                                                        recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), user.getFriendRequests(), userList));
+                                                    },
+                                                    throwable -> {
+                                                        Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                            );
+                                }catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             },
                             throwable -> {
                                 Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -60,6 +70,7 @@ public class HomeFragment extends Fragment {
         }catch (Exception e) {
             e.printStackTrace();
         }
+
 
         return view;
     }

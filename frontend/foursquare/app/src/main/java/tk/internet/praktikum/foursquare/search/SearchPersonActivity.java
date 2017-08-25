@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import tk.internet.praktikum.foursquare.R;
 
 public class SearchPersonActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    // TODO - Hier das Fragment mit HistoryFragment tauschen
     private Fragment fragment;
 
     @Override
@@ -32,10 +31,11 @@ public class SearchPersonActivity extends AppCompatActivity implements Navigatio
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        setTitle("Search Person");
+        setTitle(getApplicationContext().getResources().getString(R.string.action_search_person));
 
+        fragment = new PersonSearchFragment();
         // TODO - initialise fragment
-        //addFragment();
+        addFragment();
     }
 
     public void addFragment() {
@@ -85,4 +85,19 @@ public class SearchPersonActivity extends AppCompatActivity implements Navigatio
             super.onBackPressed();
         }
     }
+/*    @Override
+    protected void attachBaseContext(Context newBase) {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getBaseContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        Locale locale=new Locale(language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
+    }*/
 }

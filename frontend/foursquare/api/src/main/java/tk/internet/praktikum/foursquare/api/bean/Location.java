@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Location  {
+public class Location {
     private String type = "Point";
     private List<Double> coordinates;
 
@@ -34,5 +34,19 @@ public class Location  {
 
     public boolean isPoint() {
         return type.equals("Point");
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        else {
+            if (obj instanceof Location) {
+                Location location = (Location) obj;
+                return (this.getLatitude() == location.getLatitude() && this.getLongitude() == location.getLongitude());
+            }
+            return false;
+        }
+
     }
 }

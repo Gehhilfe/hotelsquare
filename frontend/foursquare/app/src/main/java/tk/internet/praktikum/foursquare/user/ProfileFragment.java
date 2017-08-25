@@ -8,16 +8,20 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.github.clans.fab.FloatingActionButton;
+
 import java.io.IOException;
+import java.util.Locale;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MultipartBody;
@@ -37,19 +41,19 @@ import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment {
     private TextView name, email, password, city, age;
-    private Button upload, edit, save;
+    private Button edit, save;
     private RadioButton male, female, none;
     private ImageView avatarPicture;
-    private FloatingActionButton uploadAvatarBtn, editProfileButton, saveChangesButton;
 
     private static final String LOG_TAG = ProfileFragment.class.getSimpleName();
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User currentUser;
     private Bitmap avatar;
-    private boolean newPicture, changedPassword;
+    private boolean newPicture;
 
     private final int REQUEST_CAMERA = 0;
     private final int REQUEST_GALLERY = 1;
+    private boolean isEdited = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,31 +65,65 @@ public class ProfileFragment extends Fragment {
         city = (TextView) view.findViewById(R.id.profile_city);
         age = (TextView) view.findViewById(R.id.profile_age);
 
-        upload = (Button) view.findViewById(R.id.profile_avatar_upload_btn);
-        edit = (Button) view.findViewById(R.id.profile_tmp_edit_btn);
-        save = (Button) view.findViewById(R.id.profile_tmp_save_btn);
+        edit = (Button) view.findViewById(R.id.profile_fragment_edit_cancel);
+        save = (Button) view.findViewById(R.id.profile_fragment_edit_save);
 
-        male = (RadioButton) view.findViewById(R.id.radioButton);
-        female = (RadioButton) view.findViewById(R.id.radioButton2);
-        none = (RadioButton) view.findViewById(R.id.radioButton3);
+        male = (RadioButton) view.findViewById(R.id.radio_male);
+        female = (RadioButton) view.findViewById(R.id.radio_female);
+        none = (RadioButton) view.findViewById(R.id.radio_anonymous);
 
         avatarPicture = (ImageView) view.findViewById(R.id.profile_avatar);
 
-        saveChangesButton = (FloatingActionButton) view.findViewById(R.id.profile_save);
-        uploadAvatarBtn = (FloatingActionButton) view.findViewById(R.id.profile_upload_avatar_button);
-        editProfileButton = (FloatingActionButton) view.findViewById(R.id.profile_edit_button);
+        avatarPicture.setOnClickListener(v -> uploadPicture());
 
-        saveChangesButton.setOnClickListener(v -> save());
-        uploadAvatarBtn.setOnClickListener(v -> uploadPicture());
-        editProfileButton.setOnClickListener(v -> edit());
-
-        upload.setOnClickListener(v -> uploadPicture());
         edit.setOnClickListener(v -> edit());
         save.setOnClickListener(v -> save());
 
-        view.clearFocus();
+        age.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE)
+                    save();
+                return true;
+            }
+        });
+        //view.clearFocus();
+        currentUser = null;
         initialiseProfile();
         return view;
+    }
+
+    private void cancel() {
+        edit.setOnClickListener(v -> edit());
+        edit.setText(R.string.profile_edit);
+
+        name.setText(currentUser.getDisplayName());
+        email.setText(currentUser.getEmail());
+        city.setText(currentUser.getCity());
+        age.setText(String.format(Locale.ENGLISH, "%1$d", currentUser.getAge()));
+        Gender gender = currentUser.getGender();
+        if (gender == Gender.MALE)
+            male.setChecked(true);
+        else if (gender == Gender.FEMALE)
+            female.setChecked(true);
+        else
+            none.setChecked(true);
+
+        password.setEnabled(false);
+        city.setEnabled(false);
+        age.setEnabled(false);
+
+        password.clearFocus();
+        city.clearFocus();
+        age.clearFocus();
+
+        save.setEnabled(false);
+
+        male.setEnabled(false);
+        female.setEnabled(false);
+        none.setEnabled(false);
+
+        isEdited = false;
     }
 
     private void initialiseProfile() {
@@ -103,7 +141,7 @@ public class ProfileFragment extends Fragment {
                                 name.setText(currentUser.getDisplayName());
                                 email.setText(currentUser.getEmail());
                                 city.setText(currentUser.getCity());
-                                age.setText(Integer.toString(currentUser.getAge()));
+                                age.setText(String.format(Locale.ENGLISH, "%1$d", currentUser.getAge()));
                                 Gender gender = currentUser.getGender();
                                 if (gender == Gender.MALE)
                                     male.setChecked(true);
@@ -115,7 +153,7 @@ public class ProfileFragment extends Fragment {
 
                             if (currentUser.getAvatar() != null) {
                                 ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
-                                imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.LARGE)
+                                imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.MEDIUM)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(bitmap -> {
@@ -137,23 +175,14 @@ public class ProfileFragment extends Fragment {
     }
 
     private void save() {
-        /*
-        name.setEnabled(false);
-        email.setEnabled(false);
-        */
         password.setEnabled(false);
         city.setEnabled(false);
         age.setEnabled(false);
 
-        /*
-        name.clearFocus();
-        email.clearFocus();
-        */
         password.clearFocus();
         city.clearFocus();
         age.clearFocus();
 
-        upload.setEnabled(false);
         save.setEnabled(false);
 
         male.setEnabled(false);
@@ -163,10 +192,6 @@ public class ProfileFragment extends Fragment {
         if (password.getText() != "")
             currentUser.setPassword(password.getText().toString());
 
-        /*
-        currentUser.setName(name.getText().toString());
-        currentUser.setEmail(email.getText().toString());
-        */
         currentUser.setCity(city.getText().toString());
         currentUser.setAge(Integer.parseInt(age.getText().toString()));
 
@@ -177,15 +202,18 @@ public class ProfileFragment extends Fragment {
         else
             currentUser.setGender(Gender.UNSPECIFIED);
 
+        isEdited = true;
         uploadChanges();
+        edit.setOnClickListener(v -> edit());
+        edit.setText(R.string.profile_edit);
     }
 
     private void uploadChanges() {
-        ProfileService service = ServiceFactory
-                .createRetrofitService(ProfileService.class, URL, LocalStorage.
-                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
-
         if  (newPicture) {
+            ProfileService service = ServiceFactory
+                    .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                            getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
             try {
                 MultipartBody.Part img = UploadHelper.createMultipartBodySync(avatar, getContext(), true);
                 service.uploadAvatar(img)
@@ -203,58 +231,54 @@ public class ProfileFragment extends Fragment {
             }
         }
 
-        UserService service2 = ServiceFactory
-                .createRetrofitService(UserService.class, URL, LocalStorage.
-                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+        if (isEdited) {
+            UserService service2 = ServiceFactory
+                    .createRetrofitService(UserService.class, URL, LocalStorage.
+                            getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
-        try {
-            service2.update(currentUser)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(user -> {
-                        currentUser = user;
-                            },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                    );
-        } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                service2.update(currentUser)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(user -> {
+                                    currentUser = user;
+                                },
+                                throwable -> {
+                                    Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                        );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
+        isEdited = false;
     }
 
     private void edit() {
-        /*
-        name.setFocusable(true);
-        email.setFocusable(true);
-        */
         password.setFocusable(true);
         city.setFocusable(true);
         age.setFocusable(true);
 
-        /*
-        name.setEnabled(true);
-        email.setEnabled(true);
-        */
         password.setEnabled(true);
         city.setEnabled(true);
         age.setEnabled(true);
 
-        upload.setEnabled(true);
         save.setEnabled(true);
 
         male.setEnabled(true);
         female.setEnabled(true);
         none.setEnabled(true);
-
-        changedPassword = false;
         newPicture = false;
+
+        edit.setOnClickListener(v -> cancel());
+        edit.setText(R.string.profile_cancel);
     }
 
     private void uploadPicture() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final String[] options = {"Camera", "Gallery", "Cancel"};
-        builder.setTitle("Select an option to choose your avatar.");
+        builder.setTitle("Select an option to choose your logo.");
         builder.setItems(options, (dialog, option) -> {
             switch (options[option]) {
                 case "Camera":

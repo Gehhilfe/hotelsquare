@@ -1,6 +1,6 @@
 package tk.internet.praktikum.foursquare.search;
 
-import android.content.res.Resources;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -8,9 +8,7 @@ import android.graphics.drawable.Drawable;
 
 import java.io.InputStream;
 
-/**
- * Created by truongtud on 02.07.2017.
- */
+
 
 public class Utils {
 
@@ -21,8 +19,8 @@ public class Utils {
         return  BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
     }
 
-    public static Bitmap decodeResourceImage(Resources resources, int id,int width,int height) throws  Exception {
-        Drawable drawable = resources.getDrawable(id, null);
+    public static Bitmap decodeResourceImage(Context context,String drawableName, int width, int height) throws  Exception {
+        Drawable drawable =context.getDrawable(context.getResources().getIdentifier(drawableName, "drawable", context.getPackageName()));
         Canvas canvas = new Canvas();
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         canvas.setBitmap(bitmap);

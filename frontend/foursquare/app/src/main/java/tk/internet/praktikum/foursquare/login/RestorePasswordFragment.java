@@ -25,7 +25,6 @@ public class RestorePasswordFragment extends Fragment {
 
     private EditText email, name;
     private AppCompatButton resetPwBtn;
-    private  LoginGeneralFragment loginGeneralFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -99,12 +98,5 @@ public class RestorePasswordFragment extends Fragment {
             email.setError(null);
 
         return valid;
-    }
-    public LoginGeneralFragment getLoginGeneralFragment() {
-        return loginGeneralFragment;
-    }
-
-    public void setLoginGeneralFragment(LoginGeneralFragment loginGeneralFragment) {
-        this.loginGeneralFragment = loginGeneralFragment;
     }
 }

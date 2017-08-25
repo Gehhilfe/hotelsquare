@@ -3,14 +3,13 @@ package tk.internet.praktikum.foursquare.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Set;
+
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.bean.TokenInformation;
 import tk.internet.praktikum.foursquare.api.bean.User;
 
-/**
- * Created by truongtud on 16.05.2017.
- */
 
 public class LocalStorage {
 
@@ -116,13 +115,34 @@ public class LocalStorage {
      */
     public void deleteLoggedInInformation() {
         SharedPreferences.Editor editor = getEditor();
-        editor.clear();
-        editor.commit();
+
+        deleteValue(Constants.TOKEN);
+        deleteValue(Constants.NAME);
+        deleteValue(Constants.EMAIL);
+        deleteValue(Constants.IS_LOGGED_IN);
+       // deleteValue(Constants.KEY_WORDS);
+       // editor.commit();
     }
 
     public boolean isLoggedIn(){
         return sharedPreferences.getBoolean(Constants.IS_LOGGED_IN,false);
     }
 
+    /**
+     *
+     * @param key
+     * @param value
+     */
+    public void setLanguage(String key, String value){
+        SharedPreferences.Editor editor = getEditor();
+        editor.putString(key, value);
+        editor.commit();
+    }
 
+    public void setKeyWords(String key,Set<String> keyWords){
+        SharedPreferences.Editor editor=getEditor();
+        editor.clear();
+        editor.putStringSet(key,keyWords);
+        editor.commit();
+    }
 }

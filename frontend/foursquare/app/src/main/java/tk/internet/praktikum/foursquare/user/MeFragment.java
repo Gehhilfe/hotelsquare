@@ -1,6 +1,6 @@
 package tk.internet.praktikum.foursquare.user;
 
-//import android.app.Fragment;
+
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,10 +17,8 @@ import android.view.ViewGroup;
 
 import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.chat.ChatFragment;
 import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
-import tk.internet.praktikum.foursquare.history.dummy.DummyHistoryFragment;
 import tk.internet.praktikum.foursquare.home.HomeFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -41,27 +39,6 @@ public class MeFragment extends Fragment {
         tabLayout= (TabLayout) view.findViewById(R.id.tabs);
 
         fragmentContainer = (ViewPager) view.findViewById(R.id.user_fragment_container);
-
-        TabLayout.Tab homeTab=tabLayout.newTab();
-
-        homeTab.setText("Home").setIcon(R.mipmap.user_home);
-        TabLayout.Tab profileTab=tabLayout.newTab();
-        profileTab.setText("Profile").setIcon(R.mipmap.user_profile);
-        TabLayout.Tab historyTab=tabLayout.newTab();
-        historyTab.setText("History").setIcon(R.mipmap.user_history);
-
-        TabLayout.Tab friendsTab=tabLayout.newTab();
-        friendsTab.setText("Friends").setIcon(R.mipmap.user_friends);
-
-        TabLayout.Tab inbox=tabLayout.newTab();
-        inbox.setText("Inbox").setIcon(R.mipmap.user_message);
-
-        tabLayout.addTab(homeTab);
-        tabLayout.addTab(profileTab);
-        tabLayout.addTab(historyTab);
-        tabLayout.addTab(friendsTab);
-        tabLayout.addTab(inbox);
-
         userStatePagerAdapter = new UserStatePagerAdapter(getFragmentManager(), getContext());
         initialiseFragmentContainer(fragmentContainer);
         fragmentContainer.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -93,7 +70,6 @@ public class MeFragment extends Fragment {
     private void initialiseFragmentContainer(ViewPager container) {
         userStatePagerAdapter.addFragment(new HomeFragment(), "Home");
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
-        userStatePagerAdapter.addFragment(new DummyHistoryFragment(), "History");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);

@@ -30,6 +30,7 @@
             </android.support.v7.widget.Toolbar>
         </android.support.design.widget.AppBarLayout>
 
+
         <LinearLayout
             android:id="@+id/settings_activity_container"
             android:orientation="vertical"
@@ -37,6 +38,8 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
         </LinearLayout>
+
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
@@ -48,4 +51,3 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
 </android.support.v4.widget.DrawerLayout>
-

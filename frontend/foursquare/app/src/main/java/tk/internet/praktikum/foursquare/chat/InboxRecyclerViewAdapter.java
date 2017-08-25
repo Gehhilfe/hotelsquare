@@ -3,7 +3,6 @@ package tk.internet.praktikum.foursquare.chat;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,6 @@ import java.util.Objects;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
-import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
@@ -67,19 +65,19 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
 
             Intent intent = new Intent(context, ProfileActivity.class);
             intent.putExtra("userID", chatPartner.getId());
-            activity.startActivityForResult(intent, REQUEST_PROFILE);
+            intent.putExtra("Parent", "UserActivity");
+            activity.startActivity(intent);
         }
 
         private void startChat() {
             Intent intent = new Intent(context, ChatActivity.class);
             intent.putExtra("chatId", chatList.get(getAdapterPosition()).getChatId());
             intent.putExtra("currentUserName", currentUserName);
-            activity.startActivityForResult(intent, REQUEST_CHAT);
+            intent.putExtra("Parent", "UserActivity");
+            activity.startActivity(intent);
         }
     }
 
-    private final int REQUEST_CHAT = 1;
-    private final int REQUEST_PROFILE = 2;
     private Context context;
     private LayoutInflater inflater;
     private List<Chat> chatList = Collections.emptyList();
@@ -117,6 +115,7 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
                 chatPartner = user;
             }
         }
+        // TODO - HIGHLIGHT NEW MESSAGES
 
         if (chatPartner.getAvatar() != null) {
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);

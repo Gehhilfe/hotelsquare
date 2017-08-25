@@ -37,6 +37,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -50,12 +52,19 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.UploadHelper;
 import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
+import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.history.HistoryEntry;
+import tk.internet.praktikum.foursquare.history.HistoryType;
 import tk.internet.praktikum.foursquare.search.VenueImagesActivity;
+import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
+import tk.internet.praktikum.foursquare.user.UserActivity;
+import tk.internet.praktikum.foursquare.utils.AdjustedContextWrapper;
 
 public class VenueInDetailsNestedScrollView extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -93,12 +102,18 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
     private CircleImageView[] leaderboard_avatar;
     private RecyclerView lastHereRecylcer;
     private LastHereAdapter lastHereAdapter;
+    private String venueName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_venue_detail_nestedscrollview);
 
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language = sharedPreferences.getString("LANGUAGE", "de");
+
+        System.out.println("Language: " + language);
+        AdjustedContextWrapper.wrap(getBaseContext(), language);
         // Setup toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -149,6 +164,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         commentRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
 
         commentAdapter = new CommentAdapter(venueId, getApplicationContext());
+
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 
         scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
@@ -190,6 +206,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         lastHereRecylcer.setNestedScrollingEnabled(false);
         lastHereRecylcer.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         lastHereRecylcer.setItemAnimator(new DefaultItemAnimator());
+        lastHereRecylcer.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL));
+
         lastHereRecylcer.setAdapter(lastHereAdapter);
 
         progressDialog = new ProgressDialog(this, 0);
@@ -202,9 +220,10 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         fabTextComment = (FloatingActionButton) findViewById(R.id.venue_detail_text_comment_button);
         fabImageComment = (FloatingActionButton) findViewById(R.id.venue_detail_image_commnent_button);
         venueImagesButton = (FloatingActionButton) findViewById(R.id.venue_detail_images);
-
         venueImagesButton.setOnClickListener(v -> venueImages());
+
     }
+
 
     @Override
     protected void onStart() {
@@ -222,6 +241,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 .subscribe(venue -> {
                     progressDialog.dismiss();
                     toolbar.setTitle(venue.getName());
+                    commentAdapter.setVenueName(venue.getName());
+                    venueName = venue.getName();
                     updateVicinty(venue);
                     updateVenueLocation(venue.getLocation());
                     updatePrice(venue);
@@ -230,7 +251,6 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                     lastHereAdapter.setData(venue.getLastCheckins());
                     if (venue.getImages().size() > 0) {
                         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
-
                         imageCacheLoader.loadBitmap(venue.getImages().get(0), ImageSize.MEDIUM)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -285,6 +305,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((bitmap) -> leaderboard_avatar[current].setImageBitmap(bitmap), (err) -> Log.d(LOG, err.toString(), err));
                         }
+
+                        leaderboard_avatar[current].setOnClickListener(seeProfileListener(res));
                     }, (err) -> Log.d(LOG, err.toString(), err));
         }
     }
@@ -294,13 +316,13 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
         SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
         if (!ls.isLoggedIn()) {
-            Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.login_first), Toast.LENGTH_SHORT).show();
             return;
         }
         new MaterialDialog.Builder(this)
-                .title("Post Comment")
+                .title(getApplicationContext().getResources().getString(R.string.action_post_text))
                 .inputType(InputType.TYPE_CLASS_TEXT)
-                .input("Your awesome message!", "", (dialog, input) -> {
+                .input(getApplicationContext().getResources().getString(R.string.action_post_text_default), "", (dialog, input) -> {
                     if (input.toString().isEmpty())
                         return;
                     VenueService vs = ServiceFactory.createRetrofitService(VenueService.class, URL, sp.getString(Constants.TOKEN, ""));
@@ -309,7 +331,11 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    (res) -> commentAdapter.addComment(res),
+                                    (res) -> {
+                                        commentAdapter.addComment(res);
+                                        HistoryEntry historyEntry = new HistoryEntry(UUID.randomUUID().toString(), HistoryType.TEXT_COMMENT, venueName, venueId, new Date());
+                                        LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession().getHistoryEntryDao().insert(historyEntry);
+                                    },
                                     (err) -> Log.d(LOG, err.toString())
                             );
                 })
@@ -321,14 +347,14 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         LocalStorage ls = LocalStorage.getLocalStorageInstance(getApplicationContext());
         SharedPreferences sp = LocalStorage.getSharedPreferences(getApplicationContext());
         if (!ls.isLoggedIn()) {
-            Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.login_first), Toast.LENGTH_SHORT).show();
             return;
         }
         new MaterialDialog.Builder(this)
-                .title("Add Image Comment")
+                .title(getApplicationContext().getResources().getString(R.string.action_post_image))
                 .items(new String[]{
-                        "Take Picture",
-                        "Choose from Gallery"
+                        getApplicationContext().getResources().getString(R.string.action_post_image_select_1),
+                        getApplicationContext().getResources().getString(R.string.action_post_image_select_2)
                 })
                 .itemsCallback((dialog, itemView, position, text) -> {
                     if (position == 0) {
@@ -339,6 +365,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                         chooseFromGallery.setType("image/*");
                         startActivityForResult(Intent.createChooser(chooseFromGallery, "Select Picture"), REQUEST_GALLERY);
                     }
+                    HistoryEntry historyEntry = new HistoryEntry(UUID.randomUUID().toString(), HistoryType.IMAGE_COMMENT, venueName, venueId, new Date());
+                    LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession().getHistoryEntryDao().insert(historyEntry);
                 })
                 .show();
     }
@@ -372,10 +400,16 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
-                                (res) -> Toast.makeText(getApplicationContext(), "Checked in", Toast.LENGTH_SHORT).show(),
+                                (res) ->
+                                {
+                                    Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.history_state_check_in), Toast.LENGTH_SHORT).show();
+                                    HistoryEntry historyEntry = new HistoryEntry(UUID.randomUUID().toString(), HistoryType.CHECKIN, venue.getName(), venue.getId(), new Date());
+                                    LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession().getHistoryEntryDao().insert(historyEntry);
+
+                                },
                                 (err) -> Log.d(LOG, err.toString(), err));
             } else {
-                Toast.makeText(getApplicationContext(), "Login first", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getApplicationContext().getResources().getString(R.string.login_first), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -453,7 +487,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
             sb.append(venue.getPhoneNumber()).append("\n");
         if (venue.getWebsite() != null && !venue.getWebsite().isEmpty())
             sb.append(venue.getWebsite()).append("\n");
-        sb.append(venue.getCheckInCount() + " Checkins").append("\n");
+        sb.append(venue.getCheckInCount() + " " + getApplicationContext().getResources().getString(R.string.checkins_count)).append("\n");
         infoVicinity.setText(sb.toString());
     }
 
@@ -531,11 +565,32 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 break;
         }
     }
+
     private void venueImages() {
         Intent intent = new Intent(getApplicationContext(), VenueImagesActivity.class);
         intent.putExtra("venueID", venueId);
         this.startActivity(intent);
 
 
+    }
+
+    public View.OnClickListener seeProfileListener(User user) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+                String userName = sharedPreferences.getString(Constants.NAME, "");
+                if (user.getName().equals(userName)) {
+                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                    intent.putExtra("userID", user.getId());
+                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                    startActivity(intent);
+                }
+
+            }
+        };
     }
 }

@@ -8,16 +8,13 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
-import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.ChatMessage;
-import tk.internet.praktikum.foursquare.api.bean.Message;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -89,7 +86,7 @@ public class ChatListViewAdapter extends BaseAdapter {
            //     view.setTag(holder1);
            // } else {
            //     view = convertView;
-           //     holder1 = (ViewHolder) view.getTag();
+           //     holder1 = (HistoryViewHolder) view.getTag();
            // }
 
             holder1.messageView.setText(message.getMessage());
