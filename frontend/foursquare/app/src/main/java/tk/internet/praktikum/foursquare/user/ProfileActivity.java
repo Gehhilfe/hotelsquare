@@ -30,7 +30,6 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Gender;
 import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.User;
-import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueCheckinInformation;
 import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
@@ -79,9 +78,9 @@ public class ProfileActivity extends AppCompatActivity {
         venueShortName = (TextView) findViewById(R.id.profile_top_venue_short_name);
         venueCount = (TextView) findViewById(R.id.profile_top_venue_count);
 
-        male = (RadioButton) findViewById(R.id.radioButton);
-        female = (RadioButton) findViewById(R.id.radioButton2);
-        none = (RadioButton) findViewById(R.id.radioButton3);
+        male = (RadioButton) findViewById(R.id.radio_male);
+        female = (RadioButton) findViewById(R.id.radio_female);
+        none = (RadioButton) findViewById(R.id.radio_anonymous);
 
         avatarPicture = (ImageView) findViewById(R.id.profile_activity_avatar);
         venueLogo = (ImageView) findViewById(R.id.profile_top_venue_logo);

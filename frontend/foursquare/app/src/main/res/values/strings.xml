@@ -48,6 +48,9 @@
     <string name="profile_female">Female</string>
     <string name="profile_Anonymous">Anonymous</string>
     <string name="top_check_in">Top Check-in</string>
+    <string name="profile_cancel">Cancel</string>
+    <string name="profile_edit">Edit</string>
+    <string name="prof_save">Save</string>
 
     <!-- Other stuff -->
     <string name="near_me">near me</string>

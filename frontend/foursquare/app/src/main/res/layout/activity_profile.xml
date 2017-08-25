@@ -161,7 +161,7 @@
                             android:orientation="horizontal">
 
                             <RadioButton
-                                android:id="@+id/radioButton2"
+                                android:id="@+id/radio_male"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -171,7 +171,7 @@
                                 android:text="@string/profile_male" />
 
                             <RadioButton
-                                android:id="@+id/radioButton"
+                                android:id="@+id/radio_female"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -181,7 +181,7 @@
                                 android:text="@string/profile_female" />
 
                             <RadioButton
-                                android:id="@+id/radioButton3"
+                                android:id="@+id/radio_anonymous"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
