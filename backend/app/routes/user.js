@@ -236,7 +236,7 @@ async function deleteUser(request, response, next) {
  * @returns {undefined}
  */
 async function uploadAvatar(request, response, next) {
-    let user = await User.findOne({name: request.authentication.name});
+    let user = await User.findOne({name: request.authentication.name}).populate('avatar');
     if(user.avatar) {
         await Image.destroy(user.avatar);
     }

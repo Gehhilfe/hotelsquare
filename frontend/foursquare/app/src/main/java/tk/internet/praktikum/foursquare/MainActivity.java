@@ -30,6 +30,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -407,13 +408,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         public void run() {
             String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-            if (token == "")
+            if (Objects.equals(token, ""))
                 return;
 
             UserService service = ServiceFactory
                     .createRetrofitService(UserService.class, URL, token);
 
-            service.update(locationUser)
+            //TODO Send only location no more details
+            //This overides changes
+            User u = new User();
+            u.setLocation(locationUser.getLocation());
+
+            service.update(u)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
