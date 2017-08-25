@@ -43,12 +43,15 @@ import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
+import tk.internet.praktikum.foursquare.history.DaoSession;
 import tk.internet.praktikum.foursquare.history.HistoryFragment;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.search.PersonSearchFragment;
+import tk.internet.praktikum.foursquare.search.SuggestionKeyWord;
+import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.SettingsFragment;
 import tk.internet.praktikum.foursquare.user.UserActivity;
@@ -448,15 +451,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void readStaticKeyWords() {
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        Set<String> keyWords = sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS, null);
-         if (keyWords == null) {
-              keyWords = new HashSet<>();
-
+        DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession();
+         List<SuggestionKeyWord> keyWords = daoSession.getSuggestionKeyWordDao().queryBuilder().list();
+        if (keyWords == null ||keyWords.size()==0) {
+            System.out.println(("#### readStaticKeyWords"));
         String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
-        keyWords.addAll(Arrays.asList(suggestionList));
+        for (int i = 0; i < suggestionList.length; i++) {
+            SuggestionKeyWord suggestionKeyWord = new SuggestionKeyWord();
+            suggestionKeyWord.setUid(UUID.randomUUID().toString());
+            suggestionKeyWord.setSuggestionName(suggestionList[i]);
+            daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
 
-        LocalStorage.getLocalStorageInstance(getApplicationContext()).setKeyWords(tk.internet.praktikum.Constants.KEY_WORDS, keyWords);
+        }
          }
     }
 

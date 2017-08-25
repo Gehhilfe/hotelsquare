@@ -220,7 +220,7 @@ async function resetPassword(request, response, next) {
  */
 async function deleteUser(request, response, next) {
     const user = await User.findOne({_id: request.authentication._id});
-    user.deleted = true;
+    await user.destory();
     await user.save();
     response.json(user);
     return next();
@@ -236,7 +236,7 @@ async function deleteUser(request, response, next) {
  * @returns {undefined}
  */
 async function uploadAvatar(request, response, next) {
-    let user = await User.findOne({name: request.authentication.name});
+    let user = await User.findOne({name: request.authentication.name}).populate('avatar');
     if(user.avatar) {
         await Image.destroy(user.avatar);
     }

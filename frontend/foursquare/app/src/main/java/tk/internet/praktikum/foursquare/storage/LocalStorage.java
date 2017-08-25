@@ -3,8 +3,6 @@ package tk.internet.praktikum.foursquare.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.Set;
-
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.bean.TokenInformation;
@@ -17,12 +15,12 @@ public class LocalStorage {
     private static LocalStorage localStorage;
     private static SharedPreferences sharedPreferences;
     private static Context context;
+
     /**
-     *
      * @return
      */
     public static LocalStorage getLocalStorageInstance(Context context) {
-        if(LocalStorage.context==null) {
+        if (LocalStorage.context == null) {
             LocalStorage.context = context;
             LocalStorage.sharedPreferences = getSharedPreferences(context);
         }
@@ -31,7 +29,6 @@ public class LocalStorage {
 
 
     /**
-     *
      * @return
      */
     private SharedPreferences.Editor getEditor() {
@@ -39,7 +36,6 @@ public class LocalStorage {
     }
 
     /**
-     *
      * @param context
      * @return
      */
@@ -48,24 +44,23 @@ public class LocalStorage {
     }
 
 
-
     /**
      * It's called when logging in
      *
      * @param tokenInformation
      */
     public void saveToken(TokenInformation tokenInformation) {
-        saveBooleanValue(Constants.IS_LOGGED_IN,true);
+        saveBooleanValue(Constants.IS_LOGGED_IN, true);
         saveValue(Constants.TOKEN, tokenInformation.getToken());
     }
-    public void saveBooleanValue(String key, boolean value){
+
+    public void saveBooleanValue(String key, boolean value) {
         SharedPreferences.Editor editor = getEditor();
-        editor.putBoolean(key,value);
+        editor.putBoolean(key, value);
         editor.commit();
     }
 
     /**
-     *
      * @param key
      * @param value
      */
@@ -76,28 +71,25 @@ public class LocalStorage {
     }
 
     /**
-     *
      * @param tokenInformation
      * @param user
      */
-    public void saveLoggedinInformation(TokenInformation tokenInformation, User user){
-         saveToken(tokenInformation);
-         savedUserInformation(user);
+    public void saveLoggedinInformation(TokenInformation tokenInformation, User user) {
+        saveToken(tokenInformation);
+        savedUserInformation(user);
     }
 
     /**
-     *
      * @param user
      */
-    public void savedUserInformation(User user){
-        SharedPreferences.Editor editor=getEditor();
-        editor.putString(Constants.NAME,user.getName());
-        editor.putString(Constants.EMAIL,user.getEmail());
+    public void savedUserInformation(User user) {
+        SharedPreferences.Editor editor = getEditor();
+        editor.putString(Constants.NAME, user.getName());
+        editor.putString(Constants.EMAIL, user.getEmail());
         editor.commit();
     }
 
     /**
-     *
      * @param key
      */
     public void deleteValue(String key) {
@@ -115,34 +107,22 @@ public class LocalStorage {
      */
     public void deleteLoggedInInformation() {
         SharedPreferences.Editor editor = getEditor();
-
-        deleteValue(Constants.TOKEN);
-        deleteValue(Constants.NAME);
-        deleteValue(Constants.EMAIL);
-        deleteValue(Constants.IS_LOGGED_IN);
-       // deleteValue(Constants.KEY_WORDS);
-       // editor.commit();
+        editor.clear();
+        editor.commit();
     }
 
-    public boolean isLoggedIn(){
-        return sharedPreferences.getBoolean(Constants.IS_LOGGED_IN,false);
+    public boolean isLoggedIn() {
+        return sharedPreferences.getBoolean(Constants.IS_LOGGED_IN, false);
     }
 
     /**
-     *
      * @param key
      * @param value
      */
-    public void setLanguage(String key, String value){
+    public void setLanguage(String key, String value) {
         SharedPreferences.Editor editor = getEditor();
         editor.putString(key, value);
         editor.commit();
     }
 
-    public void setKeyWords(String key,Set<String> keyWords){
-        SharedPreferences.Editor editor=getEditor();
-        editor.clear();
-        editor.putStringSet(key,keyWords);
-        editor.commit();
-    }
 }

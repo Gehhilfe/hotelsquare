@@ -223,6 +223,20 @@ class UserClass {
         };
     }
 
+    async destory() {
+        const self = this;
+        self.deleted = true;
+        const populated = await self.populate('friends').execPopulate();
+
+        // Remove self from all friends
+        await Promise.all(_.map(populated.friends, (it) => {
+            it.removeFriend(self);
+            return it.save();
+        }));
+
+        self.friends = [];
+    }
+
     update(data) {
         const self = this;
 

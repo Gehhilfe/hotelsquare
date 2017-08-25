@@ -57,7 +57,6 @@ describe('User', () => {
             gender: 'f'
         });
         peter2Token = jsonwt.sign(peter2.toJSON(), config.jwt.secret, config.jwt.options);
-
         await User.create({name: 'peter1113', email: 'peter12223@cool.de', password: 'peter99', active: true});
     }));
 
@@ -305,7 +304,7 @@ describe('User', () => {
 
     describe('DELETE user', () => {
 
-        it('should delete user if authenticated', (done) => {
+        it('should delete user', (done) => {
             request(server)
                 .delete('/users')
                 .set('x-auth', peterToken)
@@ -319,6 +318,28 @@ describe('User', () => {
                 });
         });
 
+
+        describe('when user has friends', () => {
+            beforeEach(mochaAsync(async () => {
+                [peter, peter2] = User.connectFriends(peter, peter2);
+                await Promise.all([peter.save(), peter2.save()]);
+            }));
+
+
+            it('should delete user', mochaAsync( async () => {
+                const res = await request(server)
+                    .delete('/users')
+                    .set('x-auth', peterToken);
+                res.should.have.status(200);
+                const user = await User.findById(peter._id);
+                expect(user).to.not.be.null;
+                user.deleted.should.be.true;
+                user.friends.length.should.be.equal(0);
+                const other = await User.findById(peter2._id);
+                other.friends.length.should.be.equal(0);
+            }));
+
+        });
     });
 
     describe('DELETE profile/friends/', () => {
