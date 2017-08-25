@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="suggestion_list">
+        <item>Beer</item>
+        <item>Cafe</item>
+        <item>Vegetarian</item>
+        <item>Beach</item>
+        <item>Castle</item>
+        <item>Zoo</item>
+        <item>Bank</item>
+        <item>Gas station</item>
+        <item>Car wash</item>
+        <item>Supermarket</item>
+        <item>Florist</item>
+        <item>Music</item>
+        <item>Airport</item>
+        <item>Harbor</item>
+        <item>E-charging station</item>
+        <item>University</item>
+        <item>Library</item>
+        <item>Church</item>
+        <item>Breakfast</item>
+        <item>Lunch</item>
+
+        <item>Bier</item>
+        <item>Cafe</item>
+        <item>Vegetarisch</item>
+        <item>Strand</item>
+        <item>Burg</item>
+        <item>Zoo</item>
+        <item>Bank</item>
+        <item>Tankstelle</item>
+        <item>Autowaschanlage</item>
+        <item>Supermarkt</item>
+        <item>Blumen</item>
+        <item>Musik</item>
+        <item>Flughafen</item>
+        <item>Hafen</item>
+        <item>Elektrotankstelle</item>
+        <item>Rewe</item>
+        <item>Aldi</item>
+        <item>Edeka</item>
+        <item>Universität</item>
+        <item>Bibliothek</item>
+        <item>Kirchen</item>
+        <item>Frühstück</item>
+        <item>Mittagessen</item>
+        <item>Abendessen</item>
+        <item>Restaurant</item>
+    </string-array>
+
+</resources>

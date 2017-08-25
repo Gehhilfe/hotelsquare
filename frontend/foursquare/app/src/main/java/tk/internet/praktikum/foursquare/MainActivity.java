@@ -28,6 +28,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
@@ -70,8 +74,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        LanguageHelper.updateResources(this,language);
+        String language = sharedPreferences.getString("LANGUAGE", "de");
+        LanguageHelper.updateResources(this, language);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -90,12 +94,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View parentView = navigationView.getHeaderView(0);
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
-
+        readStaticKeyWords();
         if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
             initialiseNavigationHeader();
 
         FastSearchFragment searchFragment = new FastSearchFragment();
-        redirectToFragment(searchFragment,getApplicationContext().getResources().getString(R.string.action_search));
+        redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
 
         handler.postDelayed(sendLocation, PARAM_INTERVAL);
     }
@@ -132,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                     );
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -144,15 +148,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawer.closeDrawer(GravityCompat.START);
         }
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            int lastBackStackEntryPosition=getSupportFragmentManager().getBackStackEntryCount()-2;
-            if(lastBackStackEntryPosition>=0) {
+            int lastBackStackEntryPosition = getSupportFragmentManager().getBackStackEntryCount() - 2;
+            if (lastBackStackEntryPosition >= 0) {
                 FragmentManager.BackStackEntry lastBackStackEntry =
                         getSupportFragmentManager().getBackStackEntryAt(lastBackStackEntryPosition);
                 setTitle(lastBackStackEntry.getName());
                 getSupportFragmentManager().popBackStack();
             }
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
     }
@@ -182,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void searchNavigation(MenuItem item) {
         try {
             Fragment fragment = FastSearchFragment.class.newInstance();
-            redirectToFragment(fragment,getApplicationContext().getResources().getString(R.string.action_search));
+            redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search));
             setTitle(item);
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -198,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void searchPersonNavigation(MenuItem item) {
         PersonSearchFragment fragment = new PersonSearchFragment();
-        redirectToFragment(fragment,getApplicationContext().getResources().getString(R.string.action_search_person));
+        redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search_person));
         setTitle(item);
     }
 /*
@@ -209,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void historyNavigation(MenuItem item) {
         HistoryFragment fragment = new HistoryFragment();
-        redirectToFragment(fragment,getApplicationContext().getResources().getString(R.string.action_history));
+        redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_history));
         setTitle(item);
     }
 
@@ -225,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void settingsNavigation(MenuItem item) {
         SettingsFragment fragment = new SettingsFragment();
-        redirectToFragment(fragment,getApplicationContext().getResources().getString(R.string.action_settings));
+        redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_settings));
         setTitle(item);
     }
 
@@ -283,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void redirectToFragment(Fragment fragment,String backStackName) {
+    private void redirectToFragment(Fragment fragment, String backStackName) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(backStackName);
@@ -314,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStart() {
         super.onStart();
         Log.d("LOCATION", "StartService");
-        if(!isMyServiceRunning(LocationService.class))
+        if (!isMyServiceRunning(LocationService.class))
             startService(new Intent(this, LocationService.class)); // start tracking service
 
         // off-topic -> ignore this
@@ -383,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         public void run() {
             String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-            if(token == "")
+            if (token == "")
                 return;
 
             UserService service = ServiceFactory
@@ -405,7 +408,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     };
 
-    public void setTitleOnBackStack(){
+    public void setTitleOnBackStack() {
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
@@ -415,5 +418,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    public void readStaticKeyWords() {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        Set<String> keyWords = sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS, null);
+         if (keyWords == null) {
+              keyWords = new HashSet<>();
+
+        String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
+        keyWords.addAll(Arrays.asList(suggestionList));
+
+        LocalStorage.getLocalStorageInstance(getApplicationContext()).setKeyWords(tk.internet.praktikum.Constants.KEY_WORDS, keyWords);
+         }
+    }
 
 }

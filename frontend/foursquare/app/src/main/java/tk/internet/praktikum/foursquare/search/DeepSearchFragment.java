@@ -286,17 +286,21 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         if(!typedKeyWord.isEmpty()) {
             SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getContext());
             Set<String> keyWords = sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS, null);
-            ArrayList<String> allKeyWords = new ArrayList<>(keyWords);
-            System.out.println("** allkeywords: " + allKeyWords);
-            searchView.setSuggestionsAdapter(keyWordsSuggestionAdapter);
-            final MatrixCursor matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID, KEY_WORD});
+            if(keyWords!=null) {
+                ArrayList<String> allKeyWords = new ArrayList<>(keyWords);
+                System.out.println("** allkeywords: " + allKeyWords);
 
-            for (int i = 0; i < allKeyWords.size(); i++) {
-                String keyWord = allKeyWords.get(i);
-                if (keyWord.startsWith(typedKeyWord))
-                    matrixCursor.addRow(new Object[]{i, keyWord});
+                MatrixCursor matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID, KEY_WORD});
+                for (int i = 0; i < allKeyWords.size(); i++) {
+                    String keyWord = allKeyWords.get(i).trim().toLowerCase();
+                    if (keyWord.startsWith(typedKeyWord))
+                        matrixCursor.addRow(new Object[]{i, keyWord});
+                }
+
+                keyWordsSuggestionAdapter.changeCursor(matrixCursor);
+                searchView.setSuggestionsAdapter(keyWordsSuggestionAdapter);
+
             }
-            keyWordsSuggestionAdapter.changeCursor(matrixCursor);
         }
         return false;
     }
@@ -382,6 +386,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                     );
         }
     }
+
+
 
     /**
      * listens the changes of location
@@ -652,9 +658,8 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             }
         }
         LocalStorage.getLocalStorageInstance(getContext()).setKeyWords(tk.internet.praktikum.Constants.KEY_WORDS,keyWords);
-        //Set<String>test=sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS,null);
-
     }
+
 
 
     public void onStop(){

@@ -99,7 +99,7 @@ public class VenuesListFragment extends Fragment {
         }
         System.out.println("**** all venues:");
         for(Venue venue:searchResultAdapter.getSearchResultViewHolderList()){
-            System.out.println(venue.getName());
+            System.out.println(venue.getName()+"---"+venue.getId()+"--ad:"+venue.getLocation().getLatitude()+"--"+venue.getLocation().getLongitude());
         }
 
 

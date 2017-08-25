@@ -115,8 +115,13 @@ public class LocalStorage {
      */
     public void deleteLoggedInInformation() {
         SharedPreferences.Editor editor = getEditor();
-        editor.clear();
-        editor.commit();
+
+        deleteValue(Constants.TOKEN);
+        deleteValue(Constants.NAME);
+        deleteValue(Constants.EMAIL);
+        deleteValue(Constants.IS_LOGGED_IN);
+       // deleteValue(Constants.KEY_WORDS);
+       // editor.commit();
     }
 
     public boolean isLoggedIn(){
@@ -136,6 +141,7 @@ public class LocalStorage {
 
     public void setKeyWords(String key,Set<String> keyWords){
         SharedPreferences.Editor editor=getEditor();
+        editor.clear();
         editor.putStringSet(key,keyWords);
         editor.commit();
     }

@@ -96,7 +96,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHo
     }
     public boolean containVenue(Venue venue){
         for(Venue v: searchResultViewHolderList){
-            if(v.getId().equals(venue.getId()))
+            if(v.getId().equals(venue.getId())||(v.getName().equals(venue.getName()) &&v.getLocation().equals(venue.getLocation())))
                 return true;
         }
         return  false;
