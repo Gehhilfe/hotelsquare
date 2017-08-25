@@ -204,7 +204,7 @@ class ImageClass {
             this._tryRemoveImage(baseFileName + '_' + 'middle.jpeg'),
             this._tryRemoveImage(baseFileName + '_' + 'large.jpeg')
         ]);
-        return img.remove();
+        return await img.remove();
     }
 
     toJSON() {

@@ -14,7 +14,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -29,6 +28,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -57,44 +57,21 @@ import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
-    private final int REQUEST_SEARCH_PERSON = 3;
-    private final int REQUEST_HISTORY = 4;
     private final int REQUEST_ME = 6;
-    private final String URL = "https://dev.ip.stimi.ovh/";
-    private MenuItem searchMenu, meMenu;
+    private final int RESULT_USER_ACTIVITY = 3;
+    private final int RESULT_LOGIN = 2;
+
+
     private TextView userName;
     private ImageView avatar;
+
     private Location userLocation = new Location(0, 0);
     private Handler handler = new Handler();
+    private final String URL = "https://dev.ip.stimi.ovh/";
     private User locationUser = new User();
     private int PARAM_INTERVAL = 10000;
     private NavigationView navigationView;
-    private SearchView searchView;
-    private Runnable sendLocation = new Runnable() {
-        @Override
-        public void run() {
-            String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-            if (token == "")
-                return;
-
-            UserService service = ServiceFactory
-                    .createRetrofitService(UserService.class, URL, token);
-
-            service.update(locationUser)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(user -> {
-                                locationUser = user;
-                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
-                            },
-                            throwable -> {
-                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                    );
-            handler.postDelayed(this, PARAM_INTERVAL);
-        }
-
-    };
+    private MenuItem loginMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,8 +97,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
         readStaticKeyWords();
-        if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+
+        Menu tmpMenu = navigationView.getMenu();
+        loginMenu = null;
+        for (int i = 0; i < tmpMenu.size(); i++) {
+            tmpMenu.getItem(i);
+            if (tmpMenu.getItem(i).getItemId() == R.id.nav_login_logout) {
+                loginMenu = tmpMenu.getItem(i);
+            }
+        }
+
+        if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             initialiseNavigationHeader();
+            loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+        }
 
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
@@ -207,11 +196,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-  /*  private void searchPersonNavigation() {
-        Intent intent = new Intent(getApplicationContext(), SearchPersonActivity.class);
-        startActivityForResult(intent, REQUEST_SEARCH_PERSON);
-    }*/
-
     private void searchNavigation(MenuItem item) {
         try {
             Fragment fragment = FastSearchFragment.class.newInstance();
@@ -223,10 +207,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             e.printStackTrace();
         }
     }
-/*
-    private void historyNavigation() {
-        Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
-        startActivityForResult(intent, REQUEST_HISTORY);
+
+  /*  private void searchPersonNavigation() {
+        Intent intent = new Intent(getApplicationContext(), SearchPersonActivity.class);
+        startActivityForResult(intent, REQUEST_SEARCH_PERSON);
     }*/
 
     private void searchPersonNavigation(MenuItem item) {
@@ -234,6 +218,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search_person));
         setTitle(item);
     }
+/*
+    private void historyNavigation() {
+        Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
+        startActivityForResult(intent, REQUEST_HISTORY);
+    }*/
 
     private void historyNavigation(MenuItem item) {
         HistoryFragment fragment = new HistoryFragment();
@@ -243,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void meNavigation() {
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-            login();
+            login(true);
         } else {
             Intent intent = new Intent(getApplicationContext(), UserActivity.class);
             startActivityForResult(intent, REQUEST_ME);
@@ -256,19 +245,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setTitle(item);
     }
 
-    private void login() {
+    private void login(boolean destination) {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        intent.putExtra("UserActivity", destination);
         startActivityForResult(intent, REQUEST_LOGIN);
-
     }
 
     private void logout() {
-        //navigationView.getMenu().clear();
-        //navigationView.inflateMenu(R.menu.activity_main_drawer);
         LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
+        this.recreate();
+        /*
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivityForResult(intent, 0);
+        */
     }
+
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -294,12 +285,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_login_logout:
                 if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-                    login();
-                    item.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    login(false);
                     return false;
                 } else {
                     logout();
-                    item.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
+                    //item.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
                 }
                 break;
         }
@@ -328,10 +318,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_LOGIN:
-                if (resultCode == RESULT_OK) {
+                if (resultCode == RESULT_LOGIN) {
                     initialiseNavigationHeader();
-                    // meNavigation(meMenu);
+                    loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
                     break;
+                } else if (resultCode == RESULT_USER_ACTIVITY) {
+                    initialiseNavigationHeader();
+                    loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    meNavigation();
                 }
         }
     }
@@ -352,7 +346,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        initialiseNavigationHeader();
+        if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
+            initialiseNavigationHeader();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -404,6 +403,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public Location getUserLocation() {
         return userLocation;
     }
+
+    private Runnable sendLocation = new Runnable() {
+        @Override
+        public void run() {
+            String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+            if (Objects.equals(token, ""))
+                return;
+
+            UserService service = ServiceFactory
+                    .createRetrofitService(UserService.class, URL, token);
+
+            //TODO Send only location no more details
+            //This overides changes
+            User u = new User();
+            u.setLocation(locationUser.getLocation());
+
+            service.update(u)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                                locationUser = user;
+                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+            handler.postDelayed(this, PARAM_INTERVAL);
+        }
+
+    };
 
     public void setTitleOnBackStack() {
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
