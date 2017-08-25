@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -59,8 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final int RESULT_USER_ACTIVITY = 3;
     private final int RESULT_LOGIN = 2;
 
-
-    private TextView userName;
+    private TextView userName, hotelsquare;
     private ImageView avatar;
 
     private Location userLocation = new Location(0, 0);
@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         View parentView = navigationView.getHeaderView(0);
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
+        hotelsquare = (TextView) parentView.findViewById(R.id.nav_hotelsquare);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
         readStaticKeyWords();
 
@@ -110,6 +111,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
         }
 
+        Typeface type = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Pacifico.ttf");
+        hotelsquare.setTypeface(type);
+
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
 
@@ -120,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        avatar.setVisibility(View.VISIBLE);
+        hotelsquare.setVisibility(View.GONE);
 
         try {
             service.profile()

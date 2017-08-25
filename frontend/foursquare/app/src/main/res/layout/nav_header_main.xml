@@ -13,18 +13,28 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <!-- TODO - Change logo -->
+
     <ImageView
         android:id="@+id/nav_header_avatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@mipmap/foursquare_logo_2" />
+        android:visibility="gone" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="21dp"
+        android:textSize="40dp"
+        android:text="hotelsquare"
+        android:textColor="@color/orange"
+        android:id="@+id/nav_hotelsquare"/>
 
     <TextView
         android:id="@+id/nav_header_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/foursquare_slogan"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 </LinearLayout>
