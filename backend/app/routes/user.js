@@ -220,7 +220,7 @@ async function resetPassword(request, response, next) {
  */
 async function deleteUser(request, response, next) {
     const user = await User.findOne({_id: request.authentication._id});
-    user.deleted = true;
+    await user.destory();
     await user.save();
     response.json(user);
     return next();
