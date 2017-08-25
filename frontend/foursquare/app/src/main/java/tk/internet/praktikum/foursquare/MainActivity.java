@@ -28,9 +28,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.UUID;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -42,12 +41,15 @@ import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
+import tk.internet.praktikum.foursquare.history.DaoSession;
 import tk.internet.praktikum.foursquare.history.HistoryFragment;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.search.PersonSearchFragment;
+import tk.internet.praktikum.foursquare.search.SuggestionKeyWord;
+import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.SettingsFragment;
 import tk.internet.praktikum.foursquare.user.UserActivity;
@@ -58,18 +60,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final int REQUEST_SEARCH_PERSON = 3;
     private final int REQUEST_HISTORY = 4;
     private final int REQUEST_ME = 6;
-
+    private final String URL = "https://dev.ip.stimi.ovh/";
     private MenuItem searchMenu, meMenu;
     private TextView userName;
     private ImageView avatar;
-
     private Location userLocation = new Location(0, 0);
     private Handler handler = new Handler();
-    private final String URL = "https://dev.ip.stimi.ovh/";
     private User locationUser = new User();
     private int PARAM_INTERVAL = 10000;
     private NavigationView navigationView;
     private SearchView searchView;
+    private Runnable sendLocation = new Runnable() {
+        @Override
+        public void run() {
+            String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+            if (token == "")
+                return;
+
+            UserService service = ServiceFactory
+                    .createRetrofitService(UserService.class, URL, token);
+
+            service.update(locationUser)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                                locationUser = user;
+                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+            handler.postDelayed(this, PARAM_INTERVAL);
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,6 +207,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+  /*  private void searchPersonNavigation() {
+        Intent intent = new Intent(getApplicationContext(), SearchPersonActivity.class);
+        startActivityForResult(intent, REQUEST_SEARCH_PERSON);
+    }*/
+
     private void searchNavigation(MenuItem item) {
         try {
             Fragment fragment = FastSearchFragment.class.newInstance();
@@ -193,10 +223,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             e.printStackTrace();
         }
     }
-
-  /*  private void searchPersonNavigation() {
-        Intent intent = new Intent(getApplicationContext(), SearchPersonActivity.class);
-        startActivityForResult(intent, REQUEST_SEARCH_PERSON);
+/*
+    private void historyNavigation() {
+        Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
+        startActivityForResult(intent, REQUEST_HISTORY);
     }*/
 
     private void searchPersonNavigation(MenuItem item) {
@@ -204,11 +234,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search_person));
         setTitle(item);
     }
-/*
-    private void historyNavigation() {
-        Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
-        startActivityForResult(intent, REQUEST_HISTORY);
-    }*/
 
     private void historyNavigation(MenuItem item) {
         HistoryFragment fragment = new HistoryFragment();
@@ -224,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivityForResult(intent, REQUEST_ME);
         }
     }
-
 
     private void settingsNavigation(MenuItem item) {
         SettingsFragment fragment = new SettingsFragment();
@@ -245,7 +269,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivityForResult(intent, 0);
     }
-
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -382,32 +405,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return userLocation;
     }
 
-    private Runnable sendLocation = new Runnable() {
-        @Override
-        public void run() {
-            String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-            if (token == "")
-                return;
-
-            UserService service = ServiceFactory
-                    .createRetrofitService(UserService.class, URL, token);
-
-            service.update(locationUser)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(user -> {
-                                locationUser = user;
-                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
-                            },
-                            throwable -> {
-                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                    );
-            handler.postDelayed(this, PARAM_INTERVAL);
-        }
-
-    };
-
     public void setTitleOnBackStack() {
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
@@ -419,15 +416,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void readStaticKeyWords() {
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        Set<String> keyWords = sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS, null);
-         if (keyWords == null) {
-              keyWords = new HashSet<>();
-
+        DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession();
+         List<SuggestionKeyWord> keyWords = daoSession.getSuggestionKeyWordDao().queryBuilder().list();
+        if (keyWords == null ||keyWords.size()==0) {
+            System.out.println(("***** readStaticKeyWords"));
         String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
-        keyWords.addAll(Arrays.asList(suggestionList));
-
-        LocalStorage.getLocalStorageInstance(getApplicationContext()).setKeyWords(tk.internet.praktikum.Constants.KEY_WORDS, keyWords);
+        for (int i = 0; i < suggestionList.length; i++) {
+            SuggestionKeyWord suggestionKeyWord = new SuggestionKeyWord();
+            suggestionKeyWord.setUid(UUID.randomUUID().toString());
+            suggestionKeyWord.setSuggestionName(suggestionList[i]);
+            daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
+        }
          }
     }
 
