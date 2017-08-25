@@ -3,8 +3,11 @@ package tk.internet.praktikum.foursquare.search;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +19,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -312,17 +316,17 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         // TODO: New Markers
         float rating = venue.getRating();
         if (rating == 0) {
-            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_grey_24dp));
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_grey_marker));
         } else if (rating > 0 && rating <= 1) {
-            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_red_24dp));
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_red_marker));
         } else if (rating > 1 && rating <= 2) {
-            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_orange_24dp));
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_orange_marker));
         } else if (rating > 2 && rating <= 3) {
-            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_yellow_24dp));
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_yellow_marker));
         } else if (rating > 3 && rating <= 4) {
-            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_lime_24dp));
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_lime_marker));
         } else if (rating > 4) {
-            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location_green_24dp));
+            tmp.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_green_marker));
         }
 
         markerVenueMap.put(tmp, venue);
@@ -363,8 +367,8 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
             updateFriendsMarker();
         }
-        Location centerLocation=calculateClusteringCenterLocation(venues);
-        //Location centerLocation = userLocation;
+        //Location centerLocation=calculateClusteringCenterLocation(venues);
+        Location centerLocation = userLocation;
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 12));
 
     }
@@ -552,7 +556,6 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             return;
         }
     }
-
     // TODO: Delete?
  /*   */
 
@@ -567,11 +570,11 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.HORIZONTAL));
 
     }*/
-    protected Location calculateClusteringCenterLocation(List<Venue> venues) {
-        return new Location(venues.stream().mapToDouble(location -> location.getLocation().getLongitude()).average().getAsDouble(),
-                venues.stream().mapToDouble(location -> location.getLocation().getLatitude()).average().getAsDouble());
-
-    }
+  //  protected Location calculateClusteringCenterLocation(List<Venue> venues) {
+  //      return new Location(venues.stream().mapToDouble(location -> location.getLocation().getLongitude()).average().getAsDouble(),
+  //              venues.stream().mapToDouble(location -> location.getLocation().getLatitude()).average().getAsDouble());
+    //
+  //  }
 
     /**
      * Listen for new database entries from background service
