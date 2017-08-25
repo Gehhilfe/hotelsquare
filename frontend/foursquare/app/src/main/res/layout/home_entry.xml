@@ -1,16 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="40dp"
+    android:layout_width="match_parent" android:layout_height="48dp"
     android:background="?attr/selectableItemBackground" >
 
+    <ImageView
+        android:paddingStart="10dp"
+        android:id="@+id/home_avatar"
+        android:src="@mipmap/user_avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
     <TextView
-        android:id="@+id/home_entry"
+        android:id="@+id/home_entry_text"
         android:paddingRight="10dp"
         android:layout_marginStart="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/home_avatar"
+        android:layout_toEndOf="@+id/home_avatar"
+        android:layout_toStartOf="@+id/home_friend_request_accept"
+        android:text="adsadasdasdasdasdaddddddd"
+        android:textColor="@color/colorPrimaryDark"/>
+
+    <ImageView
+        android:id="@+id/home_friend_request_decline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        app:srcCompat="@mipmap/ic_close_black_48dp"
+        android:paddingEnd="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:id="@+id/home_friend_request_accept"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/home_friend_request_decline"
+        app:srcCompat="@mipmap/ic_check_black_48dp" />
+
+
 
 </RelativeLayout>

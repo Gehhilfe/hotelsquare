@@ -3,6 +3,7 @@ package tk.internet.praktikum.foursquare.search;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,9 +29,7 @@ public class VenuesListFragment extends Fragment {
     private int firstVisibleItem;
     private int currentVisibleItem;
     private int maxLastVisibleItemPosition=0;
-    private boolean scrolledVenue;
     private DeepSearchFragment parent;
-    private boolean endOfList;
     View view;
 
     public DeepSearchFragment getParent() {
@@ -88,6 +87,7 @@ public class VenuesListFragment extends Fragment {
             searchResultAdapter=new SearchResultAdapter(this, venues);
             recyclerView.setAdapter(searchResultAdapter);
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
         }
         else{
 
@@ -99,7 +99,7 @@ public class VenuesListFragment extends Fragment {
         }
         System.out.println("**** all venues:");
         for(Venue venue:searchResultAdapter.getSearchResultViewHolderList()){
-            System.out.println(venue.getName());
+            System.out.println(venue.getName()+"---"+venue.getId()+"--ad:"+venue.getLocation().getLatitude()+"--"+venue.getLocation().getLongitude());
         }
 
 
@@ -135,15 +135,8 @@ public class VenuesListFragment extends Fragment {
                     maxLastVisibleItemPosition=Math.max(maxLastVisibleItemPosition,lastVisibleItemPosition);
                     parent.deepSearch();
                 }
-
-                // Toast.makeText(getContext(), linearLayoutManager.getChildCount(),Toast.LENGTH_LONG).show();
-
             }
         });
-    }
-
-    public void detectScrollDown(){
-
     }
 
     public int getCurrentPage() {

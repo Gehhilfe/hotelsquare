@@ -1,7 +1,5 @@
 package tk.internet.praktikum.foursquare.login;
 
-/*import android.app.Fragment;
-import android.app.FragmentTransaction;*/
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -24,7 +22,6 @@ import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.SessionService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
-import tk.internet.praktikum.foursquare.user.MeFragment;
 
 public class LoginFragment extends Fragment {
     private static final String LOG_TAG = LoginFragment.class.getSimpleName();
@@ -88,6 +85,7 @@ public class LoginFragment extends Fragment {
 
                         },
                         throwable -> {
+                            Toast.makeText(getActivity().getBaseContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                             failedLogin();
                             progressDialog.dismiss();
                         }
@@ -101,20 +99,13 @@ public class LoginFragment extends Fragment {
     private void successfulLogin() {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
-   /*   Intent intent = new Intent(getActivity().getApplicationContext(), UserActivity.class);
-        startActivityForResult(intent, 1);*/
-        getActivity().setResult(-1, null);
-        getActivity().finish();
 
-        /*
-        try {
-            Fragment fragment = MeFragment.class.newInstance();
-            redirectToFragment(fragment);
-        } catch (java.lang.InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }*/
+        if (getArguments().getBoolean("UserActivity"))
+            getActivity().setResult(3, null);
+        else
+            getActivity().setResult(2, null);
+
+        getActivity().finish();
     }
 
     private void redirectToFragment(Fragment fragment) {
@@ -131,7 +122,6 @@ public class LoginFragment extends Fragment {
     private void failedLogin() {
         Log.d(LOG_TAG, "Failed login.");
         loginBtn.setEnabled(true);
-        Toast.makeText(getActivity().getBaseContext(), "Failed to login.", Toast.LENGTH_LONG).show();
     }
 
     /**

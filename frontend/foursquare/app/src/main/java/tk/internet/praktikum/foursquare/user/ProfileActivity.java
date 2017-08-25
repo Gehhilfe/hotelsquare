@@ -4,45 +4,55 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.List;
+import java.util.Locale;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
+import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Gender;
+import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.User;
+import tk.internet.praktikum.foursquare.api.bean.VenueCheckinInformation;
+import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
-import tk.internet.praktikum.foursquare.chat.DummyChatActivity;
+import tk.internet.praktikum.foursquare.api.service.VenueService;
+import tk.internet.praktikum.foursquare.chat.ChatActivity;
+import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
+import tk.internet.praktikum.foursquare.search.Utils;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
-public class ProfileActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class ProfileActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = ProfileActivity.class.getSimpleName();
     private final String URL = "https://dev.ip.stimi.ovh/";
-    private User currentUser = new User();
     private User otherUser = new User();
-    private TextView name, email, city, age;
+    private TextView name, city, age, venueName, venueShortName, venueCount;
     private RadioButton male, female, none;
-    private ImageView avatarPicture;
+    private ImageView avatarPicture, venueLogo;
     private FloatingActionButton fab;
-    private Bitmap avatar;
     private String userID;
+    private RecyclerView recyclerView;
+    private LinearLayout profileTopContent;
+    private VenueCheckinInformation topVenue;
+    private Toolbar toolbar;
 
     public ProfileActivity() {}
 
@@ -52,35 +62,42 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_profile);
 
         userID = getIntent().getStringExtra("userID");
-        userID = "599071a509ad180015af8b27"; // janus nicht auf flist von peter
-        //userID = "599071a509ad180015af8b25"; // Admin auf FList von peter
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         name = (TextView) findViewById(R.id.profile_name);
-        email = (TextView) findViewById(R.id.profile_email);
         city = (TextView) findViewById(R.id.profile_city);
         age = (TextView) findViewById(R.id.profile_age);
 
-        male = (RadioButton) findViewById(R.id.radioButton);
-        female = (RadioButton) findViewById(R.id.radioButton2);
-        none = (RadioButton) findViewById(R.id.radioButton3);
+        venueName = (TextView) findViewById(R.id.profile_top_venue_name);
+        venueShortName = (TextView) findViewById(R.id.profile_top_venue_short_name);
+        venueCount = (TextView) findViewById(R.id.profile_top_venue_count);
+
+        male = (RadioButton) findViewById(R.id.radio_male);
+        female = (RadioButton) findViewById(R.id.radio_female);
+        none = (RadioButton) findViewById(R.id.radio_anonymous);
 
         avatarPicture = (ImageView) findViewById(R.id.profile_activity_avatar);
+        venueLogo = (ImageView) findViewById(R.id.profile_top_venue_logo);
+        profileTopContent = (LinearLayout) findViewById(R.id.profile_top_content_container);
         fab = (FloatingActionButton) findViewById(R.id.profile_activity_fab);
 
+        recyclerView = (RecyclerView) findViewById(R.id.profile_last_checkin_recylcer_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        profileTopContent.setOnClickListener(v -> loadVenue());
         initialiseFab();
         initialiseProfile();
+
+    }
+
+    private void loadVenue() {
+        Intent intent = new Intent(this, VenueInDetailsNestedScrollView.class);
+        intent.putExtra("VENUE_ID", topVenue.getVenueID());
+        startActivity(intent);
     }
 
     private void initialiseFab() {
@@ -89,18 +106,23 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.friends(0)
+            service.profileIfFriends(userID)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             friendListResponse -> {
                                 List<User> friendList = friendListResponse.getFriends();
+                                boolean isFriend = false;
 
                                 for (User user : friendList)
                                     if (user.getId().equals(userID)) {
                                         fab.setImageResource(R.mipmap.ic_chat_black_48dp);
+                                        isFriend = true;
+                                    }
+
+                                    if  (isFriend) {
                                         fab.setOnClickListener(v -> startChat());
-                                    } else {
+                                    }else {
                                         fab.setOnClickListener(v -> addFriend());
                                     }
                             },
@@ -119,17 +141,17 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.detailsByName("janus")
-           // service.profileByID(userID)
+            service.profileByID(userID)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
+                                String tmpName = user.getDisplayName().substring(0, 1).toUpperCase() + user.getDisplayName().substring(1);
+                                toolbar.setTitle(tmpName);
                                 otherUser = user;
-                                name.setText(otherUser.getDisplayName());
-                                email.setText(otherUser.getEmail());
+                                name.setText(tmpName);
                                 city.setText(otherUser.getCity());
-                                age.setText(Integer.toString(otherUser.getAge()));
+                                age.setText(String.format(Locale.ENGLISH, "%1$d", otherUser.getAge()));
                                 Gender gender = otherUser.getGender();
                                 if (gender == Gender.MALE)
                                     male.setChecked(true);
@@ -138,6 +160,18 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                                 else
                                     none.setChecked(true);
 
+                                recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins(), this));
+
+                                if (user.getTopCheckins().size() > 0) {
+                                    topVenue = user.getTopCheckins().get(0);
+                                    initialiseTopVenue(topVenue.getVenueID());
+                                    venueCount.setText("# " + String.valueOf(topVenue.getCount()));
+                                } else {
+                                    venueLogo.setVisibility(View.GONE);
+                                    venueShortName.setVisibility(View.GONE);
+                                    venueName.setVisibility(View.GONE);
+                                    venueCount.setVisibility(View.GONE);
+                                }
                                 if (otherUser.getAvatar() != null) {
                                     ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
                                     imageCacheLoader.loadBitmap(otherUser.getAvatar(), ImageSize.LARGE)
@@ -150,6 +184,58 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                                                         Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                                                     }
                                             );
+                                } else {
+                                    avatarPicture.setImageResource(R.mipmap.user_avatar);
+                                }
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void initialiseTopVenue(String venueId){
+        VenueService service = ServiceFactory
+                .createRetrofitService(VenueService.class, URL, LocalStorage.
+                        getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        try {
+            service.getDetails(venueId)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            venue -> {
+                                venueName.setText(venue.getName());
+
+                                List<Image> images=venue.getImages();
+                                if(images.size()>0) {
+                                    Image image = images.get(0);
+                                    ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
+                                    imageCacheLoader.loadBitmap(image, ImageSize.SMALL)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(bitmap -> {
+                                                venueLogo.setImageBitmap(bitmap);
+                                                venueLogo.setVisibility(View.VISIBLE);
+                                                venueShortName.setVisibility(View.GONE);
+                                            });
+                                }
+                                else {
+                                    venueLogo.setDrawingCacheEnabled(true);
+                                    Bitmap bitmap= null;
+                                    try {
+                                        bitmap = Utils.decodeResourceImage(getApplicationContext(),"default_image",50,50);
+                                        venueLogo.setImageBitmap(bitmap);
+                                        venueShortName.setText(venue.getName().substring(0,1).toUpperCase());
+                                        venueShortName.setVisibility(View.VISIBLE);
+                                        venueLogo.setVisibility(View.VISIBLE);
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             },
                             throwable -> {
@@ -182,61 +268,78 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
     }
 
     private void startChat() {
-        // TODO - GET CHAT ID, falls es keien gibt neuen chat erstellen => wechseln
-        String chatID = "599071a609ad180015af8b2c";
-        Intent intent = new Intent(getApplicationContext(), DummyChatActivity.class);
-        intent.putExtra("chatId", chatID);
-        intent.putExtra("currentUserName", "wahrscinenlich egal");
-        startActivityForResult(intent, 0);
-    }
+        ChatService service = ServiceFactory
+                .createRetrofitService(ChatService.class, URL, LocalStorage.
+                        getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
-
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        // TODO - Entwerder finish und weitere navigation im onactivityresult (mittels result codes)
-        // TODO - oder finish und parameter (item) mitgeben. new itent => set data => item id, item name
-        if (id == R.id.nav_search) {
-            return true;
-        } else if (id == R.id.nav_history) {
-            return true;
-        } else if (id == R.id.nav_me) {
-            return true;
-        }else if (id == R.id.nav_manage) {
-            return true;
-        }
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        try {
+            service.getOrStartChat(userID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            chatResponse -> {
+                                chatResponse.getChatId();
+                                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                                intent.putExtra("chatId", chatResponse.getChatId());
+                                intent.putExtra("Parent", "ProfileActivity");
+                                startActivity(intent);
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+        }catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    public Intent getSupportParentActivityIntent() {
+        return getParentActivityIntentImpl();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public Intent getParentActivityIntent() {
+        return getParentActivityIntentImpl();
     }
+
+    private Intent getParentActivityIntentImpl() {
+        Intent i = null;
+        Bundle bundle = getIntent().getExtras();
+        String parentActivity = bundle.getString("Parent");
+
+        if (parentActivity.equals("UserActivity")) {
+            i = new Intent(this, UserActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        } else if (parentActivity.equals("SearchPerson")) {
+            i = new Intent(this, SearchPersonActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        }
+        else if(parentActivity.equals("VenueInDetailsNestedScrollView")){
+            i = new Intent(this, VenueInDetailsNestedScrollView.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        }
+        else {
+                i = new Intent(this, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        }
+
+        return i;
+    }
+/*
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
+        String language=sharedPreferences.getString("LANGUAGE","de");
+        Locale locale=new Locale(language);
+        AdjustedContextWrapper.wrap(getBaseContext(),language);
+
+    }*/
 }

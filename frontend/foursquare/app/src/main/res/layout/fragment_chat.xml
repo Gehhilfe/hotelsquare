@@ -1,11 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/chat_layout"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    tools:context="tk.internet.praktikum.foursquare.chat.ChatFragment">
 
     <ListView
         android:id="@+id/chat_list_view"
@@ -16,6 +17,7 @@
         android:layout_above="@+id/chat_control_panel"
         android:stackFromBottom="true"
         android:transcriptMode="alwaysScroll"
+        android:overScrollMode="never"
         android:layout_height="match_parent"
         android:divider="@null"
         android:dividerHeight="0dp"
@@ -49,7 +51,8 @@
                 android:inputType="text"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:paddingLeft="4dp" />
+                android:paddingLeft="4dp"
+                android:imeOptions="actionSend"/>
 
             <ImageView
                 android:id="@+id/chat_send"

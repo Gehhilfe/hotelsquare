@@ -437,6 +437,18 @@ describe('User', () => {
                     });
             });
 
+            it('should return the request', (done) => {
+                request(server)
+                    .get('/profile/friend_requests')
+                    .set('x-auth', peter2Token)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.should.be.an('array');
+                        res.body.should.have.length(1);
+                        return done();
+                    });
+            });
+
             it('should be able to accept', (done) => {
                 request(server)
                     .put('/profile/friend_requests/' + peter.name)

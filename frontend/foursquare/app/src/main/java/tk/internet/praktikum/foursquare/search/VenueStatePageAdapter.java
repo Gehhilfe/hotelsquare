@@ -7,9 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by truongtud on 09.07.2017.
- */
+
 
 public class VenueStatePageAdapter extends FragmentStatePagerAdapter {
     private final List<Fragment> venuesFragments = new ArrayList<>();

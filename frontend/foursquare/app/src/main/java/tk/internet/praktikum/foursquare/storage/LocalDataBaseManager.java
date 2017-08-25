@@ -1,26 +1,44 @@
 package tk.internet.praktikum.foursquare.storage;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 
-/**
- * Created by truongtud on 04.07.2017.
- */
+import org.greenrobot.greendao.database.Database;
 
-public class LocalDataBaseManager extends SQLiteOpenHelper {
+import tk.internet.praktikum.foursquare.history.DaoMaster;
+import tk.internet.praktikum.foursquare.history.DaoSession;
 
-    public LocalDataBaseManager(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+
+public class LocalDataBaseManager {
+    private Context context;
+    private   DaoSession daoSession;
+    private static  LocalDataBaseManager localDataBaseManager;
+
+    public static LocalDataBaseManager getLocalDatabaseManager(Context context){
+        return localDataBaseManager!=null?  localDataBaseManager:new LocalDataBaseManager(context);
+    }
+    public LocalDataBaseManager(Context context){
+         this.context=context;
+         initDatabase();
+    }
+    public void initDatabase(){
+        DaoMaster.DevOpenHelper helper=new DaoMaster.DevOpenHelper(context,"history-db");
+        Database database=helper.getWritableDb();
+        daoSession=new DaoMaster(database).newSession();
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-
+    public Context getContext() {
+        return context;
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void setContext(Context context) {
+        this.context = context;
+    }
 
+    public  DaoSession getDaoSession() {
+        return daoSession;
+    }
+
+    public void setDaoSession(DaoSession daoSession) {
+        this.daoSession = daoSession;
     }
 }

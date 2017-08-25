@@ -3,12 +3,15 @@ package tk.internet.praktikum.foursquare.chat;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Collections;
@@ -24,7 +27,6 @@ import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.ChatMessage;
 import tk.internet.praktikum.foursquare.api.bean.Message;
-import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -33,19 +35,17 @@ public class ChatFragment extends Fragment {
     private ImageView sendBtn;
     private EditText inputMsg;
     private ChatListViewAdapter chatListViewAdapter;
-    private String chatId, currentUserName;
+    private String chatId;
     private Chat chat;
     private final String URL = "https://dev.ip.stimi.ovh/";
-    private List<ChatMessage> messages;
+    private List<ChatMessage> messages = Collections.emptyList();
     private ChatMessage lastMsg;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO - INITIALISE CHAT
         Bundle args = getArguments();
         chatId = args.getString("chatId");
-        currentUserName = args.getString("currentUserName");
     }
 
     @Override
@@ -61,35 +61,46 @@ public class ChatFragment extends Fragment {
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.getConversation(chatId, 0)
+            service.getConversation(chatId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             chatResponse -> {
                                 chat = chatResponse;
                                 messages = chat.getMessages();
-                                lastMsg = messages.get(0);
-                                Collections.reverse(messages);
+                                if (messages.size() > 0) {
+                                    lastMsg = messages.get(0);
+                                    Collections.reverse(messages);
+                                }
                                 chatListViewAdapter = new ChatListViewAdapter(messages, chat.getParticipants(), getActivity().getApplicationContext());
                                 chatView.setAdapter(chatListViewAdapter);
                                 updateLoop();
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
 
          sendBtn.setOnClickListener(v -> send());
-        
+
+        inputMsg.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND)
+                    send();
+                return true;
+            }
+        });
+
         return view;
     }
+
     private void updateLoop() {
         ChatService service = ServiceFactory
                 .createRetrofitService(ChatService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
 
         try {
             service.getConversation(chatId, 0)
@@ -98,30 +109,52 @@ public class ChatFragment extends Fragment {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             chatResponse -> {
-                                Date last = lastMsg.getDate();
-                                Date now = chatResponse.getMessages().get(0).getDate();
+                                if (messages.size() > 0) {
+                                    Date last = lastMsg.getDate();
+                                    Date now = chatResponse.getMessages().get(0).getDate();
 
-                                if (last.compareTo(now) == -1) {
-                                    messages.clear();
-                                    messages.addAll(chatResponse.getMessages());
-                                    lastMsg = messages.get(0);
-                                    Collections.reverse(messages);
-                                    chatListViewAdapter.notifyDataSetChanged();
+                                    if (last.compareTo(now) == -1) {
+                                        messages.clear();
+                                        messages.addAll(chatResponse.getMessages());
+                                        lastMsg = messages.get(0);
+                                        Collections.reverse(messages);
+                                        chatListViewAdapter.notifyDataSetChanged();
+                                    }
+                                }else {
+                                    if (chatResponse.getMessages().size() > 0) {
+                                        messages.clear();
+                                        messages.addAll(chatResponse.getMessages());
+                                        lastMsg = messages.get(0);
+                                        Collections.reverse(messages);
+                                        chatListViewAdapter.notifyDataSetChanged();
+                                    }
                                 }
 
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
+        /*
+        try {
+            service.getConversation(chatId, messages.get(0).getId())
+                    .repeatWhen(done -> done.delay(10, TimeUnit.SECONDS))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            chatResponse -> {
+                                messages.addAll(chatResponse.getMessages());
+                                chatListViewAdapter.notifyDataSetChanged();
+                            },
+                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
+        }catch (Exception e) {
+            e.printStackTrace();
+        }*/
     }
 
     private void send() {
-        //Toast.makeText(getActivity().getApplicationContext(), "Send: " + inputMsg.getText().toString(), Toast.LENGTH_SHORT).show();
-
         ChatService service = ServiceFactory
                 .createRetrofitService(ChatService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
@@ -134,17 +167,15 @@ public class ChatFragment extends Fragment {
                     .subscribe(
                             chatResponse -> {
                                 messages.add(chatResponse);
+                                lastMsg = chatResponse;
                                 chatListViewAdapter.notifyDataSetChanged();
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
 
         inputMsg.setText("");
-        inputMsg.clearFocus();
     }
 }

@@ -48,30 +48,21 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
         String title = "";
 
         switch (position) {
-            case 0:
-                title = " \n" + " Home";
-                //drawable = context.getResources().getDrawable(R.mipmap.user_home, null);
-                drawable = ContextCompat.getDrawable(context, R.mipmap.user_home);
+            case 0: // profile
+                title = " \n" + context.getResources().getString(R.string.user_tab_profile);
+                drawable = ContextCompat.getDrawable(context, R.drawable.ic_person_white_24dp);
                 break;
-            case 1: // profile
-                title = " \n" + " Profile";
-                //drawable = context.getResources().getDrawable(R.mipmap.user_profile, null);
-                drawable = ContextCompat.getDrawable(context, R.mipmap.user_profile);
-            break;
-            case 2: // history
-                title = " \n" + " History";
-                //drawable = context.getResources().getDrawable(R.mipmap.user_history, null);
-                drawable = ContextCompat.getDrawable(context, R.mipmap.user_history);
+            case 1:
+                title = " \n" + context.getResources().getString(R.string.user_tab_requests);
+                drawable = ContextCompat.getDrawable(context, R.drawable.ic_person_add_white_24dp);
                 break;
-            case 3: // friends
-                title = " \n" + " Friends";
-                //drawable = context.getResources().getDrawable(R.mipmap.user_friends, null);
-                drawable = ContextCompat.getDrawable(context, R.mipmap.user_friends);
+            case 2: // friends
+                title = " \n" + context.getResources().getString(R.string.user_tab_friends);
+                drawable = ContextCompat.getDrawable(context, R.drawable.ic_people_white_24dp);
                 break;
-            case 4: // inbox
-                title = " \n" + " Inbox";
-                //drawable = context.getResources().getDrawable(R.mipmap.user_message, null);
-                drawable = ContextCompat.getDrawable(context, R.mipmap.user_message);
+            case 3: // inbox
+                title = " \n" + context.getResources().getString(R.string.user_tab_inbox);
+                drawable = ContextCompat.getDrawable(context, R.drawable.ic_chat_white_24dp);
                 break;
             default:
             break;
