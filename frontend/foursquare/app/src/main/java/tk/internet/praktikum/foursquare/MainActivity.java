@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
         hotelsquare = (TextView) parentView.findViewById(R.id.nav_hotelsquare);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
-        readStaticKeyWords();
+        //readStaticKeyWords();
 
         Menu tmpMenu = navigationView.getMenu();
         loginMenu = null;

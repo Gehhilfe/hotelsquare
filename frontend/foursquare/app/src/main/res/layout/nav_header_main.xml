@@ -28,7 +28,7 @@
         android:padding="21dp"
         android:textSize="40dp"
         android:text="hotelsquare"
-        android:textColor="@color/orange"
+        android:textColor="@color/logo"
         android:id="@+id/nav_hotelsquare"/>
 
     <TextView
