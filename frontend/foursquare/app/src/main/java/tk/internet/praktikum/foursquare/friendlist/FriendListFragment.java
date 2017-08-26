@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -50,7 +51,13 @@ public class FriendListFragment extends Fragment {
                     .subscribe(
                             friendListResponse -> {
                                 List<User> friendList = friendListResponse.getFriends();
-                                friendList.sort(new Comparator<User>() {
+ /*                               friendList.sort(new Comparator<User>() {
+                                    @Override
+                                    public int compare(User o1, User o2) {
+                                        return o1.getName().compareTo(o2.getName());
+                                    }
+                                });*/
+                                Collections.sort(friendList,new Comparator<User>() {
                                     @Override
                                     public int compare(User o1, User o2) {
                                         return o1.getName().compareTo(o2.getName());
