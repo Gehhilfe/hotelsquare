@@ -6,7 +6,7 @@
     <string name="login_password">Passwort</string>
     <string name="user_name">Benutzername</string>
     <string name="login">Anmelden</string>
-    <string name="register_here">Neu? Registrieren hier.</string>
+    <string name="register_here">Neu? Registriere dich hier.</string>
     <string name="fb_login">Anmelden mit Facebook.</string>
     <string name="existing_account">Haben Sie schon ein Konto? Anmelden!</string>
     <string name="register">Registrieren</string>
@@ -21,16 +21,16 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_search">Suchen</string>
-    <string name="action_search_person">Suchen Person</string>
+    <string name="action_search_person">Suche Person</string>
     <string name="action_history">Verlauf</string>
     <string name="action_settings">Einstellung</string>
-    <string name="action_me">Mich</string>
+    <string name="action_me">Profil</string>
     <string name="action_login">Anmelden</string>
     <string name="action_logout">Abmelden</string>
 
-    <string name="reset_password_lbl">Geben Sie Ihre Email um Ihr Passwort zurückzusetzen.</string>
+    <string name="reset_password_lbl">Geben Sie Ihre Email ein um Ihr Passwort zurückzusetzen.</string>
     <string name="reset_password">Passwort zurücksetzen</string>
-    <string name="searching_question">Was suchst du jetzt?</string>
+    <string name="searching_question">Was suchst du?</string>
 
     <!-- User -->
     <string name="user_tab_requests">Anfragen</string>
@@ -41,7 +41,7 @@
 
     <!-- user profile stuff -->
     <string name="profile_city">Stadt</string>
-    <string name="profile_age">Age</string>
+    <string name="profile_age">Alter</string>
     <string name="profile_gender">Geschlecht</string>
     <string name="profile_male">Männlich</string>
     <string name="profile_female">Weiblich</string>
@@ -56,30 +56,30 @@
     <!-- Other stuff -->
     <string name="profile_upload_avatar">Hochladen</string>
     <string name="title_activity_maps">Map</string>
-    <string name="liked">Mag</string>
+    <string name="liked">Likes</string>
     <string name="more">Weiter...</string>
-    <string name="open_now">Öffnen jetzt</string>
-    <string name="price">Kosten</string>
+    <string name="open_now">Jetzt geöffnet</string>
+    <string name="price">Preis</string>
     <string name="saved">Speichern</string>
     <string name="venue_call">Anrufen</string>
     <string name="venue_check_in">Einschecken</string>
 
-    <string name="login_first">Du musst anmelden</string>
+    <string name="login_first">Du musst dich anmelden</string>
     <string name="history_state_check_in">Eingescheckt</string>
     <string name="history_state_visit">Besucht</string>
-    <string name="history_state_like">Gefällt mir einen Kommentar</string>
-    <string name="history_state_dislike">Gefällt mir einen Kommentar nicht</string>
-    <string name="history_state_text_comment">Geschrieben einen Kommentar</string>
-    <string name="history_state_image_comment">Hochgeladen ein Bild</string>
+    <string name="history_state_like">Dir gefällt ein Kommentar</string>
+    <string name="history_state_dislike">Dir gefällt ein Kommentar nicht</string>
+    <string name="history_state_text_comment">Du hast ein Kommentar geschrieben</string>
+    <string name="history_state_image_comment">Du hast ein Bild hochgeladen</string>
     <string name="button_post_image">Bild hochladen</string>
     <string name="button_post_text">Kommentar schreiben</string>
-    <string name="button_pictures">Bilders</string>
-    <string name="title_activity_venue_gallery">Gallery</string>
+    <string name="button_pictures">Bilder</string>
+    <string name="title_activity_venue_gallery">Galerie</string>
     <string name="action_post_image">Bild hochladen</string>
-    <string name="action_post_text">Text kommnentieren</string>
-    <string name="action_post_text_default">Dein Kommentar!</string>
+    <string name="action_post_text">Text kommentieren</string>
+    <string name="action_post_text_default">Dein Kommentar</string>
     <string name="action_post_image_select_1">Foto machen</string>
-    <string name="action_post_image_select_2">Foto von Gallery auswählen</string>
+    <string name="action_post_image_select_2">Foto aus Gallerie auswählen</string>
 
     <!-- settings-->
     <string name="langSelect">Sprache auswählen</string>
@@ -88,7 +88,7 @@
 
     <!-- venue in details -->
     <string name="leaderboard">Bestenliste</string>
-    <string name="last_checkins">Letztes Einchecken</string>
+    <string name="last_checkins">Zuletzt eingecheckt</string>
     <string name="checkins_count">Einchecken</string>
     <string name="a_year">einem Jahr</string>
     <string name="years">Jahren</string>

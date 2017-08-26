@@ -395,7 +395,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         } else {
             Marker tmp = map.addMarker(new MarkerOptions()
                     .position(friendLocation)
-                    .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position))
+                    .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position_1))
             );
             markerFriendMap.put(tmp, friend);
         }
