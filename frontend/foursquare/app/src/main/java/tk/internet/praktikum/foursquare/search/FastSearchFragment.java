@@ -109,6 +109,7 @@ public class FastSearchFragment extends Fragment {
 
         initCategories();
         createContent();
+
         //readStaticKeyWords();
         //Log.d(FastSearchFragment.class.getSimpleName(), "Categories");
        // Log.d(FastSearchFragment.class.getSimpleName(), _categories.toString());

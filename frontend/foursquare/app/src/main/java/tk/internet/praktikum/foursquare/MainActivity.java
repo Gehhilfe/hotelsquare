@@ -28,7 +28,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.List;
 import java.util.UUID;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -96,7 +95,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
         hotelsquare = (TextView) parentView.findViewById(R.id.nav_hotelsquare);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
-        //readStaticKeyWords();
 
         Menu tmpMenu = navigationView.getMenu();
         loginMenu = null;
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 loginMenu = tmpMenu.getItem(i);
             }
         }
-
+        readStaticKeyWords();
         if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             initialiseNavigationHeader();
             loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
@@ -180,28 +178,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     private void searchNavigation(MenuItem item) {
         try {
             Fragment fragment = FastSearchFragment.class.newInstance();
@@ -214,21 +190,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-  /*  private void searchPersonNavigation() {
-        Intent intent = new Intent(getApplicationContext(), SearchPersonActivity.class);
-        startActivityForResult(intent, REQUEST_SEARCH_PERSON);
-    }*/
-
     private void searchPersonNavigation(MenuItem item) {
         PersonSearchFragment fragment = new PersonSearchFragment();
         redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search_person));
         setTitle(item);
     }
-/*
-    private void historyNavigation() {
-        Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
-        startActivityForResult(intent, REQUEST_HISTORY);
-    }*/
 
     private void historyNavigation(MenuItem item) {
         HistoryFragment fragment = new HistoryFragment();
@@ -260,11 +226,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void logout() {
         LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
-        this.recreate();
-        /*
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivityForResult(intent, 0);
-        */
+        loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
+        avatar.setVisibility(View.GONE);
+        hotelsquare.setVisibility(View.VISIBLE);
+        userName.setText(getApplicationContext().getResources().getString(R.string.foursquare_slogan));
     }
 
 
@@ -276,18 +241,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 searchNavigation(item);
                 break;
             case R.id.nav_search_person:
-                //searchPersonNavigation();
                 searchPersonNavigation(item);
                 break;
             case R.id.nav_history:
-                //historyNavigation();
                 historyNavigation(item);
                 break;
             case R.id.nav_me:
                 meNavigation();
                 break;
             case R.id.nav_manage:
-                //settingsNavigation();
                 settingsNavigation(item);
                 break;
             case R.id.nav_login_logout:
@@ -296,7 +258,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     return false;
                 } else {
                     logout();
-                    //item.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
                 }
                 break;
         }
@@ -448,20 +409,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    public void readStaticKeyWords() {
-        DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession();
-         List<SuggestionKeyWord> keyWords = daoSession.getSuggestionKeyWordDao().queryBuilder().list();
-        if (keyWords == null ||keyWords.size()==0) {
+    public synchronized void readStaticKeyWords() {
+         LocalStorage ls = LocalStorage.getLocalStorageInstance(this);
+        if (!ls.alreadyReadStaticKeyWords()) {
             System.out.println(("#### readStaticKeyWords"));
-        String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
-        for (int i = 0; i < suggestionList.length; i++) {
-            SuggestionKeyWord suggestionKeyWord = new SuggestionKeyWord();
-            suggestionKeyWord.setUid(UUID.randomUUID().toString());
-            suggestionKeyWord.setSuggestionName(suggestionList[i]);
-            daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
+            DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession();
+            LocalStorage.getLocalStorageInstance(getApplicationContext()).saveBooleanValue(Constants.ALREADY_READ_STATIC_KEYWORDS, true);
+            String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
+            for (int i = 0; i < suggestionList.length; i++) {
+                SuggestionKeyWord suggestionKeyWord = new SuggestionKeyWord();
+                suggestionKeyWord.setUid(UUID.randomUUID().toString());
+                suggestionKeyWord.setSuggestionName(suggestionList[i]);
+                daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
 
+            }
         }
-         }
     }
 
 }

@@ -281,6 +281,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
     @Override
     public boolean onQueryTextChange(String typedKeyWord) {
+        System.out.println("### onQueryTextChange deepSearch");
         typedKeyWord=typedKeyWord.trim().toLowerCase(Locale.getDefault());
         if(!typedKeyWord.isEmpty()) {
             DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getContext()).getDaoSession();
@@ -682,10 +683,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         return false;
 
     }
-
-
-
-
 
     public void onStop(){
         //Post SearchEvent to EventBus
