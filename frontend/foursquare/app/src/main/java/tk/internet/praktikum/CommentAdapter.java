@@ -3,6 +3,7 @@ package tk.internet.praktikum;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.history.HistoryEntry;
 import tk.internet.praktikum.foursquare.history.HistoryType;
+import tk.internet.praktikum.foursquare.search.Utils;
 import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
@@ -124,7 +126,19 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                         holder.avatar.setVisibility(View.VISIBLE);
                     }, err -> Log.d("CommentAdapter", err.toString(), err));
         }
-       else  holder.avatar.setVisibility(View.GONE);
+       else{
+
+            holder.avatar.setDrawingCacheEnabled(true);
+            Bitmap bitmap= null;
+            try {
+                bitmap = Utils.decodeResourceImage(context,"no_avatar",50,50);
+                holder.avatar.setImageBitmap(bitmap);
+                holder.avatar.setVisibility(View.VISIBLE);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         holder.upvote.setOnClickListener((event) -> {
             LocalStorage ls = LocalStorage.getLocalStorageInstance(context);

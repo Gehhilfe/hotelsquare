@@ -59,6 +59,7 @@ import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.history.HistoryEntry;
 import tk.internet.praktikum.foursquare.history.HistoryType;
+import tk.internet.praktikum.foursquare.search.Utils;
 import tk.internet.praktikum.foursquare.search.VenueImagesActivity;
 import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
@@ -100,6 +101,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
     private TextView[] leaderboard_name;
     private TextView[] leaderboard_count;
     private CircleImageView[] leaderboard_avatar;
+    private TextView[]leaderboard_position;
     private RecyclerView lastHereRecylcer;
     private LastHereAdapter lastHereAdapter;
     private String venueName;
@@ -144,6 +146,12 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 (CircleImageView) findViewById(R.id.leaderboard_1_avatar),
                 (CircleImageView) findViewById(R.id.leaderboard_2_avatar),
                 (CircleImageView) findViewById(R.id.leaderboard_3_avatar)
+        };
+
+        leaderboard_position=new TextView[]{
+                (TextView)findViewById(R.id.leaderboard_1_position),
+                (TextView)findViewById(R.id.leaderboard_2_position),
+                (TextView)findViewById(R.id.leaderboard_3_position)
         };
 
         // Buttons
@@ -289,9 +297,12 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
     private void updateLeaderboard(Venue venue) {
         UserService us = ServiceFactory.createRetrofitService(UserService.class, URL);
+        int[] leaderboard_avatar_sizes={60,50,40};
+        int[]positions={1,2,3};
         for (int i = 0; i < 3 && i < venue.getTopCheckins().size(); i++) {
             UserCheckinInformation info = venue.getTopCheckins().get(i);
             leaderboard_count[i].setText(String.format("%d", info.getCount()));
+            leaderboard_position[i].setText(String.format("#%d",positions[i]));
             final int current = i;
             us.profileByID(info.getUserID())
                     .subscribeOn(Schedulers.io())
@@ -304,6 +315,18 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((bitmap) -> leaderboard_avatar[current].setImageBitmap(bitmap), (err) -> Log.d(LOG, err.toString(), err));
+                        }
+                        else{
+                            leaderboard_avatar[current].setDrawingCacheEnabled(true);
+                            Bitmap bitmap= null;
+                            try {
+                                bitmap = Utils.decodeResourceImage(getApplicationContext(),"no_avatar",leaderboard_avatar_sizes[current],leaderboard_avatar_sizes[current]);
+                                leaderboard_avatar[current].setImageBitmap(bitmap);
+                                leaderboard_avatar[current].setVisibility(View.VISIBLE);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         leaderboard_avatar[current].setOnClickListener(seeProfileListener(res));
