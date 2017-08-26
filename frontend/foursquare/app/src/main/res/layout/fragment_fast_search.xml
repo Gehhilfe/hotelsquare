@@ -27,7 +27,7 @@
             android:padding="25dp"
             android:textSize="40dp"
             android:text="hotelsquare"
-            android:textColor="@color/orange"
+            android:textColor="@color/logo"
             android:id="@+id/hotelsquare"/>
 
     </android.support.v7.widget.CardView>

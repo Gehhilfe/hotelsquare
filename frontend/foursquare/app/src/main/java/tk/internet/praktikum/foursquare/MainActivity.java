@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -59,8 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final int RESULT_USER_ACTIVITY = 3;
     private final int RESULT_LOGIN = 2;
 
-
-    private TextView userName;
+    private TextView userName, hotelsquare;
     private ImageView avatar;
 
     private Location userLocation = new Location(0, 0);
@@ -93,8 +93,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         View parentView = navigationView.getHeaderView(0);
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
+        hotelsquare = (TextView) parentView.findViewById(R.id.nav_hotelsquare);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
-
 
         Menu tmpMenu = navigationView.getMenu();
         loginMenu = null;
@@ -110,6 +110,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
         }
 
+        Typeface type = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Pacifico.ttf");
+        hotelsquare.setTypeface(type);
+
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
 
@@ -120,6 +123,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        avatar.setVisibility(View.VISIBLE);
+        hotelsquare.setVisibility(View.GONE);
 
         try {
             service.profile()
@@ -172,28 +178,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     private void searchNavigation(MenuItem item) {
         try {
             Fragment fragment = FastSearchFragment.class.newInstance();
@@ -206,21 +190,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-  /*  private void searchPersonNavigation() {
-        Intent intent = new Intent(getApplicationContext(), SearchPersonActivity.class);
-        startActivityForResult(intent, REQUEST_SEARCH_PERSON);
-    }*/
-
     private void searchPersonNavigation(MenuItem item) {
         PersonSearchFragment fragment = new PersonSearchFragment();
         redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search_person));
         setTitle(item);
     }
-/*
-    private void historyNavigation() {
-        Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
-        startActivityForResult(intent, REQUEST_HISTORY);
-    }*/
 
     private void historyNavigation(MenuItem item) {
         HistoryFragment fragment = new HistoryFragment();
@@ -252,11 +226,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void logout() {
         LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
-        this.recreate();
-        /*
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivityForResult(intent, 0);
-        */
+        loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
+        avatar.setVisibility(View.GONE);
+        hotelsquare.setVisibility(View.VISIBLE);
+        userName.setText(getApplicationContext().getResources().getString(R.string.foursquare_slogan));
     }
 
 
@@ -268,18 +241,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 searchNavigation(item);
                 break;
             case R.id.nav_search_person:
-                //searchPersonNavigation();
                 searchPersonNavigation(item);
                 break;
             case R.id.nav_history:
-                //historyNavigation();
                 historyNavigation(item);
                 break;
             case R.id.nav_me:
                 meNavigation();
                 break;
             case R.id.nav_manage:
-                //settingsNavigation();
                 settingsNavigation(item);
                 break;
             case R.id.nav_login_logout:
@@ -288,7 +258,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     return false;
                 } else {
                     logout();
-                    //item.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
                 }
                 break;
         }
