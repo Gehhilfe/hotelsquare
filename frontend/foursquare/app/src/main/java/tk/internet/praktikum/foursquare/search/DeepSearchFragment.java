@@ -200,9 +200,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     public void initVenueStatePageAdapter() {
         venueStatePageAdapter = new VenueStatePageAdapter(getFragmentManager());
         venueStatePageAdapter.initVenuesFragment();
-        /*savedView=new ArrayList<View>();
-        savedView.add(venueStatePageAdapter.getItem(0).getView());
-        savedView.add(venueStatePageAdapter.getItem(1).getView());*/
         venuesViewPager.setAdapter(venueStatePageAdapter);
     }
 

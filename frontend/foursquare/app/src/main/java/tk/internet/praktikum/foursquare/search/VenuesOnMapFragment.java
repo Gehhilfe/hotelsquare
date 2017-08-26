@@ -3,11 +3,8 @@ package tk.internet.praktikum.foursquare.search;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +16,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -367,9 +363,10 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
             updateFriendsMarker();
         }
-        //Location centerLocation=calculateClusteringCenterLocation(venues);
-        Location centerLocation = userLocation;
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 12));
+        Location centerLocation=calculateClusteringCenterLocation(venues);
+        //Location centerLocation = userLocation;
+        // TODO - Zoom radius anpassen (Bsp. zoo)
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 14));
 
     }
 
@@ -570,11 +567,11 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.HORIZONTAL));
 
     }*/
-  //  protected Location calculateClusteringCenterLocation(List<Venue> venues) {
-  //      return new Location(venues.stream().mapToDouble(location -> location.getLocation().getLongitude()).average().getAsDouble(),
-  //              venues.stream().mapToDouble(location -> location.getLocation().getLatitude()).average().getAsDouble());
-    //
-  //  }
+    protected Location calculateClusteringCenterLocation(List<Venue> venues) {
+        return new Location(venues.stream().mapToDouble(location -> location.getLocation().getLongitude()).average().getAsDouble(),
+                venues.stream().mapToDouble(location -> location.getLocation().getLatitude()).average().getAsDouble());
+
+    }
 
     /**
      * Listen for new database entries from background service

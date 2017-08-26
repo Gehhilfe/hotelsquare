@@ -4,7 +4,6 @@ package tk.internet.praktikum.foursquare.login;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +18,6 @@ import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
-import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.SessionService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -78,7 +76,7 @@ public class LoginFragment extends Fragment {
                         tokenInformation -> {
                             successfulLogin();
                             progressDialog.dismiss();
-                            LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveLoggedinInformation(tokenInformation, new User(email, email));
+                            LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveLoggedinInformation(tokenInformation, tokenInformation.getUser());
 
                         },
                         throwable -> {

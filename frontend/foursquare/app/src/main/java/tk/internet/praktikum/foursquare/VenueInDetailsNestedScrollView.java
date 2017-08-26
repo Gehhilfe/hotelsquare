@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -98,10 +99,13 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
     private FloatingActionButton venueImagesButton;
 
 
+    private CardView leaderboard_card;
     private TextView[] leaderboard_name;
     private TextView[] leaderboard_count;
     private CircleImageView[] leaderboard_avatar;
     private TextView[]leaderboard_position;
+
+    private CardView lastHereCard;
     private RecyclerView lastHereRecylcer;
     private LastHereAdapter lastHereAdapter;
     private String venueName;
@@ -130,6 +134,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         headerImage = (ImageView) findViewById(R.id.header_image);
 
         // Leaderboard
+        leaderboard_card = (CardView) findViewById(R.id.venue_detail_leaderboard_card);
         leaderboard_name = new TextView[]{
                 (TextView) findViewById(R.id.leaderboard_1_name),
                 (TextView) findViewById(R.id.leaderboard_2_name),
@@ -209,6 +214,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         lastHereRecylcer = (RecyclerView) findViewById(R.id.last_here_recylcer_view);
 
         lastHereAdapter = new LastHereAdapter(new ArrayList<UserCheckinInformation>(), getApplicationContext());
+        lastHereCard = (CardView) findViewById(R.id.venue_detail_checkin_card);
 
 
         lastHereRecylcer.setNestedScrollingEnabled(false);
@@ -241,6 +247,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
         fabImageComment.setOnClickListener(v -> openImageDialog());
 
+        lastHereCard.setVisibility(View.GONE);
+
         // Load venue data from server
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
         venueService.getDetails(venueId)
@@ -256,6 +264,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                     updatePrice(venue);
                     updateButtons(venue);
                     updateLeaderboard(venue);
+                    if(venue.getLastCheckins().size() > 0)
+                        lastHereCard.setVisibility(View.VISIBLE);
                     lastHereAdapter.setData(venue.getLastCheckins());
                     if (venue.getImages().size() > 0) {
                         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
@@ -299,6 +309,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         UserService us = ServiceFactory.createRetrofitService(UserService.class, URL);
         int[] leaderboard_avatar_sizes={60,50,40};
         int[]positions={1,2,3};
+        leaderboard_card.setVisibility(View.GONE);
         for (int i = 0; i < 3 && i < venue.getTopCheckins().size(); i++) {
             UserCheckinInformation info = venue.getTopCheckins().get(i);
             leaderboard_count[i].setText(String.format("%d", info.getCount()));
@@ -308,6 +319,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((res) -> {
+                        leaderboard_card.setVisibility(View.VISIBLE);
                         leaderboard_name[current].setText(res.getDisplayName());
                         ImageCacheLoader icl = new ImageCacheLoader(getApplicationContext());
                         if (res.getAvatar() != null) {

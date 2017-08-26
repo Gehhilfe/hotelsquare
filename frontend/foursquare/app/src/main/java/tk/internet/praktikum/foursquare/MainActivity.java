@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
         avatar.setVisibility(View.VISIBLE);
+        userName.setVisibility(View.VISIBLE);
         hotelsquare.setVisibility(View.GONE);
 
         try {
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
-                                userName.setText(user.getName());
+                                userName.setText(user.getDisplayName());
                                 if (user.getAvatar() != null) {
                                     ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
                                     imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
@@ -228,8 +229,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
         loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
         avatar.setVisibility(View.GONE);
+        userName.setVisibility(View.GONE);
         hotelsquare.setVisibility(View.VISIBLE);
-        userName.setText(getApplicationContext().getResources().getString(R.string.foursquare_slogan));
     }
 
 
