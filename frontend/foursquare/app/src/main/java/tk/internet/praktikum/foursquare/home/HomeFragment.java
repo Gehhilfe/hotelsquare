@@ -31,6 +31,7 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private final String URL = "https://dev.ip.stimi.ovh/";
+    private HomeRecyclerViewAdapter homeRecyclerViewAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,6 +43,8 @@ public class HomeFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.home_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        homeRecyclerViewAdapter = new HomeRecyclerViewAdapter(getContext());
+        recyclerView.setAdapter(homeRecyclerViewAdapter);
 
 
         try {
@@ -56,7 +59,9 @@ public class HomeFragment extends Fragment {
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .subscribe(
                                                     user -> {
-                                                        recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), user.getFriendRequests(), userList));
+                                                        //recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), user.getFriendRequests(), userList));
+                                                        homeRecyclerViewAdapter.setResults(user.getFriendRequests(), userList);
+                                                        homeRecyclerViewAdapter.notifyDataSetChanged();
                                                     },
                                                     throwable -> {
                                                         Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();

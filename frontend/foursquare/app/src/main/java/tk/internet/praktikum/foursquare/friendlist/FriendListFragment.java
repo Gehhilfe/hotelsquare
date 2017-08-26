@@ -27,6 +27,7 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 public class FriendListFragment extends Fragment {
     private RecyclerView recyclerView;
     private final String URL = "https://dev.ip.stimi.ovh/";
+    private FLRecyclerViewAdapter flRecyclerViewAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,6 +39,9 @@ public class FriendListFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.fl_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        flRecyclerViewAdapter = new FLRecyclerViewAdapter(getContext(), getActivity());
+        recyclerView.setAdapter(flRecyclerViewAdapter);
+
 
         try {
             service.friends(0)
@@ -52,7 +56,8 @@ public class FriendListFragment extends Fragment {
                                         return o1.getName().compareTo(o2.getName());
                                     }
                                 });
-                                recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), friendList, getActivity()));
+                                //recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), friendList, getActivity()));
+                                flRecyclerViewAdapter.setResults(friendList);
                             },
                             throwable -> {
                                 Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();

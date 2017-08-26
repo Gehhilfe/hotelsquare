@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequest;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequestResponse;
 import tk.internet.praktikum.foursquare.api.bean.User;
@@ -106,8 +108,8 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
 
     private Context context;
     private LayoutInflater inflater;
-    private List<FriendRequest> friendRequestList = Collections.emptyList();
-    private List<User> userList = Collections.emptyList();
+    private List<FriendRequest> friendRequestList;
+    private List<User> userList;
     private HashMap<String, String> idNameMap = new HashMap<>();
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.y HH:mm",  Locale.ENGLISH);
     private final String URL = "https://dev.ip.stimi.ovh/";
@@ -115,9 +117,16 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
 
     public HomeRecyclerViewAdapter(Context context, List<FriendRequest> friendRequestList, List<User> userList) {
         inflater = LayoutInflater.from(context);
-        this.friendRequestList = friendRequestList;
         this.context = context;
-        this.userList = userList;
+        friendRequestList = friendRequestList;
+        userList = userList;
+    }
+
+    public HomeRecyclerViewAdapter(Context context) {
+        inflater = LayoutInflater.from(context);
+        this.context = context;
+        friendRequestList = new ArrayList<>();
+        userList = new ArrayList<>();
     }
 
     @Override
@@ -160,5 +169,11 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     @Override
     public int getItemCount() {
         return friendRequestList.size();
+    }
+
+    public void setResults(List<FriendRequest> requests, List<User> users) {
+        friendRequestList = new ArrayList<>(requests);
+        userList = new ArrayList<>(users);
+        notifyDataSetChanged();
     }
 }

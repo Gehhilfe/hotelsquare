@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -80,19 +81,25 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
 
     private Context context;
     private LayoutInflater inflater;
-    private List<Chat> chatList = Collections.emptyList();
+    private List<Chat> chatList;
     private String currentUserName;
-    private InboxFragment inboxFragment;
     private Activity activity;
 
 
-    public InboxRecylcerViewAdapter(Context context, List<Chat> inbox, InboxFragment inboxFragment, Activity activity) {
+    public InboxRecylcerViewAdapter(Context context, List<Chat> inbox, Activity activity) {
         inflater = LayoutInflater.from(context);
         this.chatList = inbox;
         this.context = context;
         currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
-        this.inboxFragment = inboxFragment;
         this.activity = activity;
+    }
+
+    public InboxRecylcerViewAdapter(Context context, Activity activity) {
+        inflater = LayoutInflater.from(context);
+        this.context = context;
+        this.activity = activity;
+        currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
+        chatList = new ArrayList<>();
     }
 
     @Override
@@ -142,5 +149,10 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
     @Override
     public int getItemCount() {
         return chatList.size();
+    }
+
+    public void setResults(List<Chat> data) {
+        chatList = new ArrayList<>(data);
+        notifyDataSetChanged();
     }
 }

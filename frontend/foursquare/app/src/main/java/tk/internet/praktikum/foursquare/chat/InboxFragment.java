@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -30,6 +31,8 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 public class InboxFragment extends Fragment {
     private RecyclerView recyclerView;
     private final String URL = "https://dev.ip.stimi.ovh/";
+    private InboxRecylcerViewAdapter inboxRecylcerViewAdapter;
+    private List<Chat> chatList = Collections.emptyList();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,13 +45,18 @@ public class InboxFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+        inboxRecylcerViewAdapter = new InboxRecylcerViewAdapter(getContext(), getActivity());
+        recyclerView.setAdapter(inboxRecylcerViewAdapter);
+
+
         try {
             service.getConversations()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             inboxResponse -> {
-                                recyclerView.setAdapter(new InboxRecylcerViewAdapter(getContext(), inboxResponse, this, getActivity()));
+                                //recyclerView.setAdapter(new InboxRecylcerViewAdapter(getContext(), inboxResponse, getActivity()));
+                                inboxRecylcerViewAdapter.setResults(inboxResponse);
                             },
                             throwable -> {
                                 Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();

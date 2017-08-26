@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +26,7 @@ import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.Image;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueCheckinInformation;
@@ -73,6 +75,13 @@ public class ProfileLatestRecyclerViewAdapter extends RecyclerView.Adapter<Profi
         this.venueCheckinList = venueCheckinList;
         this.context = context;
         this.activity = activity;
+    }
+
+    public ProfileLatestRecyclerViewAdapter(Context context, Activity activity) {
+        inflater = LayoutInflater.from(context);
+        this.activity = activity;
+        this.context = context;
+        venueCheckinList = new ArrayList<>();
     }
 
     @Override
@@ -143,5 +152,10 @@ public class ProfileLatestRecyclerViewAdapter extends RecyclerView.Adapter<Profi
     @Override
     public int getItemCount() {
         return venueCheckinList.size();
+    }
+
+    public void setResults(List<VenueCheckinInformation> data) {
+        venueCheckinList = new ArrayList<>(data);
+        notifyDataSetChanged();
     }
 }

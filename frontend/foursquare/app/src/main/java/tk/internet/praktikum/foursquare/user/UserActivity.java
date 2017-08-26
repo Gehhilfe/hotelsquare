@@ -44,13 +44,6 @@ public class UserActivity extends AppCompatActivity  {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private void logout() {
-        LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
     private void initialiseFragmentContainer(ViewPager container) {
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
         userStatePagerAdapter.addFragment(new HomeFragment(), "Friend Request");
