@@ -141,6 +141,9 @@
     <string name="category_5">
         Infrastructure
     </string>
+    <string name="home_no_current_requests">Currently there are no pending friend requests.</string>
+    <string name="friendlist_no_friends">No Friends? Why don\'t you just start to search some with Hotlesquare</string>
+    <string name="inbox_no_chats">Currently there are no open conversations from you.</string>
 
     <!--- C1-->
     <array name="beer">

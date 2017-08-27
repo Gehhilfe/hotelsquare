@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -30,17 +31,14 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class InboxFragment extends Fragment {
     private RecyclerView recyclerView;
+    private TextView emptyChat;
     private final String URL = "https://dev.ip.stimi.ovh/";
     private InboxRecylcerViewAdapter inboxRecylcerViewAdapter;
-    private List<Chat> chatList = Collections.emptyList();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ChatService service = ServiceFactory
-                .createRetrofitService(ChatService.class, URL, LocalStorage.
-                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
-
         View view = inflater.inflate(R.layout.fragment_inbox, container, false);
+        emptyChat = (TextView) view.findViewById(R.id.inbox_empty_view);
         recyclerView = (RecyclerView) view.findViewById(R.id.inbox_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
@@ -48,6 +46,15 @@ public class InboxFragment extends Fragment {
         inboxRecylcerViewAdapter = new InboxRecylcerViewAdapter(getContext(), getActivity());
         recyclerView.setAdapter(inboxRecylcerViewAdapter);
 
+        loadInbox();
+
+        return view;
+    }
+
+    private void loadInbox() {
+        ChatService service = ServiceFactory
+                .createRetrofitService(ChatService.class, URL, LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
             service.getConversations()
@@ -55,7 +62,14 @@ public class InboxFragment extends Fragment {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             inboxResponse -> {
-                                //recyclerView.setAdapter(new InboxRecylcerViewAdapter(getContext(), inboxResponse, getActivity()));
+                                if (inboxResponse.size() > 0) {
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                    emptyChat.setVisibility(View.GONE);
+                                } else {
+                                    recyclerView.setVisibility(View.GONE);
+                                    emptyChat.setVisibility(View.VISIBLE);
+                                }
+
                                 inboxRecylcerViewAdapter.setResults(inboxResponse);
                             },
                             throwable -> {
@@ -65,7 +79,5 @@ public class InboxFragment extends Fragment {
         }catch (Exception e) {
             e.printStackTrace();
         }
-
-        return view;
     }
 }

@@ -9,7 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,22 +30,31 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
+    private TextView emptyRequests;
     private final String URL = "https://dev.ip.stimi.ovh/";
     private HomeRecyclerViewAdapter homeRecyclerViewAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ProfileService service = ServiceFactory
-                .createRetrofitService(ProfileService.class, URL, LocalStorage.
-                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
-
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        emptyRequests = (TextView) view.findViewById(R.id.home_empty_view);
         recyclerView = (RecyclerView) view.findViewById(R.id.home_recyclerview);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
         homeRecyclerViewAdapter = new HomeRecyclerViewAdapter(getContext());
         recyclerView.setAdapter(homeRecyclerViewAdapter);
 
+        loadFriendRequests();
+
+
+        return view;
+    }
+
+    private void loadFriendRequests() {
+        ProfileService service = ServiceFactory
+                .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
             service.getFriendRequests(0)
@@ -56,7 +68,6 @@ public class HomeFragment extends Fragment {
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .subscribe(
                                                     user -> {
-                                                        //recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), user.getFriendRequests(), userList));
                                                         List<FriendRequest> tmpRequestList = user.getFriendRequests();
 
                                                         for (Iterator<User> iterator = userList.listIterator(); iterator.hasNext(); ) {
@@ -81,6 +92,14 @@ public class HomeFragment extends Fragment {
                                                             }
                                                         }
 
+                                                        if (userList.size() > 0 && tmpRequestList.size() > 0) {
+                                                            recyclerView.setVisibility(View.VISIBLE);
+                                                            emptyRequests.setVisibility(View.GONE);
+                                                        } else {
+                                                            recyclerView.setVisibility(View.GONE);
+                                                            emptyRequests.setVisibility(View.VISIBLE);
+                                                        }
+
                                                         homeRecyclerViewAdapter.setResults(user.getFriendRequests(), userList);
                                                         homeRecyclerViewAdapter.notifyDataSetChanged();
                                                     },
@@ -99,8 +118,5 @@ public class HomeFragment extends Fragment {
         }catch (Exception e) {
             e.printStackTrace();
         }
-
-
-        return view;
     }
 }

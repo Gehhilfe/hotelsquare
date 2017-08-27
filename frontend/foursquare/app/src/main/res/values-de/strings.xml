@@ -128,6 +128,9 @@
     <string name="category_5">
         Infrastruktur
     </string>
+    <string name="home_no_current_requests">Zurzeit hast du keine ausstehende Freundesanfrage.</string>
+    <string name="friendlist_no_friends">Keine Freunde? Warum suchst du nicht einfach welche mit Hotelsquare!</string>
+    <string name="inbox_no_chats">Zurzeit hast du keine offenen Unterhaltungen.</string>
 
     <!--- C1-->
     <array name="beer">
