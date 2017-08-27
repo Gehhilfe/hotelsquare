@@ -69,12 +69,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ImageView avatar;
 
     private Location userLocation = new Location(0, 0);
+    private Location oldUserLocation = new Location(0,0);
     private Handler handler = new Handler();
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User locationUser = new User();
     private int PARAM_INTERVAL = 10;
     private NavigationView navigationView;
     private MenuItem loginMenu;
+    private static boolean alreadystarted = false;
 
 
     private static final int MY_PERMISSIONS_FINE_ACCESS = 0;
@@ -367,11 +369,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LocationTracker.LocationEvent event) {
         Log.d("SUBSRIBE", "This is: " + event.location);
+        oldUserLocation = userLocation;
         // Update User Location on Map
         userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
         // Update User Location on Server
         if ((LocalStorage.
                 getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "")) != "") {
+
             sendUserLocation(userLocation);
         }
     }
@@ -388,6 +392,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
         if (token == "")
             return;
+
+
         try {
 
             UserService service = ServiceFactory
@@ -399,7 +405,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .subscribe(user -> {
                                 locationUser = user;
                                 Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
-                                updateLoop();
+                                if(!alreadystarted){
+                                    updateLoop();
+                                }
+                                alreadystarted = true;
+
                     },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -439,10 +449,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void updateLoop(){
+    private void updateLoop() {
         String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-        if (token == "")
+        if (token == "") {
             return;
+        }
         try {
 
             UserService service = ServiceFactory
@@ -465,6 +476,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             e.printStackTrace();
         }
 
+    }
+
+    private boolean checkLocationChange() {
+        if(userLocation.getLatitude().equals(oldUserLocation.getLatitude()) && userLocation.getLongitude().equals(oldUserLocation.getLongitude())){
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
