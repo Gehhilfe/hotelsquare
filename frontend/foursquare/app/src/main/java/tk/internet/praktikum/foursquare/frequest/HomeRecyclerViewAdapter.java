@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare.home;
+package tk.internet.praktikum.foursquare.frequest;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +23,6 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
-import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequest;
 import tk.internet.praktikum.foursquare.api.bean.FriendRequestResponse;
 import tk.internet.praktikum.foursquare.api.bean.User;

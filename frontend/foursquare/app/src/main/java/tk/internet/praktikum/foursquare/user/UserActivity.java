@@ -1,7 +1,6 @@
 package tk.internet.praktikum.foursquare.user;
 
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -9,11 +8,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
-import tk.internet.praktikum.foursquare.home.HomeFragment;
+import tk.internet.praktikum.foursquare.frequest.HomeFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 

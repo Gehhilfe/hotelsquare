@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivityForResult(intent, REQUEST_LOGIN);
     }
 
-    private void logout() {
+    public void logout() {
         LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
         loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
         avatar.setVisibility(View.GONE);

@@ -19,7 +19,7 @@ import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
-import tk.internet.praktikum.foursquare.home.HomeFragment;
+import tk.internet.praktikum.foursquare.frequest.HomeFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 
