@@ -485,6 +485,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                         //TODO
                         // change toggle button to map view
                         // isMapView = true;
+
                         displayVenuesOnMap();
 
                     }
