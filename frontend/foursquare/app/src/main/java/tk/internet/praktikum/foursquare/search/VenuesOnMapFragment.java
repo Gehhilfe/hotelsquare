@@ -124,7 +124,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         findmeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), 14));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), 16));
             }
         });
         this.setRetainInstance(true);
@@ -385,9 +385,19 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         //  Location centerLocation = userLocation;
         // TODO - Zoom radius anpassen (Bsp. zoo)
         //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 14));
-        if (venues.size() <= 10)
-            dynamicZoomLevel(locations, venues.size() / 10);
+        if (venues.size() <= 10) {
+            //dynamicZoomLevel(locations, 1);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locations[0].getLatitude(), locations[0].getLongitude()), 12));
+        }
         else {
+            int nbPOI;
+            if(venues.size()>100){
+               // nbPOI=venues.size()/50;
+                nbPOI=1;
+            }
+            else
+                nbPOI=venues.size()/5;
+
             ProgressDialog  progressDialog = new ProgressDialog(getActivity(), 1);
             progressDialog.setIndeterminate(true);
             progressDialog.setMessage("Venues on map...");
@@ -396,7 +406,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             Runnable dynamicUpdateZoomLevel = new Runnable() {
                 @Override
                 public void run() {
-                    dynamicZoomLevel(locations, venues.size());
+                    dynamicZoomLevel(locations,nbPOI);
                 }
             };
             Handler handler = new Handler();
@@ -439,7 +449,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     }
                 }
                 if (keepSearchingForWithinRadius) {
-                    if (currentFoundPoi > numberOfPOI) {
+                    if (currentFoundPoi >=numberOfPOI) {
                         keepZoomingOut = false;
                         break;
 
