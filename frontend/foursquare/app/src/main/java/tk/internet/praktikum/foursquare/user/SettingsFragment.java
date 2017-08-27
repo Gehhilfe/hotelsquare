@@ -87,6 +87,7 @@ public class SettingsFragment extends Fragment {
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .subscribe(user -> {
                                                 Log.d(TAG, "User: " + user.getDisplayName() + " was deleted");
+                                                ((MainActivity) getActivity()).logout();
                                             }, throwable -> {
                                                 Log.d(TAG, "Exception: delete");
                                             });
