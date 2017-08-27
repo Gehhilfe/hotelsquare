@@ -37,7 +37,7 @@
                 style="@style/chat_text_message_style"
                 android:paddingLeft="20dp"
                 android:autoLink="web"
-                android:maxWidth="280dp"
+                android:maxWidth="270dp"
                 android:text="Test Msg received." />
         </LinearLayout>
 
