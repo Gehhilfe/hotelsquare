@@ -29,6 +29,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Handler handler = new Handler();
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User locationUser = new User();
-    private int PARAM_INTERVAL = 10000;
+    private int PARAM_INTERVAL = 10;
     private NavigationView navigationView;
     private MenuItem loginMenu;
 
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
 
-        handler.postDelayed(sendLocation, PARAM_INTERVAL);
+        sendLocation();
     }
 
     private void initialiseNavigationHeader() {
@@ -374,12 +375,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return userLocation;
     }
 
-    private Runnable sendLocation = new Runnable() {
-        @Override
-        public void run() {
-            String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-            if (token == "")
-                return;
+    private void sendLocation() {
+        String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+        if (token == "")
+            return;
+        try {
 
             UserService service = ServiceFactory
                     .createRetrofitService(UserService.class, URL, token);
@@ -390,15 +390,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .subscribe(user -> {
                                 locationUser = user;
                                 Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
-                            },
+                                updateLoop();
+                    },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                     );
-            handler.postDelayed(this, PARAM_INTERVAL);
+
+        }catch(Exception e){
+            e.printStackTrace();
         }
 
-    };
+    }
 
     public void setTitleOnBackStack() {
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
@@ -425,6 +428,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         }
+    }
+
+    private void updateLoop(){
+        String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+        if (token == "")
+            return;
+        try {
+
+            UserService service = ServiceFactory
+                    .createRetrofitService(UserService.class, URL, token);
+
+            service.update(locationUser)
+                    .repeatWhen(done -> done.delay(PARAM_INTERVAL, TimeUnit.SECONDS))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                                locationUser = user;
+                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
     }
 
 }
