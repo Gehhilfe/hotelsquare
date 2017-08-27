@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -70,6 +71,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private Bitmap userImage;
 
 
+    private Button findmeButton;
     private static ProfileService profileService;
     private static int overAllID = 0;
     private int thisID = 0;
@@ -117,6 +119,13 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         userLocation = new Location(0, 0);
         userLocation = mainActivity.getUserLocation();
 
+        findmeButton = (Button) view.findViewById(R.id.focus_on_userlocation);
+        findmeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), 14));
+            }
+        });
         this.setRetainInstance(true);
 
         //work-around

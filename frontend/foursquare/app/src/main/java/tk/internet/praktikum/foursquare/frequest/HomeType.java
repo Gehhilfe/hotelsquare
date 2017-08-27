@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare.home;
+package tk.internet.praktikum.foursquare.frequest;
 
 
 public enum HomeType {

@@ -4,13 +4,16 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,12 +26,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.Manifest;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -67,9 +72,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Handler handler = new Handler();
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User locationUser = new User();
-    private int PARAM_INTERVAL = 10000;
+    private int PARAM_INTERVAL = 10;
     private NavigationView navigationView;
     private MenuItem loginMenu;
+
+
+    private static final int MY_PERMISSIONS_FINE_ACCESS = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,8 +124,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
 
-        handler.postDelayed(sendLocation, PARAM_INTERVAL);
+        requestNeededPermissions();
+        sendLocation();
     }
+
 
     private void initialiseNavigationHeader() {
         ProfileService service = ServiceFactory
@@ -225,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivityForResult(intent, REQUEST_LOGIN);
     }
 
-    private void logout() {
+    public void logout() {
         LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
         loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
         avatar.setVisibility(View.GONE);
@@ -374,12 +384,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return userLocation;
     }
 
-    private Runnable sendLocation = new Runnable() {
-        @Override
-        public void run() {
-            String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-            if (token == "")
-                return;
+    private void sendLocation() {
+        String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+        if (token == "")
+            return;
+        try {
 
             UserService service = ServiceFactory
                     .createRetrofitService(UserService.class, URL, token);
@@ -390,15 +399,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .subscribe(user -> {
                                 locationUser = user;
                                 Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
-                            },
+                                updateLoop();
+                    },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                     );
-            handler.postDelayed(this, PARAM_INTERVAL);
+
+        }catch(Exception e){
+            e.printStackTrace();
         }
 
-    };
+    }
 
     public void setTitleOnBackStack() {
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
@@ -427,4 +439,69 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void updateLoop(){
+        String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+        if (token == "")
+            return;
+        try {
+
+            UserService service = ServiceFactory
+                    .createRetrofitService(UserService.class, URL, token);
+
+            service.update(locationUser)
+                    .repeatWhen(done -> done.delay(PARAM_INTERVAL, TimeUnit.SECONDS))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                                locationUser = user;
+                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void requestNeededPermissions() {
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_FINE_ACCESS);
+            }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_FINE_ACCESS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
 }

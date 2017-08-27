@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare.home;
+package tk.internet.praktikum.foursquare.frequest;
 
 import tk.internet.praktikum.foursquare.api.bean.FriendRequest;
 
