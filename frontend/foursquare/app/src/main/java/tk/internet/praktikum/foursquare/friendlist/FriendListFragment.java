@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Collections;
@@ -27,22 +28,29 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class FriendListFragment extends Fragment {
     private RecyclerView recyclerView;
+    private TextView emptyFriendList;
     private final String URL = "https://dev.ip.stimi.ovh/";
     private FLRecyclerViewAdapter flRecyclerViewAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ProfileService service = ServiceFactory
-                .createRetrofitService(ProfileService.class, URL, LocalStorage.
-                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
-
         View view = inflater.inflate(R.layout.fragment_friendlist, container, false);
+        emptyFriendList = (TextView) view.findViewById(R.id.friendlist_empty_view);
         recyclerView = (RecyclerView) view.findViewById(R.id.fl_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
         flRecyclerViewAdapter = new FLRecyclerViewAdapter(getContext(), getActivity());
         recyclerView.setAdapter(flRecyclerViewAdapter);
 
+        loadFriendList();
+
+        return view;
+    }
+
+    private void loadFriendList() {
+        ProfileService service = ServiceFactory
+                .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
             service.friends(0)
@@ -63,7 +71,15 @@ public class FriendListFragment extends Fragment {
                                         return o1.getName().compareTo(o2.getName());
                                     }
                                 });
-                                //recyclerView.setAdapter(new FLRecyclerViewAdapter(getContext(), friendList, getActivity()));
+
+                                if (friendList.size() > 0) {
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                    emptyFriendList.setVisibility(View.GONE);
+                                } else {
+                                    recyclerView.setVisibility(View.GONE);
+                                    emptyFriendList.setVisibility(View.VISIBLE);
+                                }
+
                                 flRecyclerViewAdapter.setResults(friendList);
                             },
                             throwable -> {
@@ -73,7 +89,5 @@ public class FriendListFragment extends Fragment {
         }catch (Exception e) {
             e.printStackTrace();
         }
-
-        return view;
     }
 }
