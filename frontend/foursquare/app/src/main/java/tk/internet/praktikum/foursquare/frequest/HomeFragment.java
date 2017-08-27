@@ -11,11 +11,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.FriendRequest;
+import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -51,6 +57,30 @@ public class HomeFragment extends Fragment {
                                             .subscribe(
                                                     user -> {
                                                         //recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), user.getFriendRequests(), userList));
+                                                        List<FriendRequest> tmpRequestList = user.getFriendRequests();
+
+                                                        for (Iterator<User> iterator = userList.listIterator(); iterator.hasNext(); ) {
+                                                            User tmpUser = iterator.next();
+                                                            if(tmpUser.getId() == null)
+                                                                iterator.remove();
+                                                        }
+
+
+                                                        if (userList.size() < tmpRequestList.size()) {
+                                                            for (Iterator<FriendRequest> iterator = tmpRequestList.listIterator(); iterator.hasNext(); ) {
+                                                                boolean valid = false;
+                                                                FriendRequest friendRequest = iterator.next();
+                                                                for (User tmpUser : userList) {
+                                                                    if (friendRequest.getSenderID().equals(tmpUser.getId())) {
+                                                                        valid = true;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                if (!valid)
+                                                                    iterator.remove();
+                                                            }
+                                                        }
+
                                                         homeRecyclerViewAdapter.setResults(user.getFriendRequests(), userList);
                                                         homeRecyclerViewAdapter.notifyDataSetChanged();
                                                     },
