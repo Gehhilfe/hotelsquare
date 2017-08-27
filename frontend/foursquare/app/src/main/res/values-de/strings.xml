@@ -103,6 +103,8 @@
     <string name="a_second">einer Sekunde</string>
     <string name="seconds">Sekunden</string>
     <string name="about">circa</string>
+    <string name="find_me">Meine Position</string>
+
     <string-array name="languages">
         <item>Englisch</item>
         <item>Deutsch</item>

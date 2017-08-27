@@ -121,6 +121,7 @@
     <string name="history_state_dislike">Disliked a comment</string>
     <string name="history_state_text_comment">Wrote a comment</string>
     <string name="history_state_image_comment">Posted a picture</string>
+    <string name="find_me">Find me</string>
 
     <string name="login_first">You must login</string>
     <!-- menu-->

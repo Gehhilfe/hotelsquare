@@ -25,7 +25,7 @@
             android:id="@+id/focus_on_userlocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Find me" />
+            android:text="@string/find_me" />
 
 
     </fragment>
