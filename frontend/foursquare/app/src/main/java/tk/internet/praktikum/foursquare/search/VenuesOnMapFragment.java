@@ -1,5 +1,6 @@
 package tk.internet.praktikum.foursquare.search;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -365,6 +366,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     public void updateVenuesMarker(List<Venue> venues) {
         // clear Map
         //map.clear();
+
         Log.d("MAPFIX", "UVM: Map is cleared");
 
         for (Venue venue : venues) {
@@ -386,6 +388,11 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         if (venues.size() <= 10)
             dynamicZoomLevel(locations, venues.size() / 10);
         else {
+            ProgressDialog  progressDialog = new ProgressDialog(getActivity(), 1);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage("Venues on map...");
+            progressDialog.show();
+
             Runnable dynamicUpdateZoomLevel = new Runnable() {
                 @Override
                 public void run() {
@@ -394,8 +401,9 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
             };
             Handler handler = new Handler();
             handler.post(dynamicUpdateZoomLevel);
-
+            progressDialog.dismiss();
         }
+
     }
 
 
