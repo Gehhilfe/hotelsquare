@@ -3,25 +3,23 @@ package tk.internet.praktikum.foursquare.search;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -31,6 +29,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +70,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private Bitmap userImage;
 
 
+    private Button findmeButton;
     private static ProfileService profileService;
     private static int overAllID = 0;
     private int thisID = 0;
@@ -86,6 +86,10 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     private MainActivity mainActivity;
     private Fragment parent;
     int i = 0;
+    final int MAX_ZOOM_LEVEL = 14;
+    final int MIN_ZOOM_LEVEL = 9;
+    final int MAX_RADIUS = 8;
+    final int MIN_RADIUS = 5;
 
     // private ClusterManager<Location> locationClusterManager;
     public VenuesOnMapFragment() {
@@ -114,6 +118,13 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         userLocation = new Location(0, 0);
         userLocation = mainActivity.getUserLocation();
 
+        findmeButton = (Button) view.findViewById(R.id.focus_on_userlocation);
+        findmeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), 16));
+            }
+        });
         this.setRetainInstance(true);
 
         //work-around
@@ -280,11 +291,13 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     //TODO: "Call FriendFragment"
                     Intent intent = new Intent(parent.getActivity(), ProfileActivity.class);
                     intent.putExtra("userID", markerFriendMap.get(marker).getId());
+                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
                     parent.getActivity().startActivity(intent);
                     // if User, go to Me-Fragment
                 } else if (!(LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("") && !markerFriendMap.containsKey(marker)) {
                     Intent intent = new Intent(parent.getActivity(), UserActivity.class);
+                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
                     startActivity(intent);
                     /*
                     MeFragment meFragment = new MeFragment();
@@ -353,6 +366,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     public void updateVenuesMarker(List<Venue> venues) {
         // clear Map
         //map.clear();
+
         Log.d("MAPFIX", "UVM: Map is cleared");
 
         for (Venue venue : venues) {
@@ -367,9 +381,88 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
             updateFriendsMarker();
         }
-        //Location centerLocation=calculateClusteringCenterLocation(venues);
-        Location centerLocation = userLocation;
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 12));
+        android.location.Location[] locations = calculateBoundsOfLocations(venues);
+        //  Location centerLocation = userLocation;
+        // TODO - Zoom radius anpassen (Bsp. zoo)
+        //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 14));
+        if (venues.size() <= 10) {
+            //dynamicZoomLevel(locations, 1);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locations[0].getLatitude(), locations[0].getLongitude()), 13));
+        }
+        else if (venues.size()>100) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locations[0].getLatitude(), locations[0].getLongitude()), 9));
+
+        }
+        else{
+            int  nbPOI = venues.size() / 5;
+            dynamicZoomLevel(locations, nbPOI);
+              /*  ProgressDialog progressDialog = new ProgressDialog(getActivity(), 1);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setMessage("Venues on map...");
+                progressDialog.show();
+                dynamicZoomLevel(locations, nbPOI);
+                Runnable dynamicUpdateZoomLevel = new Runnable() {
+                    @Override
+                    public void run() {
+                        dynamicZoomLevel(locations, nbPOI);
+                    }
+                };
+                Handler handler = new Handler();
+                handler.post(dynamicUpdateZoomLevel);
+                progressDialog.dismiss();*/
+            }
+
+
+    }
+
+
+    public void dynamicZoomLevel(android.location.Location[] locations, int numberOfPOI) {
+        int currentZoomLevel = MAX_ZOOM_LEVEL;
+        int currentFoundPoi = 0;
+        LatLngBounds bounds = null;
+        List<Marker> foundMarkers = new ArrayList<Marker>();
+        boolean keepZoomingOut = true;
+        boolean keepSearchingForWithinRadius = true;
+        android.location.Location centerLocation = locations[0];
+        android.location.Location locationNE = locations[1];
+        android.location.Location locationSW = locations[2];
+
+        LatLng latLng = new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude());
+        LatLngBounds latLngBounds = createLatLngBoundsForAllVenues(locationNE, locationSW);
+        while (keepZoomingOut) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, currentZoomLevel--));
+            // bounds = map.getProjection().getVisibleRegion().latLngBounds;
+            // android.location.Location centerBound=latlngToLocation( bounds.getCenter());
+            //double distanceToNE=Math.round(centerLocation.distanceTo(latlngToLocation(bounds.northeast)) / 1000);
+            //double distanceToSW=Math.round(centerLocation.distanceTo(latlngToLocation(bounds.southwest)) / 1000);
+            double distanceToNE = Math.round(centerLocation.distanceTo(locationNE) / 1000);
+            double distanceToSW = Math.round(centerLocation.distanceTo(locationSW) / 1000);
+            keepSearchingForWithinRadius = !((distanceToNE > MAX_RADIUS) || (distanceToSW > MAX_RADIUS));
+            Iterator<Marker> markers = markerVenueMap.keySet().iterator();
+            while (markers.hasNext()) {
+                Marker marker = markers.next();
+                if (latLngBounds.contains(marker.getPosition())) {
+                    if (!foundMarkers.contains(marker)) {
+                        currentFoundPoi++;
+                        foundMarkers.add(marker);
+                    }
+                }
+                if (keepSearchingForWithinRadius) {
+                    if (currentFoundPoi >=numberOfPOI) {
+                        keepZoomingOut = false;
+                        break;
+
+                    }
+                } else if (currentZoomLevel < MIN_ZOOM_LEVEL) {
+                    keepZoomingOut = false;
+                    break;
+                }
+            }
+            keepZoomingOut = ((currentZoomLevel > 0) && keepZoomingOut);
+
+        }
+        System.out.println("### Zoom level: " + currentZoomLevel);
+
 
     }
 
@@ -395,7 +488,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         } else {
             Marker tmp = map.addMarker(new MarkerOptions()
                     .position(friendLocation)
-                    .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position))
+                    .title(friend.getName()).icon(BitmapDescriptorFactory.fromResource(R.drawable.friend_position_1))
             );
             markerFriendMap.put(tmp, friend);
         }
@@ -559,22 +652,46 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
     // TODO: Delete?
  /*   */
 
-    /**
-     * update new venues list
-     *
-     * @param venues
-     *//*
-    protected void updateRecyclerView(List<Venue> venues) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-        recyclerView.setAdapter(new SearchResultAdapter(this, venues));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.HORIZONTAL));
 
-    }*/
-  //  protected Location calculateClusteringCenterLocation(List<Venue> venues) {
-  //      return new Location(venues.stream().mapToDouble(location -> location.getLocation().getLongitude()).average().getAsDouble(),
-  //              venues.stream().mapToDouble(location -> location.getLocation().getLatitude()).average().getAsDouble());
-    //
-  //  }
+    protected android.location.Location[] calculateBoundsOfLocations(List<Venue> venues) {
+        double averageLat = 0.0;
+        double averageLong = 0.0;
+        double minLat = Double.MAX_VALUE;
+        double maxLat = 0.0;
+        double minLong = Double.MAX_VALUE;
+        double maxLong = 0.0;
+        int numberOfVenues = venues.size();
+
+        for (Venue venue : venues) {
+            minLat = Math.min(minLat, venue.getLocation().getLatitude());
+            maxLat = Math.max(maxLat, venue.getLocation().getLatitude());
+            minLong = Math.min(minLong, venue.getLocation().getLongitude());
+            maxLong = Math.max(maxLong, venue.getLocation().getLongitude());
+            averageLat += venue.getLocation().getLatitude() / numberOfVenues;
+            averageLong += venue.getLocation().getLongitude() / numberOfVenues;
+        }
+        android.location.Location centerLocation = new android.location.Location("");
+        centerLocation.setLongitude(averageLong);
+        centerLocation.setLatitude(averageLat);
+        android.location.Location locationNE = new android.location.Location("");
+        locationNE.setLongitude(maxLong);
+        locationNE.setLatitude(minLat);
+        android.location.Location locationSW = new android.location.Location("");
+        locationSW.setLongitude(minLong);
+        locationSW.setLatitude(maxLat);
+
+        return new android.location.Location[]{centerLocation, locationNE, locationSW};
+    }
+
+    public LatLngBounds createLatLngBoundsForAllVenues(android.location.Location locationNE, android.location.Location locationSW) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        LatLng boundsNE = new LatLng(locationNE.getLatitude(), locationNE.getLongitude());
+        LatLng boundsSW = new LatLng(locationSW.getLatitude(), locationSW.getLongitude());
+        builder.include(boundsNE);
+        builder.include(boundsSW);
+        return builder.build();
+    }
+
 
     /**
      * Listen for new database entries from background service
@@ -603,5 +720,14 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
+
+
+    private android.location.Location latlngToLocation(LatLng dest) {
+        android.location.Location loc = new android.location.Location("");
+        loc.setLatitude(dest.latitude);
+        loc.setLongitude(dest.longitude);
+        return loc;
+    }
+
 }
 

@@ -8,9 +8,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +32,6 @@ public class RegisterFragment extends Fragment {
     private EditText nameInput, emailInput, passwordInput;
     private AppCompatButton registerBtn;
     private TextView loginLbl;
-    private  LoginGeneralFragment loginGeneralFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,8 +46,16 @@ public class RegisterFragment extends Fragment {
 
         registerBtn.setOnClickListener(v -> register());
 
-       loginLbl.setOnClickListener(v -> ((LoginActivity) getActivity()).changeFragment(0));
-       // loginLbl.setOnClickListener(v -> loginGeneralFragment.changeFragment(0));
+        loginLbl.setOnClickListener(v -> ((LoginActivity) getActivity()).changeFragment(0));
+
+        passwordInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE)
+                    register();
+                return true;
+            }
+        });
 
         return view;
     }
@@ -140,12 +149,5 @@ public class RegisterFragment extends Fragment {
         Log.d(LOG_TAG, "Failed login.");
         registerBtn.setEnabled(true);
         Toast.makeText(getActivity().getBaseContext(), "Failed to register.", Toast.LENGTH_LONG).show();
-    }
-    public LoginGeneralFragment getLoginGeneralFragment() {
-        return loginGeneralFragment;
-    }
-
-    public void setLoginGeneralFragment(LoginGeneralFragment loginGeneralFragment) {
-        this.loginGeneralFragment = loginGeneralFragment;
     }
 }

@@ -6,10 +6,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -25,7 +28,6 @@ public class RestorePasswordFragment extends Fragment {
 
     private EditText email, name;
     private AppCompatButton resetPwBtn;
-    private  LoginGeneralFragment loginGeneralFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,6 +38,15 @@ public class RestorePasswordFragment extends Fragment {
         resetPwBtn = (AppCompatButton) view.findViewById(R.id.reset_password_btn);
 
         resetPwBtn.setOnClickListener(v -> resetPassword());
+
+        name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE)
+                    resetPassword();
+                return true;
+            }
+        });
 
         return view;
     }
@@ -59,24 +70,34 @@ public class RestorePasswordFragment extends Fragment {
         service.passwordReset(new PasswordResetInformation(name.getText().toString(), email.getText().toString()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((a) -> successfulReset(), (a) -> failedReset());
+                .subscribe((a) -> successfulReset(progressDialog), (a) -> failedReset(progressDialog));
 
     }
 
     /**
      * Logs the reset and returns to the login activity.
      */
-    private void successfulReset() {
+    private void successfulReset(ProgressDialog progressDialog) {
         Log.d(LOG_TAG, "Successfully reset the password.");
         resetPwBtn.setEnabled(true);
+        progressDialog.dismiss();
        ((LoginActivity) getActivity()).changeFragment(0);
        // loginGeneralFragment.changeFragment(0);
     }
 
     /**
+     * Routine to execute on Failed rest. Logs the attempt, displays a Toast for the user and dismisses the progressDialog.
+     */
+    private void failedReset(ProgressDialog progressDialog) {
+        Log.d(LOG_TAG, "Failed login.");
+        progressDialog.dismiss();
+        resetPwBtn.setEnabled(true);
+        Toast.makeText(getActivity().getBaseContext(), "Couldn't reset the password.", Toast.LENGTH_LONG).show();
+    }
+
+    /**
      * Routine to execute on Failed rest. Logs the attempt and displays a Toast for the user.
      */
-
     private void failedReset() {
         Log.d(LOG_TAG, "Failed login.");
         resetPwBtn.setEnabled(true);
@@ -99,12 +120,5 @@ public class RestorePasswordFragment extends Fragment {
             email.setError(null);
 
         return valid;
-    }
-    public LoginGeneralFragment getLoginGeneralFragment() {
-        return loginGeneralFragment;
-    }
-
-    public void setLoginGeneralFragment(LoginGeneralFragment loginGeneralFragment) {
-        this.loginGeneralFragment = loginGeneralFragment;
     }
 }

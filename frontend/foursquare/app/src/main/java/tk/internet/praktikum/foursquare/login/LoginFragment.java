@@ -4,22 +4,24 @@ package tk.internet.praktikum.foursquare.login;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.LoginCredentials;
-import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.SessionService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
@@ -30,7 +32,6 @@ public class LoginFragment extends Fragment {
     private EditText userInput, passwordInput;
     private AppCompatButton loginBtn;
     private TextView registerLbl, passwordForgottenLbl;
-    private LoginGeneralFragment loginGeneralFragment;
 
 
     @Override
@@ -46,6 +47,14 @@ public class LoginFragment extends Fragment {
         registerLbl.setOnClickListener(v -> register());
         passwordForgottenLbl.setOnClickListener(v -> restorePassword());
 
+        passwordInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE)
+                    login();
+                return true;
+            }
+        });
         return view;
     }
 
@@ -77,11 +86,9 @@ public class LoginFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
                 .subscribe(
                         tokenInformation -> {
-                            //UserService uservice = ServiceFactory.createRetrofitService(UserService.class, URL, tokenInformation.getToken());
                             successfulLogin();
                             progressDialog.dismiss();
-                            //Toast.makeText(getActivity().getApplicationContext(), tokenInformation.getToken(), Toast.LENGTH_LONG).show();
-                            LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveLoggedinInformation(tokenInformation, new User(email, email));
+                            LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveLoggedinInformation(tokenInformation, tokenInformation.getUser());
 
                         },
                         throwable -> {
@@ -100,20 +107,18 @@ public class LoginFragment extends Fragment {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
 
-        if (getArguments().getBoolean("UserActivity"))
-            getActivity().setResult(3, null);
-        else
+        String destination = getArguments().getString("Destination");
+
+        if (Objects.equals(destination, "FastSearch"))
             getActivity().setResult(2, null);
+        else if (Objects.equals(destination, "PersonSearch"))
+            getActivity().setResult(3, null);
+        else if (Objects.equals(destination, "History"))
+            getActivity().setResult(4, null);
+        else if (Objects.equals(destination, "MyProfile"))
+            getActivity().setResult(5, null);
 
         getActivity().finish();
-    }
-
-    private void redirectToFragment(Fragment fragment) {
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.login_layout, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
     }
 
     /**
@@ -129,20 +134,10 @@ public class LoginFragment extends Fragment {
      */
     private void register() {
         ((LoginActivity) getActivity()).changeFragment(1);
-        //loginGeneralFragment.changeFragment(1);
     }
 
     // TODO - Restore Password
     private void restorePassword() {
         ((LoginActivity) getActivity()).changeFragment(2);
-        // loginGeneralFragment.changeFragment(2);
-    }
-
-    public LoginGeneralFragment getLoginGeneralFragment() {
-        return loginGeneralFragment;
-    }
-
-    public void setLoginGeneralFragment(LoginGeneralFragment loginGeneralFragment) {
-        this.loginGeneralFragment = loginGeneralFragment;
     }
 }

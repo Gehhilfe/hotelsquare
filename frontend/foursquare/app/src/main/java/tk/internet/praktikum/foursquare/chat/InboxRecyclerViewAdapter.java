@@ -11,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -80,19 +82,16 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
 
     private Context context;
     private LayoutInflater inflater;
-    private List<Chat> chatList = Collections.emptyList();
+    private List<Chat> chatList;
     private String currentUserName;
-    private InboxFragment inboxFragment;
     private Activity activity;
 
-
-    public InboxRecylcerViewAdapter(Context context, List<Chat> inbox, InboxFragment inboxFragment, Activity activity) {
+    public InboxRecylcerViewAdapter(Context context, Activity activity) {
         inflater = LayoutInflater.from(context);
-        this.chatList = inbox;
         this.context = context;
-        currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
-        this.inboxFragment = inboxFragment;
         this.activity = activity;
+        currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
+        chatList = new ArrayList<>();
     }
 
     @Override
@@ -115,7 +114,6 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
                 chatPartner = user;
             }
         }
-        // TODO - HIGHLIGHT NEW MESSAGES
 
         if (chatPartner.getAvatar() != null) {
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
@@ -137,10 +135,27 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
 
         if (currentChat.getMessages().size() > 0)
             holder.preview.setText(currentChat.getMessages().get(currentChat.getMessages().size() - 1).getMessage());
+
+        long lastReadMsgTime = LocalStorage.getSharedPreferences(context).getLong(currentChat.getChatId(), -1);
+
+        Date lastMsgRead = new Date(lastReadMsgTime);
+        if (currentChat.getMessages().size() > 0) {
+            Date previewDate = currentChat.getMessages().get(0).getDate();
+
+            if (lastMsgRead.compareTo(previewDate) == -1 &&
+                    !(currentChat.getMessages().get(currentChat.getMessages().size() - 1).getSender().equals(currentUser))) {
+                holder.sendMsg.setImageResource(R.drawable.ic_email_alert_red);
+            }
+        }
     }
 
     @Override
     public int getItemCount() {
         return chatList.size();
+    }
+
+    public void setResults(List<Chat> data) {
+        chatList = new ArrayList<>(data);
+        notifyDataSetChanged();
     }
 }

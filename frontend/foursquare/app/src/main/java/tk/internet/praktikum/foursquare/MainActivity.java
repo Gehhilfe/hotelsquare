@@ -4,17 +4,20 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -23,15 +26,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.Manifest;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -43,12 +45,15 @@ import tk.internet.praktikum.foursquare.api.bean.Location;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.api.service.UserService;
+import tk.internet.praktikum.foursquare.history.DaoSession;
 import tk.internet.praktikum.foursquare.history.HistoryFragment;
 import tk.internet.praktikum.foursquare.location.LocationService;
 import tk.internet.praktikum.foursquare.location.LocationTracker;
 import tk.internet.praktikum.foursquare.login.LoginActivity;
 import tk.internet.praktikum.foursquare.search.FastSearchFragment;
 import tk.internet.praktikum.foursquare.search.PersonSearchFragment;
+import tk.internet.praktikum.foursquare.search.SuggestionKeyWord;
+import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.SettingsFragment;
 import tk.internet.praktikum.foursquare.user.UserActivity;
@@ -56,21 +61,27 @@ import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
-    private final int REQUEST_ME = 6;
-    private final int RESULT_USER_ACTIVITY = 3;
-    private final int RESULT_LOGIN = 2;
+    private final int RESULT_FAST_SEARCH = 2;
+    private final int RESULT_PERSON_SEARCH = 3;
+    private final int RESULT_HISTORY = 4;
+    private final int RESULT_USER_ACTIVITY = 5;
 
 
-    private TextView userName;
+    private TextView userName, hotelsquare;
     private ImageView avatar;
 
     private Location userLocation = new Location(0, 0);
+    private Location oldUserLocation = new Location(0,0);
     private Handler handler = new Handler();
     private final String URL = "https://dev.ip.stimi.ovh/";
     private User locationUser = new User();
-    private int PARAM_INTERVAL = 10000;
+    private int PARAM_INTERVAL = 10;
     private NavigationView navigationView;
-    private MenuItem loginMenu;
+    private MenuItem loginMenu, fastSearchMenu, personSearchMenu, historyMenu;
+    private static boolean alreadystarted = false;
+
+
+    private static final int MY_PERMISSIONS_FINE_ACCESS = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,27 +105,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         View parentView = navigationView.getHeaderView(0);
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
+        hotelsquare = (TextView) parentView.findViewById(R.id.nav_hotelsquare);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
+        avatar.setOnClickListener(v -> meNavigation());
+
+        initialiseMenuItems(navigationView.getMenu());
+
         readStaticKeyWords();
-
-        Menu tmpMenu = navigationView.getMenu();
-        loginMenu = null;
-        for (int i = 0; i < tmpMenu.size(); i++) {
-            tmpMenu.getItem(i);
-            if (tmpMenu.getItem(i).getItemId() == R.id.nav_login_logout) {
-                loginMenu = tmpMenu.getItem(i);
-            }
-        }
-
         if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             initialiseNavigationHeader();
             loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
         }
 
+        Typeface type = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Pacifico.ttf");
+        hotelsquare.setTypeface(type);
+
         FastSearchFragment searchFragment = new FastSearchFragment();
         redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
 
-        handler.postDelayed(sendLocation, PARAM_INTERVAL);
+        requestNeededPermissions();
+        sendLocation();
+    }
+
+    private void initialiseMenuItems(Menu menu) {
+        for (int i = 0; i < menu.size(); i++) {
+            menu.getItem(i);
+            if (menu.getItem(i).getItemId() == R.id.nav_login_logout) {
+                loginMenu = menu.getItem(i);
+            } else if (menu.getItem(i).getItemId() == R.id.nav_search) {
+                fastSearchMenu = menu.getItem(i);
+            } else if (menu.getItem(i).getItemId() == R.id.nav_search_person) {
+                personSearchMenu = menu.getItem(i);
+            } else if (menu.getItem(i).getItemId() == R.id.nav_history) {
+                historyMenu = menu.getItem(i);
+            }
+        }
     }
 
     private void initialiseNavigationHeader() {
@@ -122,13 +147,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
 
+        avatar.setVisibility(View.VISIBLE);
+        userName.setVisibility(View.VISIBLE);
+        hotelsquare.setVisibility(View.GONE);
+
         try {
             service.profile()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
-                                userName.setText(user.getName());
+                                userName.setText(user.getDisplayName());
                                 if (user.getAvatar() != null) {
                                     ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
                                     imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
@@ -173,33 +202,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     private void searchNavigation(MenuItem item) {
         try {
             Fragment fragment = FastSearchFragment.class.newInstance();
             redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search));
-            setTitle(item);
+            setTitle("Hotelsquare");
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -207,34 +214,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-  /*  private void searchPersonNavigation() {
-        Intent intent = new Intent(getApplicationContext(), SearchPersonActivity.class);
-        startActivityForResult(intent, REQUEST_SEARCH_PERSON);
-    }*/
-
     private void searchPersonNavigation(MenuItem item) {
-        PersonSearchFragment fragment = new PersonSearchFragment();
-        redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search_person));
-        setTitle(item);
+        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
+            login("PersonSearch");
+        } else {
+            PersonSearchFragment fragment = new PersonSearchFragment();
+            redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search_person));
+            setTitle(item);
+        }
     }
-/*
-    private void historyNavigation() {
-        Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
-        startActivityForResult(intent, REQUEST_HISTORY);
-    }*/
 
     private void historyNavigation(MenuItem item) {
-        HistoryFragment fragment = new HistoryFragment();
-        redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_history));
-        setTitle(item);
+        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
+            login("History");
+        } else {
+            HistoryFragment fragment = new HistoryFragment();
+            redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_history));
+            setTitle(item);
+        }
     }
 
     private void meNavigation() {
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-            login(true);
+            login("MyProfile");
         } else {
             Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-            startActivityForResult(intent, REQUEST_ME);
+            intent.putExtra("Parent", "MainActivity");
+            startActivity(intent);
         }
     }
 
@@ -245,19 +251,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setTitle(item);
     }
 
-    private void login(boolean destination) {
+    private void login(String destination) {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        intent.putExtra("UserActivity", destination);
+        intent.putExtra("Destination", destination);
         startActivityForResult(intent, REQUEST_LOGIN);
     }
 
-    private void logout() {
+    public void logout() {
         LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
-        this.recreate();
-        /*
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivityForResult(intent, 0);
-        */
+        loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
+        avatar.setVisibility(View.GONE);
+        userName.setVisibility(View.GONE);
+        hotelsquare.setVisibility(View.VISIBLE);
+        FastSearchFragment searchFragment = new FastSearchFragment();
+        redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
+        setTitle("Hotelsquare");
     }
 
 
@@ -269,27 +277,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 searchNavigation(item);
                 break;
             case R.id.nav_search_person:
-                //searchPersonNavigation();
                 searchPersonNavigation(item);
                 break;
             case R.id.nav_history:
-                //historyNavigation();
                 historyNavigation(item);
                 break;
             case R.id.nav_me:
                 meNavigation();
                 break;
             case R.id.nav_manage:
-                //settingsNavigation();
                 settingsNavigation(item);
                 break;
             case R.id.nav_login_logout:
                 if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-                    login(false);
+                    login("FastSearch");
                     return false;
                 } else {
                     logout();
-                    //item.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
                 }
                 break;
         }
@@ -318,14 +322,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_LOGIN:
-                if (resultCode == RESULT_LOGIN) {
+                if (resultCode == RESULT_FAST_SEARCH) {
                     initialiseNavigationHeader();
                     loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    searchNavigation(fastSearchMenu);
                     break;
                 } else if (resultCode == RESULT_USER_ACTIVITY) {
                     initialiseNavigationHeader();
                     loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
                     meNavigation();
+                } else if (resultCode == RESULT_PERSON_SEARCH) {
+                    initialiseNavigationHeader();
+                    loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    searchPersonNavigation(personSearchMenu);
+                } else if (resultCode == RESULT_HISTORY) {
+                    initialiseNavigationHeader();
+                    loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    historyNavigation(historyMenu);
                 }
         }
     }
@@ -348,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn())
             initialiseNavigationHeader();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -387,11 +401,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LocationTracker.LocationEvent event) {
         Log.d("SUBSRIBE", "This is: " + event.location);
+        oldUserLocation = userLocation;
         // Update User Location on Map
         userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
         // Update User Location on Server
         if ((LocalStorage.
                 getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "")) != "") {
+
             sendUserLocation(userLocation);
         }
     }
@@ -404,12 +420,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return userLocation;
     }
 
-    private Runnable sendLocation = new Runnable() {
-        @Override
-        public void run() {
-            String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-            if (Objects.equals(token, ""))
-                return;
+    private void sendLocation() {
+        String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+        if (token == "")
+            return;
+
+
+        try {
 
             UserService service = ServiceFactory
                     .createRetrofitService(UserService.class, URL, token);
@@ -425,15 +442,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .subscribe(user -> {
                                 locationUser = user;
                                 Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
-                            },
+                                if(!alreadystarted){
+                                    updateLoop();
+                                }
+                                alreadystarted = true;
+
+                    },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                     );
-            handler.postDelayed(this, PARAM_INTERVAL);
+
+        }catch(Exception e){
+            e.printStackTrace();
         }
 
-    };
+    }
 
     public void setTitleOnBackStack() {
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
@@ -445,17 +469,95 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    public void readStaticKeyWords() {
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        Set<String> keyWords = sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS, null);
-         if (keyWords == null) {
-              keyWords = new HashSet<>();
+    public synchronized void readStaticKeyWords() {
+         LocalStorage ls = LocalStorage.getLocalStorageInstance(this);
+        if (!ls.alreadyReadStaticKeyWords()) {
+            System.out.println(("#### readStaticKeyWords"));
+            DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getApplicationContext()).getDaoSession();
+            LocalStorage.getLocalStorageInstance(getApplicationContext()).saveBooleanValue(Constants.ALREADY_READ_STATIC_KEYWORDS, true);
+            String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
+            for (int i = 0; i < suggestionList.length; i++) {
+                SuggestionKeyWord suggestionKeyWord = new SuggestionKeyWord();
+                suggestionKeyWord.setUid(UUID.randomUUID().toString());
+                suggestionKeyWord.setSuggestionName(suggestionList[i]);
+                daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
 
-        String[] suggestionList = getApplicationContext().getResources().getStringArray(R.array.suggestion_list);
-        keyWords.addAll(Arrays.asList(suggestionList));
-
-        LocalStorage.getLocalStorageInstance(getApplicationContext()).setKeyWords(tk.internet.praktikum.Constants.KEY_WORDS, keyWords);
-         }
+            }
+        }
     }
 
+    private void updateLoop() {
+        String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
+        if (token == "") {
+            return;
+        }
+        try {
+
+            UserService service = ServiceFactory
+                    .createRetrofitService(UserService.class, URL, token);
+
+            service.update(locationUser)
+                    .repeatWhen(done -> done.delay(PARAM_INTERVAL, TimeUnit.SECONDS))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                                locationUser = user;
+                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
+                            },
+                            throwable -> {
+                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private boolean checkLocationChange() {
+        if(userLocation.getLatitude().equals(oldUserLocation.getLatitude()) && userLocation.getLongitude().equals(oldUserLocation.getLongitude())){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    private void requestNeededPermissions() {
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_FINE_ACCESS);
+            }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_FINE_ACCESS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
 }

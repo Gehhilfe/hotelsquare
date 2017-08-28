@@ -1,4 +1,4 @@
-package tk.internet.praktikum.foursquare.home;
+package tk.internet.praktikum.foursquare.frequest;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -106,18 +106,17 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
 
     private Context context;
     private LayoutInflater inflater;
-    private List<FriendRequest> friendRequestList = Collections.emptyList();
-    private List<User> userList = Collections.emptyList();
+    private List<FriendRequest> friendRequestList;
+    private List<User> userList;
     private HashMap<String, String> idNameMap = new HashMap<>();
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.y HH:mm",  Locale.ENGLISH);
     private final String URL = "https://dev.ip.stimi.ovh/";
 
-
-    public HomeRecyclerViewAdapter(Context context, List<FriendRequest> friendRequestList, List<User> userList) {
+    public HomeRecyclerViewAdapter(Context context) {
         inflater = LayoutInflater.from(context);
-        this.friendRequestList = friendRequestList;
         this.context = context;
-        this.userList = userList;
+        friendRequestList = new ArrayList<>();
+        userList = new ArrayList<>();
     }
 
     @Override
@@ -161,4 +160,21 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     public int getItemCount() {
         return friendRequestList.size();
     }
+
+    public void setResults(List<FriendRequest> requests, List<User> users) {
+        friendRequestList = new ArrayList<>(requests);
+        userList = new ArrayList<>(users);
+        notifyDataSetChanged();
+    }
+
+    public void updateData(List<FriendRequest> requests, List<User> users) {
+        friendRequestList.addAll(requests);
+        userList.addAll(users);
+        notifyDataSetChanged();
+    }
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
 }

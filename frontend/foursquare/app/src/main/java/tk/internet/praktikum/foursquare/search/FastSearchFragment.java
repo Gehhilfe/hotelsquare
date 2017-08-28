@@ -36,7 +36,9 @@ public class FastSearchFragment extends Fragment {
     private List<String> categoriesAsList;
     private Map<String, List> categoriesMap;
     private RecyclerView rv_fast_search;
-
+    CategoryAdapter adapter;
+    TextView hotelsquare;
+    View view;
 
     private void initCategories() {
         categoriesAsList = new ArrayList<>();
@@ -94,9 +96,6 @@ public class FastSearchFragment extends Fragment {
         }
     }
 
-    CategoryAdapter adapter;
-    TextView hotelsquare;
-    View view;
 
     public FastSearchFragment() {
         // Required empty public constructor
@@ -110,6 +109,8 @@ public class FastSearchFragment extends Fragment {
 
         initCategories();
         createContent();
+
+        //readStaticKeyWords();
         //Log.d(FastSearchFragment.class.getSimpleName(), "Categories");
        // Log.d(FastSearchFragment.class.getSimpleName(), _categories.toString());
 

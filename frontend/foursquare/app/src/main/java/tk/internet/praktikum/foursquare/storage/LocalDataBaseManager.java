@@ -21,7 +21,7 @@ public class LocalDataBaseManager {
          initDatabase();
     }
     public void initDatabase(){
-        DaoMaster.DevOpenHelper helper=new DaoMaster.DevOpenHelper(context,"history-db");
+        DaoMaster.DevOpenHelper helper=new DaoMaster.DevOpenHelper(context,"hotelsquare-db");
         Database database=helper.getWritableDb();
         daoSession=new DaoMaster(database).newSession();
     }
