@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -85,15 +86,6 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
     private String currentUserName;
     private Activity activity;
 
-
-    public InboxRecylcerViewAdapter(Context context, List<Chat> inbox, Activity activity) {
-        inflater = LayoutInflater.from(context);
-        this.chatList = inbox;
-        this.context = context;
-        currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
-        this.activity = activity;
-    }
-
     public InboxRecylcerViewAdapter(Context context, Activity activity) {
         inflater = LayoutInflater.from(context);
         this.context = context;
@@ -122,7 +114,6 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
                 chatPartner = user;
             }
         }
-        // TODO - HIGHLIGHT NEW MESSAGES
 
         if (chatPartner.getAvatar() != null) {
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
@@ -144,6 +135,16 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
 
         if (currentChat.getMessages().size() > 0)
             holder.preview.setText(currentChat.getMessages().get(currentChat.getMessages().size() - 1).getMessage());
+
+        long lastReadMsgTime = LocalStorage.getSharedPreferences(context).getLong(currentChat.getChatId(), -1);
+
+        Date lastMsgRead = new Date(lastReadMsgTime);
+        Date previewDate = currentChat.getMessages().get(0).getDate();
+
+        if (lastMsgRead.compareTo(previewDate) == -1 &&
+                !(currentChat.getMessages().get(currentChat.getMessages().size() - 1).getSender().equals(currentUser))) {
+            holder.sendMsg.setImageResource(R.drawable.ic_email_alert_red);
+        }
     }
 
     @Override

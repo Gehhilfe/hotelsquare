@@ -70,10 +70,12 @@ public class ChatFragment extends Fragment {
                                 messages = chat.getMessages();
                                 if (messages.size() > 0) {
                                     lastMsg = messages.get(0);
+                                    LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveChatDate(chatId, lastMsg.getDate());
                                     Collections.reverse(messages);
                                 }
                                 chatListViewAdapter = new ChatListViewAdapter(messages, chat.getParticipants(), getActivity().getApplicationContext());
                                 chatView.setAdapter(chatListViewAdapter);
+
                                 updateLoop();
                             },
                             throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
@@ -117,6 +119,7 @@ public class ChatFragment extends Fragment {
                                         messages.clear();
                                         messages.addAll(chatResponse.getMessages());
                                         lastMsg = messages.get(0);
+                                        LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveChatDate(chatId, lastMsg.getDate());
                                         Collections.reverse(messages);
                                         chatListViewAdapter.notifyDataSetChanged();
                                     }
@@ -125,6 +128,7 @@ public class ChatFragment extends Fragment {
                                         messages.clear();
                                         messages.addAll(chatResponse.getMessages());
                                         lastMsg = messages.get(0);
+                                        LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveChatDate(chatId, lastMsg.getDate());
                                         Collections.reverse(messages);
                                         chatListViewAdapter.notifyDataSetChanged();
                                     }
