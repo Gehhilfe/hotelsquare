@@ -13,10 +13,10 @@ import android.widget.Toast;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.BooleanSupplier;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
@@ -37,9 +37,8 @@ public class FriendListFragment extends Fragment {
     private int visibleItemCount;
     private int itemCount;
     private int lastVisibleItemPosition;
-    private int firstVisibleItem;
     private int maxLastVisibleItemPosition=0;
-    private boolean done;
+    private boolean done, refresh;
 
 
     @Override
@@ -49,7 +48,6 @@ public class FriendListFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.fl_recyclerview);
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
-        firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
@@ -70,13 +68,17 @@ public class FriendListFragment extends Fragment {
                 itemCount = linearLayoutManager.getItemCount();
                 lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
 
-                if(dy > 0 && (lastVisibleItemPosition + visibleItemCount) >= itemCount && lastVisibleItemPosition % 10 ==9 && !done){
+                if(dy > 0 && (lastVisibleItemPosition + visibleItemCount) >= itemCount && lastVisibleItemPosition % 10 == 9 && !done){
                     maxLastVisibleItemPosition = Math.max(maxLastVisibleItemPosition, lastVisibleItemPosition);
-                    loadFriendList();
+                    if (refresh && !done)
+                        checkForUpdates();
+                    else if (!done)
+                        loadFriendList();
                 }
             }
         });
 
+        refresh = false;
         done = false;
         page = 0;
         loadFriendList();
@@ -84,12 +86,21 @@ public class FriendListFragment extends Fragment {
         return view;
     }
 
-    private void setDone() {
-        done = true;
+    private void setRefresh(boolean refresh) {
+        this.refresh = refresh;
+    }
+
+
+    private void setDone(boolean done) {
+        this.done = done;
     }
 
     private void increasePage() {
         page++;
+    }
+
+    private void resetPage() {
+        page = 0;
     }
 
     private void loadFriendList() {
@@ -105,23 +116,16 @@ public class FriendListFragment extends Fragment {
                             friendListResponse -> {
                                 List<User> friendList = friendListResponse.getFriends();
 
-                                Collections.sort(friendList,new Comparator<User>() {
-                                    @Override
-                                    public int compare(User o1, User o2) {
-                                        return o1.getName().compareTo(o2.getName());
-                                    }
-                                });
-
                                 if (friendList.size() > 0) {
                                     recyclerView.setVisibility(View.VISIBLE);
                                     emptyFriendList.setVisibility(View.GONE);
                                     increasePage();
                                 } else if (friendList.size() == 0 && page > 0){
-                                    setDone();
+                                    setDone(true);
                                 } else {
                                     recyclerView.setVisibility(View.GONE);
                                     emptyFriendList.setVisibility(View.VISIBLE);
-                                    setDone();
+                                    setDone(true);
                                 }
 
                                 flRecyclerViewAdapter.updateList(friendList);
@@ -133,5 +137,64 @@ public class FriendListFragment extends Fragment {
         }catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void checkForUpdates() {
+        ProfileService service = ServiceFactory
+                .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                        getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        try {
+            service.friends(page)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            friendListResponse -> {
+                                List<User> friendList = friendListResponse.getFriends();
+                                List<User> fList = flRecyclerViewAdapter.getFlist();
+
+                                if (friendList.size() > 0) {
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                    emptyFriendList.setVisibility(View.GONE);
+                                    increasePage();
+                                } else if (friendList.size() == 0 && page > 0){
+                                    setDone(true);
+                                    setRefresh(true);
+                                } else {
+                                    recyclerView.setVisibility(View.GONE);
+                                    emptyFriendList.setVisibility(View.VISIBLE);
+                                    setRefresh(true);
+                                    setDone(true);
+                                }
+
+                                for (Iterator<User> iterator = friendList.listIterator(); iterator.hasNext(); ) {
+                                    User tmpUser = iterator.next();
+                                    if (fList.contains(tmpUser))
+                                        iterator.remove();
+                                }
+
+                                if (friendList.size() > 0)
+                                    flRecyclerViewAdapter.updateList(friendList);
+                            },
+                            throwable -> {
+                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                    );
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (getView() != null)
+            if (isVisibleToUser) {
+                refresh = true;
+                setDone(false);
+                resetPage();
+                checkForUpdates();
+            }
+
     }
 }
