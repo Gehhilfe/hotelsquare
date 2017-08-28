@@ -20,8 +20,8 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_search">Suchen</string>
-    <string name="action_search_person">Suche Person</string>
+    <string name="action_search">Orte</string>
+    <string name="action_search_person">Personen</string>
     <string name="action_history">Verlauf</string>
     <string name="action_settings">Einstellung</string>
     <string name="action_me">Profil</string>
