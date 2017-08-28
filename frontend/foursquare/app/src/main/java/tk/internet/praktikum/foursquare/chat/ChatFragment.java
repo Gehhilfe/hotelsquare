@@ -119,6 +119,8 @@ public class ChatFragment extends Fragment {
                                         messages.clear();
                                         messages.addAll(chatResponse.getMessages());
                                         lastMsg = messages.get(0);
+                                        if (getActivity() == null)
+                                            return;
                                         LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveChatDate(chatId, lastMsg.getDate());
                                         Collections.reverse(messages);
                                         chatListViewAdapter.notifyDataSetChanged();
@@ -128,6 +130,8 @@ public class ChatFragment extends Fragment {
                                         messages.clear();
                                         messages.addAll(chatResponse.getMessages());
                                         lastMsg = messages.get(0);
+                                        if (getActivity() == null)
+                                            return;
                                         LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveChatDate(chatId, lastMsg.getDate());
                                         Collections.reverse(messages);
                                         chatListViewAdapter.notifyDataSetChanged();
@@ -135,7 +139,11 @@ public class ChatFragment extends Fragment {
                                 }
 
                             },
-                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                            throwable -> {
+                                if (getActivity() == null)
+                                    return;
+                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
                     );
         }catch (Exception e) {
             e.printStackTrace();
