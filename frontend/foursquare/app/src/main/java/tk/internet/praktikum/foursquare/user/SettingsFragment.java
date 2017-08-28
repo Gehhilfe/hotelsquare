@@ -39,6 +39,7 @@ public class SettingsFragment extends Fragment {
     String TAG = this.getClass().getSimpleName();
     private String URL = "https://dev.ip.stimi.ovh/";
     private User user;
+
     public SettingsFragment() {
         // Required empty public constructor
     }
@@ -72,8 +73,8 @@ public class SettingsFragment extends Fragment {
                 } else {
                     builder = new AlertDialog.Builder(getContext());
                 }
-                builder.setTitle("Delete Account")
-                        .setMessage("Are you sure you want to delete your Profile?")
+                builder.setTitle(R.string.delete_dialog)
+                        .setMessage(R.string.delete_text)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // continue with delete
@@ -123,6 +124,7 @@ public class SettingsFragment extends Fragment {
                 break;
             }
         }
+
         // attaching data adapter to spinner
         selectLanguageSpinner.setAdapter(dataAdapter);
         selectLanguageSpinner.setSelection(selectedIndex,false);
@@ -131,7 +133,6 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getItemAtPosition(position).toString();
-                Log.d("HUSSO", "item is: " + item);
                 int index= langList.indexOf(item);
                 LocalStorage.getLocalStorageInstance(getContext()).setLanguage("LANGUAGE", localeList.get(index));
                // getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commit();

@@ -85,6 +85,8 @@
     <string name="langSelect">Sprache auswählen</string>
     <string name="incognito">Inkonito-Modus</string>
     <string name="delete_profile">Profil löschen</string>
+    <string name="delete_dialog">Profil löschen</string>
+    <string name="delete_text">"Wollen Sie ihr Profile wirklich löschen?</string>
 
     <!-- venue in details -->
     <string name="leaderboard">Bestenliste</string>
