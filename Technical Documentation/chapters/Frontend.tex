@@ -9,7 +9,7 @@ Each step is taken by a Fragment \footnote{\url{https://developer.android.com/gu
 	\centering
 	\caption[]{Venue Search architecture}
 	\label{fig:venue_search}
-\end{figure} 
+\end{figure}
 \subsubsection{Deep Search}
 \subsubsection{Fast Search}
 When user starts the application, the fast search will be firstly displayed. It plays a role as default view of the application. It provides some name suggestions of interest which are written from static strings resource. On it five categories are predefined and each category contains three items (Figure \ref{fig:fastsearch}).
@@ -60,7 +60,7 @@ Deep search only processes in the following cases:
 	\caption[]{Location suggestions}
 	\label{fig:locationSuggestions}
 \end{figure} 
-In order to avoid sending undesired request to the server, the current keyword will be saved as last keyword query. In case 1 und 2, if the current keyword and the saved last keyword query are the same, the request will be not sent. 
+In order to avoid sending undesired request to the server, the current keyword will be saved as last keyword query. In cases 1 und 2, if the current keyword and the saved keyword query are the same, the request will be not sent. 
 
 Two possible view modes are supported:
  \begin{enumerate}
@@ -73,7 +73,7 @@ Two possible view modes are supported:
  	\end{figure}
  	\item Venues on map: it will be described in (\ref{markervenue})
  \end{enumerate}
-There is a correlation between venues on map and venues in the list because only the first mode has an effect on changing the number of returned venues. If the user wants to see all venues pointed in the second mode, firstly he should enable or switch to the first mode then scroll to reach the maximal possible number of venues. 
+There is a correlation between venues on map and venues in the list because only the first mode has an effect on changing the number of returned venues. If the user wants to see all venues pointed in the second mode, firstly he should enable or switch to the first mode then scroll to reach the maximal possible number of venues.
 
 \subsection{Location Awareness}
 
@@ -127,13 +127,13 @@ The venue markers locate the search results on the map. They differ in color, de
 
 If the user clicks on one of the markers an infoWindow shows up, which shows on image and tells the name, the exact rating and if it is open right now or not. With a click on the infoWindow the user is redirected to the \textit{VenueDetails}, where he can find more additional information about the venue.
 
-\subsection{Marker: Friend}
+\subsubsection{Marker: Friend}
 The friend markers locate the friends of the user, if he is logged in and has nearby friends. The marker of the friends is similar to the marker of the user, except it is green.
 The position of his nearby friends are updated everytime, the location of the user changes. 
 
 If the user clicks on on of his friends marker, an \textit{infoWindow} shows up with the avatar and name and if given, also the city and age. With a click on the \textit{infoWindow} the user gets to the profile of his friend.
 
-\subsection{Marker: User}
+\subsubsection{Marker: User}
 The user marker locate the user on the map. If the user clicks on himself, a \textit{infoWindow} shows up. If the user is not logged in, it shows the default \textit{infoWindow} with the default avatar. If the user is logged in, it shows his own avatar and additonal info. 
 
 If he clicks on the \textit{infoWindow} he is redirected to his own profile.
@@ -146,10 +146,10 @@ If he clicks on the \textit{infoWindow} he is redirected to his own profile.
 \end{figure}
 
 
- 
+
 \subsection{Venue in detail}
 By detailing informations of venue, the use not only getting more meaningful information but can also do more actions on it. The informations are distributed in two parts. The first one is the detailed about venue; including name, address, number of check-ins, price level and images.
-In addition to it, the location is also pointed on a small map. By clicking on location on map the user can always directly utilize two optional functionalities of Googlemap. With the same action on Call Button he can also make a phone call to owner of venue or check in, if he is interested in it (Figure \ref{fig:detailedInformationsOfVenue}). 
+In addition to it, the location is also pointed on a small map. By clicking on location on map the user can always directly utilize two optional functionalities of Googlemap. With the same action on Call Button he can also make a phone call to owner of venue or check in, if he is interested in it (Figure \ref{fig:detailedInformationsOfVenue}).
 \begin{figure}[htbp]
 	\includegraphics[width=0.8\textwidth]{images/venueInDetail_Part_1.jpg}
 	\centering
@@ -157,7 +157,7 @@ In addition to it, the location is also pointed on a small map. By clicking on l
 	\label{fig:detailedInformationsOfVenue}
 \end{figure}
 
-The second part is the previous activities of users on venue. That consits of a leaderboard of three available check-ins, top-ten check-ins and list of comments( text comments and image comments). The leaderboard is sorted by the number of users check-ins. The two others are sorted by decreasing order of time. On each comment two like and unlike buttons are provided, therefore the user can consider to do actions on it. From this view, if he clicks on profile or username, he will be redirected to the selected user profile(Figure \ref{fig:previous_activities}). 
+The second part is the previous activities of users on venue. That consits of a leaderboard of three available check-ins, top-ten check-ins and list of comments( text comments and image comments). The leaderboard is sorted by the number of users check-ins. The two others are sorted by decreasing order of time. On each comment two like and unlike buttons are provided, therefore the user can consider to do actions on it. From this view, if he clicks on profile or username, he will be redirected to the selected user profile(Figure \ref{fig:previous_activities}).
 The last one is floating menu user activities. With floating menu\footnote{\url{https://github.com/Clans/FloatingActionButton}} it is possible to minimize the spaces on the view and floating buttons will appear when these are needed according to opinion of the user. Moreover, in any time he can post text(Figure \ref{fig:textcomment}) or image(Figure \ref{fig:imagecomment}) on this venue or can obtain all images of venue(Figure \ref{fig:overimages}). On the overview of images the user can see fullscreen image by swiping left or right on selected image(Figure \ref{fig:swipeimage}).
 
 \begin{figure}[htbp]
@@ -182,6 +182,16 @@ The last one is floating menu user activities. With floating menu\footnote{\url{
 	\endminipage\hfill
 
 \end{figure}
-	
+
+\subsection{Settings}
+The SettingsFragment mainly provides three functionalities for logged-in users.
+
+\begin{itemize}
+\item \textbf{Language Selection:} The user has the ability to change the language of the app. There are two different languages supported: \textit{Deutsch} and \textit{English}. With a simple spinner he can change the app to his preferred language. Technically the language than is stored in the local storage and the strings are changed depending on that value.
+\item \textbf{Incognito-Mode:} The \textit{Incognito-Mode} provides the user more privacy by not showing his position to anyone especially his nearby friends. The mode ist selected by a CheckBox to toggle the \textit{Incognito-Mode} The information, that the user wants to be not seen by anyone is then send to the server.
+\item \textbf{Delete Profile:} This button provides the user the opportunity to delete his \textit{HOTELsquare} account. If he clicks on it, a dialog is open to make sure he knows what he is doing. If he confirm his choice, his profile is deleted, otherwise nothing happens.
+\end{itemize}
+
+The language selection is also available for user without a \textit{HOTELsquare} account.
 
 

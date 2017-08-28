@@ -83,6 +83,9 @@
     <string name="langSelect">Select language</string>
     <string name="incognito">Incognito Mode</string>
     <string name="delete_profile">Delete Profile</string>
+    <string name="delete_dialog">Delete Profile</string>
+    <string name="delete_text">"Are you sure you want to delete your Profile?</string>
+
     <!-- venue in details -->
     <string name="leaderboard">Leaderboard</string>
     <string name="last_checkins">Last Checkins</string>
