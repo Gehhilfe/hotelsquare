@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.foursquare.R;
@@ -95,10 +97,16 @@ public class LoginFragment extends Fragment {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
 
-        if (getArguments().getBoolean("UserActivity"))
-            getActivity().setResult(3, null);
-        else
+        String destination = getArguments().getString("Destination");
+
+        if (Objects.equals(destination, "FastSearch"))
             getActivity().setResult(2, null);
+        else if (Objects.equals(destination, "PersonSearch"))
+            getActivity().setResult(3, null);
+        else if (Objects.equals(destination, "History"))
+            getActivity().setResult(4, null);
+        else if (Objects.equals(destination, "MyProfile"))
+            getActivity().setResult(5, null);
 
         getActivity().finish();
     }
