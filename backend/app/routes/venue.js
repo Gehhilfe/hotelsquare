@@ -160,7 +160,13 @@ async function queryVenue(request, response, next) {
     let venues = await searchVenuesInDB(location, keyword, radius, price, page, 10);
     venues = _.map(venues, (v) => v.toJSONSearchResult());
     if (only_open) {
-        venues = _.filter(venues, (v) => v.isOpen());
+        venues = _.filter(venues, (v) => {
+            try {
+                v.isOpen();
+            } catch (err) {
+                return false;
+            }
+        });
     }
     response.send({
         location: location,
