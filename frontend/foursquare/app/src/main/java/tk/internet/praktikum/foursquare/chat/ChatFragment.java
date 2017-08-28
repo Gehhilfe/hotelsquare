@@ -148,22 +148,6 @@ public class ChatFragment extends Fragment {
         }catch (Exception e) {
             e.printStackTrace();
         }
-        /*
-        try {
-            service.getConversation(chatId, messages.get(0).getId())
-                    .repeatWhen(done -> done.delay(10, TimeUnit.SECONDS))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            chatResponse -> {
-                                messages.addAll(chatResponse.getMessages());
-                                chatListViewAdapter.notifyDataSetChanged();
-                            },
-                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
-                    );
-        }catch (Exception e) {
-            e.printStackTrace();
-        }*/
     }
 
     private void send() {
