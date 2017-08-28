@@ -139,11 +139,13 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         long lastReadMsgTime = LocalStorage.getSharedPreferences(context).getLong(currentChat.getChatId(), -1);
 
         Date lastMsgRead = new Date(lastReadMsgTime);
-        Date previewDate = currentChat.getMessages().get(0).getDate();
+        if (currentChat.getMessages().size() > 0) {
+            Date previewDate = currentChat.getMessages().get(0).getDate();
 
-        if (lastMsgRead.compareTo(previewDate) == -1 &&
-                !(currentChat.getMessages().get(currentChat.getMessages().size() - 1).getSender().equals(currentUser))) {
-            holder.sendMsg.setImageResource(R.drawable.ic_email_alert_red);
+            if (lastMsgRead.compareTo(previewDate) == -1 &&
+                    !(currentChat.getMessages().get(currentChat.getMessages().size() - 1).getSender().equals(currentUser))) {
+                holder.sendMsg.setImageResource(R.drawable.ic_email_alert_red);
+            }
         }
     }
 
