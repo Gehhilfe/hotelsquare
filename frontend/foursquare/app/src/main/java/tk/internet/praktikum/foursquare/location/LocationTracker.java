@@ -114,7 +114,6 @@ public class LocationTracker implements
         // No Permissions
         if ((ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 && (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            //TODO: Get Permissions in Runtime isn't that easy due to the need of an activtiy reference, maybe somewhere else
             Toast.makeText(context,R.string.permissongrant, Toast.LENGTH_LONG).show();
             return;
         }
@@ -135,7 +134,6 @@ public class LocationTracker implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        //TODO: Handle somehow?
         Log.d(TAG, "Connection failed: " + connectionResult.toString());
     }
 
