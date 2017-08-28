@@ -1,6 +1,71 @@
 \section{Frontend}
 \label{sec:frontend}
 
+\subsection{Venue Search}
+Venue Search is one of the main part of the application. When users want to search for their interest, they will experience two steps. The first is fast search and the second is deep search
+\subsubsection{Fast Search}
+When user starts the application, the fast search will be firstly displayed. It plays a role as default view of the application. It provides some name suggestions of interest which are written from static strings resource. On it five categories are predefined and each category contains three items (Figure \ref{fig:fastsearch}).
+\begin{itemize}
+	 \item Food and Drinks: beer, cafe, veggie
+	 \item Holiday and Relaxation: beach, castle, zoo
+	 \item Services: bank, gas station, car wash
+	 \item Shops: supermarket, florist, music
+	 \item Infrastructure: airport, harbor, e-charging station
+\end{itemize}
+
+ By clicking on one of the suggested name or search bar it will be redirected to Deep Search.
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/fastsearch.png}
+	\centering
+	\caption[]{Fast Search with suggestion names of interest}
+	\label{fig:fastsearch}
+\end{figure} 
+\subsubsection{Deep Search}
+
+In order to find out venues, a query should be defined. It includes three parts, the first is keyword which can be name of interest selected in fast search or typed text in search bar in deep search, the second are filters, the last one is a page number. There are two types of filters, the location is mandatory and  radius, price and open now  are optional. The location can be the name of cities, countries or the current GPS value of users.
+When user types text in search bar, the application will suggest some names of interest that are 
+read from local database. When the app starts for the first time, the keyword suggestions  are read from static strings resource then inserted into local database. Additionally, they are also dynamically extracted from types of venues and typed text by the user which has been not located in the local database (Figure \ref{fig:keywordSuggestions}).
+
+If the user doesn't have any input in location filter, the "near me" mode will be enabled. That means searching for all venues around the current location of the user by GPS value. It also plays a role as default search mode when redirecting from fast search to deep search. Otherwise, users have to give desired location name. However, it is not needed to give the complete meaningful location name. The application will take a suggested list of locations from the server then provides for him (Figure \ref{fig:locationSuggestions}).
+The page number is the pivot for obtaining corresponding number of venues. It will be clarifyed in the next section.
+Deep search only processes in the following cases:
+\begin{enumerate}
+	\item Submit keyword in search bar
+	\item Select keyword from suggested names
+	\item Select item from suggested locations
+	\item Change radius values
+	\item Select and deselect price values(from 1 to 5)
+	\item Select and deselect open now filter
+\end{enumerate}
+
+
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/suggestedkeywords.jpg}
+	\centering
+	\caption[]{Keyword suggestions}
+	\label{fig:keywordSuggestions}
+\end{figure} 
+
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/suggestedlocations.jpg}
+	\centering
+	\caption[]{Location suggestions}
+	\label{fig:locationSuggestions}
+\end{figure} 
+In order to avoid sending undesired request to the server, the current keyword will be saved as last keyword query. In case 1 und 2, if the current keyword and the saved last keyword query are the same, the request will be not sent. 
+
+Two possible view are provided:
+ \begin{enumerate}
+ 	\item Venues in list: For each request are only 10 venues returned. The first reqest starts with the page number 0 to obtain the first 10 venues. As the user scrolls list until a index position which modulo 10 is equals to 9, the page number will be increased by one and the next quest with the same content query will be sent. In this case are only the basic information( venue name, rating and venue image) displayed (Figure \ref{fig:venuesInlist}) .
+ 	\begin{figure}[htbp]
+ 		\includegraphics[width=0.8\textwidth]{images/venuesonlist.jpg}
+ 		\centering
+ 		\caption[]{Venues in list}
+ 		\label{fig:venuesInlist}
+ 	\end{figure}
+ 	\item Venues on map: it will be described in (\ref{markervenue})
+ \end{enumerate}
+ 
 \subsection{Location Awareness}
 
 To provide the possibility to find nearby venues and friends the application needs to be aware of the location of the user and his friends. A background service which tracks the location of the users has been implemented to achieve this. The location data is then provided to the search, the map and the server.
@@ -34,12 +99,12 @@ To communicate between the service and the acticity and fragements the \textit{g
 \item The \textit{VenueOnMapFragment} receives the \textit{LocationEvent} to update the location of the user on the map and also the location of his friends if the user is logged in
 \end{itemize}
 
-\subsection{The Map}
+\subsection{The Map} \label{markervenue}
 The map is used as a function to show the user graphically where he and his nearby friends are and also the searched venues. The functionality of the map in inside the \textit{VenuesOnMapFragment}, which is part of the \textit{MainActivity}. The map itself is provided by \textit{GoogleMaps}.
 
 There are three different kinds of markers shown on the map. If the user clicks on any marker, a button shows up, which allows him to change to \textit{GoogleMaps} and gets the route to the chosen marker. 
 
-\subsubsection{Marker: Venue}
+\subsubsection{Marker: Venue} 
 The venue markers locate the search results on the map. They differ in color, depending on the rating of the venue. Those colors are with the following more or less obvious order:
 
 \begin{itemize}
@@ -64,7 +129,13 @@ The user marker locate the user on the map. If the user clicks on himself, a \te
 
 If he clicks on the \textit{infoWindow} he is redirected to his own profile.
 
- 
+\begin{figure}[htbp]
+ 	\includegraphics[width=0.8\textwidth]{images/venuesonmap.jpg}
+ 	\centering
+ 	\caption[]{Venues, friends and user on map}
+ 	\label{fig:venuesonmap}
+\end{figure}
+
 
 
 
