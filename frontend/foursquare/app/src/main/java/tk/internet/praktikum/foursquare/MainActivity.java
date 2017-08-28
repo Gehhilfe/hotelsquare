@@ -346,11 +346,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("LOCATION", "StartService");
         if (!isMyServiceRunning(LocationService.class))
             startService(new Intent(this, LocationService.class)); // start tracking service
 
-        // off-topic -> ignore this
+        // register on EventBus
         if (!(EventBus.getDefault().isRegistered(this))) {
             EventBus.getDefault().register(this);
         }
@@ -381,8 +380,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onDestroy() {
         stopService(new Intent(this, LocationService.class)); // stop tracking service
-        Log.d("LOCATION", "StopService");
-        // off-topic -> ignore this
+        // unregister from EventBus
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
@@ -400,7 +398,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LocationTracker.LocationEvent event) {
-        Log.d("SUBSRIBE", "This is: " + event.location);
         oldUserLocation = userLocation;
         // Update User Location on Map
         userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
@@ -436,7 +433,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                                 locationUser = user;
-                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
                                 if(!alreadystarted){
                                     updateLoop();
                                 }
@@ -497,7 +493,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                                 locationUser = user;
-                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
                             },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -510,15 +505,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private boolean checkLocationChange() {
-        if(userLocation.getLatitude().equals(oldUserLocation.getLatitude()) && userLocation.getLongitude().equals(oldUserLocation.getLongitude())){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
+    /**
+     * Request the need permissions
+     */
     private void requestNeededPermissions() {
 
         if (ContextCompat.checkSelfPermission(this,
@@ -539,20 +528,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 }
