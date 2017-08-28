@@ -615,15 +615,22 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
             public void onClick(View v) {
                 SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
                 String userName = sharedPreferences.getString(Constants.NAME, "");
-                if (user.getName().equals(userName)) {
-                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                    intent.putExtra("userID", user.getId());
-                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
-                    startActivity(intent);
+                try {
+                    if (user.getName().equals(userName)) {
+                        Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                        intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                        intent.putExtra("userID", user.getId());
+                        intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                }
+                catch (Exception exception){
+                    Log.i(LOG,exception.getMessage());
                 }
 
             }
