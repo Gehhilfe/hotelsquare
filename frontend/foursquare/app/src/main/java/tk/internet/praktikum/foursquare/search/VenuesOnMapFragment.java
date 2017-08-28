@@ -570,7 +570,10 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .subscribe(bitmap -> {
                                                 userImage = bitmap;
-                                            });
+                                            },
+                                                    throwable -> {
+                                                        Log.d(LOG, "Exception: " + throwable.getMessage());
+                                                    });
                                 }, throwable ->{
                                     Log.d(LOG, "Exception: " + throwable.getMessage());
                                 });
