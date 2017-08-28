@@ -511,25 +511,30 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         if (!(LocalStorage.
                 getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("")) {
 
-            if (profileService == null) {
+            try {
 
-                profileService = ServiceFactory
-                        .createRetrofitService(ProfileService.class, URL, LocalStorage.
-                                getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+                if (profileService == null) {
+
+                    profileService = ServiceFactory
+                            .createRetrofitService(ProfileService.class, URL, LocalStorage.
+                                    getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+                }
+                profileService.getNearByFriends(userLocation)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(nearbyFriends -> {
+                                    friends = nearbyFriends;
+                                    for (User f : friends) {
+                                        // for every user
+                                        updateFriendsLocation(f);
+                                    }
+                                },
+                                throwable -> {
+                                    Log.d(LOG, "Exception: " + throwable.getMessage());
+                                });
+            }catch(Exception e){
+                e.printStackTrace();
             }
-            profileService.getNearByFriends(userLocation)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(nearbyFriends -> {
-                                friends = nearbyFriends;
-                                for (User f : friends) {
-                                    // for every user
-                                    updateFriendsLocation(f);
-                                }
-                            },
-                            throwable -> {
-                                Log.d(LOG, "Exception: " + throwable.getMessage());
-                            });
         }
     }
 
