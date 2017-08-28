@@ -51,6 +51,7 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
                 loadProfile();
             } else {
                 startChat();
+                sendMsg.setImageDrawable(null);
             }
 
         }
@@ -154,8 +155,35 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         return chatList.size();
     }
 
-    public void setResults(List<Chat> data) {
+    public void updateChatList(List<Chat> data) {
+        for (Chat currentNewChat : data) {
+            if (containsChat(currentNewChat)) {
+                for (int i = 0; i < chatList.size(); i++) {
+                    if (chatList.get(i).getChatId().equals(currentNewChat.getChatId())) {
+                        chatList.set(i, currentNewChat);
+                        break;
+                    }
+                }
+            } else
+                chatList.add(currentNewChat);
+        }
+
+        notifyDataSetChanged();
+    }
+
+    private boolean containsChat(Chat chat2) {
+        for (Chat chat : chatList)
+            if (chat.getChatId().equals(chat2.getChatId()))
+                return true;
+        return false;
+    }
+
+    public void setChatList(List<Chat> data) {
         chatList = new ArrayList<>(data);
         notifyDataSetChanged();
+    }
+
+    public List<Chat> getChatList() {
+        return chatList;
     }
 }

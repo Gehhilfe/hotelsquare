@@ -54,6 +54,10 @@ public class UserActivity extends AppCompatActivity  {
         container.setAdapter(userStatePagerAdapter);
     }
 
+    public ViewPager getViewPager() {
+        return fragmentContainer;
+    }
+
     @Override
     public Intent getSupportParentActivityIntent() {
         return getParentActivityIntentImpl();
