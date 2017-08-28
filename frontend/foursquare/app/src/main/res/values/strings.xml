@@ -144,6 +144,9 @@
     <string name="home_no_current_requests">Currently there are no pending friend requests.</string>
     <string name="friendlist_no_friends">No Friends? Why don\'t you just start to search some with Hotlesquare</string>
     <string name="inbox_no_chats">Currently there are no open conversations from you.</string>
+    <string name="send_friendrequest">Your friend request was sent.</string>
+    <string name="pending_friendrequest">There is still a pending friend request.</string>
+
 
     <!--- C1-->
     <array name="beer">
