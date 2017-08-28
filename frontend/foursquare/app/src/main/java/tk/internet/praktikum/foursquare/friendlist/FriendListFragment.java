@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.BooleanSupplier;
 import io.reactivex.schedulers.Schedulers;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.R;
@@ -31,20 +32,64 @@ public class FriendListFragment extends Fragment {
     private TextView emptyFriendList;
     private final String URL = "https://dev.ip.stimi.ovh/";
     private FLRecyclerViewAdapter flRecyclerViewAdapter;
+    private LinearLayoutManager linearLayoutManager;
+    private int page;
+    private int visibleItemCount;
+    private int itemCount;
+    private int lastVisibleItemPosition;
+    private int firstVisibleItem;
+    private int maxLastVisibleItemPosition=0;
+    private boolean done;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friendlist, container, false);
         emptyFriendList = (TextView) view.findViewById(R.id.friendlist_empty_view);
         recyclerView = (RecyclerView) view.findViewById(R.id.fl_recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        linearLayoutManager = new LinearLayoutManager(getActivity());
+        firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
         flRecyclerViewAdapter = new FLRecyclerViewAdapter(getContext(), getActivity());
         recyclerView.setAdapter(flRecyclerViewAdapter);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                visibleItemCount = linearLayoutManager.getChildCount();
+                itemCount = linearLayoutManager.getItemCount();
+                lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
+
+                if(dy > 0 && (lastVisibleItemPosition + visibleItemCount) >= itemCount && lastVisibleItemPosition % 10 ==9 && !done){
+                    maxLastVisibleItemPosition = Math.max(maxLastVisibleItemPosition, lastVisibleItemPosition);
+                    loadFriendList();
+                }
+            }
+        });
+
+        done = false;
+        page = 0;
         loadFriendList();
 
         return view;
+    }
+
+    private void setDone() {
+        done = true;
+    }
+
+    private void increasePage() {
+        page++;
     }
 
     private void loadFriendList() {
@@ -53,18 +98,13 @@ public class FriendListFragment extends Fragment {
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
 
         try {
-            service.friends(0)
+            service.friends(page)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             friendListResponse -> {
                                 List<User> friendList = friendListResponse.getFriends();
- /*                               friendList.sort(new Comparator<User>() {
-                                    @Override
-                                    public int compare(User o1, User o2) {
-                                        return o1.getName().compareTo(o2.getName());
-                                    }
-                                });*/
+
                                 Collections.sort(friendList,new Comparator<User>() {
                                     @Override
                                     public int compare(User o1, User o2) {
@@ -75,12 +115,16 @@ public class FriendListFragment extends Fragment {
                                 if (friendList.size() > 0) {
                                     recyclerView.setVisibility(View.VISIBLE);
                                     emptyFriendList.setVisibility(View.GONE);
+                                    increasePage();
+                                } else if (friendList.size() == 0 && page > 0){
+                                    setDone();
                                 } else {
                                     recyclerView.setVisibility(View.GONE);
                                     emptyFriendList.setVisibility(View.VISIBLE);
+                                    setDone();
                                 }
 
-                                flRecyclerViewAdapter.setResults(friendList);
+                                flRecyclerViewAdapter.updateList(friendList);
                             },
                             throwable -> {
                                 Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();

@@ -96,13 +96,6 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     private LayoutInflater inflater;
     private List<User> friendList;
 
-    public FLRecyclerViewAdapter(Context context, ArrayList<User> friendList, Activity activity) {
-        inflater = LayoutInflater.from(context);
-        this.friendList = friendList;
-        this.context = context;
-        this.activity = activity;
-    }
-
     public FLRecyclerViewAdapter(Context context, Activity activity) {
         inflater = LayoutInflater.from(context);
         friendList = new ArrayList<>();
@@ -146,6 +139,11 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
 
     public void setResults(List<User> data) {
         friendList = new ArrayList<>(data);
+        notifyDataSetChanged();
+    }
+
+    public void updateList(List<User> data) {
+        friendList.addAll(data);
         notifyDataSetChanged();
     }
 }

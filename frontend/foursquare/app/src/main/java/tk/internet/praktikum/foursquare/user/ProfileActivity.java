@@ -262,7 +262,9 @@ public class ProfileActivity extends AppCompatActivity {
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                            user -> {},
+                            user -> {
+                                Toast.makeText(getApplicationContext(), "Passt...", Toast.LENGTH_SHORT).show();
+                            },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
