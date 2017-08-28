@@ -94,13 +94,13 @@ public class VenuesListFragment extends Fragment {
            searchResultAdapter.addMoreVenues(venues);
         }
 
-        for(Venue venue:venues){
+       /* for(Venue venue:venues){
             System.out.println(venue.getName());
-        }
-        System.out.println("**** all venues:");
-        for(Venue venue:searchResultAdapter.getSearchResultViewHolderList()){
+        }*/
+        System.out.println("**** all venues:" +venues.size());
+       /* for(Venue venue:searchResultAdapter.getSearchResultViewHolderList()){
             System.out.println(venue.getName()+"---"+venue.getId()+"--ad:"+venue.getLocation().getLatitude()+"--"+venue.getLocation().getLongitude());
-        }
+        }*/
 
 
     }
@@ -121,17 +121,17 @@ public class VenuesListFragment extends Fragment {
                 itemCount = linearLayoutManager.getItemCount();
                 lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
                 currentVisibleItem=linearLayoutManager.findFirstVisibleItemPosition();
-                System.out.println("dy: "+dy);
+              /*  System.out.println("dy: "+dy);
                 System.out.println("lastVisibleItemPosition "+lastVisibleItemPosition);
                 System.out.println("visibleItemCount "+visibleItemCount);
-                System.out.println("itemCount: "+itemCount);
+                System.out.println("itemCount: "+itemCount);*/
                 if(dy>0&&(lastVisibleItemPosition+visibleItemCount)>=itemCount &&lastVisibleItemPosition%10==9 && !parent.isReachedMaxVenues() ){
                     parent.setSubmitNewQuery(false);
-                    System.out.println("**** get next page");
-                    System.out.println("parentFragment: "+parent);
+                   // System.out.println("**** get next page");
+                    //System.out.println("parentFragment: "+parent);
                     currentPage=parent.getCurrentPage()+1;
                     parent.setCurrentPage(currentPage);
-                    System.out.println("current Page: "+parent.getCurrentPage());
+                   // System.out.println("current Page: "+parent.getCurrentPage());
                     maxLastVisibleItemPosition=Math.max(maxLastVisibleItemPosition,lastVisibleItemPosition);
                     parent.deepSearch();
                 }

@@ -1,11 +1,9 @@
 package tk.internet.praktikum.foursquare.search;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -387,32 +385,31 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
         //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(centerLocation.getLatitude(), centerLocation.getLongitude()), 14));
         if (venues.size() <= 10) {
             //dynamicZoomLevel(locations, 1);
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locations[0].getLatitude(), locations[0].getLongitude()), 12));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locations[0].getLatitude(), locations[0].getLongitude()), 13));
         }
-        else {
-            int nbPOI;
-            if(venues.size()>100){
-               // nbPOI=venues.size()/50;
-                nbPOI=1;
+        else if (venues.size()>100) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locations[0].getLatitude(), locations[0].getLongitude()), 9));
+
+        }
+        else{
+            int  nbPOI = venues.size() / 5;
+            dynamicZoomLevel(locations, nbPOI);
+              /*  ProgressDialog progressDialog = new ProgressDialog(getActivity(), 1);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setMessage("Venues on map...");
+                progressDialog.show();
+                dynamicZoomLevel(locations, nbPOI);
+                Runnable dynamicUpdateZoomLevel = new Runnable() {
+                    @Override
+                    public void run() {
+                        dynamicZoomLevel(locations, nbPOI);
+                    }
+                };
+                Handler handler = new Handler();
+                handler.post(dynamicUpdateZoomLevel);
+                progressDialog.dismiss();*/
             }
-            else
-                nbPOI=venues.size()/5;
 
-            ProgressDialog  progressDialog = new ProgressDialog(getActivity(), 1);
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Venues on map...");
-            progressDialog.show();
-
-            Runnable dynamicUpdateZoomLevel = new Runnable() {
-                @Override
-                public void run() {
-                    dynamicZoomLevel(locations,nbPOI);
-                }
-            };
-            Handler handler = new Handler();
-            handler.post(dynamicUpdateZoomLevel);
-            progressDialog.dismiss();
-        }
 
     }
 
