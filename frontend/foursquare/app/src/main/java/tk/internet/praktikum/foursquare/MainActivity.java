@@ -243,6 +243,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         avatar.setVisibility(View.GONE);
         userName.setVisibility(View.GONE);
         hotelsquare.setVisibility(View.VISIBLE);
+        FastSearchFragment searchFragment = new FastSearchFragment();
+        redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
     }
 
 
@@ -302,6 +304,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (resultCode == RESULT_LOGIN) {
                     initialiseNavigationHeader();
                     loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    FastSearchFragment searchFragment = new FastSearchFragment();
+                    redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
                     break;
                 } else if (resultCode == RESULT_USER_ACTIVITY) {
                     initialiseNavigationHeader();
