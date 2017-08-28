@@ -8,9 +8,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +46,16 @@ public class RegisterFragment extends Fragment {
 
         registerBtn.setOnClickListener(v -> register());
 
-       loginLbl.setOnClickListener(v -> ((LoginActivity) getActivity()).changeFragment(0));
+        loginLbl.setOnClickListener(v -> ((LoginActivity) getActivity()).changeFragment(0));
+
+        passwordInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE)
+                    register();
+                return true;
+            }
+        });
 
         return view;
     }

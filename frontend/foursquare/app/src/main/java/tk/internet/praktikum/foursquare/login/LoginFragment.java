@@ -6,12 +6,16 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -43,6 +47,14 @@ public class LoginFragment extends Fragment {
         registerLbl.setOnClickListener(v -> register());
         passwordForgottenLbl.setOnClickListener(v -> restorePassword());
 
+        passwordInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE)
+                    login();
+                return true;
+            }
+        });
         return view;
     }
 
@@ -95,10 +107,16 @@ public class LoginFragment extends Fragment {
         Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
 
-        if (getArguments().getBoolean("UserActivity"))
-            getActivity().setResult(3, null);
-        else
+        String destination = getArguments().getString("Destination");
+
+        if (Objects.equals(destination, "FastSearch"))
             getActivity().setResult(2, null);
+        else if (Objects.equals(destination, "PersonSearch"))
+            getActivity().setResult(3, null);
+        else if (Objects.equals(destination, "History"))
+            getActivity().setResult(4, null);
+        else if (Objects.equals(destination, "MyProfile"))
+            getActivity().setResult(5, null);
 
         getActivity().finish();
     }

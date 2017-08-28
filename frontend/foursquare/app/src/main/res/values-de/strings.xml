@@ -20,8 +20,8 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_search">Suchen</string>
-    <string name="action_search_person">Suche Person</string>
+    <string name="action_search">Orte</string>
+    <string name="action_search_person">Personen</string>
     <string name="action_history">Verlauf</string>
     <string name="action_settings">Einstellung</string>
     <string name="action_me">Profil</string>
@@ -131,6 +131,9 @@
     <string name="home_no_current_requests">Zurzeit hast du keine ausstehende Freundesanfrage.</string>
     <string name="friendlist_no_friends">Keine Freunde? Warum suchst du nicht einfach welche mit Hotelsquare!</string>
     <string name="inbox_no_chats">Zurzeit hast du keine offenen Unterhaltungen.</string>
+    <string name="send_friendrequest">Die Freundesanfrage wurde verschickt.</string>
+    <string name="pending_friendrequest">Freundschaftanfrage wurde bereits versand.</string>
+
 
     <!--- C1-->
     <array name="beer">

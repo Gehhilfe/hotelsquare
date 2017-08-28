@@ -1,7 +1,5 @@
 package tk.internet.praktikum.foursquare.login;
 
-//import android.app.FragmentTransaction;
-
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -41,20 +39,15 @@ public class LoginActivity extends AppCompatActivity {
         addFragment();
     }
 
-
-
     public void addFragment() {
         loginFragment = new LoginFragment();
         Bundle arg = new Bundle();
-        arg.putBoolean("UserActivity", getIntent().getBooleanExtra("UserActivity", false));
+        arg.putString("Destination", getIntent().getStringExtra("Destination"));
         loginFragment.setArguments(arg);
         getSupportFragmentManager().beginTransaction().add(R.id.login_layout, loginFragment).commit();
-        //getFragmentManager().beginTransaction().add(R.id.login_layout, loginFragment).commit();
     }
 
     public void changeFragment(int fragmentId) {
-        //FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
         switch (fragmentId) {

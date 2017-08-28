@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -96,13 +97,6 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     private LayoutInflater inflater;
     private List<User> friendList;
 
-    public FLRecyclerViewAdapter(Context context, ArrayList<User> friendList, Activity activity) {
-        inflater = LayoutInflater.from(context);
-        this.friendList = friendList;
-        this.context = context;
-        this.activity = activity;
-    }
-
     public FLRecyclerViewAdapter(Context context, Activity activity) {
         inflater = LayoutInflater.from(context);
         friendList = new ArrayList<>();
@@ -144,8 +138,20 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
         return friendList.size();
     }
 
-    public void setResults(List<User> data) {
-        friendList = new ArrayList<>(data);
+
+    public void updateList(List<User> data) {
+        friendList.addAll(data);
+        Collections.sort(friendList,new Comparator<User>() {
+            @Override
+            public int compare(User o1, User o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
         notifyDataSetChanged();
     }
+
+    public List<User> getFlist() {
+        return friendList;
+    }
+
 }

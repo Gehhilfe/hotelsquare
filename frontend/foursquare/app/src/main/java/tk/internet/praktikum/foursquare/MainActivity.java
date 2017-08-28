@@ -61,9 +61,11 @@ import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final int REQUEST_LOGIN = 0;
-    private final int REQUEST_ME = 6;
-    private final int RESULT_USER_ACTIVITY = 3;
-    private final int RESULT_LOGIN = 2;
+    private final int RESULT_FAST_SEARCH = 2;
+    private final int RESULT_PERSON_SEARCH = 3;
+    private final int RESULT_HISTORY = 4;
+    private final int RESULT_USER_ACTIVITY = 5;
+
 
     private TextView userName, hotelsquare;
     private ImageView avatar;
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private User locationUser = new User();
     private int PARAM_INTERVAL = 10;
     private NavigationView navigationView;
-    private MenuItem loginMenu;
+    private MenuItem loginMenu, fastSearchMenu, personSearchMenu, historyMenu;
     private static boolean alreadystarted = false;
 
 
@@ -105,15 +107,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         userName = (TextView) parentView.findViewById(R.id.nav_header_name);
         hotelsquare = (TextView) parentView.findViewById(R.id.nav_hotelsquare);
         avatar = (ImageView) parentView.findViewById(R.id.nav_header_avatar);
+        avatar.setOnClickListener(v -> meNavigation());
 
-        Menu tmpMenu = navigationView.getMenu();
-        loginMenu = null;
-        for (int i = 0; i < tmpMenu.size(); i++) {
-            tmpMenu.getItem(i);
-            if (tmpMenu.getItem(i).getItemId() == R.id.nav_login_logout) {
-                loginMenu = tmpMenu.getItem(i);
-            }
-        }
+        initialiseMenuItems(navigationView.getMenu());
+
         readStaticKeyWords();
         if (LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             initialiseNavigationHeader();
@@ -130,6 +127,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sendLocation();
     }
 
+    private void initialiseMenuItems(Menu menu) {
+        for (int i = 0; i < menu.size(); i++) {
+            menu.getItem(i);
+            if (menu.getItem(i).getItemId() == R.id.nav_login_logout) {
+                loginMenu = menu.getItem(i);
+            } else if (menu.getItem(i).getItemId() == R.id.nav_search) {
+                fastSearchMenu = menu.getItem(i);
+            } else if (menu.getItem(i).getItemId() == R.id.nav_search_person) {
+                personSearchMenu = menu.getItem(i);
+            } else if (menu.getItem(i).getItemId() == R.id.nav_history) {
+                historyMenu = menu.getItem(i);
+            }
+        }
+    }
 
     private void initialiseNavigationHeader() {
         ProfileService service = ServiceFactory
@@ -195,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         try {
             Fragment fragment = FastSearchFragment.class.newInstance();
             redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search));
-            setTitle(item);
+            setTitle("Hotelsquare");
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -204,23 +215,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void searchPersonNavigation(MenuItem item) {
-        PersonSearchFragment fragment = new PersonSearchFragment();
-        redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search_person));
-        setTitle(item);
+        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
+            login("PersonSearch");
+        } else {
+            PersonSearchFragment fragment = new PersonSearchFragment();
+            redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search_person));
+            setTitle(item);
+        }
     }
 
     private void historyNavigation(MenuItem item) {
-        HistoryFragment fragment = new HistoryFragment();
-        redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_history));
-        setTitle(item);
+        if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
+            login("History");
+        } else {
+            HistoryFragment fragment = new HistoryFragment();
+            redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_history));
+            setTitle(item);
+        }
     }
 
     private void meNavigation() {
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-            login(true);
+            login("MyProfile");
         } else {
             Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-            startActivityForResult(intent, REQUEST_ME);
+            startActivity(intent);
         }
     }
 
@@ -231,9 +250,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setTitle(item);
     }
 
-    private void login(boolean destination) {
+    private void login(String destination) {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        intent.putExtra("UserActivity", destination);
+        intent.putExtra("Destination", destination);
         startActivityForResult(intent, REQUEST_LOGIN);
     }
 
@@ -243,6 +262,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         avatar.setVisibility(View.GONE);
         userName.setVisibility(View.GONE);
         hotelsquare.setVisibility(View.VISIBLE);
+        FastSearchFragment searchFragment = new FastSearchFragment();
+        redirectToFragment(searchFragment, getApplicationContext().getResources().getString(R.string.action_search));
+        setTitle("Hotelsquare");
     }
 
 
@@ -267,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_login_logout:
                 if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
-                    login(false);
+                    login("FastSearch");
                     return false;
                 } else {
                     logout();
@@ -299,14 +321,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_LOGIN:
-                if (resultCode == RESULT_LOGIN) {
+                if (resultCode == RESULT_FAST_SEARCH) {
                     initialiseNavigationHeader();
                     loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    searchNavigation(fastSearchMenu);
                     break;
                 } else if (resultCode == RESULT_USER_ACTIVITY) {
                     initialiseNavigationHeader();
                     loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
                     meNavigation();
+                } else if (resultCode == RESULT_PERSON_SEARCH) {
+                    initialiseNavigationHeader();
+                    loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    searchPersonNavigation(personSearchMenu);
+                } else if (resultCode == RESULT_HISTORY) {
+                    initialiseNavigationHeader();
+                    loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
+                    historyNavigation(historyMenu);
                 }
         }
     }
