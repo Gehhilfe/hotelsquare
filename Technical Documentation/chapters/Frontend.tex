@@ -118,13 +118,13 @@ The venue markers locate the search results on the map. They differ in color, de
 
 If the user clicks on one of the markers an infoWindow shows up, which shows on image and tells the name, the exact rating and if it is open right now or not. With a click on the infoWindow the user is redirected to the \textit{VenueDetails}, where he can find more additional information about the venue.
 
-\subsection{Marker: Friend}
+\subsubsection{Marker: Friend}
 The friend markers locate the friends of the user, if he is logged in and has nearby friends. The marker of the friends is similar to the marker of the user, except it is green.
 The position of his nearby friends are updated everytime, the location of the user changes. 
 
 If the user clicks on on of his friends marker, an \textit{infoWindow} shows up with the avatar and name and if given, also the city and age. With a click on the \textit{infoWindow} the user gets to the profile of his friend.
 
-\subsection{Marker: User}
+\subsubsection{Marker: User}
 The user marker locate the user on the map. If the user clicks on himself, a \textit{infoWindow} shows up. If the user is not logged in, it shows the default \textit{infoWindow} with the default avatar. If the user is logged in, it shows his own avatar and additonal info. 
 
 If he clicks on the \textit{infoWindow} he is redirected to his own profile.
@@ -136,6 +136,15 @@ If he clicks on the \textit{infoWindow} he is redirected to his own profile.
  	\label{fig:venuesonmap}
 \end{figure}
 
+\subsection{Settings}
+The SettingsFragment mainly provides three functionalities for logged-in users.
 
+\begin{itemize}
+\item \textbf{Language Selection:} The user has the ability to change the language of the app. There are two different languages supported: \textit{Deutsch} and \textit{English}. With a simple spinner he can change the app to his preferred language. Technically the language than is stored in the local storage and the strings are changed depending on that value. 
+\item \textbf{Incognito-Mode:} The \textit{Incognito-Mode} provides the user more privacy by not showing his position to anyone especially his nearby friends. The mode ist selected by a CheckBox to toggle the \textit{Incognito-Mode} The information, that the user wants to be not seen by anyone is then send to the server.
+\item \textbf{Delete Profile:} This button provides the user the opportunity to delete his \textit{HOTELsquare} account. If he clicks on it, a dialog is open to make sure he knows what he is doing. If he confirm his choice, his profile is deleted, otherwise nothing happens. 
+\end{itemize}
+
+The language selection is also available for user without a \textit{HOTELsquare} account.
 
 
