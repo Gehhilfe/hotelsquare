@@ -112,14 +112,6 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.y HH:mm",  Locale.ENGLISH);
     private final String URL = "https://dev.ip.stimi.ovh/";
 
-
-    public HomeRecyclerViewAdapter(Context context, List<FriendRequest> friendRequestList, List<User> userList) {
-        inflater = LayoutInflater.from(context);
-        this.context = context;
-        friendRequestList = friendRequestList;
-        userList = userList;
-    }
-
     public HomeRecyclerViewAdapter(Context context) {
         inflater = LayoutInflater.from(context);
         this.context = context;
@@ -174,4 +166,15 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         userList = new ArrayList<>(users);
         notifyDataSetChanged();
     }
+
+    public void updateData(List<FriendRequest> requests, List<User> users) {
+        friendRequestList.addAll(requests);
+        userList.addAll(users);
+        notifyDataSetChanged();
+    }
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
 }

@@ -150,7 +150,7 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
         notifyDataSetChanged();
     }
 
-    public List<User> getFlist() {
+    public List<User> getFriendList() {
         return friendList;
     }
 

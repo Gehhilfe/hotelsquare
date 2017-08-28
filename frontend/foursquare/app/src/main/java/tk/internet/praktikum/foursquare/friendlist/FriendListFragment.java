@@ -11,8 +11,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,11 +31,8 @@ public class FriendListFragment extends Fragment {
     private final String URL = "https://dev.ip.stimi.ovh/";
     private FLRecyclerViewAdapter flRecyclerViewAdapter;
     private LinearLayoutManager linearLayoutManager;
-    private int page;
-    private int visibleItemCount;
-    private int itemCount;
-    private int lastVisibleItemPosition;
-    private int maxLastVisibleItemPosition=0;
+    private int page, visibleItemCount, itemCount, lastVisibleItemPosition;
+    private int maxLastVisibleItemPosition = 0;
     private boolean done, refresh;
 
 
@@ -89,7 +84,6 @@ public class FriendListFragment extends Fragment {
     private void setRefresh(boolean refresh) {
         this.refresh = refresh;
     }
-
 
     private void setDone(boolean done) {
         this.done = done;
@@ -151,7 +145,7 @@ public class FriendListFragment extends Fragment {
                     .subscribe(
                             friendListResponse -> {
                                 List<User> friendList = friendListResponse.getFriends();
-                                List<User> fList = flRecyclerViewAdapter.getFlist();
+                                List<User> fList = flRecyclerViewAdapter.getFriendList();
 
                                 if (friendList.size() > 0) {
                                     recyclerView.setVisibility(View.VISIBLE);
