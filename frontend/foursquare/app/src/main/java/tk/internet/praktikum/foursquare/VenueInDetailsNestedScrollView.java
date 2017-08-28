@@ -176,9 +176,9 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
         commentRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
 
-        commentAdapter = new CommentAdapter(venueId, getApplicationContext());
+        commentAdapter = new CommentAdapter(venueId, this);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
 
         scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
@@ -619,13 +619,15 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                     if (user.getName().equals(userName)) {
                         Intent intent = new Intent(getApplicationContext(), UserActivity.class);
                         intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     } else {
                         Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
                         intent.putExtra("userID", user.getId());
                         intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                       // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     }
                 }
