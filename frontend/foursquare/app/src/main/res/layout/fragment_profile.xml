@@ -178,6 +178,7 @@
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
                         android:text="@string/profile_edit"
+                        android:textColor="@color/orange"
                         android:textAppearance="@style/TextAction" />
 
                     <Button
@@ -187,6 +188,7 @@
                         android:layout_height="wrap_content"
                         android:padding="@dimen/actions_padding"
                         android:text="@string/prof_save"
+                        android:textColor="@color/orange"
                         android:textAppearance="@style/TextAction" />
                 </LinearLayout>
             </LinearLayout>

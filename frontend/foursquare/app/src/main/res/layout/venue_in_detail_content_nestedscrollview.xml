@@ -214,6 +214,7 @@
         </LinearLayout>
 
         <android.support.v7.widget.CardView
+            android:id="@+id/venue_detail_leaderboard_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/activity_horizontal_margin">
@@ -250,14 +251,14 @@
                             android:id="@+id/leaderboard_2_avatar"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
-                            android:layout_gravity="center_horizontal"
-                            android:src="@mipmap/user_avatar" />
+                            android:layout_gravity="center_horizontal" />
 
                         <TextView
+                            android:id="@+id/leaderboard_2_position"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="#2" />
+                           />
 
                         <TextView
                             android:id="@+id/leaderboard_2_name"
@@ -286,13 +287,14 @@
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             android:layout_gravity="center_horizontal"
-                            android:src="@mipmap/user_avatar" />
+                           />
 
                         <TextView
+                            android:id="@+id/leaderboard_1_position"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="#1" />
+                           />
 
                         <TextView
                             android:id="@+id/leaderboard_1_name"
@@ -321,13 +323,14 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:layout_gravity="center_horizontal"
-                            android:src="@mipmap/user_avatar" />
+                            />
 
                         <TextView
+                            android:id="@+id/leaderboard_3_position"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:text="#3" />
+                            />
 
                         <TextView
                             android:id="@+id/leaderboard_3_name"
@@ -348,6 +351,7 @@
 
 
         <android.support.v7.widget.CardView
+            android:id="@+id/venue_detail_checkin_card"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/activity_horizontal_margin">

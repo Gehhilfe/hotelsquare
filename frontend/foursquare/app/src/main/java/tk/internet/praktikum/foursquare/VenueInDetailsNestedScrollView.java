@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -59,6 +60,7 @@ import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.history.HistoryEntry;
 import tk.internet.praktikum.foursquare.history.HistoryType;
+import tk.internet.praktikum.foursquare.search.Utils;
 import tk.internet.praktikum.foursquare.search.VenueImagesActivity;
 import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
@@ -97,9 +99,13 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
     private FloatingActionButton venueImagesButton;
 
 
+    private CardView leaderboard_card;
     private TextView[] leaderboard_name;
     private TextView[] leaderboard_count;
     private CircleImageView[] leaderboard_avatar;
+    private TextView[]leaderboard_position;
+
+    private CardView lastHereCard;
     private RecyclerView lastHereRecylcer;
     private LastHereAdapter lastHereAdapter;
     private String venueName;
@@ -128,6 +134,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         headerImage = (ImageView) findViewById(R.id.header_image);
 
         // Leaderboard
+        leaderboard_card = (CardView) findViewById(R.id.venue_detail_leaderboard_card);
         leaderboard_name = new TextView[]{
                 (TextView) findViewById(R.id.leaderboard_1_name),
                 (TextView) findViewById(R.id.leaderboard_2_name),
@@ -144,6 +151,12 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 (CircleImageView) findViewById(R.id.leaderboard_1_avatar),
                 (CircleImageView) findViewById(R.id.leaderboard_2_avatar),
                 (CircleImageView) findViewById(R.id.leaderboard_3_avatar)
+        };
+
+        leaderboard_position=new TextView[]{
+                (TextView)findViewById(R.id.leaderboard_1_position),
+                (TextView)findViewById(R.id.leaderboard_2_position),
+                (TextView)findViewById(R.id.leaderboard_3_position)
         };
 
         // Buttons
@@ -163,9 +176,9 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
         commentRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
 
-        commentAdapter = new CommentAdapter(venueId, getApplicationContext());
+        commentAdapter = new CommentAdapter(venueId, this);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
 
         scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
@@ -201,6 +214,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         lastHereRecylcer = (RecyclerView) findViewById(R.id.last_here_recylcer_view);
 
         lastHereAdapter = new LastHereAdapter(new ArrayList<UserCheckinInformation>(), getApplicationContext());
+        lastHereCard = (CardView) findViewById(R.id.venue_detail_checkin_card);
 
 
         lastHereRecylcer.setNestedScrollingEnabled(false);
@@ -233,6 +247,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
         fabImageComment.setOnClickListener(v -> openImageDialog());
 
+        lastHereCard.setVisibility(View.GONE);
+
         // Load venue data from server
         VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
         venueService.getDetails(venueId)
@@ -248,6 +264,8 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                     updatePrice(venue);
                     updateButtons(venue);
                     updateLeaderboard(venue);
+                    if(venue.getLastCheckins().size() > 0)
+                        lastHereCard.setVisibility(View.VISIBLE);
                     lastHereAdapter.setData(venue.getLastCheckins());
                     if (venue.getImages().size() > 0) {
                         ImageCacheLoader imageCacheLoader = new ImageCacheLoader(getApplicationContext());
@@ -289,14 +307,19 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
 
     private void updateLeaderboard(Venue venue) {
         UserService us = ServiceFactory.createRetrofitService(UserService.class, URL);
+        int[] leaderboard_avatar_sizes={60,50,40};
+        int[]positions={1,2,3};
+        leaderboard_card.setVisibility(View.GONE);
         for (int i = 0; i < 3 && i < venue.getTopCheckins().size(); i++) {
             UserCheckinInformation info = venue.getTopCheckins().get(i);
             leaderboard_count[i].setText(String.format("%d", info.getCount()));
+            leaderboard_position[i].setText(String.format("#%d",positions[i]));
             final int current = i;
             us.profileByID(info.getUserID())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((res) -> {
+                        leaderboard_card.setVisibility(View.VISIBLE);
                         leaderboard_name[current].setText(res.getDisplayName());
                         ImageCacheLoader icl = new ImageCacheLoader(getApplicationContext());
                         if (res.getAvatar() != null) {
@@ -304,6 +327,18 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((bitmap) -> leaderboard_avatar[current].setImageBitmap(bitmap), (err) -> Log.d(LOG, err.toString(), err));
+                        }
+                        else{
+                            leaderboard_avatar[current].setDrawingCacheEnabled(true);
+                            Bitmap bitmap= null;
+                            try {
+                                bitmap = Utils.decodeResourceImage(getApplicationContext(),"no_avatar",leaderboard_avatar_sizes[current],leaderboard_avatar_sizes[current]);
+                                leaderboard_avatar[current].setImageBitmap(bitmap);
+                                leaderboard_avatar[current].setVisibility(View.VISIBLE);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         leaderboard_avatar[current].setOnClickListener(seeProfileListener(res));
@@ -580,14 +615,24 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
             public void onClick(View v) {
                 SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
                 String userName = sharedPreferences.getString(Constants.NAME, "");
-                if (user.getName().equals(userName)) {
-                    Intent intent = new Intent(getApplicationContext(), UserActivity.class);
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                    intent.putExtra("userID", user.getId());
-                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
-                    startActivity(intent);
+                try {
+                    if (user.getName().equals(userName)) {
+                        Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                        intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                        intent.putExtra("userID", user.getId());
+                        intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                       // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                }
+                catch (Exception exception){
+                    Log.i(LOG,exception.getMessage());
                 }
 
             }

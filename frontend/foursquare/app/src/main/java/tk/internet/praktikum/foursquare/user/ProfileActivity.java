@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,7 @@ import java.util.Locale;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
 import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
@@ -53,6 +55,7 @@ public class ProfileActivity extends AppCompatActivity {
     private LinearLayout profileTopContent;
     private VenueCheckinInformation topVenue;
     private Toolbar toolbar;
+    private ProfileLatestRecyclerViewAdapter profileLatestRecyclerViewAdapter;
 
     public ProfileActivity() {}
 
@@ -87,6 +90,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.profile_last_checkin_recylcer_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        profileLatestRecyclerViewAdapter = new ProfileLatestRecyclerViewAdapter(getApplicationContext(), this);
+        recyclerView.setAdapter(profileLatestRecyclerViewAdapter);
 
         profileTopContent.setOnClickListener(v -> loadVenue());
         initialiseFab();
@@ -160,7 +165,9 @@ public class ProfileActivity extends AppCompatActivity {
                                 else
                                     none.setChecked(true);
 
-                                recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins(), this));
+                                //recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins(), this));
+                                profileLatestRecyclerViewAdapter.setResults(user.getLastCheckins());
+                                profileLatestRecyclerViewAdapter.notifyDataSetChanged();
 
                                 if (user.getTopCheckins().size() > 0) {
                                     topVenue = user.getTopCheckins().get(0);
@@ -257,9 +264,14 @@ public class ProfileActivity extends AppCompatActivity {
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                            user -> {},
+                            user -> {
+                                Toast.makeText(getApplicationContext(), getString(R.string.send_friendrequest), Toast.LENGTH_SHORT).show();
+                            },
                             throwable -> {
-                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                if (((HttpException) throwable).code() == 400)
+                                    Toast.makeText(getApplicationContext(), getString(R.string.pending_friendrequest), Toast.LENGTH_SHORT).show();
+                                else
+                                    Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                     );
         }catch (Exception e) {
@@ -326,20 +338,5 @@ public class ProfileActivity extends AppCompatActivity {
 
         return i;
     }
-/*
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(newBase);
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        super.attachBaseContext(AdjustedContextWrapper.wrap(newBase,language));
-    }
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getApplicationContext());
-        String language=sharedPreferences.getString("LANGUAGE","de");
-        Locale locale=new Locale(language);
-        AdjustedContextWrapper.wrap(getBaseContext(),language);
 
-    }*/
 }

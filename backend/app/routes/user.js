@@ -154,7 +154,108 @@ async function register(request, response, next) {
                 from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
                 to: user.email,
                 subject: 'Welcome to HOTELSQUARE',
-                text: 'Hello '+user.displayName+', have fun using HOTELSQUARE! But before you start please confirm your email address by clicking on this link https://dev.ip.stimi.ovh/emailConfirmation?key='+user.activation_key+'&id='+user._id.toString()
+                text: 'Hello '+user.displayName+', have fun using HOTELSQUARE! But before you start please confirm your email address by clicking on this link https://dev.ip.stimi.ovh/emailConfirmation?key='+user.activation_key+'&id='+user._id.toString(),
+                html: '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"\n' +
+                '        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' +
+                '<html xmlns="http://www.w3.org/1999/xhtml">\n' +
+                '<head>\n' +
+                '    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>\n' +
+                '    <title>E-Mail Template</title>\n' +
+                '    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n' +
+                '    <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">\n' +
+                '    <style>\n' +
+                '        body {\n' +
+                '            font-family: Arial;\n' +
+                '            margin: 0;\n' +
+                '            padding: 0;\n' +
+                '            /*background-color: #fafafa;*/\n' +
+                '        }\n' +
+                '\n' +
+                '        #logo {\n' +
+                '            color: #2fb7e6;\n' +
+                '            font-family: \'Pacifico\', cursive;\n' +
+                '            font-size: 5em;\n' +
+                '            text-align: center;\n' +
+                '            padding-bottom: .5em;\n' +
+                '        }\n' +
+                '\n' +
+                '        a {\n' +
+                '            background-color: #2fb7e6;\n' +
+                '            color: #fff;\n' +
+                '            text-decoration: none;\n' +
+                '            padding: 0 2rem;\n' +
+                '            text-transform: uppercase;\n' +
+                '            line-height: 36px;\n' +
+                '            height: 36px;\n' +
+                '            border-radius: 2px;\n' +
+                '            display: inline-block;\n' +
+                '        }\n' +
+                '\n' +
+                '        #contentTable {\n' +
+                '            background-color: #fff;\n' +
+                '            padding: 50px;\n' +
+                '            margin: 50px;\n' +
+                '            border: 1px solid #dddddd;\n' +
+                '            border-bottom: 2px solid #dddddd;\n' +
+                '        }\n' +
+                '\n' +
+                '        #trenner {\n' +
+                '            height: 1px;\n' +
+                '            line-height: 1px;\n' +
+                '            width: 100%;\n' +
+                '            background-color: #dddddd;\n' +
+                '            margin: 40px 0;\n' +
+                '        }\n' +
+                '\n' +
+                '        .input_label {\n' +
+                '            color: #2fb7e6;\n' +
+                '            font-size: .75rem;\n' +
+                '            padding-top: 15px;\n' +
+                '        }\n' +
+                '\n' +
+                '        .input_text {\n' +
+                '            border-bottom: 1px solid #2fb7e6;\n' +
+                '            padding: 5px 0;\n' +
+                '        }\n' +
+                '    </style>\n' +
+                '</head>\n' +
+                '<body style="">\n' +
+                '<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fafafa;">\n' +
+                '    <tr>\n' +
+                '        <td style="width:50%;"></td>\n' +
+                '        <td>\n' +
+                '            <table id="contentTable" border="0" cellpadding="0" cellspacing="0">\n' +
+                '                <tr>\n' +
+                '                    <td>\n' +
+                '                        <div id="logo">\n' +
+                '                            <img width="250" src="http://stimi.ovh:9000/dev/tim_hotelsquare.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=stimi-storage%2F20170828%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20170828T171954Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=d14e6b450fcb536aa9f07cb0154406dd5db45ea900d0b9b351e52d953d80d962" alt="hotelsquare">\n' +
+                '                        </div>\n' +
+                '                    </td>\n' +
+                '                </tr>\n' +
+                '                <tr>\n' +
+                '                    <td>\n' +
+                '                        Hello '+user.displayName+',<br><br>\n' +
+                '                        have fun using HOTELSQUARE!<br>\n' +
+                '                        But before you start please confirm your email address by clicking on this link<br>\n' +
+                '                    </td>\n' +
+                '                </tr>\n' +
+                '                <tr>\n' +
+                '                    <td>\n' +
+                '                        <div id="trenner"></div>\n' +
+                '                    </td>\n' +
+                '                </tr>\n' +
+                '                <tr>\n' +
+                '                    <td style="text-align:center;">\n' +
+                '                        <a href="https://dev.ip.stimi.ovh/emailConfirmation?key='+user.activation_key+'&id='+user._id.toString()+'">Activate</a>\n' +
+                '                    </td>\n' +
+                '                </tr>\n' +
+                '            </table>\n' +
+                '        </td>\n' +
+                '        <td style="width:50%;"></td>\n' +
+                '    </tr>\n' +
+                '</table>\n' +
+                '</body>\n' +
+                '</html>'
             };
 
             await transporter.sendMail(mailOptions);
@@ -200,8 +301,103 @@ async function resetPassword(request, response, next) {
             from: '"HOTELSQUARE Mailer" <'+config.email.mail+'>',
             to: user.email,
             subject: 'HOTELSQUARE Passwordreset',
-            text: 'Hello '+user.displayName+', your password has been changed to "'+password+'" without quotes. Change your password immediately!'
-        };
+            text: 'Hello '+user.displayName+', your password has been changed to "'+password+'" without quotes. Change your password immediately!',
+            html: '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"\n' +
+            '        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' +
+            '<html xmlns="http://www.w3.org/1999/xhtml">\n' +
+            '<head>\n' +
+            '    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>\n' +
+            '    <title>E-Mail Template</title>\n' +
+            '    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>\n' +
+            '    <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">\n' +
+            '    <style>\n' +
+            '        body {\n' +
+            '            font-family: Arial;\n' +
+            '            margin: 0;\n' +
+            '            padding: 0;\n' +
+            '            /*background-color: #fafafa;*/\n' +
+            '        }\n' +
+            '\n' +
+            '        #logo {\n' +
+            '            color: #2fb7e6;\n' +
+            '            font-family: \'Pacifico\', cursive;\n' +
+            '            font-size: 5em;\n' +
+            '            text-align: center;\n' +
+            '            padding-bottom: .5em;\n' +
+            '        }\n' +
+            '\n' +
+            '        a {\n' +
+            '            background-color: #2fb7e6;\n' +
+            '            color: #fff;\n' +
+            '            text-decoration: none;\n' +
+            '            padding: 0 2rem;\n' +
+            '            text-transform: uppercase;\n' +
+            '            line-height: 36px;\n' +
+            '            height: 36px;\n' +
+            '            border-radius: 2px;\n' +
+            '            display: inline-block;\n' +
+            '        }\n' +
+            '\n' +
+            '        #contentTable {\n' +
+            '            background-color: #fff;\n' +
+            '            padding: 50px;\n' +
+            '            margin: 50px;\n' +
+            '            border: 1px solid #dddddd;\n' +
+            '            border-bottom: 2px solid #dddddd;\n' +
+            '        }\n' +
+            '\n' +
+            '        #trenner {\n' +
+            '            height: 1px;\n' +
+            '            line-height: 1px;\n' +
+            '            width: 100%;\n' +
+            '            background-color: #dddddd;\n' +
+            '            margin: 40px 0;\n' +
+            '        }\n' +
+            '\n' +
+            '        .input_label {\n' +
+            '            color: #2fb7e6;\n' +
+            '            font-size: .75rem;\n' +
+            '            padding-top: 15px;\n' +
+            '        }\n' +
+            '\n' +
+            '        .input_text {\n' +
+            '            border-bottom: 1px solid #2fb7e6;\n' +
+            '            padding: 5px 0;\n' +
+            '        }\n' +
+            '    </style>\n' +
+            '</head>\n' +
+            '<body style="">\n' +
+            '<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fafafa;">\n' +
+            '    <tr>\n' +
+            '        <td style="width:50%;"></td>\n' +
+            '        <td>\n' +
+            '            <table id="contentTable" border="0" cellpadding="0" cellspacing="0">\n' +
+            '                <tr>\n' +
+            '                    <td>\n' +
+            '                        <div id="logo">\n' +
+            '                            <img width="250" src="http://stimi.ovh:9000/dev/tim_hotelsquare.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=stimi-storage%2F20170828%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20170828T171954Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=d14e6b450fcb536aa9f07cb0154406dd5db45ea900d0b9b351e52d953d80d962" alt="hotelsquare">\n' +
+            '                        </div>\n' +
+            '                    </td>\n' +
+            '                </tr>\n' +
+            '                <tr>\n' +
+            '                    <td>\n' +
+            '                        Hello '+user.displayName+',<br><br>\n' +
+            '                        Change your password immediately!<br>\n' +
+            '                    </td>\n' +
+            '                </tr>\n' +
+            '                <tr>\n' +
+            '                    <td>\n' +
+            '                        <div class="input_label">Password</div>\n' +
+            '                        <div class="input_text">'+password+'</div>\n' +
+            '                    </td>\n' +
+            '                </tr>\n' +
+            '            </table>\n' +
+            '        </td>\n' +
+            '        <td style="width:50%;"></td>\n' +
+            '    </tr>\n' +
+            '</table>\n' +
+            '</body>\n' +
+            '</html>'};
 
         await transporter.sendMail(mailOptions);
     }

@@ -1,6 +1,7 @@
 package tk.internet.praktikum.foursquare;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
 import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.service.UserService;
+import tk.internet.praktikum.foursquare.search.Utils;
 
 
 public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyViewHolder> {
@@ -64,7 +66,19 @@ public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyView
                                         ,
                                         (err) -> Log.d(LOG, err.toString(), err));
                     }
-                   // else holder.avatar.setVisibility(View.GONE);
+                    else{
+
+                        holder.avatar.setDrawingCacheEnabled(true);
+                        Bitmap bitmap= null;
+                        try {
+                            bitmap = Utils.decodeResourceImage(context,"no_avatar",35,35);
+                            holder.avatar.setImageBitmap(bitmap);
+                            holder.avatar.setVisibility(View.VISIBLE);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
 
                 }, (err) -> Log.d(LOG, err.toString(), err));
     }

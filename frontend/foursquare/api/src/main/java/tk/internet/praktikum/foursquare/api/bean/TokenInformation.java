@@ -18,7 +18,8 @@ public class TokenInformation {
         String payload = token.split(".")[1];
         try {
             Gson gson = new Gson();
-            user = gson.fromJson(new String(Base64.decode(payload, Base64.DEFAULT)), User.class);
+            String json = new String(Base64.decode(payload, Base64.DEFAULT));
+            user = gson.fromJson(json, User.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -26,6 +27,17 @@ public class TokenInformation {
 
     public User getUser() {
         try {
+            if(user == null) {
+                String[] splited = token.split("[.]");
+                String payload = splited[1];
+                try {
+                    Gson gson = new Gson();
+                    String json = new String(Base64.decode(payload, Base64.DEFAULT));
+                    user = gson.fromJson(json, User.class);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             return user;
         } catch (Exception e) {
             e.printStackTrace();

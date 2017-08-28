@@ -3,6 +3,7 @@ package tk.internet.praktikum;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ import tk.internet.praktikum.foursquare.api.service.CommentService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
 import tk.internet.praktikum.foursquare.history.HistoryEntry;
 import tk.internet.praktikum.foursquare.history.HistoryType;
+import tk.internet.praktikum.foursquare.search.Utils;
 import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
@@ -124,7 +126,19 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                         holder.avatar.setVisibility(View.VISIBLE);
                     }, err -> Log.d("CommentAdapter", err.toString(), err));
         }
-       else  holder.avatar.setVisibility(View.GONE);
+       else{
+
+            holder.avatar.setDrawingCacheEnabled(true);
+            Bitmap bitmap= null;
+            try {
+                bitmap = Utils.decodeResourceImage(context,"no_avatar",50,50);
+                holder.avatar.setImageBitmap(bitmap);
+                holder.avatar.setVisibility(View.VISIBLE);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         holder.upvote.setOnClickListener((event) -> {
             LocalStorage ls = LocalStorage.getLocalStorageInstance(context);
@@ -203,14 +217,24 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
             public void onClick(View v) {
                 SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(context);
                 String userName = sharedPreferences.getString(Constants.NAME, "");
-                if (user.getName().equals(userName)) {
-                    Intent intent = new Intent(context, UserActivity.class);
-                    context.startActivity(intent);
-                } else {
-                    Intent intent = new Intent(context, ProfileActivity.class);
-                    intent.putExtra("userID", user.getId());
-                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
-                    context.startActivity(intent);
+                try {
+                    if (user.getName().equals(userName)) {
+                        Intent intent = new Intent(context, UserActivity.class);
+                        intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(context, ProfileActivity.class);
+                        intent.putExtra("userID", user.getId());
+                        intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
+                }
+                catch (Exception exception){
+                    Log.i(LOG,exception.getMessage());
                 }
 
             }

@@ -3,7 +3,6 @@ package tk.internet.praktikum.foursquare.search;
 //import android.app.Fragment;
 
 import android.app.ProgressDialog;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
@@ -38,10 +37,9 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.UUID;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -54,7 +52,8 @@ import tk.internet.praktikum.foursquare.api.bean.Venue;
 import tk.internet.praktikum.foursquare.api.bean.VenueSearchQuery;
 import tk.internet.praktikum.foursquare.api.service.PlaceService;
 import tk.internet.praktikum.foursquare.api.service.VenueService;
-import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.history.DaoSession;
+import tk.internet.praktikum.foursquare.storage.LocalDataBaseManager;
 
 
 public class DeepSearchFragment extends Fragment implements android.support.v7.widget.SearchView.OnQueryTextListener, PlaceSelectionListener {
@@ -201,9 +200,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     public void initVenueStatePageAdapter() {
         venueStatePageAdapter = new VenueStatePageAdapter(getFragmentManager());
         venueStatePageAdapter.initVenuesFragment();
-        /*savedView=new ArrayList<View>();
-        savedView.add(venueStatePageAdapter.getItem(0).getView());
-        savedView.add(venueStatePageAdapter.getItem(1).getView());*/
         venuesViewPager.setAdapter(venueStatePageAdapter);
     }
 
@@ -282,17 +278,16 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
 
     @Override
     public boolean onQueryTextChange(String typedKeyWord) {
+        System.out.println("### onQueryTextChange deepSearch");
         typedKeyWord=typedKeyWord.trim().toLowerCase(Locale.getDefault());
         if(!typedKeyWord.isEmpty()) {
-            SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getContext());
-            Set<String> keyWords = sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS, null);
+            DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getContext()).getDaoSession();
+           List<SuggestionKeyWord> keyWords = daoSession.getSuggestionKeyWordDao().queryBuilder().distinct().list();
             if(keyWords!=null) {
-                ArrayList<String> allKeyWords = new ArrayList<>(keyWords);
-                System.out.println("** allkeywords: " + allKeyWords);
-
+                System.out.println("** allkeywords: " + keyWords);
                 MatrixCursor matrixCursor = new MatrixCursor(new String[]{BaseColumns._ID, KEY_WORD});
-                for (int i = 0; i < allKeyWords.size(); i++) {
-                    String keyWord = allKeyWords.get(i).trim().toLowerCase();
+                for (int i = 0; i < keyWords.size(); i++) {
+                    String keyWord = keyWords.get(i).getSuggestionName().trim().toLowerCase();
                     if (keyWord.startsWith(typedKeyWord))
                         matrixCursor.addRow(new Object[]{i, keyWord});
                 }
@@ -490,6 +485,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                         //TODO
                         // change toggle button to map view
                         // isMapView = true;
+
                         displayVenuesOnMap();
 
                     }
@@ -644,23 +640,47 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
     }
 
     public void updateKeyWords(List<Venue> venues,String query){
-        SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(getContext());
-        Set<String> keyWords= sharedPreferences.getStringSet(tk.internet.praktikum.Constants.KEY_WORDS, null);
-        if(keyWords==null) {
-            keyWords = new HashSet<>();
+        DaoSession daoSession = LocalDataBaseManager.getLocalDatabaseManager(getContext()).getDaoSession();
+        List<SuggestionKeyWord> keyWords = daoSession.getSuggestionKeyWordDao().queryBuilder().list();
+        List<String>extractedSuggestionNames=extractSuggestionName(keyWords);
+        SuggestionKeyWord suggestionKeyWord;
+        if(!isContains(extractedSuggestionNames,query)) {
+            extractedSuggestionNames.add(query);
+            suggestionKeyWord = new SuggestionKeyWord();
+            suggestionKeyWord.setUid(UUID.randomUUID().toString());
+            suggestionKeyWord.setSuggestionName(query);
+            daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
         }
-        keyWords.add(query);
         for(Venue venue: venues){
             List<String> types=venue.getTypes();
             for(String type: types){
                String keyWord=type.replace("_"," ");
-                keyWords.add(keyWord);
+                if(!isContains(extractedSuggestionNames,keyWord)) {
+                    extractedSuggestionNames.add(keyWord);
+                    suggestionKeyWord = new SuggestionKeyWord();
+                    suggestionKeyWord.setUid(UUID.randomUUID().toString());
+                    suggestionKeyWord.setSuggestionName(keyWord);
+                    daoSession.getSuggestionKeyWordDao().insert(suggestionKeyWord);
+                }
             }
         }
-        LocalStorage.getLocalStorageInstance(getContext()).setKeyWords(tk.internet.praktikum.Constants.KEY_WORDS,keyWords);
     }
 
+    public  List<String> extractSuggestionName(List<SuggestionKeyWord> keyWords){
+        List<String>suggestionNames=new ArrayList<>();
+        for(SuggestionKeyWord suggestionKeyWord:keyWords){
+            suggestionNames.add(suggestionKeyWord.getSuggestionName());
+        }
+        return suggestionNames;
+    }
+    public boolean isContains(List<String> keyWords ,String keyword){
+        for(String suggestionKeyWord:keyWords){
+            if(suggestionKeyWord.trim().toLowerCase().equals(keyword.trim().toLowerCase()))
+                return true;
+        }
+        return false;
 
+    }
 
     public void onStop(){
         //Post SearchEvent to EventBus

@@ -11,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -21,6 +23,7 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.chat.ChatActivity;
@@ -92,11 +95,11 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     private Activity activity;
     private Context context;
     private LayoutInflater inflater;
-    private List<User> friendList = Collections.emptyList();
+    private List<User> friendList;
 
-    public FLRecyclerViewAdapter(Context context, List<User> friendList, Activity activity) {
+    public FLRecyclerViewAdapter(Context context, Activity activity) {
         inflater = LayoutInflater.from(context);
-        this.friendList = friendList;
+        friendList = new ArrayList<>();
         this.context = context;
         this.activity = activity;
     }
@@ -134,4 +137,21 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     public int getItemCount() {
         return friendList.size();
     }
+
+
+    public void updateList(List<User> data) {
+        friendList.addAll(data);
+        Collections.sort(friendList,new Comparator<User>() {
+            @Override
+            public int compare(User o1, User o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+        notifyDataSetChanged();
+    }
+
+    public List<User> getFriendList() {
+        return friendList;
+    }
+
 }

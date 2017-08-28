@@ -72,9 +72,6 @@
 
         </activity>
         <activity
-            android:name=".friendlist.DummyActivity"
-            android:theme="@style/AppTheme" />
-        <activity
             android:name=".user.ProfileActivity"
             android:configChanges="locale"
             android:theme="@style/AppTheme" />

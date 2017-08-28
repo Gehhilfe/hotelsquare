@@ -2,9 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="48dp"
-    android:background="?attr/selectableItemBackground" >
+    android:background="?attr/selectableItemBackground"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:paddingStart="10dp"
         android:id="@+id/home_avatar"
         android:src="@mipmap/user_avatar"
@@ -18,7 +22,7 @@
     <TextView
         android:id="@+id/home_entry_text"
         android:paddingRight="10dp"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -26,7 +30,6 @@
         android:layout_toRightOf="@+id/home_avatar"
         android:layout_toEndOf="@+id/home_avatar"
         android:layout_toStartOf="@+id/home_friend_request_accept"
-        android:text="adsadasdasdasdasdaddddddd"
         android:textColor="@color/colorPrimaryDark"/>
 
     <ImageView
@@ -47,7 +50,4 @@
         android:layout_alignParentBottom="true"
         android:layout_toStartOf="@+id/home_friend_request_decline"
         app:srcCompat="@mipmap/ic_check_black_48dp" />
-
-
-
 </RelativeLayout>
