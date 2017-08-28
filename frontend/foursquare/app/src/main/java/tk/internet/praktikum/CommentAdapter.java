@@ -219,6 +219,7 @@ public class CommentAdapter extends android.support.v7.widget.RecyclerView.Adapt
                 String userName = sharedPreferences.getString(Constants.NAME, "");
                 if (user.getName().equals(userName)) {
                     Intent intent = new Intent(context, UserActivity.class);
+                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
                     context.startActivity(intent);
                 } else {
                     Intent intent = new Intent(context, ProfileActivity.class);

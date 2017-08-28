@@ -291,11 +291,13 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     //TODO: "Call FriendFragment"
                     Intent intent = new Intent(parent.getActivity(), ProfileActivity.class);
                     intent.putExtra("userID", markerFriendMap.get(marker).getId());
+                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
                     parent.getActivity().startActivity(intent);
                     // if User, go to Me-Fragment
                 } else if (!(LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, "")).equals("") && !markerFriendMap.containsKey(marker)) {
                     Intent intent = new Intent(parent.getActivity(), UserActivity.class);
+                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
                     startActivity(intent);
                     /*
                     MeFragment meFragment = new MeFragment();

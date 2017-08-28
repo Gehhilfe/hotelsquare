@@ -239,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             login("MyProfile");
         } else {
             Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+            intent.putExtra("Parent", "MainActivity");
             startActivity(intent);
         }
     }

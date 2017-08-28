@@ -617,6 +617,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
                 String userName = sharedPreferences.getString(Constants.NAME, "");
                 if (user.getName().equals(userName)) {
                     Intent intent = new Intent(getApplicationContext(), UserActivity.class);
+                    intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);

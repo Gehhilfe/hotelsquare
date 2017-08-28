@@ -1,6 +1,7 @@
 package tk.internet.praktikum.foursquare.user;
 
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -8,10 +9,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
+import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
 import tk.internet.praktikum.foursquare.frequest.HomeFragment;
+import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
@@ -48,5 +52,31 @@ public class UserActivity extends AppCompatActivity  {
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);
+    }
+
+    @Override
+    public Intent getSupportParentActivityIntent() {
+        return getParentActivityIntentImpl();
+    }
+
+    @Override
+    public Intent getParentActivityIntent() {
+        return getParentActivityIntentImpl();
+    }
+
+    private Intent getParentActivityIntentImpl() {
+        Intent i = null;
+        Bundle bundle = getIntent().getExtras();
+        String parentActivity = bundle.getString("Parent");
+
+        if(parentActivity.equals("VenueInDetailsNestedScrollView")){
+            i = new Intent(this, VenueInDetailsNestedScrollView.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        } else {
+            i = new Intent(this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        }
+
+        return i;
     }
 }
