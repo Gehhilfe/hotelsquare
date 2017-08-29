@@ -151,7 +151,20 @@
     <string name="pending_friendrequest">There is still a pending friend request.</string>
     <string name="accept_friend_request">Friend request accepted!</string>
     <string name="decline_friend_request">Friend request declined!</string>
+    <string name="wrong_login_info">Failed to login. Please check your credentials and try again.</string>
+    <string name="registration_complete">Please check your emails to complete the registration.</string>
+    <string name="registration_failed">Failed to register. Please try it again.</string>
+    <string name="register_invalid_mail">Please enter a valid email address.</string>
+    <string name="register_invalid_name">Your account name should have at least 3 characters.</string>
+    <string name="register_invalid_password">Your password should have at least 6 characters.</string>
+    <string name="reset_failed">Failed to reset your password. Please try it again</string>
+    <string name="reset_completed">Please check your emails to complete your new password.</string>
 
+
+    <!-- Dialogs -->
+    <string name="register_dialog">Waiting for the registration server…</string>
+    <string name="login_dialog">Waiting for login server…</string>
+    <string name="reset_dialog">Waiting for the server response…</string>
 
     <!--- C1-->
     <array name="beer">
@@ -164,7 +177,7 @@
     </array>
     <array name="vegetarian">
         <item>vegetarisch</item>
-        <item>Veggie</item>
+        <item>Vegetarisch</item>
     </array>
 
     <array name="food_drink">

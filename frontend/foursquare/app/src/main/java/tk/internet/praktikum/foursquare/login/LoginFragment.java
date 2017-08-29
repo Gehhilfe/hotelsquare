@@ -31,8 +31,6 @@ public class LoginFragment extends Fragment {
 
     private EditText userInput, passwordInput;
     private AppCompatButton loginBtn;
-    private TextView registerLbl, passwordForgottenLbl;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,8 +38,8 @@ public class LoginFragment extends Fragment {
         userInput = (EditText) view.findViewById(R.id.user_input);
         passwordInput = (EditText) view.findViewById(R.id.register_password_input);
         loginBtn = (AppCompatButton) view.findViewById(R.id.login_btn);
-        registerLbl = (TextView) view.findViewById(R.id.login_link);
-        passwordForgottenLbl = (TextView) view.findViewById(R.id.forgotten_password);
+        TextView registerLbl = (TextView) view.findViewById(R.id.login_link);
+        TextView passwordForgottenLbl = (TextView) view.findViewById(R.id.forgotten_password);
 
         loginBtn.setOnClickListener(v -> login());
         registerLbl.setOnClickListener(v -> register());
@@ -58,32 +56,25 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-
     /**
-     * Starts the login sequence. For now it only validates the input and displays the Progress dialog for 3 seconds.
+     * Starts the login sequence and saves the returned web token.
      */
     private void login() {
         loginBtn.setEnabled(false);
 
         final ProgressDialog progressDialog = new ProgressDialog(getActivity(), 0);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Waiting for login...");
+        progressDialog.setMessage(getString(R.string.login_dialog));
         progressDialog.show();
 
         String email = userInput.getText().toString();
         String password = passwordInput.getText().toString();
 
-        // Get the SessionService from the backend api
-        // Url should be stored somewhere as an constant
         SessionService service = ServiceFactory.createRetrofitService(SessionService.class, URL);
 
-        /**
-         * Use RxJava to handle a long running backend api call without blocking the application
-         * Would be more clean if we used java 1.8 target with Retrolambda
-         */
         service.postSession(new LoginCredentials(email, password))
-                .subscribeOn(Schedulers.io())                // call is executed i a new thread
-                .observeOn(AndroidSchedulers.mainThread())          // response is handled in main thread
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         tokenInformation -> {
                             successfulLogin();
@@ -92,21 +83,19 @@ public class LoginFragment extends Fragment {
 
                         },
                         throwable -> {
-                            Toast.makeText(getActivity().getBaseContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-                            failedLogin();
+                            Toast.makeText(getActivity().getBaseContext(), getString(R.string.wrong_login_info), Toast.LENGTH_LONG).show();
+                            Log.d(LOG_TAG, throwable.getMessage());
+                            loginBtn.setEnabled(true);
                             progressDialog.dismiss();
                         }
                 );
     }
 
     /**
-     * Start up the next Activity or Fragment after a successful login. At the moment it just logs
-     * the login and finishes the Activity.
+     * Forwards the user to its desired destination by setting the suitable result code.
      */
     private void successfulLogin() {
-        Log.d(LOG_TAG, "Successful login.");
         loginBtn.setEnabled(true);
-
         String destination = getArguments().getString("Destination");
 
         if (Objects.equals(destination, "FastSearch"))
@@ -122,21 +111,15 @@ public class LoginFragment extends Fragment {
     }
 
     /**
-     * Routine to execute on Failed login. Logs the login attempt and displays a Toast for the user.
-     */
-    private void failedLogin() {
-        Log.d(LOG_TAG, "Failed login.");
-        loginBtn.setEnabled(true);
-    }
-
-    /**
-     * Starts the Register Fragment
+     * Forwards the user to the register fragment.
      */
     private void register() {
         ((LoginActivity) getActivity()).changeFragment(1);
     }
 
-    // TODO - Restore Password
+    /**
+     * Forwards the user to the restore password fragment.
+     */
     private void restorePassword() {
         ((LoginActivity) getActivity()).changeFragment(2);
     }
