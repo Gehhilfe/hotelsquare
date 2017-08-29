@@ -29,27 +29,31 @@ public class ServiceFactory {
      */
     public static <T> T createRetrofitService(final Class<T> clazz, final String endpoint, final String token) {
 
-        OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
-        builder.readTimeout(10, TimeUnit.SECONDS);
-        builder.connectTimeout(5, TimeUnit.SECONDS);
-
-        if (token != null) {
-            builder.addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
-                    Request request = chain.request().newBuilder().addHeader("x-auth", token).build();
-                    return chain.proceed(request);
-                }
-            });
-        }
-
         GsonBuilder gsonBuilder = new GsonBuilder();
         CommentDeserializer deserializer = new CommentDeserializer("kind");
         deserializer.registerComment("TextComment", TextComment.class);
         deserializer.registerComment("ImageComment", ImageComment.class);
         gsonBuilder.registerTypeAdapter(Comment.class, deserializer);
 
-        OkHttpClient client = builder.build();
+        OkHttpClient client = null;
+        if (token != null) {
+            client = new OkHttpClient.Builder()
+                    .addInterceptor(new Interceptor() {
+                        @Override
+                        public Response intercept(Chain chain) throws IOException {
+                            Request request = chain.request().newBuilder().addHeader("x-auth", token).build();
+                            return chain.proceed(request);
+                        }
+                    })
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .build();
+        } else {
+            client = new OkHttpClient.Builder()
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .build();
+        }
 
         final Retrofit retrofit = new Retrofit.Builder().baseUrl(endpoint)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -57,10 +61,7 @@ public class ServiceFactory {
                 .client(client)
                 .build();
 
-
-        T service = retrofit.create(clazz);
-
-        return service;
+        return retrofit.create(clazz);
     }
 
     /**
