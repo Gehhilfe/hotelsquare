@@ -158,7 +158,7 @@ async function queryVenue(request, response, next) {
 
     // search in our database for query
     let venues = await searchVenuesInDB(location, keyword, radius, price, page, 10);
-    venues = _.map(venues, (v) => v.toJSONSearchResult());
+
     if (only_open) {
         venues = _.filter(venues, (v) => {
             try {
@@ -168,6 +168,9 @@ async function queryVenue(request, response, next) {
             }
         });
     }
+
+    venues = _.map(venues, (v) => v.toJSONSearchResult());
+
     response.send({
         location: location,
         locationName: locationName,

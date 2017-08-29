@@ -68,13 +68,22 @@ describe('venue', () => {
     }));
 
     it('GET venue details', (mochaAsync(async () => {
-        const res = await request(server)
+        let res = await request(server)
             .get('/venues/' + aVenue._id + '');
         res.should.have.status(200);
         res.body.should.have.property('name');
         res.body.should.have.property('location');
         res.body.should.have.property('images');
         res.body.images.length.should.not.be.equal(0);
+        res = await request(server)
+            .post('/searches/venues')
+            .send({
+                locationName: 'Hügelstraße, Darmstadt',
+                keyword: 'Krone',
+                radius: 5000,
+                only_open: true
+            });
+        res.should.have.status(200);
     })));
 
     it('GET venue details Petro', (mochaAsync(async () => {
