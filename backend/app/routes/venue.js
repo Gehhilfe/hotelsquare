@@ -162,7 +162,7 @@ async function queryVenue(request, response, next) {
     if (only_open) {
         venues = _.filter(venues, (v) => {
             try {
-                v.isOpen();
+                return v.isOpen();
             } catch (err) {
                 return false;
             }
