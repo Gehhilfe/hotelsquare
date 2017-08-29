@@ -1,6 +1,5 @@
 package tk.internet.praktikum.foursquare.api;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -15,9 +14,6 @@ import java.util.Map;
 
 import tk.internet.praktikum.foursquare.api.bean.Comment;
 
-/**
- * Created by gehhi on 10.07.2017.
- */
 
 class CommentDeserializer implements JsonDeserializer<Comment> {
     private final String kindElementName;

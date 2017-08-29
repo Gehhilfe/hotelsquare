@@ -7,9 +7,7 @@ import android.widget.FrameLayout;
 
 import tk.internet.praktikum.foursquare.R;
 
-/**
- * Created by truongtud on 22.06.2017.
- */
+
 
 public   class DrawerLayoutActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;

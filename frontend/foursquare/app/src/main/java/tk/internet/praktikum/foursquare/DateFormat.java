@@ -8,9 +8,7 @@ import java.util.Date;
 
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
-/**
- * Created by gehhi on 13.08.2017.
- */
+
 
 public class DateFormat {
     public static String getFriendlyTime(Context context, Date dateTime) {

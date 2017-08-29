@@ -9,9 +9,6 @@ import android.widget.Filterable;
 
 import java.util.List;
 
-/**
- * Created by truongtud on 24.08.2017.
- */
 
 public class KeyWordsSuggestionAdapter extends CursorAdapter implements Filterable {
     List<String> suggestedKeyWords;
