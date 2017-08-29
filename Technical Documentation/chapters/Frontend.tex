@@ -10,7 +10,6 @@ Each step is taken by a Fragment \footnote{\url{https://developer.android.com/gu
 	\caption[]{Venue Search architecture}
 	\label{fig:venue_search}
 \end{figure}
-\subsubsection{Deep Search}
 \subsubsection{Fast Search}
 When user starts the application, the fast search will be firstly displayed. It plays a role as default view of the application. It provides some name suggestions of interest which are written from static strings resource. On it five categories are predefined and each category contains three items (Figure \ref{fig:fastsearch}).
 \begin{itemize}
@@ -64,7 +63,7 @@ In order to avoid sending undesired request to the server, the current keyword w
 
 Two possible view modes are supported:
  \begin{enumerate}
- 	\item Venues in list: For each request are only 10 venues returned. The first reqest starts with the page number 0 to obtain the first 10 venues. As the user scrolls list until an index position which modulo 10 is equals to 9, the page number will be increased by one and the next quest with the same content query will be sent. In this case are only the basic information( venue name, rating and venue image) displayed (Figure \ref{fig:venuesInlist}). If the user clicks on venue item, it will be redirected to venue in detail view.
+ 	\item Venues in list: For each request are only 10 venues returned. The first request starts with the page number 0 to obtain the first 10 venues. As the user scrolls list until an index position which modulo 10 is equals to 9, the page number will be increased by one and the next quest with the same content query will be sent. In this case are only the basic information( venue name, rating and venue image) displayed (Figure \ref{fig:venuesInlist}). If the user clicks on venue item, it will be redirected to venue in detail view.
  	\begin{figure}[htbp]
  		\includegraphics[width=0.8\textwidth]{images/venuesonlist.jpg}
  		\centering
@@ -183,6 +182,24 @@ The last one is floating menu user activities. With floating menu\footnote{\url{
 
 \end{figure}
 
+\subsection{History}
+History section is built with the purpose to help users tracking their activities on venues. In the implementation  only activities of logged-in users are saved in local database. Assuming that a smart device can be identified with a being logged-in user. This means that only state of user is taken into account. In order to distinguish the activities on venue, the five following states are defined:
+
+\begin{itemize}
+	\item CHECK IN(0)
+	\item LIKE COMMENT(1)
+	\item DISLIKE COMMENT(2)
+	\item TEXT COMMENT(3)
+	\item IMAGE COMMENT(4)
+\end{itemize}
+
+Each history entry consits of five elements: history id, venue name, name  of activity, date of activity and referenced venue id. The green Dao takes responsibility for saving, deleting history entries. 
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/history.jpg}
+	\centering
+	\caption[]{History activities}
+	\label{fig:history}
+\end{figure}
 \subsection{Settings}
 The SettingsFragment mainly provides three functionalities for logged-in users.
 

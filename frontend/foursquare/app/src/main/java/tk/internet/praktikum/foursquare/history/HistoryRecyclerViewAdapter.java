@@ -96,8 +96,8 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
             switch (historyType) {
                 case CHECKIN:
                     return context.getResources().getString(R.string.history_state_check_in);
-                case VISIT:
-                    return context.getResources().getString(R.string.history_state_visit);
+               /* case VISIT:
+                    return context.getResources().getString(R.string.history_state_visit);*/
                 case LIKECOMMENT:
                     return context.getResources().getString(R.string.history_state_like);
                 case DISLIKE_COMMENT:

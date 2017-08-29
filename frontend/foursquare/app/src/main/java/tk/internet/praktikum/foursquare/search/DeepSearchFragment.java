@@ -353,6 +353,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(venueSearchResult -> {
                                 List venuesList = venueSearchResult.getResults();
+                                System.out.println("venueslist: "+venuesList.size());
                                 updateKeyWords(venuesList,lastQuery);
                                if(venuesList.size()>0) {
                                    venues.addAll(venuesList);

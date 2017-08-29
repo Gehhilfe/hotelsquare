@@ -2,11 +2,11 @@ package tk.internet.praktikum.foursquare.history;
 
 public enum HistoryType {
     CHECKIN(0),
-    VISIT(1),
-    LIKECOMMENT(2),
-    DISLIKE_COMMENT(3),
-    TEXT_COMMENT(4),
-    IMAGE_COMMENT(5);
+    //VISIT(1),
+    LIKECOMMENT(1),
+    DISLIKE_COMMENT(2),
+    TEXT_COMMENT(3),
+    IMAGE_COMMENT(4);
     private int value;
 
     HistoryType(int value){
