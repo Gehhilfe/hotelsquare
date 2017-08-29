@@ -2,15 +2,8 @@ package tk.internet.praktikum.foursquare.chat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
@@ -25,10 +18,13 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         Toolbar toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setTitle("Chat");
 
+        // Create the ChatFragment and forwards the arguments from the chat activity to the fragment.
         fragment = new ChatFragment();
         Intent intent = getIntent();
         Bundle args = new Bundle();
@@ -40,7 +36,10 @@ public class ChatActivity extends AppCompatActivity {
         addFragment();
     }
 
-    public void addFragment() {
+    /**
+     * Adds the chat activity fragment to the fragment container.
+     */
+    private void addFragment() {
         getSupportFragmentManager().beginTransaction().add(R.id.chat_activity_container, fragment).commit();
     }
 
@@ -54,17 +53,23 @@ public class ChatActivity extends AppCompatActivity {
         return getParentActivityIntentImpl();
     }
 
+    /**
+     * Sets the intent for the return destination depending on the given parent view.
+     * @return Destination intent.
+     */
     private Intent getParentActivityIntentImpl() {
         Intent i = null;
         Bundle bundle = getIntent().getExtras();
         String parentActivity = bundle.getString("Parent");
 
-        if (parentActivity.equals("UserActivity")) {
-            i = new Intent(this, UserActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        } else {
-            i = new Intent(this, ProfileActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        if (parentActivity != null) {
+            if (parentActivity.equals("UserActivity")) {
+                i = new Intent(this, UserActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            } else {
+                i = new Intent(this, ProfileActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            }
         }
 
         return i;
