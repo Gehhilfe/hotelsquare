@@ -215,11 +215,84 @@ The SettingsFragment mainly provides three functionalities for logged-in users.
 The language selection is also available for users without an \textit{HOTELsquare} account.
 
 \subsection{Own Profile}
-The Profile section provides the user with additional functionalities for editing his profile informations, accepting friend requests and interacting with his friends. The UserActivity will act as a container for the different functionalities and handles the navigation between them. For this purpose the additional functions have been implemented in different Fragments which will be added to the UserStatePagerAdapter which implements the FragmentStatePagerAdapter. By using a FragmentStatePagerAdapter \footnote{\url{https://developer.android.com/reference/android/support/v4/app/FragmentStatePagerAdapter.html}} in combination with a ViewPager \footnote{\url{https://developer.android.com/reference/android/support/v4/view/ViewPager.html}} the user can freely switch between the desired functions by selecting the corresponding tab or by swiping to the adjacent tabs without experiencing long loading times.
+The Profile section provides the user with additional functionalities for editing his profile informations, accepting friend requests and interacting with his friends. The UserActivity will act as a container for the different functionalities and handles the navigation between them. For this purpose the additional functions have been implemented in different Fragments which will be added to the UserStatePagerAdapter which implements the FragmentStatePagerAdapter. By using a FragmentStatePagerAdapter \footnote{\url{https://developer.android.com/reference/android/support/v4/app/FragmentStatePagerAdapter.html}} in combination with a ViewPager \footnote{\url{https://developer.android.com/reference/android/support/v4/view/ViewPager.html}} the user can freely switch between the desired functions by selecting the corresponding tab or by swiping to the adjacent tabs without experiencing long loading times. (Figure \ref{fig:profile_tabbar}).
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/profile_tabbar.jpg}
+	\centering
+	\caption{ViewPager navigation in the UserActivity}\label{fig:profile_tabbar}
+\end{figure}
 
+\subsubsection{Profile}
+The first tab of the ViewPager is ProfileFragment (Figure \ref{fig:profile_fragment_one}). This fragment provides the user with a way to change the informations that he wants to publish. Apart from textual data like Name, Email, Password, City and the Age a user is able to choose his gender and select a profile picture (Figure \ref{fig:profile_fragment_two}). When selecting his profile picture the user can choose between taking a picture from his gallery or to take a new picture with his camera (Figure \ref{fig:profile_image_selection}).
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/profile_fragment_one.jpg}
+	\centering
+	\caption{Profile Fragment}\label{fig:profile_fragment_one}
+\end{figure}
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/profile_fragment_two.jpg}
+	\centering
+	\caption{Changeable user data}\label{fig:profile_fragment_two}
+\end{figure}
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/profile_image_selection.jpg}
+	\centering
+	\caption{Image selection dialogue.}\label{fig:profile_image_selection}
+\end{figure}
 
+\subsubsection{Friend Requests}
+The second tab is for the FriendRequestFragment. This fragment implements a RecyclerView \footnote{\url{https://developer.android.com/reference/android/support/v7/widget/RecyclerView.html}} to display incoming friend requests. To grantee a smooth user experience behaviour not all friend requests will be loaded right away. Instead we are using the technique of pagination to load small chunks of data whenever scrolling would remove an visible entry of the recycler view. Since a fragments from the FragmentStatePagerAdapter will be loaded as soon as one of its adjacent is shown new friend requests wouldn't be displayed unless the last visible fragment would be 2 tabs away. In order to change this behaviour a refresh function will be executed to check for new requests and updates the RecyclerView whenever the friend request fragment is visible  (Figure \ref{fig:friend_request}).
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/friend_request.jpg}
+	\centering
+	\caption{Friend request fragment}\label{fig:friend_request}
+\end{figure} 
 
+\subsubsection{Friend List}
+Our third fragment of the UserActivity is the friend list. the friend list is implemented in the same way as our friend request fragment which includes pagination, data refreshing when the friend list becomes visible. On top of that the user can navigate directly to a chat with one of his friends or load the profile of his friends to get more informations about them (Figure \ref{fig:friend_list}). 
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/friend_list.jpg}
+	\centering
+	\caption{Friend list fragment}\label{fig:friend_list}
+\end{figure} 
 
+\subsubsection{Inbox}
+The last functionality from this section is provided by the InboxFragment. Here a user can see all his ongoing chats. The list of chats is implemented by using a recycler view again as well as a functionality to refresh the last messages when loading up the from an adjoining fragment. As two bonus features we provide the user a little preview of the chat by spoiling them with the last messages from a chat and by highlighting chats with unread messages. From this view the user can navigate either to the profile of a friend by tabbing on the picture of the friend or go straight to the chat by tabbing anywhere else on the row entry (Figure \ref{fig:inbox}).
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/inbox.jpg}
+	\centering
+	\caption{Inbox with an unread message}\label{fig:inbox}
+\end{figure} 
 
+\subsection{Other Person Profile}
+The Profile of other people provides the user with informations about their friends or potential friends. Besides their user data you can have a look at their favourite venue and where they checked in the last time. This element of the app is implemented as a single activity which can be called from various locations within the app (for example; friend list, friend requests, inbox, venu informations, map). When the activity is created all the necessary data will be fetched from the server and displayed on their corresponding ui-element. The profile picture is located inside a CollapsingToolbarLayout \footnote{\url{https://developer.android.com/reference/android/support/design/widget/CollapsingToolbarLayout.html}} which creates more space for displaying the venue informations when scrolling down (Figure \ref{fig:profile_activity_two}). A FloatingActionButton will change its functionality depending on the friend status between the two users. By default the FloatingActionButton will provide the user with the functionality to add the currently viewed person as a friend but in case they are already friends it will allow him to go navigate him towards their chat (Figure \ref{fig:fab_comparrison}).
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/profile_activity_two.jpg}
+	\centering
+	\caption{Profile with a collapsed tool bar.}\label{fig:profile_activity_two}
+\end{figure} 
+\begin{figure}
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.4\linewidth]{images/profile_activity_one.jpg}
+		\caption{Profile with from a person that is not on the friend yet.}
+		\label{fig:profile_activity_one}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.4\linewidth]{images/profile_activity_three.jpg}
+		\caption{Profile of a friend}
+		\label{fig:profile_activity_three}
+	\end{subfigure}
+	\caption{Comparison of the two FloatingActionButton states.}
+	\label{fig:fab_comparrison}
+\end{figure}
 
-
+\subsection{Chat}
+The chat is implemented as an activity that hosts a fragment which implements chat functionalities. This allows us to open the chat from different parts of the app without changing the chat behaviour. The chat messages are displayed on a ListView \footnote{\url{https://developer.android.com/reference/android/widget/ListView.html}} which request an update from the server every 10 seconds. Upon loading the chat fragment all previous messages will be requests from the server and forwarded to a ChatListViewAdapter which extends from a BaseAdapter \footnote{\url{https://developer.android.com/reference/android/widget/BaseAdapter.html}}. The ChatListViewAdapter is responsible for displaying all necessary informations (names, messages, dates) in a way that the users will be able to quickly differ between their own messages and messages from the chat partner (Figure \ref{fig:chat}).
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/chat.jpg}
+	\centering
+	\caption{Profile with a collapsed tool bar.}\label{fig:chat}
+\end{figure} 
