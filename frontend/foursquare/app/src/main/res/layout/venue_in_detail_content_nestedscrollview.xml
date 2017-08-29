@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:overScrollMode="never"
+    android:scrollbars="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView"
+    tools:showIn="@layout/activity_venue_detail_nestedscrollview">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="75dp">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:weightSum="10">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="3"
+                            android:orientation="vertical">
+
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="7"
+                            android:orientation="horizontal">
+
+                            <fragment
+                                android:id="@+id/mapView"
+                                android:name="com.google.android.gms.maps.SupportMapFragment"
+                                android:layout_width="match_parent"
+                                android:layout_height="150dp" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/map_overlay_gradient"
+                                android:orientation="vertical" />
+                        </FrameLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/text_margin"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/money_1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_attach_money_black_24dp"
+                                android:tint="@color/gray" />
+
+                            <ImageView
+                                android:id="@+id/money_2"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_attach_money_black_24dp"
+                                android:tint="@color/gray" />
+
+                            <ImageView
+                                android:id="@+id/money_3"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_attach_money_black_24dp"
+                                android:tint="@color/gray" />
+
+                            <ImageView
+                                android:id="@+id/money_4"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_attach_money_black_24dp"
+                                android:tint="@color/gray" />
+
+                            <ImageView
+                                android:id="@+id/money_5"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_attach_money_black_24dp"
+                                android:tint="@color/gray" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/text_vicinty"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/text_margin"
+                            android:text="Vicinity"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/actions_padding"
+                    android:paddingLeft="@dimen/actions_padding_left"
+                    android:paddingRight="@dimen/actions_padding_left">
+
+                    <Button
+                        android:id="@+id/www"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/actions_padding"
+                        android:text="@string/venue_website"
+                        android:textAppearance="@style/TextAction" />
+
+                    <Button
+                        android:id="@+id/call"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/actions_padding"
+                        android:text="@string/venue_call"
+                        android:textAppearance="@style/TextAction" />
+
+                    <Button
+                        android:id="@+id/checkin"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/actions_padding"
+                        android:text="@string/venue_check_in"
+                        android:textAppearance="@style/TextAction" />
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/image_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                  />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/image_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/image_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                   />
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/venue_detail_leaderboard_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/activity_vertical_margin"
+                    android:gravity="center"
+                    android:text="@string/leaderboard"
+                    android:textSize="26dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/activity_vertical_margin"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/leaderboard_2_avatar"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center_horizontal" />
+
+                        <TextView
+                            android:id="@+id/leaderboard_2_position"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                           />
+
+                        <TextView
+                            android:id="@+id/leaderboard_2_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:textColor="@color/colorAccent" />
+
+                        <TextView
+                            android:id="@+id/leaderboard_2_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                             />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/leaderboard_1_avatar"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center_horizontal"
+                           />
+
+                        <TextView
+                            android:id="@+id/leaderboard_1_position"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                           />
+
+                        <TextView
+                            android:id="@+id/leaderboard_1_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:textColor="@color/colorAccent" />
+
+                        <TextView
+                            android:id="@+id/leaderboard_1_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/leaderboard_3_avatar"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center_horizontal"
+                            />
+
+                        <TextView
+                            android:id="@+id/leaderboard_3_position"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            />
+
+                        <TextView
+                            android:id="@+id/leaderboard_3_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:textColor="@color/colorAccent" />
+
+                        <TextView
+                            android:id="@+id/leaderboard_3_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/venue_detail_checkin_card"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/activity_horizontal_margin">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/activity_vertical_margin"
+
+                    android:gravity="center"
+                    android:text="@string/last_checkins"
+                    android:textSize="26dp" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/last_here_recylcer_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                </android.support.v7.widget.RecyclerView>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/comment_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:scrollbars="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

@@ -1,12 +1,6 @@
 {
   "db": {
-    "host": "localhost",
+    "host": "docker",
     "name": "dev"
-  },
-  "jwt": {
-    "secret": "secret",
-    "options": {
-      "algorithm": "HS256"
-    }
   }
 }

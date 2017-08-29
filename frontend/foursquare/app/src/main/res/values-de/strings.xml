@@ -1,0 +1,258 @@
+<resources>
+    <string name="foursquare_slogan">Erkunden die Welt um dich herum</string>
+
+    <string name="app_name">Hotelsquare</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Passwort</string>
+    <string name="user_name">Benutzername</string>
+    <string name="login">Anmelden</string>
+    <string name="register_here">Neu? Registriere dich hier.</string>
+    <string name="fb_login">Anmelden mit Facebook.</string>
+    <string name="existing_account">Haben Sie schon ein Konto? Anmelden!</string>
+    <string name="register">Registrieren</string>
+    <string name="name">Name</string>
+    <string name="user_preferences">User_preferences</string>
+    <string name="title_activity_foursquare">Foursquare</string>
+    <string name="password_forgotten">Passwort vergessen?</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_main">Foursquare</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_search">Orte</string>
+    <string name="action_search_person">Personen</string>
+    <string name="action_history">Verlauf</string>
+    <string name="action_settings">Einstellung</string>
+    <string name="action_me">Profil</string>
+    <string name="action_login">Anmelden</string>
+    <string name="action_logout">Abmelden</string>
+
+    <string name="reset_password_lbl">Geben Sie Ihre Email ein um Ihr Passwort zurückzusetzen.</string>
+    <string name="reset_password">Passwort zurücksetzen</string>
+    <string name="searching_question">Was suchst du?</string>
+
+    <!-- User -->
+    <string name="user_tab_requests">Anfragen</string>
+    <string name="user_tab_profile">Profil</string>
+    <string name="user_tab_friends">Freunden</string>
+    <string name="user_tab_inbox">Inbox</string>
+    <string name="near_me">in meiner Nähe</string>
+
+    <!-- user profile stuff -->
+    <string name="profile_city">Stadt</string>
+    <string name="profile_age">Alter</string>
+    <string name="profile_gender">Geschlecht</string>
+    <string name="profile_male">Männlich</string>
+    <string name="profile_female">Weiblich</string>
+    <string name="profile_Anonymous">Anonym</string>
+    <string name="top_check_in">Am häufigsten Eingecheckt</string>
+    <string name="profile_cancel">Abbrechen</string>
+    <string name="profile_edit">Bearbeiten</string>
+    <string name="prof_save">Speichern</string>
+
+
+
+    <!-- Other stuff -->
+    <string name="profile_upload_avatar">Hochladen</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="liked">Likes</string>
+    <string name="more">Weiter...</string>
+    <string name="open_now">Jetzt geöffnet</string>
+    <string name="price">Preis</string>
+    <string name="saved">Speichern</string>
+    <string name="venue_call">Anrufen</string>
+    <string name="venue_check_in">Einschecken</string>
+
+    <string name="login_first">Du musst dich anmelden</string>
+    <string name="history_state_check_in">Eingescheckt</string>
+    <string name="history_state_visit">Besucht</string>
+    <string name="history_state_like">Dir gefällt ein Kommentar</string>
+    <string name="history_state_dislike">Dir gefällt ein Kommentar nicht</string>
+    <string name="history_state_text_comment">Du hast ein Kommentar geschrieben</string>
+    <string name="history_state_image_comment">Du hast ein Bild hochgeladen</string>
+    <string name="button_post_image">Bild hochladen</string>
+    <string name="button_post_text">Kommentar schreiben</string>
+    <string name="button_pictures">Bilder</string>
+    <string name="title_activity_venue_gallery">Galerie</string>
+    <string name="action_post_image">Bild hochladen</string>
+    <string name="action_post_text">Text kommentieren</string>
+    <string name="action_post_text_default">Dein Kommentar</string>
+    <string name="action_post_image_select_1">Foto machen</string>
+    <string name="action_post_image_select_2">Foto aus Gallerie auswählen</string>
+
+    <!-- settings-->
+    <string name="langSelect">Sprache auswählen</string>
+    <string name="incognito">Inkonito-Modus</string>
+    <string name="delete_profile">Profil löschen</string>
+    <string name="delete_dialog">Profil löschen</string>
+    <string name="delete_text">"Wollen Sie ihr Profile wirklich löschen?</string>
+
+    <!-- venue in details -->
+    <string name="leaderboard">Bestenliste</string>
+    <string name="last_checkins">Zuletzt eingecheckt</string>
+    <string name="checkins_count">Einchecken</string>
+    <string name="a_year">einem Jahr</string>
+    <string name="years">Jahren</string>
+    <string name="a_month">einem Monat</string>
+    <string name="months">Monaten</string>
+    <string name="a_day">einem Tag</string>
+    <string name="days">Tage</string>
+    <string name="an_hour">einer Stunde</string>
+    <string name="hours">Studen</string>
+    <string name="a_minute">einer Minute</string>
+    <string name="minutes">Minuten</string>
+    <string name="a_second">einer Sekunde</string>
+    <string name="seconds">Sekunden</string>
+    <string name="about">circa</string>
+    <string name="find_me">Meine Position</string>
+
+    <string-array name="languages">
+        <item>Englisch</item>
+        <item>Deutsch</item>
+    </string-array>
+    <string-array name="locale">
+        <item>en</item>
+        <item>de</item>
+    </string-array>
+    <string name="category_1">
+        Essen&amp;Trinken
+    </string>
+    <string name="category_2">
+        Urlaub&amp;Erholung
+    </string>
+    <string name="category_3">
+       Services
+    </string>
+    <string name="category_4">
+       Geschäfte
+    </string>
+    <string name="category_5">
+        Infrastruktur
+    </string>
+    <string name="home_no_current_requests">Zurzeit hast du keine ausstehende Freundesanfrage.</string>
+    <string name="friendlist_no_friends">Keine Freunde? Warum suchst du nicht einfach welche mit Hotelsquare!</string>
+    <string name="inbox_no_chats">Zurzeit hast du keine offenen Unterhaltungen.</string>
+    <string name="send_friendrequest">Die Freundesanfrage wurde verschickt.</string>
+    <string name="pending_friendrequest">Freundschaftanfrage wurde bereits versand.</string>
+    <string name="accept_friend_request">Die Freundschaftanfrage wurde bestätigt!</string>
+    <string name="decline_friend_request">Die Freundschaftanfrage wurde abgelehnt!</string>
+    <string name="wrong_login_info">Der Login ist fehlgeschlagen. Bitte überprüfe deine Anmeldeinformationen und versuche es erneut.</string>
+    <string name="registration_complete">Bitte prüfe deine Emails, um die Registrierung abzuschließen.</string>
+    <string name="registration_failed">Es ist ein Fehler bei der Registrierung aufgetretten. Bitte versuche es nochmal.</string>
+    <string name="register_invalid_mail">Bitte gib eine gültige Email-Adresse ein..</string>
+    <string name="register_invalid_name">Dein Benutzeraccount sollte mindestens 3 Zeichen haben..</string>
+    <string name="register_invalid_password">Dein Passwort sollte mindestens 6 Zeichen haben</string>
+    <string name="reset_failed">Es ist ein Fehler bei der Passwortzurücksetzung aufgetretten. Bitte versuche es nochmal</string>
+    <string name="reset_completed">Bitte prüfe deine Emails, um dein neues Passwort zu erhalten.</string>
+
+    <!-- Upload image -->
+    <string name="image_cancel">Abbrechen</string>
+    <string name="image_camera">Kamera</string>
+    <string name="image_gallery">Gallery</string>
+    <string name="image_title">Wähle aus von wo du dein Profilbild laden willst.</string>
+
+
+    <!-- Dialogs -->
+    <string name="register_dialog">Warte auf den Registrierungs- Server…</string>
+    <string name="login_dialog">Warte auf den Login- Server…</string>
+    <string name="reset_dialog">Warte auf die Server- Atwort…</string>
+    <string name="load_profile">Warte auf die Nutzerinformationen…</string>
+    <string name="error_user_data">Die Nutzerinformationen konnten nicht geladen werden.</string>
+    <string name="error_upload_user_data">Beim upload deiner Nutzerinformationen ist ein Fehler aufgetretten. Bitte prüfe deine Internetverbindung und versuche es erneut.</string>
+
+
+    <!--- C1-->
+    <array name="beer">
+        <item>bier</item>
+        <item>Bier</item>
+    </array>
+    <array name="cafe">
+        <item>cafe</item>
+        <item>Cafe</item>
+    </array>
+    <array name="vegetarian">
+        <item>vegetarisch</item>
+        <item>Veggie</item>
+    </array>
+
+    <array name="food_drink">
+        <item>@array/beer</item>
+        <item>@array/cafe</item>
+        <item>@array/vegetarian</item>
+    </array>
+    <!--- C2-->
+    <array name="beach">
+        <item>strand</item>
+        <item>Strand</item>
+    </array>
+    <array name="castle">
+        <item>burg</item>
+        <item>Burg</item>
+    </array>
+    <array name="zoo">
+        <item>zoo</item>
+        <item>Zoo</item>
+    </array>
+    <array name="holiday_relaxation">
+        <item>@array/beach</item>
+        <item>@array/castle</item>
+        <item>@array/zoo</item>
+    </array>
+    <!--- C3-->
+    <array name="bank">
+        <item>bank</item>
+        <item>Bank</item>
+    </array>
+    <array name="gas_station">
+        <item>tankstelle</item>
+        <item>Tankstelle</item>
+    </array>
+    <array name="car_wash">
+        <item>autowaschanlage</item>
+        <item>Autowaschanlage</item>
+    </array>
+    <array name="service">
+        <item>@array/bank</item>
+        <item>@array/gas_station</item>
+        <item>@array/car_wash</item>
+    </array>
+    <!--- C4-->
+    <array name="supermarket">
+        <item>supermarkt</item>
+        <item>Supermarkt</item>
+    </array>
+    <array name="florist">
+        <item>florist</item>
+        <item>Blumen</item>
+    </array>
+    <array name="music">
+        <item>musik</item>
+        <item>Musik</item>
+    </array>
+    <array name="shops">
+        <item>@array/supermarket</item>
+        <item>@array/florist</item>
+        <item>@array/music</item>
+    </array>
+
+    <!--- C5-->
+    <array name="airport">
+        <item>flughafen</item>
+        <item>Flughafen</item>
+    </array>
+    <array name="harbor">
+        <item>hafen</item>
+        <item>Hafen</item>
+    </array>
+    <array name="electrical_charging_station">
+        <item>elektrotankstelle</item>
+        <item>Elektrotankstelle</item>
+    </array>
+    <array name="infrastructure">
+        <item>@array/airport</item>
+        <item>@array/harbor</item>
+        <item>@array/electrical_charging_station</item>
+    </array>
+
+</resources>

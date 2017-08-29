@@ -1,0 +1,347 @@
+\section{Backend}
+\label{sec:backend}
+The backend of the project shall provide the app with all necessary features like user management, venue data, image handling and a lot more. It was required to implement the backend by creating a \textit{NodeJS} server which is communicating with a \textit{NoSQL} database of choice. For the latter, as mentioned in sec.\ \ref{subsec:general_architecture}, a \textit{MongoDB} database was used im combination with \textit{mongoose} for easy \texttt{CRUD} access to it. 
+
+\subsection{Development Practice}
+\label{subsec:developmentpractice}
+To implement the given task, \textit{Gitlab} was used to manage the git repository for both the frontend and the backend. The reason for choosing \textit{Gitlab} was that it provides build in project management tools such as issue tracking, milestone planning and it supports several integration strategies. Most important, it is easily possible to script a pipeline for a continuous deployment (CD) strategy for the software development. As we used \textit{Docker} containers to build an agile software delivery pipeline to deliver new backend features faster for the frontend team, this could be perfectly done with \textit{Gitlab}. \newline
+In general, we built a three staged pipeline running after each push of code to the git repository with an automatic E-Mail notification service for broken pipelines. The steps are:
+\begin{itemize}
+	\item Test: running all tests written for the backend, including a code coverage analysis and lint for statical code analysis
+	\item Build: building the backend software after all tests succeeded
+	\item Deploy: deploy software to a new docker container and run it on the server (just for \texttt{dev} and \texttt{master} branches)
+\end{itemize} 
+However, development took place on individual branches for the different tasks and the integration of running software (all tests succeeded) could be done by creating a merge request for the \texttt{dev} branch, where the current state of functionality was deployed to. \newline\newline
+Furthermore, behaviour driven development (BDD) going along with test driven development (TDD) was the development style of choice. After user stories where created, the tests for the backend code providing the required functionality were created in a behavioural style directly representing the thought of user stories. This ensured that most functionality provided to the frontend was working and the routes for accessing the server are provided in a logic manner following the actions of the user. In the next lines, some more information about the just mentioned topics are provided.
+
+\subsubsection{Continuous Integration (CI)}
+\label{subsubsec:continuousintegration}
+Continuous Integration (CI) focusses on the integration of software through validation with unit tests and possibly integration tests. This means that usually there is a test environment (in this project a \texttt{dev} space on the server) available, where the newly generated code will be build into. When pushing new code to the repository  automatically regression tests are run to check if the integration into the project is working. CI is the first step to automate software development, delivery and deployment. 
+\newline\newline
+In this project a CD pipeline is implemented including the necessary steps for CI as mentioned in the next lines. 
+
+\subsubsection{Continuous Deployment (CD)}
+\label{subsubsec:continuousdeployment}
+Continuous Deployment (CD) is the next step above CI to further improve the development speed and automatically deploy the code. In contrast to continuous delivery, each successful build is directly deployed to production. This results in faster feedback. In this project a CD pipeline based on behavioural tests and build into \textit{Docker} container images is implemented as mentioned above.
+
+\subsubsection{Test Driven Development (TDD) \& Behaviour Driven Development (BDD)}
+\label{subsubsec:bddtdd}
+Test driven development (TDD) is a development style often used in agile environments. Using TDD, the developers or testers create tests before writing the code. This ensures a high coverage of the code by the tests, as in traditional development environments, the code is often not tested exhaustively after its creation. The tests are usually separated into unit tests, integration tests, system tests and acceptance tests, which ensure trust in the software product during all stages of development.\newline
+Behaviour driven development (BDD) is another agile style of software development based on user stories. This approach was developed based on TDD. The user stories are used to create a testbench which can be automatically run throughout the whole development process. In combination with TDD, it is possible to always define exhaustive test cases for specific user actions. So the improvement comparing to "just" using TDD is that not just the single components of the software are tested in advance, but also the whole 'action flows' of the end user is stepped through and evaluated.\newline\newline
+The testing in this project is realised with the \textit{Chai Assertion Library} for \textit{NodeJS}. In general, that BDD is a slightly different approach than TDD can be seen in the different style of testing instructions in the chosen library: 
+\begin{itemize}
+	\item BDD: \begin{lstlisting}
+	chai.should();
+	
+	foo.should.be.a('string');
+	foo.should.equal('bar');
+	foo.should.have.lengthOf(3);
+	tea.should.have.property('flavors')
+	.with.lengthOf(3);
+	\end{lstlisting}
+	\item TDD: \begin{lstlisting}
+	var assert = chai.assert;
+		
+	assert.typeOf(foo, 'string');
+	assert.equal(foo, 'bar');
+	assert.lengthOf(foo, 3)
+	assert.property(tea, 'flavors');
+	assert.lengthOf(tea.flavors, 3);
+	\end{lstlisting}
+\end{itemize}
+However, our development was based on the BDD style testing framework of the \textit{Chai Assertion Library}. As an example, a defined user action would be to delete himself in the app. For doing this, the user has to be authenticated. A possible test for this scenario (in the test script, the user has already been defined) looks for example like shown in lst.\ (\ref{lst:deleteuser}).\footnote{http://chaijs.com/ (25.07.2017)}
+
+\begin{lstlisting}[caption={Example of BDD testing for a user deleting himself from the database.}, label=lst:deleteuser]
+describe('DELETE user', () => {
+	it('should delete user if authenticated', (done) => {
+		request(server)
+			.delete('/users')
+			.set('x-auth', peterToken)
+			.end((err, res) => {
+				res.should.have.status(200);
+				User.findById(peter._doc._id, (error, user) => {
+					expect(user).to.be.null;
+					return done();
+				});
+			});
+	});
+});
+\end{lstlisting}
+
+\subsubsection{Docker}
+\label{subsubsec:docker}
+\textit{Docker} is an open-source software, which isolates applications in virtual OS environments. This has several benefits. It enables the automation of setting up and configuring development environments which makes it easy to work together in a project. Furthermore, \textit{Docker} makes it easy to on the one hand scale a cloud service, as the single images can be replicated as often as needed. On the other hand, containers are easy to shift, which makes the implementation less dependant on the current environment. Finally, it helps creating agile software development pipelines as the build-servers do not have to be manually configured and at the end of a CD pipeline, automatically a \textit{Docker} image can be build.\footnote{\url{https://www.docker.com/what-docker} (25.07.2017)}
+
+\subsubsection{Lint}
+\label{subsubsec:lint}
+\textit{Lint} is a software tool for statical code analysis. Its purpose is to ensure a readable layout of the code, which is also useful for defining a constant coding style in a project or company, to find not portable constructs like dependencies on special compilers and to highlight dangerous coding style like not initialized variables. It is highly configurable so that the developer can well define the behaviour of the tool. In general, \textit{Lint} is available for most common programming languages.\newline\newline
+In this project, \textit{Lint} for \textit{NodeJS} was part of the standard BDD pipeline managed in \textit{Gitlab}, so that good coding style, \textbf{JavaDoc}, etc. was ensured. In lst.\ (\ref{lst:lintrules}), a small extract from the rules defined in the \textit{Lint} configuration file are shown. It can be seen that several issues concerning good coding style, like a valid \textit{JavaDoc} documentation or correct comma spacing are listed. '- error' defines that this feature will lead to an error message when the test pipeline is run.
+
+\begin{lstlisting}[caption={Extract from the rules of the \textit{Lint} configuration file.}, label=lst:lintrules]
+rules:
+	indent:
+		- error
+		- 4
+	linebreak-style:
+		- error
+		- unix
+	quotes:
+		- error
+		- single
+	valid-jsdoc:
+		- error
+	require-jsdoc: 1
+	prefer-const:
+		- error
+	comma-spacing: error
+\end{lstlisting}
+
+\subsubsection{Code Coverage}
+\label{subsubsec:codecoverage}
+Code coverage is a general criterion of static code analysis. There are several code properties, of which the coverage can be calculated. Below those are for example statement coverage, branch coverage, function coverage, line coverage and many more, which are often derived from the formerly mentioned tests. The statement of how much code is covered by tests does not improve the code directly, but it increases the trust in the proper functioning of it. 
+\newline\newline
+For this project, the coverage test was part of the above mentioned CD-pipeline, so that it could be tracked, how much of the backend code was covered by the prior implemented tests. In case of low coverage, some more tests, covering so far not considered effects could be added. Finally, the following coverage ratios could be achieved for the backend:
+\begin{itemize}
+	\item statements: 86.33%
+	\item branches: 70.14%
+	\item functions: 83.15%
+	\item lines: 86.34%s
+\end{itemize} 
+
+\subsection{Server and Database}
+\label{subsec:server}
+For implementing the web server providing a \texttt{REST}ful API to the \textit{Android} app, \textit{NodeJS} was the required \textit{JavaScript} runtime environment. In sec.\ \ref{subsubsec:nodejs}, some general remarks about \textit{NodeJS} are mentioned. In the project, version 7.10 is used. From version 7.6 on, the \texttt{async - await} language construct was introduced to provide a much more readable callback approach than before. This helps for having compact, readable and maintainable software code. Besides many other language features, we made use of this new construct for the prior mentioned reasons. It should still be remarked that the functionality of the software does not improve by the newly available syntax. In lst.\ (\ref{lst:callback}) and lst.\ (\ref{lst:async}), a short example of two \textit{NodeJS} statements (both logging 'Hello World' to the console) with the same functionality are shown. To illustrate the real benefit of this new syntax, a more complex example of uploading an avatar to the server is shown in lst.\ (\ref{lst:uploadavatar}). It can be clearly seen that this coding style reads very much like sequential code and it supports readability a lot.
+
+\begin{minipage}[b]{0.45\linewidth}
+	\centering
+	\label{lst:callback}
+\begin{lstlisting}[caption={Old version of 'Hello World' code using callbacks.}]
+sleep(100).
+	then(() => {
+	console.log('Hallo Welt!');
+}).
+catch(err => {
+	// ...
+});
+\end{lstlisting}
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.45\linewidth}
+	\centering
+	\label{lst:async}
+\begin{lstlisting}[caption={New version of 'Hello World' code using callbacks within an \texttt{async} function.}]
+try {
+	await sleep(100);
+	console.log('Hallo Welt!');
+} catch (ex) {
+	// ...
+}
+\end{lstlisting}
+\end{minipage}
+
+\begin{lstlisting}[caption={Example of more complex function uploading an avatar of a user to the database.}, label=lst:uploadavatar]
+async function uploadAvatar(request, response, next) {
+	let user = await User.findOne({name: request.authentication.name});
+	if(user.avatar) {
+		await Image.destroy(user.avatar);
+	}
+	user.avatar = await Image.upload(request.files.image.path, user, user);
+	user = await user.save();
+	response.json(user);
+	return next();
+}
+\end{lstlisting}
+
+\subsubsection{Server structure}
+\label{subsubsec:serverstructure}
+In general, the backend is structured into three main parts: models, routes and tests. Furthermore, the actual server file contains the API of the backend. As far as possible, functionality is clustered in the models, as this reduces the extend of code, possible locations of errors and it improves readability and maintainability of the code. \newline
+However, out of the models created with \textit{mongoose}, as stated before, the actual \textit{JSON}-like files for data storage are created for the \textit{MongoDB}. In lst.\ (\ref{lst:model}) an example of how the 'Schema' of the \textit{venue} model looks like. The models created for this project are the following:
+\begin{itemize}
+	\item \texttt{chat}: The model contains the participants of the chat, which are references to the respective user objects in the database. In general the chat model would be usable for chat groups as well.
+	\item \texttt{comments}: The model contains the author, the object which it is assigned to (could be a any model containing text or image comments), some further own comments and some more minor information.  To implement a generic comment model, \textit{mongoose} discriminators are used. With this construct, a '\texttt{kind}' parameter is added to the 'Schema'. This parameter has to be defined as the model's discriminator key beforehand: %\begin{lstlisting}const options = {discriminatorKey: 'kind'};\end{lstlisting}
+	. Afterwards, it is possible to create different model classes for the different comment types which add further functionality to the inherited generic functionality from a common base class.
+	\item \texttt{image}: The model contains a \texttt{uuid} (unique 128Bit ID), which is used to store the image with \textit{minio}. Furthermore, the object, to which the image is assigned (could be a comment or a venue for example), the date of creation, the author and the location are stored.
+	\item \texttt{geocoderesult}: The \texttt{geocoderesult} model is used to store the results of the query of the \textit{Google Places API}\footnote{\url{https://developers.google.com/places/?hl=de} (28.07.2017)}. Besides the actual venue object, the query time and the used keyword are stored, so that old information could be updated from time to time.
+	\item \texttt{message}: A \texttt{message} represents a message in the chat. Therefore the chat ID, the sender and a time stamp are part of the model next to the actual text. 
+	\item \texttt{searchrequest}: This model represents a search query from the app to the backend and helps to reduce the queries to the \textit{Google Places API} and the \textit{Foursquare API}. It contains the location, where the user is searching for a keyword, the keyword and the query time.
+	\item \texttt{user}: A user can register by adding a display name, an e-mail address and a password. The first two parameters are used as primary keys for the database and are therefore '\texttt{unique}'. To store the name of the user, a second 'name parameter' is used, the actual '\texttt{name}' of the user. This is derived automatically by creating the lower case representation of the '\texttt{displayName}', which makes the handling and queries easier. There are few requirements for for the password strength and the length of the user name, which are checked on server-side. In case of an error a descriptive error message is sent back. \newline Besides, it is possible that a user has friends, which are users themselves and friend requests. Further important model parameters are for example the gender, the last location of the user, an incognito flag (this prevents the user from being shown in location based queries from other users; this is done on server-side) and an avatar of the user, which can be uploaded through the frontend.
+	\item \texttt{venue}: The \texttt{venue} model contains some parameters for storing venue information received by the \textit{Google Places API} and the \textit{Foursquare API}. Below the \textit{Google Places API} information are the \texttt{place\_id}, \texttt{opening\_hours} and a rating. From the \textit{Foursquare API}, the \texttt{phone number}, \texttt{price range}, \texttt{tags} and \texttt{photos} are retrieved. For this project it was necessary to add further parameters for comments, which can be added by the users of the app and check-ins of the users. 
+\end{itemize}
+
+\begin{lstlisting}[caption={Example of a \textit{mongoose} 'Schema'. The model for a venue is shown, which contains some properties which are fetched by the \textit{Google Places API} like the \texttt{opening\_hours} or the \texttt{place\_id}. On top, own properties like the ckeck-ins or text or image comments of users are added.}, label=lst:model]
+	const VenueSchema = new Schema({
+		name: String,
+		place_id: String,
+		reference: String,
+		photo_reference: String,
+		types: [String],
+		location: {
+			'type': {type: String, default: 'Point'},
+			coordinates: {type: [Number], default: [0, 0]}
+		},
+		images: [{
+			type: Schema.Types.ObjectId,
+			ref: 'Image'
+		}],
+		details_loaded: {
+			type: Boolean,
+			default: false
+		},
+		price: {
+			type: Number,
+			default: 0
+		},
+		foursquare_id: String,
+		opening_hours: {
+			periods: [{
+				close: [{
+					day: Number,
+					time: String
+				}],
+				open: [{
+					day: Number,
+					time: String
+				}]
+			}]
+		},
+		check_ins: [{
+			user: {
+				type: Schema.Types.ObjectId,
+				ref: 'User'
+			},
+			count: {
+				type: Number,
+				default: 0
+			},
+			last: {
+				type: Date,
+				default: Date.now()
+			}
+		}],
+		utc_offset: Number,
+		website: String,
+		vicinity: String,
+		formattedAddress: String,
+		phone_number: Number,
+		icon_url: String,
+		rating_google: Number,
+		comments: [{
+			kind: String,
+			item: {
+			type: Schema.Types.ObjectId,
+			refPath: 'comments.kind'
+		},
+			created_at: Date
+		}]
+	});
+\end{lstlisting}
+
+Within the model files, the actual 'Schemas' from \textit{mongoose} defining the data properties, are encapsulated with classes, which in most cases already contain the \texttt{CRUD}- and further basic functionality based on the model data. This makes the access for the API very easy as the main functionality does not need to be implemented several times if it is needed in different routes. 
+
+Despite, the routes provide the the functionality for the backend API. They are directly connected to the API in the server file. Within the routes, either functionality from the objects from the database are called or some functionality is directly implemented. The backend contains the following routes:
+\begin{itemize}
+	\item \texttt{chat}: Provides functionality to create a new chat, reply to a message, get a full conversation and get all conversations.
+	%\item \texttt{chatsocket}: Pushes new notifications to the users with the use of \textit{socket.io}.
+	\item \texttt{comment}: Provides methods for receiving all comments from an object, adding text or image comments and liking or disliking them.
+	\item \texttt{friend}: Provides routes for getting a list of all friends of a user and a list of all near by friends.
+	\item \texttt{image}: Implements methods for getting an image and its information.
+	\item \texttt{session}: Supplies a method to post a session to a user.
+	\item \texttt{user}: Provides \texttt{REST} access to the user model, handles the users friends and friend requests, the avatar, the user's own data and some more minor functionality. 
+	\item \texttt{venue}: Provides methods to query for venues, to get all comments from a venue and to check in a venue.
+	
+\end{itemize} 
+After all, it can be seen that all data related functionality is packend within the model files, wheras the routes following the behaviour of the app user like described in sec.\ \ref{subsubsec:bddtdd}.
+\newline\newline
+The actual server was implemented with the restify framework, which is further described in sec.\ \ref{subsec:3rdpartylibs}. Besides including all required models, routes and further libraries or documents, the main server file defines the API of the backend. Therefore, the above described routes are added to the \textit{restify} server. For logging purposes, the \textit{bunyan} logger is set up and connected to the restify server. In lst.\ (\ref{lst:routes}),  the example API for all venue related routes are shown.
+
+\begin{lstlisting}[caption={All venue realted \texttt{REST} routes defining parts of the API of the server.}, label=lst:routes]
+// Venue
+server.get('venues/:id', venue.getVenue);
+server.put('venues/:id/checkin', auth, venue.checkin);
+server.get('venues/:id/comments', comment.getComments(Venue));
+server.get('venues/:id/comments/:page', comment.getComments(Venue));
+
+server.post('venues/:id/comments/text', auth, comment.textComment(Venue));
+server.post('venues/:id/comments/image', auth, comment.imageComment(Venue));
+\end{lstlisting}
+
+It can be noticed that just few routes require an authentication of the user. This shows that a large part of the API is user independent and can be used in the frontend without being logged in. For each incoming request to the server, it is automatically checked whether a authentication header is part of the request. If this is the case, a middleware, basically just a filter, checks whether the \textit{JSON} web token is valid and otherwise returns an error status and message to the sender. If the token is valid, the user started a session and the request is directly lead through to the actual route.
+\newline\newline
+In general, the implemented API is a \texttt{REST}ful API. This means in short that all provided routes are one of the four major HTTP methods \texttt{POST} (post data to the server), \texttt{PUT} (change data on the server), \texttt{DELETE} (delete data on the server) and \texttt{GET} (get data from the server). The naming of the routes should directly follow its purpose. In this project we followed the name conventions from \url{www.restapitutorials.com}\footnote{\url{http://www.restapitutorial.com/lessons/restfulresourcenaming.html}, (28.07.2017)}.
+
+\subsection{3rd Party Libraries}
+\label{subsec:3rdpartylibs}
+To achieve having a running server providing all the necessary functionality needed for running a \textit{Foursquare} clone app without too much development time, it was necessary to include some 3rd party libraries providing different features to the backend. In the following, a list of all used libraries and their purposes is given:
+\begin{itemize}
+	\item \texttt{bunyan}: \textit{Bunyan} is a simple \textit{JSON} logging library for \textit{NodeJS}. This helps both during the development and production phase, as full error messages can be seen and server accesses  evaluated.\footnote{\url{https://www.npmjs.com/package/bunyan} (26.07.2017)}
+	\item \texttt{bunyan-logstash}: Adds the logstash UDP stream for the bunyan cloud logger.\footnote{\url{https://www.npmjs.com/package/bunyan-logstash} (26.07.2017)}
+	\item \texttt{restify-bunyan-logger}: Adds the bunyan logger to the \textit{restify} web service framework.	\footnote{\url{https://www.npmjs.com/package/restify-bunyan-logger} (26.07.2017)}
+	\item \texttt{restify-errors}: \textit{NodeJS} package for easy usage of \textit{HTTP} and \textit{REST} errors. The package provides constructors to create error objects for all common errors.	\footnote{\url{https://www.npmjs.com/package/restify-errors} (26.07.2017)}
+	\item \texttt{restify}: \textit{restify} is a \textit{NodeJS} web service framework optimized for \texttt{REST}ful APIs. This framework already includes a basic server, which is the basis for this project. All routes are added to the server in order to make the API accessible for the app.\footnote{\url{http://restify.com/} (28.07.2017)}
+	%\item \texttt{socket.io}: \textit{socket.io} helps to implement real-time bidirectional event-based communication. This helps in special to provide push messages for new friend requests, new chat messages or similar events.\footnote{\url{https://socket.io/} (26.07.2017)}
+	\item \texttt{bcrypt}: \textit{bcrypt} is one of the most secure hashing libraries. In the project it is used for hashing the user's password as shown in lst.\ (\ref{lst:bcrypt}). It is possible to pass a so called 'salt-factor' to the function, which defines the amount of added characters to the password before hashing. This helps increasing the entropy of the input string.\footnote{\url{https://www.npmjs.com/package/bcrypt} (26.07.2017)}	\begin{lstlisting}[caption={\textit{bcrypt} for hashing the users password.}, label=lst:bcrypt]
+		bcrypt.hash(self.password, SALT\_WORK\_FACTOR).then((hash) => {
+			self.password = hash;
+				return next();
+			}, (err) => {
+				return next(new Error(err));
+		});
+	\end{lstlisting}
+	\item \texttt{mongoose}: As already mentioned in sec.\ \ref{sec:backend}, to access the \textit{MongoDB} from the backend, \textit{mongoose} is used. Some more information about \textit{mongoose} is given in sec.\ \ref{subsubsec:mongodb}. 
+	\footnote{\url{http://mongoosejs.com/} (26.07.2017)}
+	\item \texttt{exif}: The \textit{exif} package is used to extract metadata from images. The \textit{Exif} format is used by most digital gadgets which create images and is used to store metadata like the gps coordinates or the creation time.\footnote{\url{https://www.npmjs.com/package/exif} (26.07.2017)}
+	\begin{lstlisting}[caption={Extraction of \textit{Exif} metadata from an image.}, label=lst:exif]
+	static \_getExifInformation(path) {
+		return new Promise((resolve, reject) => {
+			new ExifImage({
+				image: path
+			}, (err, data) => {
+				if (err)
+					reject(err);
+				else
+					resolve(data);
+			});
+		});
+	}
+	\end{lstlisting}	
+	\item \texttt{urlsafe-base64}: The library takes an input Buffer, which in case is the image ID. This is then enccoded in \texttt{base64} and return as a \textit{URL}. This makes it easy to store the image using \textit{minio}.
+	\footnote{\url{https://www.npmjs.com/package/urlsafe-base64} (26.07.2017)}
+	\begin{lstlisting}[caption={This package enables encoding an ID created with \texttt{uuid} in \texttt{base64} as a \textit{URL}. This name then can further be used to save the image with \texttt{minio}.}, label=lst:urlsafe-base64]
+	const baseFileName = URLSafeBase64.encode(img.uuid);
+	\end{lstlisting}
+	\item \texttt{googleplaces}: This package is used to facilitate the access to the \textit{Google Places API}.\footnote{\url{https://www.npmjs.com/package/googleplaces} (26.07.2017)}
+	\item \texttt{node-foursquare}: This package is a wrapper for the \textit{Foursquare API} and therefore facilitates the handling of the \textit{Foursquare API} requests.\footnote{\url{https://www.npmjs.com/package/node-foursquare} (15.08.2017)} 
+	\item \texttt{json-web-token}: \textit{JSON} web tokens are compact, \textit{URL}-safe \textit{JSON} based access tokens, which can be used to verify claims. It consists of three parts: the header (defines the token type, and the encryption method), the payload (this is a \textit{JSON} object, which describes the claims) and the signature (the signature is normed as \textit{JSON Web Signature, JWS} in RFC 7515). All parts are \texttt{base64} encoded and separated by a point. In this project, the payload contains user information so that the sender can directly be authenticated and is known without putting its name to the body or parameter list of the request.	\footnote{\url{https://www.npmjs.com/package/json-web-token} (26.07.2017)}
+	\item \texttt{lodash}: \textit{lodash} introduces easy to use lambda functions to \textit{JavaScript}. This makes working with arrays, numbers, objects, strings, etc. easy, fast, readable and maintainable. The library provides modular methods for iterating, manipulating and creating composite functions.\footnote{\url{https://lodash.com/} (26.07.2017)}
+	\begin{lstlisting}[caption={Example usage of \textit{lodash} functionality. The shown line of code is extracted from the 'addComment' method. By using this package, in this single line all comments of the current object, where the comments are added, are sorted and the order gets reversed. It is much more readable and compact than coding this by hand.}, label=lst:lodash]
+	this.comments = \_.reverse(\_.sortBy(this.comments, 'created\_at'));
+	\end{lstlisting}
+	\item \texttt{minio}: \textit{minio} is a self-hosted, distributed, free alternative to S3 storage for large data as objects. In this project it is used for saving all images which are uploaded from the users of the app or which are fetched from \textit{Google} data. \textit{minio} works like a hash map, which keeps access times very low.\footnote{\url{https://www.minio.io/} (26.07.2017)}
+	\item \texttt{node-geocoder}: The \textit{node-geocoder} is used to geocode location names to locations in latitude/longitude representation and reverse. This is necessary for example for easy testing, as exact coordinates of places are not needed to be known and for the transfer if in the app the search in another place than the current location is used. So basically, the package for example would just return the latitude and longitude of Darmstadt if it is queried with Darmstadt as parameter.\footnote{\url{https://www.npmjs.com/package/node-geocoder} (26.07.2017)}
+	\item \texttt{restify}: \textit{restify} is a \textit{NodeJS} web service framework for creating \texttt{REST}ful APIs. The framework provides a basic server, to which the self-defined routes are added.\footnote{\url{http://restify.com/} (26.07.2017)}
+	\item \texttt{sharp}: This is the image scaling package used in this project. By providing and storing the fetched images in different sizes, a lot of bandwidth can be saved, as the image quality can be adapted to the use case.\footnote{\url{http://sharp.dimens.io/en/stable/} (26.07.2017)}
+	\begin{lstlisting}[caption={In the above example from the backend an extract from the 'upload' method for images is shown. The image is scaled to three different sizes and those are then lateron stored in the S3 storage.}, label=lst:sharp]
+		const buffers = await Promise.all([
+			sharp(path)
+				.resize(200, 200)
+				.max()
+				.toFormat('jpeg')
+				.toBuffer(),
+			sharp(path)
+				.resize(500, 500)
+				.max()
+				.toFormat('jpeg')
+				.toBuffer(),
+			sharp(path)
+				.resize(1920, 1080)
+				.max()
+				.toFormat('jpeg')
+				.toBuffer()
+		]);
+		const small = buffers[0];
+		const middle = buffers[1];
+		const large = buffers[2];
+	\end{lstlisting}
+	\item \texttt{uuid}: With \textit{uuid} it is possible to create a 128Bit random number as a unique ID (following RFC4122). As the ID is 128Bit large, there is nearly no chance of having two times the same ID at the same moment of time.\footnote{\url{https://www.npmjs.com/package/uuid} (26.07.2017)}
+\end{itemize}
+Furthermore, during development, further libraries for testing (\texttt{chai}\footnote{\url{http://chaijs.com/} (28.07.2017)}), static code analysis (\texttt{eslint}\footnote{\url{http://eslint.org/} (28.07.2017)}), test image generation (\texttt{js-image-generator}\footnote{\url{https://www.npmjs.com/package/js-image-generator} (28.07.2017)}), etc.\ have been used.

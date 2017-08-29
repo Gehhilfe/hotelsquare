@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">@android:color/holo_blue_light</color>
+
+    <color name="primary">#E43F3F</color>
+    <color name="primary_dark">#E12929</color>
+    <color name="primary_darker">#CC1D1D</color>
+    <color name="accent">#FFFFFF</color>
+
+    <color name="logo">@android:color/holo_blue_light</color>
+
+
+    <color name="black">#000000</color>
+    <color name="jet">#222222</color>
+    <color name="oil">#333333</color>
+    <color name="monsoon">#777777</color>
+    <color name="jumbo">#888888</color>
+    <color name="aluminum">#999999</color>
+    <color name="base">#aaaaaa</color>
+    <color name="iron">#CCCCCC</color>
+    <color name="white">#FFFFFF</color>
+
+
+    <color name="cadet_blue_2">#5f9f9f</color>
+    <color name="cadet_blue_3">#0091ea</color>
+    <color name="cadet_blue_4">#8EE5EE</color>
+
+    <color name="PrimaryColor">#2196f3</color>
+    <color name="PrimaryDarkColor">#1976D2</color>
+
+    <!-- Chat -->
+    <color name="chat_user_reply_background_color">#c8f0ff</color>
+    <color name="chat_company_reply_background_color">#F5F5F5</color>
+    <color name="gray">@android:color/darker_gray</color>
+    <color name="transparent">@android:color/transparent</color>
+    <color name="orange">@android:color/holo_blue_light</color>
+    <color name="background_tab_pressed">#6633B5E5</color>
+    <color name="detail_info_background">#33FFFFFF</color>
+</resources>

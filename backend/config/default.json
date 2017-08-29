@@ -1,0 +1,50 @@
+{
+  "keywords": {
+    "bier": "bar",
+    "beer": "bar",
+    "wine": "bar",
+    "wein": "bar",
+    "essen": "restaurant",
+    "burger": "restaurant",
+    "apotheke": "pharmacy",
+    "arzt": "doctor",
+    "zahnarzt": "dentist",
+    "disco": "night_club",
+    "club": "night_club",
+    "tanzen": "night_club",
+    "tankstelle": "gas_station",
+    "krankenhaus": "hospital",
+    "versicherung": "insurance_agency",
+    "flughafen": "airport",
+    "kunst": "art_gallery",
+    "anwalt": "lawyer",
+    "bibliothek": "library",
+    "kino": "cinema"
+  },
+  "jwt": {
+    "secret": "secret",
+    "options": {
+      "algorithm": "HS256"
+    }
+  },
+  "facebook": {
+    "app_id": "260324484463075",
+    "key": ""
+  },
+  "googleapi": {
+    "GOOGLE_PLACES_API_KEY": "AIzaSyBxx-kkw7jMsJJ9yJGygJDUt6i894fgz3s",
+    "GOOGLE_PLACES_OUTPUT_FORMAT": "json"
+  },
+  "minio": {
+    "key": "stimi-storage",
+    "secret": "6!u40ws?}QwjhpFw",
+    "bucket": "test"
+  },
+  "foursquare": {
+    "secrets": {
+      "clientId": "JXUSU3TKGAOBOHMLT1DPZZHEBRWB2YFZ301LQTG2OV2QA44R",
+      "clientSecret": "JXMLL3A4WA31CA2RG0WVMETZPWJT05CFNPEBY3XHCDKJX1MY",
+      "redirectUrl": "https://dev.ip.stimi.ovh/"
+    }
+  }
+}

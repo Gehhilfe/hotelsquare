@@ -1,13 +1,11 @@
 # This file is a template, and might need editing before it works on your project.
 # Official framework image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/node/tags/
-image: node:latest
+image: node:7.10.0
 
 # Pick zero or more services to be used on all builds.
 # Only needed when using a docker container to run your tests in.
 # Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-service
-services:
- - mongo:3.5.6
 #  - redis:latest
 
 # This folder is cached between builds
@@ -17,53 +15,81 @@ cache:
   - backend/node_modules/
 
 stages:
-  - backend
-  - backend-build
-  - backend-deploy
+  - test
+  - build
+  - deploy
 
 backend-test:
-  stage: backend
+  services:
+   - mongo:3.5.6
+  stage: test
   coverage: '/^Statements[\s]*:[\s]*(\d+\.*\d*%)/'
   script:
+   - ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
    - cd backend
    - export NODE_ENV=test
-   - npm install
+   - npm install --silent
    - npm run coverage
   artifacts:
     paths:
-     - coverage
+     - backend/coverage
    
 backend-lint:
-  stage: backend
+  stage: test
   script:
    - cd backend
    - export NODE_ENV=test
-   - npm install
+   - npm install --silent
    - npm run lint
 
 build-backend-container:
   only: 
    - master
+   - dev
   image: docker:latest
   variables:
     DOCKER_DRIVER: overlay
   services:
     - docker:dind
-  stage: backend-build
+  stage: build
   script:
    - cd backend
    - export IMAGE_TAG=$(echo -en $CI_COMMIT_REF_NAME | tr -c '[:alnum:]_.-' '-')
    - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
    - docker build --pull -t "$CI_REGISTRY_IMAGE:$IMAGE_TAG" .
    - docker push "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
-   
-backend-deploy-container:
+
+backend-deploy-container-master:
   only: 
    - master
   environment:
     name: staging
     url: https://staging.ip.stimi.ovh
-  stage: backend-deploy
+  stage: deploy
   image: cdrx/rancher-gitlab-deploy
   script:
-   - upgrade --stack ip-staging --service node-app
+   - upgrade --stack ip-master --service node-app
+   
+backend-deploy-container-dev:
+  only: 
+   - dev
+  environment:
+    name: dev
+    url: https://dev.ip.stimi.ovh
+  stage: deploy
+  image: cdrx/rancher-gitlab-deploy
+  script:
+   - upgrade --stack ip-dev --service node-app
+   
+#frontend-build:
+#  stage: test
+#  only:
+#   - /frontend/
+#   - dev
+#   - master
+#  image: jangrewe/gitlab-ci-android
+#  script:
+#   - cd frontend/foursquare
+#   - export GRADLE_USER_HOME=$(pwd)/.gradle
+#   - chmod +x ./gradlew
+#   - ./gradlew assembleDebug

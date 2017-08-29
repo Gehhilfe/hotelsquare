@@ -1,0 +1,271 @@
+<resources>
+    <!-- Register / login -->
+    <string name="foursquare_slogan">Explore the world around you</string>
+    <string name="app_name">Hotelsquare</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="user_name">Username</string>
+    <string name="login">Login</string>
+    <string name="register_here">New? Register here.</string>
+    <string name="fb_login">Login with Facebook.</string>
+    <string name="existing_account">Got an account already? Login!</string>
+    <string name="register">Register</string>
+    <string name="name">Name</string>
+    <string name="user_preferences">User_preferences</string>
+    <string name="title_activity_foursquare">Foursquare</string>
+    <string name="password_forgotten">Password forgotten?</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_main">Foursquare</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- navigation items-->
+    <string name="action_search">Venues</string>
+    <string name="action_search_person">Persons</string>
+    <string name="action_history">History</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_me">Profile</string>
+    <string name="action_login">Log in</string>
+    <string name="action_logout">Log out</string>
+
+    <string name="reset_password_lbl">Enter your Email address to reset your password.</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="searching_question">What are you searching for?</string>
+
+<!-- User -->
+    <!-- Tab menu -->
+    <string name="user_tab_requests">Requests</string>
+    <string name="user_tab_profile">Profile</string>
+    <string name="user_tab_friends">Friends</string>
+    <string name="user_tab_inbox">Inbox</string>
+
+    <!-- user profile stuff -->
+    <string name="profile_city">City</string>
+    <string name="profile_age">Age</string>
+    <string name="profile_gender">Gender</string>
+    <string name="profile_male">Male</string>
+    <string name="profile_female">Female</string>
+    <string name="profile_Anonymous">Anonymous</string>
+    <string name="top_check_in">Top Check-in</string>
+    <string name="profile_cancel">Cancel</string>
+    <string name="profile_edit">Edit</string>
+    <string name="prof_save">Save</string>
+
+    <!-- Other stuff -->
+    <string name="near_me">near me</string>
+    <string name="profile_upload_avatar">Upload</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="price">Price</string>
+    <string name="liked">Liked</string>
+    <string name="open_now">Open Now</string>
+    <string name="saved">Saved</string>
+    <string name="title_activity_venue_gallery">Gallery</string>
+    <string name="isOpened">Open now</string>
+    <string name="closed">Closed</string>
+    <string name="websiteLabel">Website: </string>
+    <string name="startLabel">Search</string>
+    <string name="restore_name">Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="sendComment">Send</string>
+    <string name="loginToContinue">Continue</string>
+    <string name="permissongrant">Please grant location permission</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="thatsme">"That's me!"</string>
+    <string name="venue_website">WWW</string>
+    <string name="venue_call">Call</string>
+    <string name="venue_check_in">Check in</string>
+    <string name="button_post_image">Post image</string>
+    <string name="button_post_text">Post text</string>
+    <string name="button_pictures">Pictures</string>
+
+    <!-- settings-->
+    <string name="langSelect">Select language</string>
+    <string name="incognito">Incognito Mode</string>
+    <string name="delete_profile">Delete Profile</string>
+    <string name="delete_dialog">Delete Profile</string>
+    <string name="delete_text">"Are you sure you want to delete your Profile?</string>
+
+    <!-- venue in details -->
+    <string name="leaderboard">Leaderboard</string>
+    <string name="last_checkins">Last Checkins</string>
+    <string name="checkins_count">Check-ins</string>
+    <string name="a_year">a year</string>
+    <string name="years">years</string>
+    <string name="a_month">a month</string>
+    <string name="months">months</string>
+    <string name="a_day">a day</string>
+    <string name="days">days</string>
+    <string name="an_hour">an hours</string>
+    <string name="hours">hours</string>
+    <string name="a_minute">a minute</string>
+    <string name="minutes">minutes</string>
+    <string name="a_second">a second</string>
+    <string name="seconds">seconds</string>
+    <string name="about">about</string>
+    <string-array name="languages">
+        <item>English</item>
+        <item>German</item>
+    </string-array>
+    <string-array name="locale">
+        <item>en</item>
+        <item>de</item>
+    </string-array>
+
+    <string name="action_post_text">Post text</string>
+    <string name="action_post_text_default">Your awesome message!</string>
+    <string name="action_post_image">Add Image Comment</string>
+    <string name="action_post_image_select_1">Take Picture</string>
+    <string name="action_post_image_select_2">Choose from Gallery</string>
+
+    <string name="history_state_check_in">Checked in</string>
+    <string name="history_state_visit">Visited</string>
+    <string name="history_state_like">Liked a comment</string>
+    <string name="history_state_dislike">Disliked a comment</string>
+    <string name="history_state_text_comment">Wrote a comment</string>
+    <string name="history_state_image_comment">Posted a picture</string>
+    <string name="find_me">Find me</string>
+
+    <string name="login_first">You must login</string>
+    <!-- menu-->
+
+    <string name="category_1">
+        Food&amp;Drinks
+    </string>
+    <string name="category_2">
+        Holiday&amp;Relaxation
+    </string>
+    <string name="category_3">
+       Services
+    </string>
+    <string name="category_4">
+       Shops
+    </string>
+    <string name="category_5">
+        Infrastructure
+    </string>
+    <string name="home_no_current_requests">Currently there are no pending friend requests.</string>
+    <string name="friendlist_no_friends">No Friends? Why don\'t you just start to search some with Hotlesquare</string>
+    <string name="inbox_no_chats">Currently there are no open conversations from you.</string>
+    <string name="send_friendrequest">Your friend request was sent.</string>
+    <string name="pending_friendrequest">There is still a pending friend request.</string>
+    <string name="accept_friend_request">Friend request accepted!</string>
+    <string name="decline_friend_request">Friend request declined!</string>
+    <string name="wrong_login_info">Failed to login. Please check your credentials and try again.</string>
+    <string name="registration_complete">Please check your emails to complete the registration.</string>
+    <string name="registration_failed">Failed to register. Please try it again.</string>
+    <string name="register_invalid_mail">Please enter a valid email address.</string>
+    <string name="register_invalid_name">Your account name should have at least 3 characters.</string>
+    <string name="register_invalid_password">Your password should have at least 6 characters.</string>
+    <string name="reset_failed">Failed to reset your password. Please try it again</string>
+    <string name="reset_completed">Please check your emails to complete your new password.</string>
+
+    <!-- Upload image -->
+    <string name="image_cancel">Cancel</string>
+    <string name="image_camera">Camera</string>
+    <string name="image_gallery">Gallery</string>
+    <string name="image_title">Select an option to choose your avatar.</string>
+
+    <!-- Dialogs -->
+    <string name="register_dialog">Waiting for the registration server…</string>
+    <string name="login_dialog">Waiting for login server…</string>
+    <string name="reset_dialog">Waiting for the server response…</string>
+    <string name="load_profile">Loading user information…</string>
+    <string name="error_user_data">Couldn\'t load the user data.</string>
+    <string name="error_upload_user_data">An error occurred while uploading your user information. Please check your internet connection and try it again.</string>
+
+    <!--- C1-->
+    <array name="beer">
+        <item>bier</item>
+        <item>Beer</item>
+    </array>
+    <array name="cafe">
+        <item>cafe</item>
+        <item>Cafe</item>
+    </array>
+    <array name="vegetarian">
+        <item>vegetarisch</item>
+        <item>Vegetarisch</item>
+    </array>
+
+    <array name="food_drink">
+        <item>@array/beer</item>
+        <item>@array/cafe</item>
+        <item>@array/vegetarian</item>
+    </array>
+    <!--- C2-->
+    <array name="beach">
+        <item>strand</item>
+        <item>Beach</item>
+    </array>
+    <array name="castle">
+        <item>burg</item>
+        <item>Castle</item>
+    </array>
+    <array name="zoo">
+        <item>zoo</item>
+        <item>Zoo</item>
+    </array>
+    <array name="holiday_relaxation">
+        <item>@array/beach</item>
+        <item>@array/castle</item>
+        <item>@array/zoo</item>
+    </array>
+    <!--- C3-->
+    <array name="bank">
+        <item>bank</item>
+        <item>Bank</item>
+    </array>
+    <array name="gas_station">
+        <item>tankstelle</item>
+        <item>Gas station</item>
+    </array>
+    <array name="car_wash">
+        <item>autowaschanlage</item>
+        <item>Car wash</item>
+    </array>
+    <array name="service">
+        <item>@array/bank</item>
+        <item>@array/gas_station</item>
+        <item>@array/car_wash</item>
+    </array>
+    <!--- C4-->
+    <array name="supermarket">
+        <item>supermarkt</item>
+        <item>Supermarket</item>
+    </array>
+    <array name="florist">
+        <item>florist</item>
+        <item>Florist</item>
+    </array>
+    <array name="music">
+        <item>musik</item>
+        <item>Music</item>
+    </array>
+    <array name="shops">
+        <item>@array/supermarket</item>
+        <item>@array/florist</item>
+        <item>@array/music</item>
+    </array>
+
+    <!--- C5-->
+    <array name="airport">
+        <item>flughafen</item>
+        <item>Airport</item>
+    </array>
+    <array name="harbor">
+        <item>hafen</item>
+        <item>Harbor</item>
+    </array>
+    <array name="electrical_charging_station">
+        <item>elektrotankstelle</item>
+        <item>E-charging station</item>
+    </array>
+    <array name="infrastructure">
+        <item>@array/airport</item>
+        <item>@array/harbor</item>
+        <item>@array/electrical_charging_station</item>
+    </array>
+
+
+</resources>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@mipmap/ic_search_black_24dp"
+            android:title="Search"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportHeight="24.0"
+            android:viewportWidth="24.0"/>
+        <item
+            android:id="@+id/nav_search_person"
+            android:icon="@mipmap/ic_search_black_24dp"
+            android:title="Search Person"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportHeight="24.0"
+            android:viewportWidth="24.0"/>
+        <!-- TODO - icon, titel in der activity ändern.-->
+        <item
+            android:id="@+id/nav_history"
+            android:icon="@mipmap/ic_history_black_24dp"
+            android:title="History"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportHeight="24.0"
+            android:viewportWidth="24.0"/>
+        <item
+            android:id="@+id/nav_me"
+            android:icon="@mipmap/ic_perm_identity_black_24dp"
+            android:title="Me"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportHeight="24.0"
+            android:viewportWidth="24.0"/>
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Settings" />
+        <!-- TODO - icon, titel in der activity ändern.-->
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@mipmap/ic_perm_identity_black_24dp"
+            android:title="Logout"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportHeight="24.0"
+            android:viewportWidth="24.0"/>
+    </group>
+
+   <!-- <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>-->
+
+</menu>

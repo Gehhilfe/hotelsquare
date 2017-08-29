@@ -2,11 +2,5 @@
   "db": {
     "host": "mongo",
     "name": "test"
-  },
-  "jwt": {
-    "secret": "secret",
-    "options": {
-      "algorithm": "HS256"
-    }
   }
 }

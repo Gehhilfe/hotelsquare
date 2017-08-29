@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:id="@+id/inbox_layout">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/inbox_recyclerview"
+        android:overScrollMode="never"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </android.support.v7.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/inbox_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="32dp"
+        android:textColor="@color/black"
+        android:text="@string/inbox_no_chats" />
+
+</RelativeLayout>
