@@ -371,11 +371,14 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
                                        reachedMaxVenues=true;
                                    }
                                }
-                                progressDialog.dismiss();
+                               if(progressDialog!=null)
+                                   progressDialog.dismiss();
 
                             },
                             throwable -> {
                                 //handle exception
+                                if(progressDialog!=null)
+                                    progressDialog.dismiss();
                                 Log.d(LOG, throwable.toString());
 
                             }
