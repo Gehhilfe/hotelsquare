@@ -37,7 +37,7 @@
     <string name="user_tab_profile">Profil</string>
     <string name="user_tab_friends">Freunde</string>
     <string name="user_tab_inbox">Inbox</string>
-    <string name="near_me">in meiner Nähe</string>
+    <string name="near_me">In meiner Nähe</string>
 
     <!-- user profile stuff -->
     <string name="profile_city">Stadt</string>
@@ -57,7 +57,7 @@
     <string name="profile_upload_avatar">Hochladen</string>
     <string name="title_activity_maps">Map</string>
     <string name="liked">Likes</string>
-    <string name="more">Weiter...</string>
+    <string name="more">Weiter…</string>
     <string name="open_now">Jetzt geöffnet</string>
     <string name="price">Preis</string>
     <string name="saved">Speichern</string>
