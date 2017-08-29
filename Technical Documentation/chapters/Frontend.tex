@@ -1,8 +1,16 @@
 \section{Frontend}
 \label{sec:frontend}
 
-\subsection{Venue Search}
+\subsection{Venues Search}
 Venue Search is one of the main part of the application. When users want to search for their interest, they will experience two steps. The first is fast search and the second is deep search
+Each step is taken by a Fragment \footnote{\url{https://developer.android.com/guide/components/fragments.html}}. Two fragments are working in the MainActivity and taking the different responsibilities for searching. In DeepSearchFragment is VenueStatePageAdapter which extends class FragmentStatePagerAdapter  \footnote{\url{https://developer.android.com/reference/android/support/v4/app/FragmentStatePagerAdapter.html}} provided  to manage switching two view modes, that are also two Fragments and are created or destroyed if necessary.
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/venue_search.jpg}
+	\centering
+	\caption[]{Venue Search architecture}
+	\label{fig:venue_search}
+\end{figure}
+\subsubsection{Deep Search}
 \subsubsection{Fast Search}
 When user starts the application, the fast search will be firstly displayed. It plays a role as default view of the application. It provides some name suggestions of interest which are written from static strings resource. On it five categories are predefined and each category contains three items (Figure \ref{fig:fastsearch}).
 \begin{itemize}
@@ -24,10 +32,10 @@ When user starts the application, the fast search will be firstly displayed. It 
 
 In order to find out venues, a query should be defined. It includes three parts, the first is keyword which can be name of interest selected in fast search or typed text in search bar in deep search, the second are filters, the last one is a page number. There are two types of filters, the location is mandatory and  radius, price and open now  are optional. The location can be the name of cities, countries or the current GPS value of users.
 When user types text in search bar, the application will suggest some names of interest that are 
-read from local database. When the app starts for the first time, the keyword suggestions  are read from static strings resource then inserted into local database. Additionally, they are also dynamically extracted from types of venues and typed text by the user which has been not located in the local database (Figure \ref{fig:keywordSuggestions}).
+read from local database. When the app starts for the first time, the keyword suggestions  are read from static strings resource then inserted into local database\footnote{\url{https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html}} with the help of green Dao \footnote{\url{http://greenrobot.org/greendao/}}. Additionally, they are also dynamically extracted from types of venues and typed text by the user which has been not located in the local database (Figure \ref{fig:keywordSuggestions}).
 
-If the user doesn't have any input in location filter, the "near me" mode will be enabled. That means searching for all venues around the current location of the user by GPS value. It also plays a role as default search mode when redirecting from fast search to deep search. Otherwise, users have to give desired location name. However, it is not needed to give the complete meaningful location name. The application will take a suggested list of locations from the server then provides for him (Figure \ref{fig:locationSuggestions}).
-The page number is the pivot for obtaining corresponding number of venues. It will be clarifyed in the next section.
+If the user doesn't have any input in location filter, the "near me" mode will be enabled. That means searching for all venues around the current location of the user by GPS value. It also plays a role as default search mode when redirecting from fast search to deep search. Otherwise, users have to give desired location name. However, it is not needed to give the complete meaningful location name, because this filter is surrounded by AutoCompleteTextView \footnote{\url{https://developer.android.com/reference/android/widget/AutoCompleteTextView.html}}. The application will take a suggested list of locations from the server then shows completion suggestions for the user (Figure \ref{fig:locationSuggestions}).
+The page number is the pivot for obtaining corresponding number of venues. It is paremeterized in venue serivce. It will be clarifyed in the next section.
 Deep search only processes in the following cases:
 \begin{enumerate}
 	\item Submit keyword in search bar
@@ -52,11 +60,11 @@ Deep search only processes in the following cases:
 	\caption[]{Location suggestions}
 	\label{fig:locationSuggestions}
 \end{figure} 
-In order to avoid sending undesired request to the server, the current keyword will be saved as last keyword query. In case 1 und 2, if the current keyword and the saved last keyword query are the same, the request will be not sent. 
+In order to avoid sending undesired request to the server, the current keyword will be saved as last keyword query. In cases 1 und 2, if the current keyword and the saved keyword query are the same, the request will be not sent. 
 
-Two possible view are provided:
+Two possible view modes are supported:
  \begin{enumerate}
- 	\item Venues in list: For each request are only 10 venues returned. The first reqest starts with the page number 0 to obtain the first 10 venues. As the user scrolls list until a index position which modulo 10 is equals to 9, the page number will be increased by one and the next quest with the same content query will be sent. In this case are only the basic information( venue name, rating and venue image) displayed (Figure \ref{fig:venuesInlist}) .
+ 	\item Venues in list: For each request are only 10 venues returned. The first reqest starts with the page number 0 to obtain the first 10 venues. As the user scrolls list until an index position which modulo 10 is equals to 9, the page number will be increased by one and the next quest with the same content query will be sent. In this case are only the basic information( venue name, rating and venue image) displayed (Figure \ref{fig:venuesInlist}). If the user clicks on venue item, it will be redirected to venue in detail view.
  	\begin{figure}[htbp]
  		\includegraphics[width=0.8\textwidth]{images/venuesonlist.jpg}
  		\centering
@@ -65,7 +73,8 @@ Two possible view are provided:
  	\end{figure}
  	\item Venues on map: it will be described in (\ref{markervenue})
  \end{enumerate}
- 
+There is a correlation between venues on map and venues in the list because only the first mode has an effect on changing the number of returned venues. If the user wants to see all venues pointed in the second mode, firstly he should enable or switch to the first mode then scroll to reach the maximal possible number of venues.
+
 \subsection{Location Awareness}
 
 To provide the possibility to find nearby venues and friends the application needs to be aware of the location of the user and his friends. A background service which tracks the location of the users has been implemented to achieve this. The location data is then provided to the search, the map and the server.
@@ -136,13 +145,51 @@ If he clicks on the \textit{infoWindow} he is redirected to his own profile.
  	\label{fig:venuesonmap}
 \end{figure}
 
+
+
+\subsection{Venue in detail}
+By detailing informations of venue, the use not only getting more meaningful information but can also do more actions on it. The informations are distributed in two parts. The first one is the detailed about venue; including name, address, number of check-ins, price level and images.
+In addition to it, the location is also pointed on a small map. By clicking on location on map the user can always directly utilize two optional functionalities of Googlemap. With the same action on Call Button he can also make a phone call to owner of venue or check in, if he is interested in it (Figure \ref{fig:detailedInformationsOfVenue}).
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/venueInDetail_Part_1.jpg}
+	\centering
+	\caption[]{Detailed informations of venue}
+	\label{fig:detailedInformationsOfVenue}
+\end{figure}
+
+The second part is the previous activities of users on venue. That consits of a leaderboard of three available check-ins, top-ten check-ins and list of comments( text comments and image comments). The leaderboard is sorted by the number of users check-ins. The two others are sorted by decreasing order of time. On each comment two like and unlike buttons are provided, therefore the user can consider to do actions on it. From this view, if he clicks on profile or username, he will be redirected to the selected user profile(Figure \ref{fig:previous_activities}).
+The last one is floating menu user activities. With floating menu\footnote{\url{https://github.com/Clans/FloatingActionButton}} it is possible to minimize the spaces on the view and floating buttons will appear when these are needed according to opinion of the user. Moreover, in any time he can post text(Figure \ref{fig:textcomment}) or image(Figure \ref{fig:imagecomment}) on this venue or can obtain all images of venue(Figure \ref{fig:overimages}). On the overview of images the user can see fullscreen image by swiping left or right on selected image(Figure \ref{fig:swipeimage}).
+
+\begin{figure}[htbp]
+	\includegraphics[width=0.8\textwidth]{images/venueInDetail_Part_2.jpg}
+	\centering
+	\caption[]{The previous activities of users on venue}
+	\label{fig:previous_activities}
+\end{figure}
+
+\begin{figure}[!htb]
+	\minipage{0.45\textwidth}
+	\includegraphics[width=\linewidth]{images/textcomment.jpg}
+	\caption{Text comment}\label{fig:textcomment}
+	\includegraphics[width=\linewidth]{images/imagecomment.jpg}
+	\caption{Image comment}\label{fig:imagecomment}
+	\endminipage\hfill
+	\minipage{0.45\textwidth}
+	\includegraphics[width=\linewidth]{images/overview_image.jpg}
+    \caption{Overview pictures}\label{fig:overimages}
+	\includegraphics[width=\linewidth]{images/swipeimage.jpg}
+	\caption{Swiped picture}\label{fig:swipeimage}
+	\endminipage\hfill
+
+\end{figure}
+
 \subsection{Settings}
 The SettingsFragment mainly provides three functionalities for logged-in users.
 
 \begin{itemize}
-\item \textbf{Language Selection:} The user has the ability to change the language of the app. There are two different languages supported: \textit{Deutsch} and \textit{English}. With a simple spinner he can change the app to his preferred language. Technically the language than is stored in the local storage and the strings are changed depending on that value. 
+\item \textbf{Language Selection:} The user has the ability to change the language of the app. There are two different languages supported: \textit{Deutsch} and \textit{English}. With a simple spinner he can change the app to his preferred language. Technically the language than is stored in the local storage and the strings are changed depending on that value.
 \item \textbf{Incognito-Mode:} The \textit{Incognito-Mode} provides the user more privacy by not showing his position to anyone especially his nearby friends. The mode ist selected by a CheckBox to toggle the \textit{Incognito-Mode} The information, that the user wants to be not seen by anyone is then send to the server.
-\item \textbf{Delete Profile:} This button provides the user the opportunity to delete his \textit{HOTELsquare} account. If he clicks on it, a dialog is open to make sure he knows what he is doing. If he confirm his choice, his profile is deleted, otherwise nothing happens. 
+\item \textbf{Delete Profile:} This button provides the user the opportunity to delete his \textit{HOTELsquare} account. If he clicks on it, a dialog is open to make sure he knows what he is doing. If he confirm his choice, his profile is deleted, otherwise nothing happens.
 \end{itemize}
 
 The language selection is also available for user without a \textit{HOTELsquare} account.
