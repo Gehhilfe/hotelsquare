@@ -27,7 +27,7 @@ public class ImageCacheLoader {
     private static OkHttpClient client;
 
     public ImageCacheLoader(Context context) {
-        if(client == null) {
+        if (client == null) {
             Cache cache = new Cache(context.getCacheDir(), cacheSize);
             client = new OkHttpClient.Builder()
                     .cache(cache)
@@ -36,7 +36,8 @@ public class ImageCacheLoader {
     }
 
     /**
-     * Loads image asynchronously while using  
+     * Loads image asynchronously while using
+     *
      * @param image
      * @param size
      * @return
@@ -47,16 +48,20 @@ public class ImageCacheLoader {
             // Build request
             Request.Builder request = new Request.Builder()
                     .url(url);
+            okhttp3.Response response = client.newCall(request.build()).execute();
             try {
-                okhttp3.Response response = client.newCall(request.build()).execute();
                 InputStream inputStream = response.body().byteStream();
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                if(bitmap == null)
+                inputStream.close();
+                response.close();
+                if (bitmap == null)
                     return Observable.error(new UnsupportedOperationException("Bitmap could not be decoded"));
                 else
                     return Observable.just(bitmap);
             } catch (Exception e) {
                 return Observable.error(e);
+            } finally {
+                response.close();
             }
         });
     }
