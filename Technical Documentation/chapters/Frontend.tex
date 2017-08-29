@@ -214,4 +214,12 @@ The SettingsFragment mainly provides three functionalities for logged-in users.
 
 The language selection is also available for users without an \textit{HOTELsquare} account.
 
+\subsection{Own Profile}
+The Profile section provides the user with additional functionalities for editing his profile informations, accepting friend requests and interacting with his friends. The UserActivity will act as a container for the different functionalities and handles the navigation between them. For this purpose the additional functions have been implemented in different Fragments which will be added to the UserStatePagerAdapter which implements the FragmentStatePagerAdapter. By using a FragmentStatePagerAdapter \footnote{\url{https://developer.android.com/reference/android/support/v4/app/FragmentStatePagerAdapter.html}} in combination with a ViewPager \footnote{\url{https://developer.android.com/reference/android/support/v4/view/ViewPager.html}} the user can freely switch between the desired functions by selecting the corresponding tab or by swiping to the adjacent tabs without experiencing long loading times.
+
+
+
+
+
+
 
