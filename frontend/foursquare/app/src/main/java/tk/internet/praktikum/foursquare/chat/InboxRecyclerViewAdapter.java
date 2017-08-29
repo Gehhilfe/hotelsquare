@@ -4,15 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -28,13 +27,13 @@ import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
 
-class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAdapter.InboxViewHolder> {
+class InboxRecyclerViewAdapter extends RecyclerView.Adapter<InboxRecyclerViewAdapter.InboxViewHolder> {
 
     class InboxViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView sendMsg, avatar;
         private TextView name, preview;
 
-        public InboxViewHolder(View itemView) {
+        InboxViewHolder(View itemView) {
             super(itemView);
             sendMsg = (ImageView) itemView.findViewById(R.id.inbox_msg);
             avatar = (ImageView) itemView.findViewById(R.id.inbox_avatar);
@@ -56,6 +55,9 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
 
         }
 
+        /**
+         * Load up the profile activity.
+         */
         private void loadProfile() {
             Chat currentChat = chatList.get(getAdapterPosition());
             User chatPartner = new User();
@@ -72,6 +74,9 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
             activity.startActivity(intent);
         }
 
+        /**
+         * Loads up the chat activity.
+         */
         private void startChat() {
             Intent intent = new Intent(context, ChatActivity.class);
             intent.putExtra("chatId", chatList.get(getAdapterPosition()).getChatId());
@@ -81,24 +86,24 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         }
     }
 
+    private static final String LOG = InboxRecyclerViewAdapter.class.getSimpleName();
     private Context context;
     private LayoutInflater inflater;
     private List<Chat> chatList;
     private String currentUserName;
     private Activity activity;
 
-    public InboxRecylcerViewAdapter(Context context, Activity activity) {
+    InboxRecyclerViewAdapter(Context context, Activity activity) {
         inflater = LayoutInflater.from(context);
         this.context = context;
         this.activity = activity;
-        currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
         chatList = new ArrayList<>();
+        currentUserName = LocalStorage.getSharedPreferences(context).getString(Constants.NAME, "");
     }
 
     @Override
     public InboxViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.inbox_entry, parent, false);
-
         return new InboxViewHolder(view);
     }
 
@@ -108,6 +113,7 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         User currentUser = new User();
         User chatPartner = new User();
 
+        // Determine the chat participants.
         for (User user : currentChat.getParticipants()) {
             if (Objects.equals(user.getName(), currentUserName)) {
                 currentUser = user;
@@ -116,17 +122,14 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
             }
         }
 
+        // Loads the avatar.
         if (chatPartner.getAvatar() != null) {
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
             imageCacheLoader.loadBitmap(chatPartner.getAvatar(), ImageSize.LARGE)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(bitmap -> {
-                                holder.avatar.setImageBitmap(bitmap);
-                            },
-                            throwable -> {
-                                Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                    .subscribe(bitmap -> holder.avatar.setImageBitmap(bitmap),
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         } else {
             holder.avatar.setImageResource(R.mipmap.user_avatar);
@@ -134,11 +137,12 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
 
         holder.name.setText(chatPartner.getName());
 
+        // Initialise the preview messages.
         if (currentChat.getMessages().size() > 0)
             holder.preview.setText(currentChat.getMessages().get(currentChat.getMessages().size() - 1).getMessage());
 
+        // Load the date of the last read message and the newest message and determine if there are unread messages
         long lastReadMsgTime = LocalStorage.getSharedPreferences(context).getLong(currentChat.getChatId(), -1);
-
         Date lastMsgRead = new Date(lastReadMsgTime);
         if (currentChat.getMessages().size() > 0) {
             Date previewDate = currentChat.getMessages().get(0).getDate();
@@ -155,7 +159,11 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         return chatList.size();
     }
 
-    public void updateChatList(List<Chat> data) {
+    /**
+     * Updates the current chat list with the newer chats.
+     * @param data New chats to be updated.
+     */
+    void updateChatList(List<Chat> data) {
         for (Chat currentNewChat : data) {
             if (containsChat(currentNewChat)) {
                 for (int i = 0; i < chatList.size(); i++) {
@@ -171,6 +179,11 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         notifyDataSetChanged();
     }
 
+    /**
+     * Determine if the given chat is already a part of the chat list.
+     * @param chat2 Chat to look up in the chat list.
+     * @return True - Chat is already in the chat list. False - this is a brand new chat.
+     */
     private boolean containsChat(Chat chat2) {
         for (Chat chat : chatList)
             if (chat.getChatId().equals(chat2.getChatId()))
@@ -178,12 +191,20 @@ class InboxRecylcerViewAdapter extends RecyclerView.Adapter<InboxRecylcerViewAda
         return false;
     }
 
-    public void setChatList(List<Chat> data) {
+    /**
+     * Sets the initial data for the chat list.
+     * @param data Initial chat data.
+     */
+    void setChatList(List<Chat> data) {
         chatList = new ArrayList<>(data);
         notifyDataSetChanged();
     }
 
-    public List<Chat> getChatList() {
+    /**
+     * Getter for the current chat list.
+     * @return Current chat list.
+     */
+    List<Chat> getChatList() {
         return chatList;
     }
 }

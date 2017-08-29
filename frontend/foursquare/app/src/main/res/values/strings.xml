@@ -149,6 +149,8 @@
     <string name="inbox_no_chats">Currently there are no open conversations from you.</string>
     <string name="send_friendrequest">Your friend request was sent.</string>
     <string name="pending_friendrequest">There is still a pending friend request.</string>
+    <string name="accept_friend_request">Friend request accepted!</string>
+    <string name="decline_friend_request">Friend request declined!</string>
 
 
     <!--- C1-->

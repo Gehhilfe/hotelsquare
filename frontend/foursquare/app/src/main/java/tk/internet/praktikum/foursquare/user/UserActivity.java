@@ -14,8 +14,7 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
-import tk.internet.praktikum.foursquare.frequest.HomeFragment;
-import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
+import tk.internet.praktikum.foursquare.frequest.FriendRequestFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
@@ -48,7 +47,7 @@ public class UserActivity extends AppCompatActivity  {
 
     private void initialiseFragmentContainer(ViewPager container) {
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
-        userStatePagerAdapter.addFragment(new HomeFragment(), "Friend Request");
+        userStatePagerAdapter.addFragment(new FriendRequestFragment(), "Friend Request");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);

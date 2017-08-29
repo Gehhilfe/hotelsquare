@@ -1,20 +1,17 @@
 package tk.internet.praktikum.foursquare.frequest;
 
 import android.support.v4.app.Fragment;
-//import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,11 +25,12 @@ import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
-public class HomeFragment extends Fragment {
+public class FriendRequestFragment extends Fragment {
+    private static final String LOG = FriendRequestFragment.class.getSimpleName();
     private RecyclerView recyclerView;
     private TextView emptyRequests;
     private final String URL = "https://dev.ip.stimi.ovh/";
-    private HomeRecyclerViewAdapter homeRecyclerViewAdapter;
+    private FriendRequestRecyclerViewAdapter friendRequestRecyclerViewAdapter;
     private LinearLayoutManager linearLayoutManager;
     private int page, visibleItemCount, itemCount, lastVisibleItemPosition;
     private int maxLastVisibleItemPosition = 0;
@@ -48,9 +46,10 @@ public class HomeFragment extends Fragment {
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-        homeRecyclerViewAdapter = new HomeRecyclerViewAdapter(getContext());
-        recyclerView.setAdapter(homeRecyclerViewAdapter);
+        friendRequestRecyclerViewAdapter = new FriendRequestRecyclerViewAdapter(getContext());
+        recyclerView.setAdapter(friendRequestRecyclerViewAdapter);
 
+        // Starts to load more data pages from the server depending on the scroll position.
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -82,10 +81,12 @@ public class HomeFragment extends Fragment {
 
         loadFriendRequests();
 
-
         return view;
     }
 
+    /**
+     * Checks for new friend requests and fetches data from the given page.
+     */
     private void checkForUpdates() {
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -104,8 +105,9 @@ public class HomeFragment extends Fragment {
                                             .subscribe(
                                                     user -> {
                                                         List<FriendRequest> tmpRequestList = user.getFriendRequests();
-                                                        List<User> adapterUserList = homeRecyclerViewAdapter.getUserList();
+                                                        List<User> adapterUserList = friendRequestRecyclerViewAdapter.getUserList();
 
+                                                        // determine the page state of the friend requests.
                                                         if (userList.size() > 0) {
                                                             recyclerView.setVisibility(View.VISIBLE);
                                                             emptyRequests.setVisibility(View.GONE);
@@ -120,6 +122,7 @@ public class HomeFragment extends Fragment {
                                                             setRefresh(true);
                                                         }
 
+                                                        // removes invalid friend requests
                                                         for (Iterator<User> iterator = userList.listIterator(); iterator.hasNext(); ) {
                                                             User tmpUser = iterator.next();
                                                             if(tmpUser.getId() == null)
@@ -129,6 +132,7 @@ public class HomeFragment extends Fragment {
                                                         if (userList.size() < tmpRequestList.size())
                                                             removeInvalidRequests(userList, tmpRequestList);
 
+                                                        // removes already existing friend requests.
                                                         for (Iterator<User> iterator = userList.listIterator(); iterator.hasNext(); ) {
                                                             User tmpUser = iterator.next();
                                                             if (adapterUserList.contains(tmpUser))
@@ -138,28 +142,29 @@ public class HomeFragment extends Fragment {
                                                         if (userList.size() < tmpRequestList.size())
                                                             removeInvalidRequests(userList, tmpRequestList);
 
-
+                                                        // updates the current list of friend requests.
                                                         if (userList.size() > 0)
-                                                            homeRecyclerViewAdapter.updateData(tmpRequestList, userList);
+                                                            friendRequestRecyclerViewAdapter.updateData(tmpRequestList, userList);
                                                         setDone(true);
                                                     },
-                                                    throwable -> {
-                                                        Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                                                    }
+                                                    throwable -> Log.d(LOG, throwable.getMessage())
                                             );
                                 }catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Removes invalid/old friend request and their senders.
+     * @param userList Sender of the friend requests.
+     * @param tmpRequestList Friend requests to be removed
+     */
     private void removeInvalidRequests(List<User> userList, List<FriendRequest> tmpRequestList) {
         for (Iterator<FriendRequest> iterator = tmpRequestList.listIterator(); iterator.hasNext(); ) {
             boolean valid = false;
@@ -175,22 +180,39 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    /**
+     * Setter for the variable that determines if the refresh function is running.
+     * @param refresh Running/ Not running
+     */
     private void setRefresh(boolean refresh) {
         this.refresh = refresh;
     }
 
+    /**
+     * Setter for the variable that determines if the refresh function is done.
+     * @param done Done/ Not done
+     */
     private void setDone(boolean done) {
         this.done = done;
     }
 
+    /**
+     * Increases the page parameter.
+     */
     private void increasePage() {
         page++;
     }
 
+    /**
+     * Resets the page parameter.
+     */
     private void resetPage() {
         page = 0;
     }
 
+    /**
+     * Loads the initial page of friend requests.
+     */
     private void loadFriendRequests() {
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -234,20 +256,17 @@ public class HomeFragment extends Fragment {
                                                             setDone(true);
                                                         }
 
-                                                        homeRecyclerViewAdapter.updateData(user.getFriendRequests(), userList);
+                                                        friendRequestRecyclerViewAdapter.updateData(user.getFriendRequests(), userList);
                                                         setDone(true);
                                                     },
-                                                    throwable -> {
-                                                        Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                                                    }
+                                                    throwable -> Log.d(LOG, throwable.getMessage())
                                             );
-                                }catch (Exception e) {
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Log.d(LOG, throwable.getMessage())
+
                     );
         }catch (Exception e) {
             e.printStackTrace();
@@ -256,6 +275,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
+        // Workaround to refresh the friend requests when loading up the fragment from the adjacent fragments.
         super.setUserVisibleHint(isVisibleToUser);
         if (getView() != null)
             if (isVisibleToUser) {
