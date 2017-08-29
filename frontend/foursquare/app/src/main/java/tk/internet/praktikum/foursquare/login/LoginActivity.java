@@ -15,9 +15,7 @@ import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 public class LoginActivity extends AppCompatActivity {
     private LoginFragment loginFragment;
     private RegisterFragment registerFragment;
-
     private RestorePasswordFragment restorePasswordFragment;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
         setTitle(getApplicationContext().getResources().getString(R.string.login));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Display the logo.
         Typeface type = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Pacifico.ttf");
         TextView hotelsquare = (TextView) findViewById(R.id.login_hotelsquare);
         hotelsquare.setTypeface(type);
@@ -39,6 +38,9 @@ public class LoginActivity extends AppCompatActivity {
         addFragment();
     }
 
+    /**
+     * Adds the login fragment to the fragment container and passes the return destination to the fragment container.
+     */
     public void addFragment() {
         loginFragment = new LoginFragment();
         Bundle arg = new Bundle();
@@ -47,6 +49,10 @@ public class LoginActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().add(R.id.login_layout, loginFragment).commit();
     }
 
+    /**
+     * Changes the displayed fragment depending on the given fragment id.
+     * @param fragmentId 0 = Login fragment, 1 = Register fragment, 2 = restore password fragment.
+     */
     public void changeFragment(int fragmentId) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
