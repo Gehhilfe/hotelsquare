@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +24,8 @@ import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
-//import android.app.Fragment;
-
 public class FriendListFragment extends Fragment {
+    private static final String LOG = FriendListFragment.class.getSimpleName();
     private RecyclerView recyclerView;
     private TextView emptyFriendList;
     private final String URL = "https://dev.ip.stimi.ovh/";
@@ -48,6 +48,8 @@ public class FriendListFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
         flRecyclerViewAdapter = new FLRecyclerViewAdapter(getContext(), getActivity());
         recyclerView.setAdapter(flRecyclerViewAdapter);
+
+        // Starts to load more data pages from the server depending on the scroll position.
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -81,22 +83,39 @@ public class FriendListFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Setter for the variable that determines if the refresh function is running.
+     * @param refresh Running/ Not running
+     */
     private void setRefresh(boolean refresh) {
         this.refresh = refresh;
     }
 
+    /**
+     * Setter for the variable that determines if the refresh function is done.
+     * @param done Done/ Not done
+     */
     private void setDone(boolean done) {
         this.done = done;
     }
 
+    /**
+     * Increases the page parameter.
+     */
     private void increasePage() {
         page++;
     }
 
+    /**
+     * Resets the page parameter.
+     */
     private void resetPage() {
         page = 0;
     }
 
+    /**
+     * Loads the initial page of the friend list.
+     */
     private void loadFriendList() {
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -124,15 +143,16 @@ public class FriendListFragment extends Fragment {
 
                                 flRecyclerViewAdapter.updateList(friendList);
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Checks for new accepted friends and fetches data from the given page.
+     */
     private void checkForUpdates() {
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -161,6 +181,7 @@ public class FriendListFragment extends Fragment {
                                     setDone(true);
                                 }
 
+                                // remove old friends from the update list
                                 for (Iterator<User> iterator = friendList.listIterator(); iterator.hasNext(); ) {
                                     User tmpUser = iterator.next();
                                     if (fList.contains(tmpUser))
@@ -170,9 +191,7 @@ public class FriendListFragment extends Fragment {
                                 if (friendList.size() > 0)
                                     flRecyclerViewAdapter.updateList(friendList);
                             },
-                            throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         }catch (Exception e) {
             e.printStackTrace();
@@ -181,6 +200,7 @@ public class FriendListFragment extends Fragment {
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
+        // Workaround to refresh the friend requests when loading up the fragment from the adjacent fragments.
         super.setUserVisibleHint(isVisibleToUser);
         if (getView() != null)
             if (isVisibleToUser) {
