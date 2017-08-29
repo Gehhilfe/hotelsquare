@@ -16,18 +16,18 @@ import java.util.List;
 
 import tk.internet.praktikum.foursquare.R;
 
-public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
+class UserStatePagerAdapter extends FragmentStatePagerAdapter {
 
     private final List<Fragment> fragmentList = new ArrayList<>();
     private final List<String> fragmentTitleList = new ArrayList<>();
     private Context context;
 
-    public UserStatePagerAdapter(FragmentManager fm, Context context) {
+    UserStatePagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         this.context = context;
     }
 
-    public void addFragment(Fragment fragment, String title) {
+    void addFragment(Fragment fragment, String title) {
         fragmentList.add(fragment);
         fragmentTitleList.add(title);
     }
@@ -46,7 +46,7 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_menu_search);
         String title = "";
-
+        // Initialises the tab with their title and logo.
         switch (position) {
             case 0: // profile
                 title = " \n" + context.getResources().getString(R.string.user_tab_profile);
@@ -67,6 +67,8 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
             default:
             break;
         }
+
+        // Builds up the title for the tabs by placing their title name below their icon.
         SpannableStringBuilder sb = new SpannableStringBuilder("" + title);
 
         try {
@@ -76,7 +78,6 @@ public class UserStatePagerAdapter extends FragmentStatePagerAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return sb;
     }
 }

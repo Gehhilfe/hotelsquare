@@ -2,6 +2,7 @@ package tk.internet.praktikum.foursquare.user;
 
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment {
+    private static final String LOG  = ProfileFragment.class.getSimpleName();
     private TextView name, email, password, city, age;
     private Button edit, save;
     private RadioButton male, female, none;
@@ -87,12 +89,15 @@ public class ProfileFragment extends Fragment {
                 return true;
             }
         });
-        //view.clearFocus();
+
         currentUser = null;
         initialiseProfile();
         return view;
     }
 
+    /**
+     * Cancel and discard change
+     */
     private void cancel() {
         edit.setOnClickListener(v -> edit());
         edit.setText(R.string.profile_edit);
@@ -126,10 +131,18 @@ public class ProfileFragment extends Fragment {
         isEdited = false;
     }
 
+    /**
+     * Loads data for the given userId data from the server.
+     */
     private void initialiseProfile() {
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity(), 0);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage(getString(R.string.load_profile));
+        progressDialog.show();
 
         try {
             service.profile()
@@ -150,23 +163,24 @@ public class ProfileFragment extends Fragment {
                                 else
                                     none.setChecked(true);
 
+                                // Loads the avatar.
+                                if (currentUser.getAvatar() != null) {
+                                    ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
+                                    imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.MEDIUM)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(bitmap -> {
+                                                avatarPicture.setImageBitmap(bitmap);
+                                            }, throwable -> Log.d(LOG_TAG, throwable.getMessage())
+                                            );
+                                }
 
-                            if (currentUser.getAvatar() != null) {
-                                ImageCacheLoader imageCacheLoader = new ImageCacheLoader(this.getContext());
-                                imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.MEDIUM)
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(bitmap -> {
-                                            avatarPicture.setImageBitmap(bitmap);
-                                        },
-                                                throwable -> {
-                                                    Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                                                }
-                                        );
-                            }
+                            progressDialog.dismiss();
                             },
                             throwable -> {
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
+                                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_user_data), Toast.LENGTH_SHORT).show();
+                                Log.d(LOG, throwable.getMessage());
                             }
                     );
         }catch (Exception e) {
@@ -174,6 +188,9 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Changes the ui settings, fetches the new user information and calls the upload function.
+     */
     private void save() {
         password.setEnabled(false);
         city.setEnabled(false);
@@ -208,6 +225,9 @@ public class ProfileFragment extends Fragment {
         edit.setText(R.string.profile_edit);
     }
 
+    /**
+     * Uploads the new user information.
+     */
     private void uploadChanges() {
         if  (newPicture) {
             ProfileService service = ServiceFactory
@@ -219,11 +239,10 @@ public class ProfileFragment extends Fragment {
                 service.uploadAvatar(img)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(user -> {
-                            Log.d(LOG_TAG, "AVATAR ID" + user.getAvatar().getId());
-                                },
+                        .subscribe(user -> Log.d(LOG_TAG, "AVATAR ID" + user.getAvatar().getId()),
                                 throwable -> {
-                                    Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Log.d(LOG, throwable.getMessage());
+                                    Toast.makeText(getActivity().getApplicationContext(), getString(R.string.error_upload_user_data), Toast.LENGTH_SHORT).show();
                                 }
                         );
             } catch (Exception e) {
@@ -255,6 +274,9 @@ public class ProfileFragment extends Fragment {
         isEdited = false;
     }
 
+    /**
+     * Setup the ui settings to be editable
+     */
     private void edit() {
         password.setFocusable(true);
         city.setFocusable(true);
@@ -275,10 +297,13 @@ public class ProfileFragment extends Fragment {
         edit.setText(R.string.profile_cancel);
     }
 
+    /**
+     * Starts a selection screen to select an Image from either your camera or your gallery
+     */
     private void uploadPicture() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final String[] options = {"Camera", "Gallery", "Cancel"};
-        builder.setTitle("Select an option to choose your logo.");
+        final String[] options = {getString(R.string.image_camera), getString(R.string.image_gallery), getString(R.string.image_cancel)};
+        builder.setTitle(getString(R.string.image_title));
         builder.setItems(options, (dialog, option) -> {
             switch (options[option]) {
                 case "Camera":
@@ -292,16 +317,29 @@ public class ProfileFragment extends Fragment {
                 case "Cancel":
                     dialog.dismiss();
                     break;
+                case "Kamera":
+                    Log.d(LOG_TAG, "Camera");
+                    cameraIntent();
+                    break;
+                case "Abbrechen":
+                    dialog.dismiss();
+                    break;
             }
         });
         builder.show();
     }
 
+    /**
+     * Starts the camera intent.
+     */
     private void cameraIntent() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
+    /**
+     * Starts the gallery intent.
+     */
     private void galleryIntent() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -312,7 +350,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        // Set the image from the camera or the gallery as avatar.
         switch (requestCode) {
             case REQUEST_CAMERA:
                 if (resultCode == RESULT_OK) {

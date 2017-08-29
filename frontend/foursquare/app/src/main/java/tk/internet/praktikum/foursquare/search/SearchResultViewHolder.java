@@ -3,6 +3,7 @@ package tk.internet.praktikum.foursquare.search;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -54,7 +55,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
                       this.image.setImageBitmap(bitmap);
                       this.image.setVisibility(View.VISIBLE);
                       this.shortNameOverImage.setVisibility(View.GONE);
-                  });
+                  }, throwable -> Log.d(SearchResultViewHolder.class.getSimpleName(), throwable.getMessage()));
         }
         else {
 
