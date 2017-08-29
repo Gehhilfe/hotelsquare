@@ -97,46 +97,30 @@ The compulsory features of the server are:
 
 Besides implementing all of the above mentioned compulsory features, the following table lists all bonus features, which were further on implemented:
 
-\begin{table}[htbp]
-	\centering
-	\label{tab:bonus_features}
-	\begin{tabular}{c}
-		General \\
-		\hline\hline
-		Privacy means: "incognito modus" 
-		-> if applied, no one can see the user's location and vice versa \\
-		\hline
-		Live update of the user's friends location on the map \\
-		\hline
-		Filterable search results (opening hours/costs) \\
-		\hline
-		E-mail confirmation for registration and password reset (secured by SSL and DKIM) \\
-		\hline
-		\\
-		\hline\hline
-		Frontend \\
-		\hline\hline
-		
-		\\
-		\hline\hline
-		Backend \\
-		\hline\hline
-		BDD/TDD -> Chai \\
-		\hline
-		CD -> test/static code analysis (Lint, test code coverage)/use of docker containers for deployment \\
-		\hline
-		use of \textit{bcrypt} library for secure password hashing \\
-		\hline
-		S3 filehosting with \textit{min.io} \\
-		\hline
-		Stateless server realized with \textit{JWT} (\textit{JSON Web Token}) \\
-		\hline
-		Security measures: SSL for whole API \\
-	\end{tabular}
-\caption{Bonus features of HOTELsquare}
-\end{table}
+\paragraph{Bonus Features:}
 
-
+\begin{itemize}
+	\item General:
+	\begin{itemize}
+		\item Privacy means: "incognito modus" -> if applied, no one can see the user's location and vice versa
+		\item Live update of the user's friends location on the map
+		\item Filterable search results (opening hours/costs)
+		\item E-mail confirmation for registration and password reset (secured by SSL and DKIM)
+	\end{itemize}
+	\item Frontend:
+	\begin{itemize}
+		\item 
+	\end{itemize}
+	\item Backend:
+	\begin{itemize}
+		\item BDD/TDD -> Chai
+		\item CD -> test/static code analysis (Lint, test code coverage)/use of docker containers for deployment
+		\item Use of \textit{bcrypt} library for secure password hashing
+		\item S3 filehosting with \textit{min.io}
+		\item Stateless server realized with \textit{JWT} (\textit{JSON Web Token})
+		\item Security measures: SSL for whole API
+	\end{itemize}
+\end{itemize}}
 
 \subsection{General Architecture}
 \label{subsec:general_architecture}
