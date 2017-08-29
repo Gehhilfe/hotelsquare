@@ -28,38 +28,45 @@ public class ServiceFactory {
      * @return service
      */
     public static <T> T createRetrofitService(final Class<T> clazz, final String endpoint, final String token) {
+        T service=null;
+        try {
+            OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
+            builder.readTimeout(10, TimeUnit.SECONDS);
+            builder.connectTimeout(5, TimeUnit.SECONDS);
 
-        OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
-        builder.readTimeout(10, TimeUnit.SECONDS);
-        builder.connectTimeout(5, TimeUnit.SECONDS);
+            if (token != null) {
+                builder.addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request().newBuilder().addHeader("x-auth", token).build();
+                        return chain.proceed(request);
+                    }
+                });
+            }
 
-        if (token != null) {
-            builder.addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
-                    Request request = chain.request().newBuilder().addHeader("x-auth", token).build();
-                    return chain.proceed(request);
-                }
-            });
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            CommentDeserializer deserializer = new CommentDeserializer("kind");
+            deserializer.registerComment("TextComment", TextComment.class);
+            deserializer.registerComment("ImageComment", ImageComment.class);
+            gsonBuilder.registerTypeAdapter(Comment.class, deserializer);
+
+            OkHttpClient client = builder.build();
+
+            final Retrofit retrofit = new Retrofit.Builder().baseUrl(endpoint)
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
+                    .client(client)
+                    .build();
+
+
+            service = retrofit.create(clazz);
         }
+        catch (Exception exception){
 
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        CommentDeserializer deserializer = new CommentDeserializer("kind");
-        deserializer.registerComment("TextComment", TextComment.class);
-        deserializer.registerComment("ImageComment", ImageComment.class);
-        gsonBuilder.registerTypeAdapter(Comment.class, deserializer);
+        }
+        catch (OutOfMemoryError error){
 
-        OkHttpClient client = builder.build();
-
-        final Retrofit retrofit = new Retrofit.Builder().baseUrl(endpoint)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
-                .client(client)
-                .build();
-
-
-        T service = retrofit.create(clazz);
-
+        }
         return service;
     }
 

@@ -97,56 +97,7 @@ The compulsory features of the server are:
 
 Besides implementing all of the above mentioned compulsory features, the following table lists all bonus features, which were further on implemented:
 
-\begin{table}[htbp]
-	\centering
-	\label{tab:bonus_features}
-	\begin{tabular}{c}
-		General \\
-		\hline\hline
-		Privacy means: "incognito modus" 
-		-> if applied, no one can see the user's location and vice versa \\
-		\hline
-		Live update of the user's friends location on the map \\
-		\hline
-		Filterable search results (opening hours/costs) \\
-		\hline
-		E-mail confirmation for registration and password reset (secured by SSL and DKIM) \\
-		\hline
-		\\
-		\hline\hline
-		Frontend \\
-		\hline\hline
-		two languages: Deutsch and English  \\
-		\hline
-		different marker colors on map depending on rating \\
-		\hline
-		different accuracy-strategies to optimize accuracy/battery consumption \\
-		\hline
-		Button to directly call the venue \\
-		\hline
-		Button to open the Website of a venue \\
-		\hline
-		Jump to the profile of your friend by clicking on his marker info window \\
-		\hline
-		Button to find your own Position on the map \\
-		\hline\hline
-		Backend \\
-		\hline\hline
-		BDD/TDD -> Chai \\
-		\hline
-		CD -> test/static code analysis (Lint, test code coverage)/use of docker containers for deployment \\
-		\hline
-		use of \textit{bcrypt} library for secure password hashing \\
-		\hline
-		S3 filehosting with \textit{min.io} \\
-		\hline
-		Stateless server realized with \textit{JWT} (\textit{JSON Web Token}) \\
-		\hline
-		Security measures: SSL for whole API \\
-	\end{tabular}
-\caption{Bonus features of HOTELsquare}
-\end{table}
-
+\paragraph{Bonus Features:}
 \begin{itemize}
 	\item General:
 	\begin{itemize}
@@ -157,7 +108,14 @@ Besides implementing all of the above mentioned compulsory features, the followi
 	\end{itemize}
 	\item Frontend:
 	\begin{itemize}
-		\item 
+		\item Two languages: Deutsch and English 
+		\item Different marker colors on map depending on rating
+		\item Different accuracy-strategies to optimize accuracy/battery consumption
+		\item Button to directly call the venue 
+		\item Button to open the Website of a venue
+		\item Jump to the profile of your friend by clicking on his marker info window
+		\item Button to find your own Position on the map
+		\item History activities
 	\end{itemize}
 	\item Backend:
 	\begin{itemize}
@@ -168,7 +126,7 @@ Besides implementing all of the above mentioned compulsory features, the followi
 		\item Stateless server realized with \textit{JWT} (\textit{JSON Web Token})
 		\item Security measures: SSL for whole API
 	\end{itemize}
-\end{itemize}}
+\end{itemize}
 
 \subsection{General Architecture}
 \label{subsec:general_architecture}
