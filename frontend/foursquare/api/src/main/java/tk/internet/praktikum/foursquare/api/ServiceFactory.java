@@ -19,6 +19,8 @@ import tk.internet.praktikum.foursquare.api.bean.TextComment;
 
 public class ServiceFactory {
 
+    private static String stToken = "";
+
     /**
      * service factory for creating retrofit services for all server apis
      *
@@ -34,8 +36,21 @@ public class ServiceFactory {
         deserializer.registerComment("TextComment", TextComment.class);
         deserializer.registerComment("ImageComment", ImageComment.class);
         gsonBuilder.registerTypeAdapter(Comment.class, deserializer);
-
-        OkHttpClient client = null;
+        stToken = token;
+        final OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        if(stToken == null)
+                            return chain.proceed(chain.request());
+                        else
+                            return chain.proceed(chain.request().newBuilder().addHeader("x-auth", stToken).build());
+                    }
+                })
+                .readTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .build();
+        /**
         if (token != null) {
             client = new OkHttpClient.Builder()
                     .addInterceptor(new Interceptor() {
@@ -53,7 +68,7 @@ public class ServiceFactory {
                     .readTimeout(60, TimeUnit.SECONDS)
                     .connectTimeout(10, TimeUnit.SECONDS)
                     .build();
-        }
+        }*/
 
         final Retrofit retrofit = new Retrofit.Builder().baseUrl(endpoint)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
