@@ -134,9 +134,9 @@ public class LocalStorage {
         editor.commit();
     }
 
-    /**
-     * @param chatId
-     * @param date
+    /** Stores the chat id and the date of the last read message.
+     * @param chatId Id of the chat.
+     * @param date Date of the last read message.
      */
     public void saveChatDate(String chatId, Date date) {
         SharedPreferences.Editor editor = getEditor();

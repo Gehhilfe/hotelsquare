@@ -160,11 +160,19 @@
     <string name="reset_failed">Failed to reset your password. Please try it again</string>
     <string name="reset_completed">Please check your emails to complete your new password.</string>
 
+    <!-- Upload image -->
+    <string name="image_cancel">Cancel</string>
+    <string name="image_camera">Camera</string>
+    <string name="image_gallery">Gallery</string>
+    <string name="image_title">Select an option to choose your avatar.</string>
 
     <!-- Dialogs -->
     <string name="register_dialog">Waiting for the registration server…</string>
     <string name="login_dialog">Waiting for login server…</string>
     <string name="reset_dialog">Waiting for the server response…</string>
+    <string name="load_profile">Loading user information…</string>
+    <string name="error_user_data">Couldn\'t load the user data.</string>
+    <string name="error_upload_user_data">An error occurred while uploading your user information. Please check your internet connection and try it again.</string>
 
     <!--- C1-->
     <array name="beer">
