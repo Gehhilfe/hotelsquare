@@ -460,7 +460,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             UserService service = ServiceFactory
                     .createRetrofitService(UserService.class, URL, token);
 
-            service.update(locationUser)
+            //TODO Send only location no more details
+            //This overides changes
+            User u = new User();
+            u.setLocation(locationUser.getLocation());
+
+            service.update(u)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
