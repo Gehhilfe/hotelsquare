@@ -85,6 +85,8 @@
     <string name="langSelect">Sprache auswählen</string>
     <string name="incognito">Inkonito-Modus</string>
     <string name="delete_profile">Profil löschen</string>
+    <string name="delete_dialog">Profil löschen</string>
+    <string name="delete_text">"Wollen Sie ihr Profile wirklich löschen?</string>
 
     <!-- venue in details -->
     <string name="leaderboard">Bestenliste</string>
@@ -133,6 +135,31 @@
     <string name="inbox_no_chats">Zurzeit hast du keine offenen Unterhaltungen.</string>
     <string name="send_friendrequest">Die Freundesanfrage wurde verschickt.</string>
     <string name="pending_friendrequest">Freundschaftanfrage wurde bereits versand.</string>
+    <string name="accept_friend_request">Die Freundschaftanfrage wurde bestätigt!</string>
+    <string name="decline_friend_request">Die Freundschaftanfrage wurde abgelehnt!</string>
+    <string name="wrong_login_info">Der Login ist fehlgeschlagen. Bitte überprüfe deine Anmeldeinformationen und versuche es erneut.</string>
+    <string name="registration_complete">Bitte prüfe deine Emails, um die Registrierung abzuschließen.</string>
+    <string name="registration_failed">Es ist ein Fehler bei der Registrierung aufgetretten. Bitte versuche es nochmal.</string>
+    <string name="register_invalid_mail">Bitte gib eine gültige Email-Adresse ein..</string>
+    <string name="register_invalid_name">Dein Benutzeraccount sollte mindestens 3 Zeichen haben..</string>
+    <string name="register_invalid_password">Dein Passwort sollte mindestens 6 Zeichen haben</string>
+    <string name="reset_failed">Es ist ein Fehler bei der Passwortzurücksetzung aufgetretten. Bitte versuche es nochmal</string>
+    <string name="reset_completed">Bitte prüfe deine Emails, um dein neues Passwort zu erhalten.</string>
+
+    <!-- Upload image -->
+    <string name="image_cancel">Abbrechen</string>
+    <string name="image_camera">Kamera</string>
+    <string name="image_gallery">Gallery</string>
+    <string name="image_title">Wähle aus von wo du dein Profilbild laden willst.</string>
+
+
+    <!-- Dialogs -->
+    <string name="register_dialog">Warte auf den Registrierungs- Server…</string>
+    <string name="login_dialog">Warte auf den Login- Server…</string>
+    <string name="reset_dialog">Warte auf die Server- Atwort…</string>
+    <string name="load_profile">Warte auf die Nutzerinformationen…</string>
+    <string name="error_user_data">Die Nutzerinformationen konnten nicht geladen werden.</string>
+    <string name="error_upload_user_data">Beim upload deiner Nutzerinformationen ist ein Fehler aufgetretten. Bitte prüfe deine Internetverbindung und versuche es erneut.</string>
 
 
     <!--- C1-->

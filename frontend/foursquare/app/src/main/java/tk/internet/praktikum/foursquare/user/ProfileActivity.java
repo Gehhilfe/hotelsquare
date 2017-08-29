@@ -1,14 +1,15 @@
 package tk.internet.praktikum.foursquare.user;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,14 +46,13 @@ import tk.internet.praktikum.foursquare.storage.LocalStorage;
 public class ProfileActivity extends AppCompatActivity {
 
     private final String URL = "https://dev.ip.stimi.ovh/";
+    private static final String LOG = ProfileActivity.class.getSimpleName();
     private User otherUser = new User();
     private TextView name, city, age, venueName, venueShortName, venueCount;
     private RadioButton male, female, none;
     private ImageView avatarPicture, venueLogo;
     private FloatingActionButton fab;
     private String userID;
-    private RecyclerView recyclerView;
-    private LinearLayout profileTopContent;
     private VenueCheckinInformation topVenue;
     private Toolbar toolbar;
     private ProfileLatestRecyclerViewAdapter profileLatestRecyclerViewAdapter;
@@ -69,7 +69,8 @@ public class ProfileActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.profile_toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         name = (TextView) findViewById(R.id.profile_name);
         city = (TextView) findViewById(R.id.profile_city);
@@ -85,10 +86,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         avatarPicture = (ImageView) findViewById(R.id.profile_activity_avatar);
         venueLogo = (ImageView) findViewById(R.id.profile_top_venue_logo);
-        profileTopContent = (LinearLayout) findViewById(R.id.profile_top_content_container);
+        LinearLayout profileTopContent = (LinearLayout) findViewById(R.id.profile_top_content_container);
         fab = (FloatingActionButton) findViewById(R.id.profile_activity_fab);
 
-        recyclerView = (RecyclerView) findViewById(R.id.profile_last_checkin_recylcer_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.profile_last_checkin_recylcer_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         profileLatestRecyclerViewAdapter = new ProfileLatestRecyclerViewAdapter(getApplicationContext(), this);
         recyclerView.setAdapter(profileLatestRecyclerViewAdapter);
@@ -99,12 +100,19 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Load the VenueInDetailsNestedScrollView for the selected venue.
+     */
     private void loadVenue() {
         Intent intent = new Intent(this, VenueInDetailsNestedScrollView.class);
         intent.putExtra("VENUE_ID", topVenue.getVenueID());
         startActivity(intent);
     }
 
+    /**
+     * Initialises the fab depending on the current friend status of logged in and selected user.
+     * If they are friends replace the add friend button with the send message button.
+     */
     private void initialiseFab() {
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -131,19 +139,25 @@ public class ProfileActivity extends AppCompatActivity {
                                         fab.setOnClickListener(v -> addFriend());
                                     }
                             },
-                            throwable -> {
-                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Loads data for the given userId data from the server.
+     */
     private void initialiseProfile() {
         UserService service = ServiceFactory
                 .createRetrofitService(UserService.class, URL, LocalStorage.
                         getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, ""));
+
+        final ProgressDialog progressDialog = new ProgressDialog(this, 0);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage(getString(R.string.load_profile));
+        progressDialog.show();
 
         try {
             service.profileByID(userID)
@@ -151,6 +165,7 @@ public class ProfileActivity extends AppCompatActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             user -> {
+
                                 String tmpName = user.getDisplayName().substring(0, 1).toUpperCase() + user.getDisplayName().substring(1);
                                 toolbar.setTitle(tmpName);
                                 otherUser = user;
@@ -165,7 +180,6 @@ public class ProfileActivity extends AppCompatActivity {
                                 else
                                     none.setChecked(true);
 
-                                //recyclerView.setAdapter(new ProfileLatestRecyclerViewAdapter(getApplicationContext(), user.getLastCheckins(), this));
                                 profileLatestRecyclerViewAdapter.setResults(user.getLastCheckins());
                                 profileLatestRecyclerViewAdapter.notifyDataSetChanged();
 
@@ -194,9 +208,13 @@ public class ProfileActivity extends AppCompatActivity {
                                 } else {
                                     avatarPicture.setImageResource(R.mipmap.user_avatar);
                                 }
+
+                                progressDialog.dismiss();
                             },
                             throwable -> {
-                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
+                                Toast.makeText(getApplicationContext(), getString(R.string.error_user_data), Toast.LENGTH_SHORT).show();
+                                Log.d(LOG, throwable.getMessage());
                             }
                     );
         }catch (Exception e) {
@@ -204,6 +222,10 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Loads the top venue from the displayed user.
+     * @param venueId Id of the top venue.
+     */
     public void initialiseTopVenue(String venueId){
         VenueService service = ServiceFactory
                 .createRetrofitService(VenueService.class, URL, LocalStorage.
@@ -228,7 +250,7 @@ public class ProfileActivity extends AppCompatActivity {
                                                 venueLogo.setImageBitmap(bitmap);
                                                 venueLogo.setVisibility(View.VISIBLE);
                                                 venueShortName.setVisibility(View.GONE);
-                                            });
+                                            }, throwable -> Log.d(LOG, throwable.getMessage()));
                                 }
                                 else {
                                     venueLogo.setDrawingCacheEnabled(true);
@@ -245,15 +267,16 @@ public class ProfileActivity extends AppCompatActivity {
                                     }
                                 }
                             },
-                            throwable -> {
-                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Sends a friend request to the displayed user.
+     */
     private void addFriend() {
         UserService service = ServiceFactory
                 .createRetrofitService(UserService.class, URL, LocalStorage.
@@ -279,6 +302,9 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Starts the chat with the user if the two persons are already friends.
+     */
     private void startChat() {
         ChatService service = ServiceFactory
                 .createRetrofitService(ChatService.class, URL, LocalStorage.
@@ -296,14 +322,13 @@ public class ProfileActivity extends AppCompatActivity {
                                 intent.putExtra("Parent", "ProfileActivity");
                                 startActivity(intent);
                             },
-                            throwable -> {
-                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public Intent getSupportParentActivityIntent() {
@@ -315,25 +340,34 @@ public class ProfileActivity extends AppCompatActivity {
         return getParentActivityIntentImpl();
     }
 
+    /**
+     * Sets the intent for the return destination depending on the given parent view.
+     * @return Destination intent.
+     */
     private Intent getParentActivityIntentImpl() {
         Intent i = null;
         Bundle bundle = getIntent().getExtras();
         String parentActivity = bundle.getString("Parent");
 
-        if (parentActivity.equals("UserActivity")) {
-            i = new Intent(this, UserActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        } else if (parentActivity.equals("SearchPerson")) {
-            i = new Intent(this, SearchPersonActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        }
-        else if(parentActivity.equals("VenueInDetailsNestedScrollView")){
-            i = new Intent(this, VenueInDetailsNestedScrollView.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        }
-        else {
-                i = new Intent(this, MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        if (parentActivity != null) {
+            switch (parentActivity) {
+                case "UserActivity":
+                    i = new Intent(this, UserActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    break;
+                case "SearchPerson":
+                    i = new Intent(this, SearchPersonActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    break;
+                case "VenueInDetailsNestedScrollView":
+                    i = new Intent(this, VenueInDetailsNestedScrollView.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    break;
+                default:
+                    i = new Intent(this, MainActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    break;
+            }
         }
 
         return i;

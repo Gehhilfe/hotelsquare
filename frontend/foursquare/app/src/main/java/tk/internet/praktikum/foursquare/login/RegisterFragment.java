@@ -1,7 +1,5 @@
 package tk.internet.praktikum.foursquare.login;
 
-//import android.app.Fragment;
-
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -28,10 +26,8 @@ public class RegisterFragment extends Fragment {
 
     private static final String LOG_TAG = RegisterFragment.class.getSimpleName();
     private final String URL = "https://dev.ip.stimi.ovh/";
-
     private EditText nameInput, emailInput, passwordInput;
     private AppCompatButton registerBtn;
-    private TextView loginLbl;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,8 +37,7 @@ public class RegisterFragment extends Fragment {
         emailInput = (EditText) view.findViewById(R.id.user_input);
         passwordInput = (EditText) view.findViewById(R.id.register_password_input);
         registerBtn = (AppCompatButton) view.findViewById(R.id.create_acc_btn);
-        loginLbl = (TextView) view.findViewById(R.id.login_link);
-
+        TextView loginLbl = (TextView) view.findViewById(R.id.login_link);
 
         registerBtn.setOnClickListener(v -> register());
 
@@ -61,7 +56,7 @@ public class RegisterFragment extends Fragment {
     }
 
     /**
-     * Start the Registration process. At the moment it validates the input and shows the progress dialog.
+     * Start the Registration process.
      */
     private void register() {
         if (!validate()) {
@@ -74,7 +69,7 @@ public class RegisterFragment extends Fragment {
         final ProgressDialog progressDialog = new ProgressDialog(getActivity(), 0);
 
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Waiting for the Registration...");
+        progressDialog.setMessage(getString(R.string.register_dialog));
         progressDialog.show();
 
         String name = nameInput.getText().toString();
@@ -90,17 +85,19 @@ public class RegisterFragment extends Fragment {
                         user -> {
                             successfulRegister();
                             progressDialog.dismiss();
-                            Toast.makeText(getActivity().getApplicationContext(), "Registration complete.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.registration_complete), Toast.LENGTH_LONG).show();
                         },
                         throwable -> {
+                            Log.d(LOG_TAG, throwable.getMessage());
                             failedRegister();
+                            Toast.makeText(getActivity().getBaseContext(), getString(R.string.registration_failed), Toast.LENGTH_LONG).show();
                             progressDialog.dismiss();
                         }
                 );
     }
 
     /**
-     * Validates the entered input. Might be unnecessary if we only validate on the backend.
+     * Validates the entered input.
      * @return True or false depending on if the input is valid.
      */
     private boolean validate() {
@@ -111,19 +108,19 @@ public class RegisterFragment extends Fragment {
         String password = passwordInput.getText().toString();
 
         if (eMail.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(eMail).matches()) {
-            emailInput.setError("Please enter a valid email address.");
+            emailInput.setError(getString(R.string.register_invalid_mail));
             valid = false;
         } else
             emailInput.setError(null);
 
         if (name.isEmpty() || name.length() < 3) {
-            nameInput.setError("Please enter a valid name.");
+            nameInput.setError(getString(R.string.register_invalid_name));
             valid = false;
         } else
             nameInput.setError(null);
 
         if (password.isEmpty() || password.length() < 6) {
-            passwordInput.setError("Please enter a valid password (> 6 characters).");
+            passwordInput.setError(getString(R.string.register_invalid_password));
             valid = false;
         } else
             passwordInput.setError(null);
@@ -132,22 +129,18 @@ public class RegisterFragment extends Fragment {
     }
 
     /**
-     * Start up the next Activity or Fragment after a successful registration. At the moment it just logs
-     * the login and finishes the Activity.
+     * Forwards the user to the login fragment.
      */
     private void successfulRegister() {
-        Log.d(LOG_TAG, "Successful login.");
         registerBtn.setEnabled(true);
        ((LoginActivity) getActivity()).changeFragment(0);
-       //loginGeneralFragment.changeFragment(0);
     }
 
     /**
-     * Routine to execute on Failed registration. Logs the login attempt and displays a Toast for the user.
+     * Routine to execute on Failed registration. Logs the login attempt.
      */
     private void failedRegister() {
         Log.d(LOG_TAG, "Failed login.");
         registerBtn.setEnabled(true);
-        Toast.makeText(getActivity().getBaseContext(), "Failed to register.", Toast.LENGTH_LONG).show();
     }
 }

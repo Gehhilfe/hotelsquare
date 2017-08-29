@@ -3,6 +3,7 @@ package tk.internet.praktikum.foursquare.chat;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Collections;
 import java.util.Date;
@@ -31,8 +31,8 @@ import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 public class ChatFragment extends Fragment {
+    private static final String LOG = ChatFragment.class.getSimpleName();
     private ListView chatView;
-    private ImageView sendBtn;
     private EditText inputMsg;
     private ChatListViewAdapter chatListViewAdapter;
     private String chatId;
@@ -54,8 +54,30 @@ public class ChatFragment extends Fragment {
 
         chatView = (ListView) view.findViewById(R.id.chat_list_view);
         inputMsg = (EditText) view.findViewById(R.id.chat_input);
-        sendBtn = (ImageView) view.findViewById(R.id.chat_send);
+        ImageView sendBtn = (ImageView) view.findViewById(R.id.chat_send);
 
+        // Create the chat service.
+        initialiseChat();
+
+        sendBtn.setOnClickListener(v -> send());
+
+        inputMsg.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND)
+                    send();
+                return true;
+            }
+        });
+
+        return view;
+    }
+
+    /**
+     * Initializes the chat by loading the messages for the current chat id from the server and
+     * start the update loop to fetch incoming messages.
+     */
+    private void initialiseChat() {
         ChatService service = ServiceFactory
                 .createRetrofitService(ChatService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
@@ -70,6 +92,7 @@ public class ChatFragment extends Fragment {
                                 messages = chat.getMessages();
                                 if (messages.size() > 0) {
                                     lastMsg = messages.get(0);
+                                    // Save the date of the last read message from this chat.
                                     LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveChatDate(chatId, lastMsg.getDate());
                                     Collections.reverse(messages);
                                 }
@@ -78,31 +101,20 @@ public class ChatFragment extends Fragment {
 
                                 updateLoop();
                             },
-                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-         sendBtn.setOnClickListener(v -> send());
-
-        inputMsg.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEND)
-                    send();
-                return true;
-            }
-        });
-
-        return view;
     }
 
+    /**
+     * Periodically fetches the new incoming messages.
+     */
     private void updateLoop() {
         ChatService service = ServiceFactory
                 .createRetrofitService(ChatService.class, URL, LocalStorage.
                         getSharedPreferences(getActivity().getApplicationContext()).getString(Constants.TOKEN, ""));
-
 
         try {
             service.getConversation(chatId, 0)
@@ -115,17 +127,20 @@ public class ChatFragment extends Fragment {
                                     Date last = lastMsg.getDate();
                                     Date now = chatResponse.getMessages().get(0).getDate();
 
+                                    // Check if there is a newer message, update the adapter and the date from the last read message.
                                     if (last.compareTo(now) == -1) {
                                         messages.clear();
                                         messages.addAll(chatResponse.getMessages());
                                         lastMsg = messages.get(0);
+
                                         if (getActivity() == null)
                                             return;
                                         LocalStorage.getLocalStorageInstance(getActivity().getApplicationContext()).saveChatDate(chatId, lastMsg.getDate());
+
                                         Collections.reverse(messages);
                                         chatListViewAdapter.notifyDataSetChanged();
                                     }
-                                }else {
+                                } else {
                                     if (chatResponse.getMessages().size() > 0) {
                                         messages.clear();
                                         messages.addAll(chatResponse.getMessages());
@@ -139,33 +154,16 @@ public class ChatFragment extends Fragment {
                                 }
 
                             },
-                            throwable -> {
-                                if (getActivity() == null)
-                                    return;
-                                Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         }catch (Exception e) {
             e.printStackTrace();
         }
-        /*
-        try {
-            service.getConversation(chatId, messages.get(0).getId())
-                    .repeatWhen(done -> done.delay(10, TimeUnit.SECONDS))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            chatResponse -> {
-                                messages.addAll(chatResponse.getMessages());
-                                chatListViewAdapter.notifyDataSetChanged();
-                            },
-                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
-                    );
-        }catch (Exception e) {
-            e.printStackTrace();
-        }*/
     }
 
+    /**
+     * Sends your last message to the server.
+     */
     private void send() {
         ChatService service = ServiceFactory
                 .createRetrofitService(ChatService.class, URL, LocalStorage.
@@ -182,7 +180,7 @@ public class ChatFragment extends Fragment {
                                 lastMsg = chatResponse;
                                 chatListViewAdapter.notifyDataSetChanged();
                             },
-                            throwable -> Toast.makeText(getActivity().getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         }catch (Exception e) {
             e.printStackTrace();

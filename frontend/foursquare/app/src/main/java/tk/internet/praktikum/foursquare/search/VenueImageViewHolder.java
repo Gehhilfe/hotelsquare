@@ -2,6 +2,7 @@ package tk.internet.praktikum.foursquare.search;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -45,7 +46,7 @@ public class VenueImageViewHolder extends RecyclerView.ViewHolder  implements  V
                 .subscribe(bitmap -> {
                     venue_image.setImageBitmap(bitmap);
 
-                });
+                }, throwable -> Log.d(VenueImageViewHolder.class.getSimpleName(), throwable.getMessage()));
     }
 
     @Override

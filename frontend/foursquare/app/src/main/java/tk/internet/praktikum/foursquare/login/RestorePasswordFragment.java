@@ -25,7 +25,6 @@ import tk.internet.praktikum.foursquare.api.service.UserService;
 public class RestorePasswordFragment extends Fragment {
 
     private static final String LOG_TAG = RestorePasswordFragment.class.getSimpleName();
-
     private EditText email, name;
     private AppCompatButton resetPwBtn;
 
@@ -51,17 +50,19 @@ public class RestorePasswordFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Validates the user input and starts the restore password process
+     */
     private void resetPassword() {
         if (!validate()) {
             failedReset();
             return;
         }
-
         resetPwBtn.setEnabled(false);
 
         final ProgressDialog progressDialog = new ProgressDialog(getActivity(), 0);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Waiting for the server response...");
+        progressDialog.setMessage(getString(R.string.reset_dialog));
         progressDialog.show();
 
 
@@ -70,38 +71,39 @@ public class RestorePasswordFragment extends Fragment {
         service.passwordReset(new PasswordResetInformation(name.getText().toString(), email.getText().toString()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((a) -> successfulReset(progressDialog), (a) -> failedReset(progressDialog));
+                .subscribe((a) -> successfulReset(progressDialog), (a) -> failedReset(progressDialog, a));
 
     }
 
     /**
-     * Logs the reset and returns to the login activity.
+     * Notifies the user that the reset process was successful and dismisses the progress dialog.
+     * @param progressDialog Dialog to dismiss
      */
     private void successfulReset(ProgressDialog progressDialog) {
-        Log.d(LOG_TAG, "Successfully reset the password.");
+        Toast.makeText(getContext(), getString(R.string.reset_completed), Toast.LENGTH_SHORT).show();
         resetPwBtn.setEnabled(true);
         progressDialog.dismiss();
        ((LoginActivity) getActivity()).changeFragment(0);
-       // loginGeneralFragment.changeFragment(0);
     }
 
     /**
-     * Routine to execute on Failed rest. Logs the attempt, displays a Toast for the user and dismisses the progressDialog.
+     * Notifies the user that the reset process failed, dismisses the progress dialog and logs the attempt.
+     * @param progressDialog Dialog to dismiss.
+     * @param throwable Error message for the log.
      */
-    private void failedReset(ProgressDialog progressDialog) {
-        Log.d(LOG_TAG, "Failed login.");
+    private void failedReset(ProgressDialog progressDialog, Throwable throwable) {
+        Log.d(LOG_TAG, throwable.getMessage());
         progressDialog.dismiss();
         resetPwBtn.setEnabled(true);
-        Toast.makeText(getActivity().getBaseContext(), "Couldn't reset the password.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity().getBaseContext(), getString(R.string.reset_failed), Toast.LENGTH_LONG).show();
     }
 
     /**
-     * Routine to execute on Failed rest. Logs the attempt and displays a Toast for the user.
+     * Notifies the user that the reset process failed, dismisses the progress dialog and logs the attempt.
      */
     private void failedReset() {
-        Log.d(LOG_TAG, "Failed login.");
         resetPwBtn.setEnabled(true);
-        Toast.makeText(getActivity().getBaseContext(), "Couldn't reset the password.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity().getBaseContext(), getString(R.string.reset_failed), Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -114,7 +116,7 @@ public class RestorePasswordFragment extends Fragment {
         String eMail = email.getText().toString();
 
         if (eMail.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(eMail).matches()) {
-            email.setError("Please enter a valid email address.");
+            email.setError(getString(R.string.register_invalid_mail));
             valid = false;
         } else
             email.setError(null);

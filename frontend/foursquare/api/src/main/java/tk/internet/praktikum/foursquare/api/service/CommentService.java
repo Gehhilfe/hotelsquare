@@ -15,9 +15,7 @@ import tk.internet.praktikum.foursquare.api.bean.Comment;
 import tk.internet.praktikum.foursquare.api.bean.ImageComment;
 import tk.internet.praktikum.foursquare.api.bean.TextComment;
 
-/**
- * Created by gehhi on 10.07.2017.
- */
+
 
 public interface CommentService {
     /**

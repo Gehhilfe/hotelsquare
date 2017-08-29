@@ -32,6 +32,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -60,16 +61,15 @@ import tk.internet.praktikum.foursquare.user.UserActivity;
 import tk.internet.praktikum.foursquare.utils.LanguageHelper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String LOG = MainActivity.class.getSimpleName();
     private final int REQUEST_LOGIN = 0;
     private final int RESULT_FAST_SEARCH = 2;
     private final int RESULT_PERSON_SEARCH = 3;
     private final int RESULT_HISTORY = 4;
     private final int RESULT_USER_ACTIVITY = 5;
 
-
     private TextView userName, hotelsquare;
     private ImageView avatar;
-
     private Location userLocation = new Location(0, 0);
     private Location oldUserLocation = new Location(0,0);
     private Handler handler = new Handler();
@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private MenuItem loginMenu, fastSearchMenu, personSearchMenu, historyMenu;
     private static boolean alreadystarted = false;
-
 
     private static final int MY_PERMISSIONS_FINE_ACCESS = 0;
 
@@ -127,6 +126,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sendLocation();
     }
 
+    /**
+     * Loads up the menu and assigns its items to their variables.
+     * @param menu Menu to fetch the items from.
+     */
     private void initialiseMenuItems(Menu menu) {
         for (int i = 0; i < menu.size(); i++) {
             menu.getItem(i);
@@ -142,6 +145,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * Initialises the navigationHeader. If no user is logged in it will display the log. When a user
+     * is logged in display the user avatar and name.
+     */
     private void initialiseNavigationHeader() {
         ProfileService service = ServiceFactory
                 .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -163,20 +170,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     imageCacheLoader.loadBitmap(user.getAvatar(), ImageSize.SMALL)
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(bitmap -> {
-                                                        avatar.setImageBitmap(bitmap);
-                                                    },
-                                                    throwable -> {
-                                                        Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                                                    }
+                                            .subscribe(bitmap -> avatar.setImageBitmap(bitmap),
+                                                    throwable -> Log.d(LOG, throwable.getMessage())
                                             );
                                 } else {
                                     avatar.setImageResource(R.mipmap.user_avatar);
                                 }
                             },
-                            throwable -> {
-                                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,18 +203,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void searchNavigation(MenuItem item) {
+    /**
+     * Start up the fast search fragment.
+     */
+    private void searchNavigation() {
         try {
             Fragment fragment = FastSearchFragment.class.newInstance();
             redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_search));
             setTitle("Hotelsquare");
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Start the search person fragment.
+     * @param item Title for the menu.
+     */
     private void searchPersonNavigation(MenuItem item) {
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             login("PersonSearch");
@@ -224,6 +230,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * Start the history fragment.
+     * @param item Title for the menu.
+     */
     private void historyNavigation(MenuItem item) {
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             login("History");
@@ -234,6 +244,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * Start the UserActivity.
+     */
     private void meNavigation() {
         if (!LocalStorage.getLocalStorageInstance(getApplicationContext()).isLoggedIn()) {
             login("MyProfile");
@@ -244,19 +257,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-
+    /**
+     * Start the settings fragment.
+     * @param item Title for the menu.
+     */
     private void settingsNavigation(MenuItem item) {
         SettingsFragment fragment = new SettingsFragment();
         redirectToFragment(fragment, getApplicationContext().getResources().getString(R.string.action_settings));
         setTitle(item);
     }
 
+    /**
+     * Start the login Activity.
+     * @param destination to return to after logging in.
+     */
     private void login(String destination) {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         intent.putExtra("Destination", destination);
         startActivityForResult(intent, REQUEST_LOGIN);
     }
 
+    /**
+     * Log out the user and reset the view.
+     */
     public void logout() {
         LocalStorage.getLocalStorageInstance(getApplicationContext()).deleteLoggedInInformation();
         loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_login));
@@ -274,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_search:
-                searchNavigation(item);
+                searchNavigation();
                 break;
             case R.id.nav_search_person:
                 searchPersonNavigation(item);
@@ -303,6 +326,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    /**
+     * Changes the fragment on the MainActivity
+     * @param fragment Fragment to go to.
+     * @param backStackName Name of the Fragment for the back stack
+     */
     private void redirectToFragment(Fragment fragment, String backStackName) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
@@ -310,9 +338,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fragmentTransaction.commit();
     }
 
+    /**
+     * Set the title of the Actionbar.
+     * @param item Title for the menu.
+     */
     private void setTitle(MenuItem item) {
         item.setChecked(true);
-        // Set action bar title
         setTitle(item.getTitle());
 
     }
@@ -321,11 +352,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
+            // Redirect to the destination view after the login. And setup the navigation drawer login/logout item.
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_FAST_SEARCH) {
                     initialiseNavigationHeader();
                     loginMenu.setTitle(getApplicationContext().getResources().getString(R.string.action_logout));
-                    searchNavigation(fastSearchMenu);
+                    searchNavigation();
                     break;
                 } else if (resultCode == RESULT_USER_ACTIVITY) {
                     initialiseNavigationHeader();
@@ -346,11 +378,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("LOCATION", "StartService");
         if (!isMyServiceRunning(LocationService.class))
             startService(new Intent(this, LocationService.class)); // start tracking service
 
-        // off-topic -> ignore this
+        // register on EventBus
         if (!(EventBus.getDefault().isRegistered(this))) {
             EventBus.getDefault().register(this);
         }
@@ -381,8 +412,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onDestroy() {
         stopService(new Intent(this, LocationService.class)); // stop tracking service
-        Log.d("LOCATION", "StopService");
-        // off-topic -> ignore this
+        // unregister from EventBus
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
@@ -400,7 +430,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LocationTracker.LocationEvent event) {
-        Log.d("SUBSRIBE", "This is: " + event.location);
         oldUserLocation = userLocation;
         // Update User Location on Map
         userLocation = new Location(event.location.getLongitude(), event.location.getLatitude());
@@ -422,7 +451,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void sendLocation() {
         String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-        if (token == "")
+        if (Objects.equals(token, ""))
             return;
 
 
@@ -441,7 +470,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                                 locationUser = user;
-                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
                                 if(!alreadystarted){
                                     updateLoop();
                                 }
@@ -488,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void updateLoop() {
         String token = LocalStorage.getSharedPreferences(getApplicationContext()).getString(Constants.TOKEN, "");
-        if (token == "") {
+        if (Objects.equals(token, "")) {
             return;
         }
         try {
@@ -502,7 +530,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                                 locationUser = user;
-                                Log.d("SENDET", "This was send to server: " + locationUser.getLocation().getLatitude() + " + " + locationUser.getLocation().getLongitude());
                             },
                             throwable -> {
                                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
@@ -515,15 +542,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private boolean checkLocationChange() {
-        if(userLocation.getLatitude().equals(oldUserLocation.getLatitude()) && userLocation.getLongitude().equals(oldUserLocation.getLongitude())){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
+    /**
+     * Request the need permissions
+     */
     private void requestNeededPermissions() {
 
         if (ContextCompat.checkSelfPermission(this,
@@ -544,20 +565,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 }

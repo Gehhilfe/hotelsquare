@@ -213,7 +213,7 @@ public class VenueInDetailsNestedScrollView extends AppCompatActivity implements
         // Last here recylcer
         lastHereRecylcer = (RecyclerView) findViewById(R.id.last_here_recylcer_view);
 
-        lastHereAdapter = new LastHereAdapter(new ArrayList<UserCheckinInformation>(), getApplicationContext());
+        lastHereAdapter = new LastHereAdapter(new ArrayList<UserCheckinInformation>(), this);
         lastHereCard = (CardView) findViewById(R.id.venue_detail_checkin_card);
 
 

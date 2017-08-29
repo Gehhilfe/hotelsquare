@@ -14,12 +14,9 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
-import tk.internet.praktikum.foursquare.frequest.HomeFragment;
-import tk.internet.praktikum.foursquare.search.SearchPersonActivity;
+import tk.internet.praktikum.foursquare.frequest.FriendRequestFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.utils.LanguageHelper;
-
-
 
 public class UserActivity extends AppCompatActivity  {
     private UserStatePagerAdapter userStatePagerAdapter;
@@ -43,15 +40,28 @@ public class UserActivity extends AppCompatActivity  {
         TabLayout tabLayout= (TabLayout) findViewById(R.id.me_tabs);
         tabLayout.setupWithViewPager(fragmentContainer);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    /**
+     * Initialise the viewpager by adding the fragments to its adapter.
+     * @param container ViewPager to add initialised userStatePagerAdapter to.
+     */
     private void initialiseFragmentContainer(ViewPager container) {
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
-        userStatePagerAdapter.addFragment(new HomeFragment(), "Friend Request");
+        userStatePagerAdapter.addFragment(new FriendRequestFragment(), "Friend Request");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");
         container.setAdapter(userStatePagerAdapter);
+    }
+
+    /**
+     * Returns the viewPager
+     * @return fragmentContainer viewpager.
+     */
+    public ViewPager getViewPager() {
+        return fragmentContainer;
     }
 
     @Override
@@ -64,17 +74,23 @@ public class UserActivity extends AppCompatActivity  {
         return getParentActivityIntentImpl();
     }
 
+    /**
+     * Sets the intent for the return destination depending on the given parent view.
+     * @return Destination intent.
+     */
     private Intent getParentActivityIntentImpl() {
         Intent i = null;
         Bundle bundle = getIntent().getExtras();
         String parentActivity = bundle.getString("Parent");
 
-        if(parentActivity.equals("VenueInDetailsNestedScrollView")){
-            i = new Intent(this, VenueInDetailsNestedScrollView.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        } else {
-            i = new Intent(this, MainActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        if (parentActivity != null) {
+            if(parentActivity.equals("VenueInDetailsNestedScrollView")){
+                i = new Intent(this, VenueInDetailsNestedScrollView.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            } else {
+                i = new Intent(this, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            }
         }
 
         return i;

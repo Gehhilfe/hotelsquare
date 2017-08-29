@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,20 +23,19 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
-import tk.internet.praktikum.foursquare.api.bean.Chat;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ChatService;
 import tk.internet.praktikum.foursquare.chat.ChatActivity;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 import tk.internet.praktikum.foursquare.user.ProfileActivity;
 
-public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAdapter.FriendListViewHolder> {
+class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAdapter.FriendListViewHolder> {
 
     class FriendListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView sendMsg, avatar;
         private TextView name;
 
-        public FriendListViewHolder(View itemView) {
+        FriendListViewHolder(View itemView) {
             super(itemView);
             sendMsg = (ImageView) itemView.findViewById(R.id.fl_msg);
             avatar = (ImageView) itemView.findViewById(R.id.fl_avatar);
@@ -57,6 +56,9 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
 
         }
 
+        /**
+         * Start or continues a chat with the selected person.
+         */
         private void loadChat() {
             ChatService service = ServiceFactory
                     .createRetrofitService(ChatService.class, URL, LocalStorage.
@@ -74,15 +76,16 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
                                     intent.putExtra("Parent", "UserActivity");
                                     activity.startActivity(intent);
                                 },
-                                throwable -> {
-                                    Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
+                                throwable -> Log.d(LOG, throwable.getMessage())
                         );
             }catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
+        /**
+         * Loads the profile of the selected user.
+         */
         private void loadProfile() {
             Intent intent = new Intent(context, ProfileActivity.class);
             intent.putExtra("userID", friendList.get(getAdapterPosition()).getId());
@@ -91,13 +94,14 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
         }
     }
 
+    private static final String LOG = FLRecyclerViewAdapter.class.getSimpleName();
     private final String URL = "https://dev.ip.stimi.ovh/";
     private Activity activity;
     private Context context;
     private LayoutInflater inflater;
     private List<User> friendList;
 
-    public FLRecyclerViewAdapter(Context context, Activity activity) {
+    FLRecyclerViewAdapter(Context context, Activity activity) {
         inflater = LayoutInflater.from(context);
         friendList = new ArrayList<>();
         this.context = context;
@@ -107,24 +111,20 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
     @Override
     public FriendListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.friendlist_entry, parent, false);
-
         return new FriendListViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(FriendListViewHolder holder, int position) {
         User currentUser = friendList.get(position);
+        // Loads the avatar
         if (currentUser.getAvatar() != null) {
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
             imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.LARGE)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(bitmap -> {
-                                holder.avatar.setImageBitmap(bitmap);
-                            },
-                            throwable -> {
-                                Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                    .subscribe(bitmap -> holder.avatar.setImageBitmap(bitmap),
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         } else {
             holder.avatar.setImageResource(R.mipmap.user_avatar);
@@ -138,8 +138,11 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
         return friendList.size();
     }
 
-
-    public void updateList(List<User> data) {
+    /**
+     * Updates and sorts the friend list.
+     * @param data New friends that will be added to the friend list.
+     */
+    void updateList(List<User> data) {
         friendList.addAll(data);
         Collections.sort(friendList,new Comparator<User>() {
             @Override
@@ -150,7 +153,11 @@ public class FLRecyclerViewAdapter extends RecyclerView.Adapter<FLRecyclerViewAd
         notifyDataSetChanged();
     }
 
-    public List<User> getFriendList() {
+    /**
+     * Returns the current friend list.
+     * @return Current list of friends.
+     */
+    List<User> getFriendList() {
         return friendList;
     }
 

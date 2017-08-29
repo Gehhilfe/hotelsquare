@@ -1,6 +1,8 @@
 package tk.internet.praktikum.foursquare;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,12 +17,17 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import tk.internet.praktikum.Constants;
 import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.ServiceFactory;
+import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.bean.UserCheckinInformation;
 import tk.internet.praktikum.foursquare.api.service.UserService;
 import tk.internet.praktikum.foursquare.search.Utils;
+import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
+import tk.internet.praktikum.foursquare.user.UserActivity;
 
 
 public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyViewHolder> {
@@ -79,10 +86,41 @@ public class LastHereAdapter extends RecyclerView.Adapter<LastHereAdapter.MyView
                             e.printStackTrace();
                         }
                     }
-
+                    holder.avatar.setOnClickListener(seeProfile(user));
+                    holder.name.setOnClickListener(seeProfile(user));
                 }, (err) -> Log.d(LOG, err.toString(), err));
+
     }
 
+    public View.OnClickListener seeProfile(User user) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sharedPreferences = LocalStorage.getSharedPreferences(context);
+                String userName = sharedPreferences.getString(Constants.NAME, "");
+                try {
+                    if (user.getName().equals(userName)) {
+                        Intent intent = new Intent(context, UserActivity.class);
+                        intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(context, ProfileActivity.class);
+                        intent.putExtra("userID", user.getId());
+                        intent.putExtra("Parent", "VenueInDetailsNestedScrollView");
+                        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
+                }
+                catch (Exception exception){
+                    Log.i(LOG,exception.getMessage());
+                }
+
+            }
+        };
+    }
     @Override
     public int getItemCount() {
         return checkinInformations.size();
