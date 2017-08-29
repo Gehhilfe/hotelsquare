@@ -35,7 +35,7 @@
     <!-- User -->
     <string name="user_tab_requests">Anfragen</string>
     <string name="user_tab_profile">Profil</string>
-    <string name="user_tab_friends">Freunden</string>
+    <string name="user_tab_friends">Freunde</string>
     <string name="user_tab_inbox">Inbox</string>
     <string name="near_me">in meiner Nähe</string>
 
@@ -91,7 +91,7 @@
     <!-- venue in details -->
     <string name="leaderboard">Bestenliste</string>
     <string name="last_checkins">Zuletzt eingecheckt</string>
-    <string name="checkins_count">Einchecken</string>
+    <string name="checkins_count">Besucher</string>
     <string name="a_year">einem Jahr</string>
     <string name="years">Jahren</string>
     <string name="a_month">einem Monat</string>
@@ -160,6 +160,9 @@
     <string name="load_profile">Warte auf die Nutzerinformationen…</string>
     <string name="error_user_data">Die Nutzerinformationen konnten nicht geladen werden.</string>
     <string name="error_upload_user_data">Beim upload deiner Nutzerinformationen ist ein Fehler aufgetretten. Bitte prüfe deine Internetverbindung und versuche es erneut.</string>
+    <string name="rating">Bewertung</string>
+    <string name="type_in_your_message">Gib deine Nachricht ein.</string>
+
     <string name="venue_search_progress_dialog">Warte auf das Suchen...</string>
 
     <!--- C1-->

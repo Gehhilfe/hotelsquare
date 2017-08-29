@@ -173,7 +173,8 @@ public class ProfileFragment extends Fragment {
                                                 avatarPicture.setImageBitmap(bitmap);
                                             }, throwable -> Log.d(LOG_TAG, throwable.getMessage())
                                             );
-                                }
+                                } else
+                                    avatarPicture.setImageResource(R.mipmap.user_avatar);
 
                             progressDialog.dismiss();
                             },

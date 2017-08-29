@@ -46,7 +46,7 @@ public class FriendRequestFragment extends Fragment {
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-        friendRequestRecyclerViewAdapter = new FriendRequestRecyclerViewAdapter(getContext());
+        friendRequestRecyclerViewAdapter = new FriendRequestRecyclerViewAdapter(getContext(), getActivity());
         recyclerView.setAdapter(friendRequestRecyclerViewAdapter);
 
         // Starts to load more data pages from the server depending on the scroll position.
