@@ -74,7 +74,7 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder implements V
 
             //this.image.setVisibility(View.GONE);
         }
-        this.rating.setText(String.valueOf(searchResult.getRating()));
+        this.rating.setText(context.getString(R.string.rating) + ": " + String.valueOf(searchResult.getRating()));
 
     }
     @Override

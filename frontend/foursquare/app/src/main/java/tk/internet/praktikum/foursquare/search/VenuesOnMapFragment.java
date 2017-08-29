@@ -171,7 +171,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                     tvTitle.setText(venue.getName());
 
                     TextView tvRate = ((TextView) myContentsView.findViewById(R.id.rate));
-                    tvRate.setText(Float.toString(venue.getRating()));
+                    tvRate.setText(getString(R.string.rating) + ": " + Float.toString(venue.getRating()));
 
                     TextView tvOpen = ((TextView) myContentsView.findViewById(R.id.isopen));
                     if (venue.isOpen()) {
@@ -525,7 +525,7 @@ public class VenuesOnMapFragment extends Fragment implements OnMapReadyCallback 
                         .subscribe(nearbyFriends -> {
                                     friends = nearbyFriends;
                                     for (User f : friends) {
-                                        // for every user
+                                        Log.d("IMPORT", "Nearby: " + friends.size());
                                         updateFriendsLocation(f);
                                     }
                                 },
