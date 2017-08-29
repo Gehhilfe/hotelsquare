@@ -268,6 +268,7 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
         //||!(openNow_button.isChecked() &&lastOpenNow)
         if(!query.equals(lastQuery) || isQueryFromFastSearch) {
             isQueryFromFastSearch=false;
+            getActivity().getCurrentFocus().clearFocus();
             resetParameters();
             deepSearch();
 
@@ -345,7 +346,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             Log.d(LOG,"ischecked: "+openNow_button.isChecked());
             lastOpenNow=openNow_button.isChecked();
             price=updatePrice();
-            //Toast.makeText(getContext(),"price: "+price,Toast.LENGTH_SHORT).show();
             venueSearchQuery.setOnlyOpen(openNow_button.isChecked());
             venueSearchQuery.setPrice(price);
             VenueService venueService = ServiceFactory.createRetrofitService(VenueService.class, URL);
@@ -698,5 +698,6 @@ public class DeepSearchFragment extends Fragment implements android.support.v7.w
             this.isSearch = b;
         }
     }
+
 
 }
