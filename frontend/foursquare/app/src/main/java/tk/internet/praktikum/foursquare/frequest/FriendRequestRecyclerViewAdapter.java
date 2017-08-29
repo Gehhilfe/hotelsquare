@@ -2,6 +2,7 @@ package tk.internet.praktikum.foursquare.frequest;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,15 +30,15 @@ import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
-public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerViewAdapter.HomeViewHolder> {
+public class FriendRequestRecyclerViewAdapter extends RecyclerView.Adapter<FriendRequestRecyclerViewAdapter.HomeViewHolder> {
 
     class HomeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView requst;
+        private TextView request;
         private ImageView accept, decline, avatar;
 
         public HomeViewHolder(View itemView) {
             super(itemView);
-            requst = (TextView) itemView.findViewById(R.id.home_entry_text);
+            request = (TextView) itemView.findViewById(R.id.home_entry_text);
             accept = (ImageView) itemView.findViewById(R.id.home_friend_request_accept);
             decline = (ImageView) itemView.findViewById(R.id.home_friend_request_decline);
             avatar = (ImageView) itemView.findViewById(R.id.home_avatar);
@@ -55,6 +56,9 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
             }
         }
 
+        /**
+         * Accepts the selected friend request
+         */
         private void acceptFriendRequest() {
             ProfileService service = ServiceFactory
                     .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -66,19 +70,22 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 user -> {
-                                    Toast.makeText(context, "Friend request accepted!", Toast.LENGTH_SHORT).show();
-                                    friendRequestList.remove(getAdapterPosition());
+                                    if (context != null) {
+                                        Toast.makeText(context, context.getString(R.string.accept_friend_request), Toast.LENGTH_SHORT).show();
+                                    }
+                                        friendRequestList.remove(getAdapterPosition());
                                     notifyDataSetChanged();
                                 },
-                                throwable -> {
-                                    Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
+                                throwable -> Log.d(LOG, throwable.getMessage())
                         );
             }catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
+        /**
+         * Declines the selected friend request.
+         */
         private void declineFriendRequest() {
             ProfileService service = ServiceFactory
                     .createRetrofitService(ProfileService.class, URL, LocalStorage.
@@ -90,13 +97,13 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 user -> {
-                                    Toast.makeText(context, "Friend request declined!", Toast.LENGTH_SHORT).show();
+                                    if (context != null) {
+                                        Toast.makeText(context, context.getString(R.string.decline_friend_request), Toast.LENGTH_SHORT).show();
+                                    }
                                     friendRequestList.remove(getAdapterPosition());
                                     notifyDataSetChanged();
                                 },
-                                throwable -> {
-                                    Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
+                                throwable -> Log.d(LOG, throwable.getMessage())
                         );
             }catch (Exception e) {
                 e.printStackTrace();
@@ -104,6 +111,7 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         }
     }
 
+    private static final String LOG = FriendRequestRecyclerViewAdapter.class.getSimpleName();
     private Context context;
     private LayoutInflater inflater;
     private List<FriendRequest> friendRequestList;
@@ -112,7 +120,7 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.y HH:mm",  Locale.ENGLISH);
     private final String URL = "https://dev.ip.stimi.ovh/";
 
-    public HomeRecyclerViewAdapter(Context context) {
+    FriendRequestRecyclerViewAdapter(Context context) {
         inflater = LayoutInflater.from(context);
         this.context = context;
         friendRequestList = new ArrayList<>();
@@ -122,7 +130,6 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     @Override
     public HomeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.home_entry, parent, false);
-
         return new HomeViewHolder(view);
     }
 
@@ -137,6 +144,7 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                 idNameMap.put(friendRequestList.get(position).getSenderID(), user.getName());
             }
 
+        // Load the avatar.
         if (currentUser.getAvatar() != null) {
             ImageCacheLoader imageCacheLoader = new ImageCacheLoader(context);
             imageCacheLoader.loadBitmap(currentUser.getAvatar(), ImageSize.LARGE)
@@ -145,15 +153,13 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                     .subscribe(bitmap -> {
                                 holder.avatar.setImageBitmap(bitmap);
                             },
-                            throwable -> {
-                                Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            throwable -> Log.d(LOG, throwable.getMessage())
                     );
         } else {
             holder.avatar.setImageResource(R.mipmap.user_avatar);
         }
 
-        holder.requst.setText(SIMPLE_DATE_FORMAT.format(currentFriendRequest.getCreatedAt()) + "\n" + currentUser.getName());
+        holder.request.setText(SIMPLE_DATE_FORMAT.format(currentFriendRequest.getCreatedAt()) + "\n" + currentUser.getName());
     }
 
     @Override
@@ -161,20 +167,22 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         return friendRequestList.size();
     }
 
-    public void setResults(List<FriendRequest> requests, List<User> users) {
-        friendRequestList = new ArrayList<>(requests);
-        userList = new ArrayList<>(users);
-        notifyDataSetChanged();
-    }
-
-    public void updateData(List<FriendRequest> requests, List<User> users) {
+    /**
+     * Updates the current list of friend requests.
+     * @param requests new friend requests.
+     * @param users list of persons who sent the requests.
+     */
+    void updateData(List<FriendRequest> requests, List<User> users) {
         friendRequestList.addAll(requests);
         userList.addAll(users);
         notifyDataSetChanged();
     }
 
-    public List<User> getUserList() {
+    /**
+     * Returns the current list of friend requests.
+     * @return Current friend requests.
+     */
+    List<User> getUserList() {
         return userList;
     }
-
 }

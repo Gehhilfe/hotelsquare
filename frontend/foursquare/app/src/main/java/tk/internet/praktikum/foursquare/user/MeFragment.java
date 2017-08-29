@@ -19,7 +19,7 @@ import tk.internet.praktikum.foursquare.MainActivity;
 import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.chat.InboxFragment;
 import tk.internet.praktikum.foursquare.friendlist.FriendListFragment;
-import tk.internet.praktikum.foursquare.frequest.HomeFragment;
+import tk.internet.praktikum.foursquare.frequest.FriendRequestFragment;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
 
 
@@ -68,7 +68,7 @@ public class MeFragment extends Fragment {
     }
 
     private void initialiseFragmentContainer(ViewPager container) {
-        userStatePagerAdapter.addFragment(new HomeFragment(), "Home");
+        userStatePagerAdapter.addFragment(new FriendRequestFragment(), "Home");
         userStatePagerAdapter.addFragment(new ProfileFragment(), "Profile");
         userStatePagerAdapter.addFragment(new FriendListFragment(), "Friend list");
         userStatePagerAdapter.addFragment(new InboxFragment(), "Chat");

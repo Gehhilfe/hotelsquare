@@ -135,6 +135,8 @@
     <string name="inbox_no_chats">Zurzeit hast du keine offenen Unterhaltungen.</string>
     <string name="send_friendrequest">Die Freundesanfrage wurde verschickt.</string>
     <string name="pending_friendrequest">Freundschaftanfrage wurde bereits versand.</string>
+    <string name="accept_friend_request">Die Freundschaftanfrage wurde bestätigt!</string>
+    <string name="decline_friend_request">Die Freundschaftanfrage wurde abgelehnt!</string>
 
 
     <!--- C1-->
