@@ -154,8 +154,8 @@
 
 
     <!-- Dialogs -->
-    <string name="register_dialog">Warte auf den Login- Server…</string>
-    <string name="login_dialog">Warte auf den Registrierungs- Server…</string>
+    <string name="register_dialog">Warte auf den Registrierungs- Server…</string>
+    <string name="login_dialog">Warte auf den Login- Server…</string>
     <string name="reset_dialog">Warte auf die Server- Atwort…</string>
     <string name="load_profile">Warte auf die Nutzerinformationen…</string>
     <string name="error_user_data">Die Nutzerinformationen konnten nicht geladen werden.</string>
