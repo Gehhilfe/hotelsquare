@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:scrollHorizontally="false"
                 android:layout_toStartOf="@+id/chat_send"
-                android:hint="Type in your message."
+                android:hint="@string/type_in_your_message"
                 android:maxLines="4"
                 android:inputType="text"
                 android:textColor="@color/black"
