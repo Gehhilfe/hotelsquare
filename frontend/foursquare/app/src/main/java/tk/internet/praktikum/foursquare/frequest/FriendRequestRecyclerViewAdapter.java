@@ -1,6 +1,8 @@
 package tk.internet.praktikum.foursquare.frequest;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import tk.internet.praktikum.foursquare.api.bean.FriendRequestResponse;
 import tk.internet.praktikum.foursquare.api.bean.User;
 import tk.internet.praktikum.foursquare.api.service.ProfileService;
 import tk.internet.praktikum.foursquare.storage.LocalStorage;
+import tk.internet.praktikum.foursquare.user.ProfileActivity;
 
 public class FriendRequestRecyclerViewAdapter extends RecyclerView.Adapter<FriendRequestRecyclerViewAdapter.HomeViewHolder> {
 
@@ -43,6 +46,7 @@ public class FriendRequestRecyclerViewAdapter extends RecyclerView.Adapter<Frien
             decline = (ImageView) itemView.findViewById(R.id.home_friend_request_decline);
             avatar = (ImageView) itemView.findViewById(R.id.home_avatar);
 
+            itemView.setOnClickListener(this);
             accept.setOnClickListener(this);
             decline.setOnClickListener(this);
         }
@@ -53,7 +57,19 @@ public class FriendRequestRecyclerViewAdapter extends RecyclerView.Adapter<Frien
                 acceptFriendRequest();
             } else if (v.getId() == R.id.home_friend_request_decline) {
                 declineFriendRequest();
+            } else {
+                loadProfile();
             }
+        }
+
+        /**
+         * Loads the profile of the selected user.
+         */
+        private void loadProfile() {
+            Intent intent = new Intent(context, ProfileActivity.class);
+            intent.putExtra("userID", friendRequestList.get(getAdapterPosition()).getSenderID());
+            intent.putExtra("Parent", "UserActivity");
+            activity.startActivity(intent);
         }
 
         /**
@@ -119,9 +135,11 @@ public class FriendRequestRecyclerViewAdapter extends RecyclerView.Adapter<Frien
     private HashMap<String, String> idNameMap = new HashMap<>();
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d.M.y HH:mm",  Locale.ENGLISH);
     private final String URL = "https://dev.ip.stimi.ovh/";
+    private Activity activity;
 
-    FriendRequestRecyclerViewAdapter(Context context) {
+    FriendRequestRecyclerViewAdapter(Context context, Activity activity) {
         inflater = LayoutInflater.from(context);
+        this.activity = activity;
         this.context = context;
         friendRequestList = new ArrayList<>();
         userList = new ArrayList<>();

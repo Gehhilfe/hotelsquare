@@ -190,12 +190,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }
+
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             int lastBackStackEntryPosition = getSupportFragmentManager().getBackStackEntryCount() - 2;
             if (lastBackStackEntryPosition >= 0) {
                 FragmentManager.BackStackEntry lastBackStackEntry =
                         getSupportFragmentManager().getBackStackEntryAt(lastBackStackEntryPosition);
-                setTitle(lastBackStackEntry.getName());
+
+                if (lastBackStackEntry.getName() == fastSearchMenu.getTitle())
+                    setTitle("Hotlesquare");
+                else
+                    setTitle(lastBackStackEntry.getName());
                 getSupportFragmentManager().popBackStack();
             }
         } else {

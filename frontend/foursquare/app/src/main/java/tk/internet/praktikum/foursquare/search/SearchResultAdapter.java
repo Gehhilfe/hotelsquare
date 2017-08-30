@@ -15,10 +15,6 @@ import tk.internet.praktikum.foursquare.R;
 import tk.internet.praktikum.foursquare.VenueInDetailsNestedScrollView;
 import tk.internet.praktikum.foursquare.api.bean.Venue;
 
-/**
- * Created by truongtud on 02.07.2017.
- */
-
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultViewHolder> implements SearchResultAdapterListener{
 
 

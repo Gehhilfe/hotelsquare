@@ -5,9 +5,7 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 
-/**
- * Created by truongtud on 25.08.2017.
- */
+
 @Entity(nameInDb = "suggestionKeyWord")
 
 public class SuggestionKeyWord {

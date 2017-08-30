@@ -13,9 +13,7 @@ import tk.internet.praktikum.foursquare.api.ImageCacheLoader;
 import tk.internet.praktikum.foursquare.api.ImageSize;
 import tk.internet.praktikum.foursquare.api.bean.Image;
 
-/**
- * Created by truongtud on 17.08.2017.
- */
+
 public class VenueImageViewHolder extends RecyclerView.ViewHolder  implements  View.OnClickListener{
     private View view;
     private ImageView venue_image;

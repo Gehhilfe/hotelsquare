@@ -173,6 +173,9 @@
     <string name="load_profile">Loading user information…</string>
     <string name="error_user_data">Couldn\'t load the user data.</string>
     <string name="error_upload_user_data">An error occurred while uploading your user information. Please check your internet connection and try it again.</string>
+    <string name="rating">Rating</string>
+    <string name="type_in_your_message">Type in your message.</string>
+    <string name="venue_search_progress_dialog">Waiting for searching...</string>
 
     <!--- C1-->
     <array name="beer">

@@ -1,8 +1,6 @@
 package tk.internet.praktikum.foursquare.api.bean;
 
-/**
- * Created by truongtud on 18.07.2017.
- */
+
 
 public class Prediction {
     String id;

@@ -2,9 +2,7 @@ package tk.internet.praktikum.foursquare.api.bean;
 
 import java.util.Date;
 
-/**
- * Created by gehhi on 14.08.2017.
- */
+
 
 public class VenueCheckinInformation {
     private String venue;
